@@ -1,0 +1,21 @@
+// ModulCA Database Schema — Minimal for Task 01.
+// Full schema created in Task 02.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Placeholder model for Prisma client generation.
+// Full schema created in Task 02.
+model User {
+  id    String @id @default(cuid())
+  email String @unique
+  name  String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}

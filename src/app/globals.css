@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --color-brand-teal: #1B3A4B;
+    --color-brand-amber: #E8913A;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  *:focus-visible {
+    outline: 2px solid var(--color-brand-amber);
+    outline-offset: 2px;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply inline-flex items-center justify-center rounded-lg
+           bg-brand-teal-800 px-6 py-3 text-sm font-semibold text-white
+           transition-colors hover:bg-brand-teal-700
+           focus-visible:outline focus-visible:outline-2
+           focus-visible:outline-offset-2 focus-visible:outline-brand-amber-500;
+  }
+
+  .btn-accent {
+    @apply inline-flex items-center justify-center rounded-lg
+           bg-brand-amber-500 px-6 py-3 text-sm font-semibold text-white
+           transition-colors hover:bg-brand-amber-600
+           focus-visible:outline focus-visible:outline-2
+           focus-visible:outline-offset-2 focus-visible:outline-brand-teal-800;
+  }
+
+  .btn-outline {
+    @apply inline-flex items-center justify-center rounded-lg
+           border-2 border-brand-teal-800 px-6 py-3 text-sm font-semibold
+           text-brand-teal-800 transition-colors
+           hover:bg-brand-teal-800 hover:text-white;
+  }
+}
