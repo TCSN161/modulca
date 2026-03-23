@@ -5,6 +5,8 @@ const nextConfig = {
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "api.mapbox.com" },
+      { protocol: "https", hostname: "images.unsplash.com" },
+      { protocol: "https", hostname: "image.pollinations.ai" },
     ],
   },
   webpack: (config, { isServer }) => {

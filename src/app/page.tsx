@@ -49,8 +49,8 @@ export default function HomePage() {
             cost estimates. Connect with certified builders when you&apos;re ready.
           </p>
           <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-            <Link href="/register" className="btn-accent px-8 py-4 text-base">
-              Start Designing — It&apos;s Free
+            <Link href="/project/demo/land" className="btn-accent px-8 py-4 text-base">
+              Try the Land Designer
             </Link>
             <Link href="#how-it-works" className="btn-outline px-8 py-4 text-base">
               See How It Works
