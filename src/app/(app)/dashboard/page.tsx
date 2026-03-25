@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 import Link from "next/link";
 
 const MAX_FREE_PROJECTS = 3;
@@ -15,6 +16,7 @@ interface SavedProject {
 }
 
 export default function DashboardPage() {
+  const router = useRouter();
   const [projects, setProjects] = useState<SavedProject[]>([]);
   const [showUpgrade, setShowUpgrade] = useState(false);
 
@@ -36,7 +38,7 @@ export default function DashboardPage() {
     const data = localStorage.getItem(`modulca-design-${id}`);
     if (data) {
       localStorage.setItem("modulca-design", data);
-      window.location.href = "/project/demo/design";
+      router.push("/project/demo/design");
     }
   };
 
