@@ -14,6 +14,7 @@ export interface FurnitureOverride {
   x?: number;
   z?: number;
   color?: string;
+  rotation?: number; // Y-axis rotation in radians
 }
 
 export interface MoodboardPin {

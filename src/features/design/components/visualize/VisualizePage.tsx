@@ -25,6 +25,7 @@ export default function VisualizePage() {
     styleDirection,
   } = useDesignStore();
   const [viewMode, setViewMode] = useState<ViewMode>("single");
+  const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
   const { saved, handleSave } = useSaveDesign();
 
   useEffect(() => {
@@ -149,10 +150,10 @@ export default function VisualizePage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {viewMode === "single" && (
           /* Left sidebar — furniture list + color picker */
-          <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
+          <aside className="hidden md:block w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto">
             <div className="p-4">
               <h3 className="mb-1 text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Furniture
@@ -272,11 +273,104 @@ export default function VisualizePage() {
 
         {/* Right — config panel (only in single mode) */}
         {viewMode === "single" && (
-          <aside className="w-80 flex-shrink-0 border-l border-gray-200 bg-gray-50">
+          <aside className="hidden md:block w-80 flex-shrink-0 border-l border-gray-200 bg-gray-50">
             {selectedModule && (
               <ConfigPanel moduleRow={selectedModule.row} moduleCol={selectedModule.col} />
             )}
           </aside>
+        )}
+
+        {/* Mobile FAB to toggle sidebars */}
+        {viewMode === "single" && (
+          <div className="md:hidden fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+            <button
+              onClick={() => setMobileSidebar(mobileSidebar === "left" ? null : "left")}
+              className="h-12 w-12 rounded-full bg-brand-teal-800 text-white shadow-lg flex items-center justify-center text-lg"
+              aria-label="Toggle furniture panel"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h7" /></svg>
+            </button>
+            <button
+              onClick={() => setMobileSidebar(mobileSidebar === "right" ? null : "right")}
+              className="h-12 w-12 rounded-full bg-brand-amber-500 text-white shadow-lg flex items-center justify-center text-lg"
+              aria-label="Toggle settings panel"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" /><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /></svg>
+            </button>
+          </div>
+        )}
+
+        {/* Mobile slide-over panel */}
+        {mobileSidebar !== null && (
+          <div className="md:hidden fixed inset-0 z-40">
+            {/* Backdrop */}
+            <div className="absolute inset-0 bg-black/30" onClick={() => setMobileSidebar(null)} />
+            {/* Panel */}
+            <aside
+              className={`absolute top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto transition-transform ${
+                mobileSidebar === "left" ? "left-0" : "right-0"
+              }`}
+            >
+              <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+                <span className="text-sm font-bold text-brand-teal-800">
+                  {mobileSidebar === "left" ? "Furniture" : "Settings"}
+                </span>
+                <button onClick={() => setMobileSidebar(null)} className="text-gray-400 hover:text-gray-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              {mobileSidebar === "left" ? (
+                <div className="p-4">
+                  <h3 className="mb-1 text-xs font-bold text-gray-500 uppercase tracking-wider">Furniture</h3>
+                  <p className="text-[10px] text-gray-400 mb-3">Click a piece in 3D or below to select.</p>
+                  <div className="space-y-1">
+                    {furnitureList.map((item) => {
+                      const isSelected = selectedFurniture === item.id;
+                      const override = currentMod ? (currentMod.furnitureOverrides[currentMod.layoutPreset] ?? {})[item.id] : undefined;
+                      const displayColor = override?.color || item.color;
+                      return (
+                        <button
+                          key={item.id}
+                          onClick={() => setSelectedFurniture(isSelected ? null : item.id)}
+                          className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm transition-all ${
+                            isSelected ? "bg-brand-amber-50 border border-brand-amber-300" : "hover:bg-gray-50 border border-transparent"
+                          }`}
+                        >
+                          <div className="h-4 w-4 rounded border border-gray-200 flex-shrink-0" style={{ backgroundColor: displayColor }} />
+                          <span className={isSelected ? "font-semibold text-brand-teal-800" : "text-gray-600"}>{item.label}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+                  {selectedItem && currentMod && (
+                    <div className="border-t border-gray-200 pt-4 mt-4">
+                      <h4 className="mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">Color — {selectedItem.label}</h4>
+                      <div className="flex flex-wrap gap-2">
+                        {colorPalette.map((c) => {
+                          const override = (currentMod.furnitureOverrides[currentMod.layoutPreset] ?? {})[selectedItem.id];
+                          const currentColor = override?.color || selectedItem.color;
+                          const isActive = currentColor === c.color;
+                          return (
+                            <button
+                              key={c.color}
+                              onClick={() => updateFurnitureOverride(currentMod.row, currentMod.col, selectedItem.id, { color: c.color })}
+                              className={`flex flex-col items-center gap-1 rounded-lg border-2 p-2 transition-all ${isActive ? "border-brand-amber-500" : "border-gray-100 hover:border-gray-200"}`}
+                              title={c.label}
+                            >
+                              <div className="h-8 w-8 rounded" style={{ backgroundColor: c.color }} />
+                              <span className="text-[8px] font-bold text-gray-500 uppercase">{c.label}</span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ) : (
+                selectedModule && <ConfigPanel moduleRow={selectedModule.row} moduleCol={selectedModule.col} />
+              )}
+            </aside>
+          </div>
         )}
       </div>
     </div>

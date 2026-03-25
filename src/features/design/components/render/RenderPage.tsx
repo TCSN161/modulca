@@ -72,6 +72,7 @@ export default function RenderPage() {
 
   const { saved, handleSave } = useSaveDesign();
   const [viewMode, setViewMode] = useState<ViewMode>("single");
+  const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
   const [renderMode, setRenderMode] = useState<RenderMode>("template");
   const [lighting, setLighting] = useState<LightingMode>("daylight");
   const [camera, setCamera] = useState<CameraAngle>("interior");
@@ -217,9 +218,9 @@ export default function RenderPage() {
       </div>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* Left Sidebar */}
-        <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
+        <aside className="hidden md:block w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
           <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Render Settings</h3>
 
           {/* Render mode */}
@@ -500,7 +501,7 @@ export default function RenderPage() {
         </main>
 
         {/* Right Sidebar */}
-        <aside className="w-80 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4">
+        <aside className="hidden md:block w-80 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4">
           <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Render Details</h3>
 
           {currentMod && (
@@ -569,6 +570,141 @@ export default function RenderPage() {
             </div>
           )}
         </aside>
+
+        {/* Mobile FAB to toggle sidebars */}
+        <div className="md:hidden fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+          <button
+            onClick={() => setMobileSidebar(mobileSidebar === "left" ? null : "left")}
+            className="h-12 w-12 rounded-full bg-brand-teal-800 text-white shadow-lg flex items-center justify-center"
+            aria-label="Toggle render settings"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" /></svg>
+          </button>
+          <button
+            onClick={() => setMobileSidebar(mobileSidebar === "right" ? null : "right")}
+            className="h-12 w-12 rounded-full bg-brand-amber-500 text-white shadow-lg flex items-center justify-center"
+            aria-label="Toggle render details"
+          >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+          </button>
+        </div>
+
+        {/* Mobile slide-over panel */}
+        {mobileSidebar !== null && (
+          <div className="md:hidden fixed inset-0 z-40">
+            <div className="absolute inset-0 bg-black/30" onClick={() => setMobileSidebar(null)} />
+            <aside
+              className={`absolute top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto ${
+                mobileSidebar === "left" ? "left-0" : "right-0"
+              }`}
+            >
+              <div className="flex items-center justify-between border-b border-gray-200 px-4 py-3">
+                <span className="text-sm font-bold text-brand-teal-800">
+                  {mobileSidebar === "left" ? "Render Settings" : "Render Details"}
+                </span>
+                <button onClick={() => setMobileSidebar(null)} className="text-gray-400 hover:text-gray-600">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+                </button>
+              </div>
+              {mobileSidebar === "left" ? (
+                <div className="p-4">
+                  <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Render Settings</h3>
+                  <div className="mb-5">
+                    <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">Mode</label>
+                    <div className="flex rounded-lg border border-gray-200 overflow-hidden">
+                      <button onClick={() => setRenderMode("template")}
+                        className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${renderMode === "template" ? "bg-brand-amber-500 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}>
+                        3D Render
+                      </button>
+                      <button onClick={() => setRenderMode("ai")}
+                        className={`flex-1 px-3 py-2 text-xs font-medium transition-colors ${renderMode === "ai" ? "bg-brand-amber-500 text-white" : "bg-white text-gray-600 hover:bg-gray-50"}`}>
+                        AI Premium
+                      </button>
+                    </div>
+                  </div>
+                  <div className="mb-5">
+                    <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">Lighting</label>
+                    <div className="flex gap-1">
+                      {(["daylight", "evening", "night"] as LightingMode[]).map((l) => (
+                        <button key={l} onClick={() => setLighting(l)}
+                          className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors ${lighting === l ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                          {l}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div className="mb-5">
+                    <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">Camera</label>
+                    <div className="flex gap-1">
+                      {(["interior", "corner", "detail"] as CameraAngle[]).map((c) => (
+                        <button key={c} onClick={() => setCamera(c)}
+                          className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors ${camera === c ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                          {c}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  {renderMode === "template" ? (
+                    <button
+                      onClick={handleGenerateRender}
+                      disabled={isRendering}
+                      className="w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors disabled:opacity-50"
+                    >
+                      {isRendering ? "Rendering..." : "Generate Render"}
+                    </button>
+                  ) : (
+                    <>
+                      <div className="mb-3">
+                        <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Prompt</label>
+                        <textarea
+                          value={aiPrompt}
+                          onChange={(e) => setAiPrompt(e.target.value)}
+                          rows={5}
+                          className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none resize-none"
+                          placeholder="Describe the render you want..."
+                        />
+                      </div>
+                      <button
+                        onClick={handleGenerateAiRender}
+                        disabled={aiLoading || !aiPrompt.trim()}
+                        className="w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors disabled:opacity-50"
+                      >
+                        {aiLoading ? "Generating..." : "Generate AI Render"}
+                      </button>
+                    </>
+                  )}
+                </div>
+              ) : (
+                <div className="p-4">
+                  <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Render Details</h3>
+                  {currentMod && (
+                    <div className="space-y-5">
+                      <div className="rounded-lg bg-gray-50 p-3 space-y-2">
+                        <div className="text-[10px] font-bold text-gray-400 uppercase">Current Module</div>
+                        <div className="flex items-center gap-2">
+                          <div className="h-4 w-4 rounded" style={{ backgroundColor: moduleType?.color || "#888" }} />
+                          <span className="text-sm font-semibold text-brand-teal-800">{currentMod.label}</span>
+                        </div>
+                        <div className="text-xs text-gray-500">Style: {style?.label || "Default"}</div>
+                      </div>
+                      <div className="rounded-lg bg-gray-50 p-3 space-y-2">
+                        <div className="text-[10px] font-bold text-gray-400 uppercase">Cost Summary</div>
+                        <div className="mt-1 flex justify-between text-sm font-bold text-brand-teal-800">
+                          <span>Total</span>
+                          <span>&euro;{stats.totalEstimate.toLocaleString()}</span>
+                        </div>
+                      </div>
+                      <Link href="/project/demo/technical"
+                        className="block w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-center text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors">
+                        CONTINUE →
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </aside>
+          </div>
+        )}
       </div>
     </div>
   );

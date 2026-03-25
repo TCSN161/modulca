@@ -391,19 +391,22 @@ function DetailedFurniture({ w, h, d, color, label }: { w: number; h: number; d:
   );
 }
 
-function FurniturePiece({ item, colorOverride }: { item: FurnitureItem; colorOverride?: string }) {
+function FurniturePiece({ item, colorOverride, rotationOverride }: { item: FurnitureItem; colorOverride?: string; rotationOverride?: number }) {
   const c = colorOverride || item.color;
+  const rotY = rotationOverride ?? 0;
   return (
     <group
       position={[item.x + item.width / 2, item.height / 2, item.z + item.depth / 2]}
     >
-      <DetailedFurniture
-        w={item.width}
-        h={item.height}
-        d={item.depth}
-        color={c}
-        label={item.label}
-      />
+      <group rotation={[0, rotY, 0]}>
+        <DetailedFurniture
+          w={item.width}
+          h={item.height}
+          d={item.depth}
+          color={c}
+          label={item.label}
+        />
+      </group>
     </group>
   );
 }
@@ -475,13 +478,17 @@ function SceneContent({ module, lighting, camera, showPlants }: SceneContentProp
         <Walls color={wallColor} showFront={camera !== "interior"} wallConfigs={module.wallConfigs} />
         <Ceiling />
 
-        {furniture.map((item) => (
-          <FurniturePiece
-            key={item.id}
-            item={item}
-            colorOverride={(module.furnitureOverrides?.[module.layoutPreset] ?? {})[item.id]?.color}
-          />
-        ))}
+        {furniture.map((item) => {
+          const ovr = (module.furnitureOverrides?.[module.layoutPreset] ?? {})[item.id];
+          return (
+            <FurniturePiece
+              key={item.id}
+              item={item}
+              colorOverride={ovr?.color}
+              rotationOverride={ovr?.rotation}
+            />
+          );
+        })}
 
         {/* Plants */}
         {showPlants && (

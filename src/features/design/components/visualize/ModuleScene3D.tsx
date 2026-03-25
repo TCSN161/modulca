@@ -545,11 +545,12 @@ function FurniturePiece({
   const posX = override?.x ?? item.x;
   const posZ = override?.z ?? item.z;
   const displayColor = override?.color ?? item.color;
+  const rotationY = override?.rotation ?? 0;
   const halfH = item.height / 2;
 
   return (
     <group position={[posX + item.width / 2, halfH, posZ + item.depth / 2]}>
-      {/* Invisible hitbox for interaction */}
+      {/* Invisible hitbox for interaction (not rotated so drag stays consistent) */}
       <mesh
         visible={false}
         onPointerOver={(e) => {
@@ -570,35 +571,54 @@ function FurniturePiece({
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
-      {/* Detailed geometry */}
-      <DetailedFurniture
-        w={item.width}
-        h={item.height}
-        d={item.depth}
-        color={displayColor}
-        label={item.label}
-      />
+      {/* Rotated group containing furniture geometry */}
+      <group rotation={[0, rotationY, 0]}>
+        {/* Detailed geometry */}
+        <DetailedFurniture
+          w={item.width}
+          h={item.height}
+          d={item.depth}
+          color={displayColor}
+          label={item.label}
+        />
 
-      {/* Hover/selection glow overlay */}
-      {(hovered || isSelected) && (
-        <mesh>
-          <boxGeometry args={[item.width, item.height, item.depth]} />
-          <meshStandardMaterial
-            color={displayColor}
-            transparent
-            opacity={0.15}
-            emissive={isSelected ? "#4488ff" : "#666666"}
-            emissiveIntensity={isSelected ? 0.5 : 0.2}
-          />
-        </mesh>
-      )}
+        {/* Hover/selection glow overlay */}
+        {(hovered || isSelected) && (
+          <mesh>
+            <boxGeometry args={[item.width, item.height, item.depth]} />
+            <meshStandardMaterial
+              color={displayColor}
+              transparent
+              opacity={0.15}
+              emissive={isSelected ? "#4488ff" : "#666666"}
+              emissiveIntensity={isSelected ? 0.5 : 0.2}
+            />
+          </mesh>
+        )}
 
-      {/* Selection wireframe outline */}
+        {/* Selection wireframe outline */}
+        {isSelected && (
+          <mesh>
+            <boxGeometry args={[item.width + 0.02, item.height + 0.02, item.depth + 0.02]} />
+            <meshBasicMaterial color="#4488ff" wireframe />
+          </mesh>
+        )}
+      </group>
+
+      {/* Rotation indicator ring on top of selected furniture */}
       {isSelected && (
-        <mesh>
-          <boxGeometry args={[item.width + 0.02, item.height + 0.02, item.depth + 0.02]} />
-          <meshBasicMaterial color="#4488ff" wireframe />
-        </mesh>
+        <group position={[0, halfH + 0.05, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+          {/* Circular ring */}
+          <mesh>
+            <torusGeometry args={[Math.max(item.width, item.depth) * 0.4, 0.012, 8, 32]} />
+            <meshBasicMaterial color="#4488ff" transparent opacity={0.6} />
+          </mesh>
+          {/* Arrow head to indicate rotation direction */}
+          <mesh position={[Math.max(item.width, item.depth) * 0.4, 0, 0.01]} rotation={[0, 0, -Math.PI / 4]}>
+            <coneGeometry args={[0.04, 0.08, 6]} />
+            <meshBasicMaterial color="#4488ff" transparent opacity={0.7} />
+          </mesh>
+        </group>
       )}
 
       {/* Shadow / highlight disc under dragged piece */}
@@ -673,6 +693,19 @@ function SceneContent({ module, furniture, floorColor, wallColor }: SceneContent
       const STEP_NORMAL = 0.05;
       const STEP_SHIFT = 0.2;
 
+      // Rotation: R key
+      if (e.key === "r" || e.key === "R") {
+        e.preventDefault();
+        const rotStep = e.shiftKey ? Math.PI / 4 : Math.PI / 2; // 45 or 90 degrees
+        const presetOvrRot = module.furnitureOverrides[module.layoutPreset] ?? {};
+        const overrideRot = presetOvrRot[selectedFurniture];
+        const curRot = overrideRot?.rotation ?? 0;
+        updateFurnitureOverride(module.row, module.col, selectedFurniture, {
+          rotation: curRot + rotStep,
+        });
+        return;
+      }
+
       let dx = 0;
       let dz = 0;
 
@@ -713,7 +746,7 @@ function SceneContent({ module, furniture, floorColor, wallColor }: SceneContent
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [selectedFurniture, furniture, module.furnitureOverrides, module.row, module.col, clampPos, updateFurnitureOverride]);
+  }, [selectedFurniture, furniture, module.furnitureOverrides, module.layoutPreset, module.row, module.col, clampPos, updateFurnitureOverride]);
 
   /* ---- drag handlers ---- */
 
@@ -856,22 +889,42 @@ export default function ModuleScene3D({ module }: ModuleScene3DProps) {
   const wallColor = WALL_MATERIALS.find((w) => w.id === module.wallColor)?.color || "#F0EDE5";
 
   return (
-    <Canvas
-      shadows
-      camera={{
-        position: [5.5, 4.5, 5.5],
-        fov: 35,
-        near: 0.1,
-        far: 100,
-      }}
-      style={{ background: "#f8f8f6" }}
-    >
-      <SceneContent
-        module={module}
-        furniture={furniture}
-        floorColor={floorColor}
-        wallColor={wallColor}
-      />
-    </Canvas>
+    <div style={{ position: "relative", width: "100%", height: "100%" }}>
+      <Canvas
+        shadows
+        camera={{
+          position: [5.5, 4.5, 5.5],
+          fov: 35,
+          near: 0.1,
+          far: 100,
+        }}
+        style={{ background: "#f8f8f6", width: "100%", height: "100%" }}
+      >
+        <SceneContent
+          module={module}
+          furniture={furniture}
+          floorColor={floorColor}
+          wallColor={wallColor}
+        />
+      </Canvas>
+      {/* Controls hint overlay */}
+      <div
+        style={{
+          position: "absolute",
+          bottom: 12,
+          left: 12,
+          background: "rgba(0,0,0,0.5)",
+          backdropFilter: "blur(4px)",
+          color: "#fff",
+          padding: "6px 12px",
+          borderRadius: 8,
+          fontSize: 11,
+          pointerEvents: "none",
+          lineHeight: 1.4,
+        }}
+      >
+        Click to select &bull; Arrow keys to move &bull; R to rotate
+      </div>
+    </div>
   );
 }
