@@ -40,8 +40,8 @@ export default function VisualizePage() {
   }, [modules, selectedModule, setSelectedModule]);
 
   const currentMod = selectedModule
-    ? modules.find((m) => m.row === selectedModule.row && m.col === selectedModule.col)
-    : null;
+    ? modules.find((m) => m.row === selectedModule.row && m.col === selectedModule.col) ?? null
+    : modules.length > 0 ? modules[0] : null;
 
   const preset = currentMod ? getPreset(currentMod.moduleType, currentMod.layoutPreset) : null;
   const furnitureList = preset?.furniture || [];

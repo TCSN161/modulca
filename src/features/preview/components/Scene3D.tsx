@@ -111,7 +111,7 @@ function GrassGround() {
       position={[0, -0.01, 0]}
       receiveShadow
     >
-      <planeGeometry args={[100, 100, 80, 80]} />
+      <planeGeometry args={[30, 30, 24, 24]} />
       <meshStandardMaterial vertexColors roughness={0.95} />
     </mesh>
   );
@@ -121,7 +121,7 @@ function GrassGround() {
 function GrassGrid() {
   return (
     <gridHelper
-      args={[100, 40, "#6b9960", "#5a8a50"]}
+      args={[30, 10, "#6b9960", "#5a8a50"]}
       position={[0, 0.01, 0]}
     />
   );
@@ -200,7 +200,7 @@ export default function Scene3D() {
 
       {/* Sky / environment */}
       <color attach="background" args={["#b8d4e8"]} />
-      <fog attach="fog" args={["#b8d4e8", 40, 90]} />
+      <fog attach="fog" args={["#b8d4e8", 200, 500]} />
       <Environment preset="park" background={false} />
 
       {/* Grass ground */}

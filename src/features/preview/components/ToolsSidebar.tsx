@@ -4,11 +4,6 @@ import { useState } from "react";
 
 const TOOLS = [
   { id: "select", label: "SELECT", icon: "▸" },
-  { id: "walls", label: "WALLS", icon: "▦" },
-  { id: "columns", label: "COLUMNS", icon: "┼" },
-  { id: "beams", label: "BEAMS", icon: "─" },
-  { id: "slabs", label: "SLABS", icon: "◇" },
-  { id: "windows", label: "WINDOWS", icon: "⊞" },
 ];
 
 const BOTTOM_TOOLS = [

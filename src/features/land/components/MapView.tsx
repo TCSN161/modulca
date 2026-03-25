@@ -24,7 +24,7 @@ const TILE_LAYERS: Record<
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri",
     maxZoom: 22,
-    maxNativeZoom: 19,
+    maxNativeZoom: 18,
   },
   streets: {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
@@ -37,7 +37,7 @@ const TILE_LAYERS: Record<
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri",
     maxZoom: 22,
-    maxNativeZoom: 19,
+    maxNativeZoom: 18,
   },
 };
 

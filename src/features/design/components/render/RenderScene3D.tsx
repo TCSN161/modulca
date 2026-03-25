@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import type { ModuleConfig } from "../../store";
@@ -35,29 +35,106 @@ function Floor({ color }: { color: string }) {
   );
 }
 
-function Walls({ color, showFront }: { color: string; showFront: boolean }) {
+const DOOR_W = 0.9;
+const DOOR_H = 2.1;
+const WIN_W = 1.2;
+const WIN_H = 1.0;
+const WIN_SILL = 0.9;
+
+/** Build a single wall with optional window/door opening */
+function WallWithType({
+  position, size, wallType, color, transparent,
+}: {
+  position: [number, number, number];
+  size: [number, number, number]; // width, height, thickness
+  wallType: string;
+  color: string;
+  transparent?: boolean;
+}) {
+  const [w, h, t] = size;
+  const mat = <meshStandardMaterial color={color} roughness={0.5} transparent={transparent} opacity={transparent ? 0.3 : 1} />;
+
+  if (wallType === "none" || wallType === "shared") return null;
+
+  if (wallType === "solid") {
+    return (
+      <mesh position={position} castShadow receiveShadow>
+        <boxGeometry args={[w, h, t]} />
+        {mat}
+      </mesh>
+    );
+  }
+
+  // For window/door, we build segments around the opening
+  const isHorizontal = w > t; // wall runs along X
+  const wallLen = isHorizontal ? w : t;
+  const wallThick = isHorizontal ? t : w;
+
+  if (wallType === "window") {
+    const gapW = Math.min(WIN_W, wallLen * 0.5);
+    const sideW = (wallLen - gapW) / 2;
+    const topH = h - WIN_SILL - WIN_H;
+    const segs: React.ReactElement[] = [];
+    // Left segment
+    if (isHorizontal) {
+      segs.push(<mesh key="l" position={[position[0] - wallLen / 2 + sideW / 2, position[1], position[2]]} castShadow><boxGeometry args={[sideW, h, wallThick]} />{mat}</mesh>);
+      segs.push(<mesh key="r" position={[position[0] + wallLen / 2 - sideW / 2, position[1], position[2]]} castShadow><boxGeometry args={[sideW, h, wallThick]} />{mat}</mesh>);
+      segs.push(<mesh key="b" position={[position[0], position[1] - h / 2 + WIN_SILL / 2, position[2]]} castShadow><boxGeometry args={[gapW, WIN_SILL, wallThick]} />{mat}</mesh>);
+      if (topH > 0) segs.push(<mesh key="t" position={[position[0], position[1] + h / 2 - topH / 2, position[2]]} castShadow><boxGeometry args={[gapW, topH, wallThick]} />{mat}</mesh>);
+      // Glass
+      segs.push(<mesh key="g" position={[position[0], position[1] - h / 2 + WIN_SILL + WIN_H / 2, position[2]]}><boxGeometry args={[gapW, WIN_H, wallThick * 0.3]} /><meshStandardMaterial color="#a8d4e6" transparent opacity={0.4} roughness={0.1} metalness={0.3} /></mesh>);
+    } else {
+      segs.push(<mesh key="l" position={[position[0], position[1], position[2] - wallLen / 2 + sideW / 2]} castShadow><boxGeometry args={[wallThick, h, sideW]} />{mat}</mesh>);
+      segs.push(<mesh key="r" position={[position[0], position[1], position[2] + wallLen / 2 - sideW / 2]} castShadow><boxGeometry args={[wallThick, h, sideW]} />{mat}</mesh>);
+      segs.push(<mesh key="b" position={[position[0], position[1] - h / 2 + WIN_SILL / 2, position[2]]} castShadow><boxGeometry args={[wallThick, WIN_SILL, gapW]} />{mat}</mesh>);
+      if (topH > 0) segs.push(<mesh key="t" position={[position[0], position[1] + h / 2 - topH / 2, position[2]]} castShadow><boxGeometry args={[wallThick, topH, gapW]} />{mat}</mesh>);
+      segs.push(<mesh key="g" position={[position[0], position[1] - h / 2 + WIN_SILL + WIN_H / 2, position[2]]}><boxGeometry args={[wallThick * 0.3, WIN_H, gapW]} /><meshStandardMaterial color="#a8d4e6" transparent opacity={0.4} roughness={0.1} metalness={0.3} /></mesh>);
+    }
+    return <group>{segs}</group>;
+  }
+
+  if (wallType === "door") {
+    const gapW = Math.min(DOOR_W, wallLen * 0.4);
+    const sideW = (wallLen - gapW) / 2;
+    const topH = h - DOOR_H;
+    const segs: React.ReactElement[] = [];
+    if (isHorizontal) {
+      segs.push(<mesh key="l" position={[position[0] - wallLen / 2 + sideW / 2, position[1], position[2]]} castShadow><boxGeometry args={[sideW, h, wallThick]} />{mat}</mesh>);
+      segs.push(<mesh key="r" position={[position[0] + wallLen / 2 - sideW / 2, position[1], position[2]]} castShadow><boxGeometry args={[sideW, h, wallThick]} />{mat}</mesh>);
+      if (topH > 0) segs.push(<mesh key="t" position={[position[0], position[1] + h / 2 - topH / 2, position[2]]} castShadow><boxGeometry args={[gapW, topH, wallThick]} />{mat}</mesh>);
+    } else {
+      segs.push(<mesh key="l" position={[position[0], position[1], position[2] - wallLen / 2 + sideW / 2]} castShadow><boxGeometry args={[wallThick, h, sideW]} />{mat}</mesh>);
+      segs.push(<mesh key="r" position={[position[0], position[1], position[2] + wallLen / 2 - sideW / 2]} castShadow><boxGeometry args={[wallThick, h, sideW]} />{mat}</mesh>);
+      if (topH > 0) segs.push(<mesh key="t" position={[position[0], position[1] + h / 2 - topH / 2, position[2]]} castShadow><boxGeometry args={[wallThick, topH, gapW]} />{mat}</mesh>);
+    }
+    return <group>{segs}</group>;
+  }
+
+  // Fallback solid
+  return (
+    <mesh position={position} castShadow receiveShadow>
+      <boxGeometry args={[w, h, t]} />
+      {mat}
+    </mesh>
+  );
+}
+
+function Walls({ color, showFront, wallConfigs }: { color: string; showFront: boolean; wallConfigs?: { north: string; south: string; east: string; west: string } }) {
   const h = WALL_HEIGHT / 2;
   const t = WALL_THICKNESS / 2;
   const s = MODULE_SIZE / 2;
+  const wc = wallConfigs ?? { north: "solid", south: "solid", east: "solid", west: "solid" };
   return (
     <group>
-      <mesh position={[s, h, t]} castShadow receiveShadow>
-        <boxGeometry args={[MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS]} />
-        <meshStandardMaterial color={color} roughness={0.5} />
-      </mesh>
-      <mesh position={[t, h, s]} castShadow receiveShadow>
-        <boxGeometry args={[WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE]} />
-        <meshStandardMaterial color={color} roughness={0.5} />
-      </mesh>
-      <mesh position={[MODULE_SIZE - t, h, s]} castShadow receiveShadow>
-        <boxGeometry args={[WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE]} />
-        <meshStandardMaterial color={color} roughness={0.5} />
-      </mesh>
+      {/* North wall (z=0) */}
+      <WallWithType position={[s, h, t]} size={[MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS]} wallType={wc.north} color={color} />
+      {/* West wall (x=0) */}
+      <WallWithType position={[t, h, s]} size={[WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE]} wallType={wc.west} color={color} />
+      {/* East wall */}
+      <WallWithType position={[MODULE_SIZE - t, h, s]} size={[WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE]} wallType={wc.east} color={color} />
+      {/* South wall (front) */}
       {showFront && (
-        <mesh position={[s, h, MODULE_SIZE - t]} castShadow receiveShadow>
-          <boxGeometry args={[MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS]} />
-          <meshStandardMaterial color={color} roughness={0.5} transparent opacity={0.3} />
-        </mesh>
+        <WallWithType position={[s, h, MODULE_SIZE - t]} size={[MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS]} wallType={wc.south} color={color} transparent />
       )}
     </group>
   );
@@ -141,7 +218,7 @@ function SceneContent({ module, lighting, camera, showPlants }: SceneContentProp
 
       <group position={[-MODULE_SIZE / 2, 0, -MODULE_SIZE / 2]}>
         <Floor color={floorColor} />
-        <Walls color={wallColor} showFront={camera !== "interior"} />
+        <Walls color={wallColor} showFront={camera !== "interior"} wallConfigs={module.wallConfigs} />
         <Ceiling />
 
         {furniture.map((item) => (

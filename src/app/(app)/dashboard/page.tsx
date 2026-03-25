@@ -38,8 +38,8 @@ export default function DashboardPage() {
     const data = localStorage.getItem(`modulca-design-${id}`);
     if (data) {
       localStorage.setItem("modulca-design", data);
-      router.push("/project/demo/design");
     }
+    router.push("/project/demo/land");
   };
 
   return (

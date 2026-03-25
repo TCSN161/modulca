@@ -1,7 +1,10 @@
+// Future: Integrate with retailer APIs (Sketchfab for 3D, affiliate links for purchases)
+// Note: IKEA does NOT have a free public API for 3D models or product data — their assets are proprietary.
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useDesignStore } from "../../store";
 import { useLandStore } from "@/features/land/store";
 import StepNav from "../shared/StepNav";
@@ -46,6 +49,7 @@ interface Product {
   icon: LucideIcon;
   iconColor: string;
   bgColor: string;
+  image: string;
 }
 
 interface SelectedProduct {
@@ -105,6 +109,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Grid3X3,
     iconColor: "#92400E",
     bgColor: "#FEF3C7",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop",
   },
   {
     id: "fin-02",
@@ -115,6 +120,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Fence,
     iconColor: "#6B7280",
     bgColor: "#F3F4F6",
+    image: "https://images.unsplash.com/photo-1615873968403-89e068629265?w=400&h=300&fit=crop",
   },
   {
     id: "fin-03",
@@ -125,6 +131,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Layers,
     iconColor: "#2563EB",
     bgColor: "#DBEAFE",
+    image: "https://images.unsplash.com/photo-1504307651254-35680f356dfd?w=400&h=300&fit=crop",
   },
   {
     id: "fin-04",
@@ -135,6 +142,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Frame,
     iconColor: "#0891B2",
     bgColor: "#CFFAFE",
+    image: "https://images.unsplash.com/photo-1604871000636-074fa5117945?w=400&h=300&fit=crop",
   },
   {
     id: "fin-05",
@@ -145,6 +153,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: DoorOpen,
     iconColor: "#7C3AED",
     bgColor: "#EDE9FE",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop&q=80",
   },
   {
     id: "fin-06",
@@ -155,6 +164,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Layers,
     iconColor: "#D97706",
     bgColor: "#FEF9C3",
+    image: "https://images.unsplash.com/photo-1607400201889-565b1ee75f8e?w=400&h=300&fit=crop",
   },
   {
     id: "fin-07",
@@ -165,6 +175,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: PaintBucket,
     iconColor: "#059669",
     bgColor: "#D1FAE5",
+    image: "https://images.unsplash.com/photo-1589939705384-5185137a7f0f?w=400&h=300&fit=crop",
   },
   {
     id: "fin-08",
@@ -175,6 +186,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Grid3X3,
     iconColor: "#64748B",
     bgColor: "#F1F5F9",
+    image: "https://images.unsplash.com/photo-1502672260266-1c1ef2d93688?w=400&h=300&fit=crop",
   },
 
   // ── Furniture & Decor ──
@@ -187,6 +199,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Sofa,
     iconColor: "#6B7280",
     bgColor: "#F3F4F6",
+    image: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&h=300&fit=crop",
   },
   {
     id: "fur-02",
@@ -197,6 +210,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Grid3X3,
     iconColor: "#92400E",
     bgColor: "#FEF3C7",
+    image: "https://images.unsplash.com/photo-1600166898405-da9535204843?w=400&h=300&fit=crop",
   },
   {
     id: "fur-03",
@@ -207,6 +221,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Blinds,
     iconColor: "#7C3AED",
     bgColor: "#EDE9FE",
+    image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400&h=300&fit=crop",
   },
   {
     id: "fur-04",
@@ -217,6 +232,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Frame,
     iconColor: "#DC2626",
     bgColor: "#FEE2E2",
+    image: "https://images.unsplash.com/photo-1612196808214-b7e239e5bb89?w=400&h=300&fit=crop",
   },
   {
     id: "fur-05",
@@ -227,6 +243,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: BookOpen,
     iconColor: "#92400E",
     bgColor: "#FEF3C7",
+    image: "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&h=300&fit=crop",
   },
   {
     id: "fur-06",
@@ -237,6 +254,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Lamp,
     iconColor: "#D97706",
     bgColor: "#FEF9C3",
+    image: "https://images.unsplash.com/photo-1507473885765-e6ed057ab6fe?w=400&h=300&fit=crop",
   },
   {
     id: "fur-07",
@@ -247,6 +265,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: CircleDot,
     iconColor: "#B45309",
     bgColor: "#FDE68A",
+    image: "https://images.unsplash.com/photo-1618220179428-22790b461013?w=400&h=300&fit=crop",
   },
   {
     id: "fur-08",
@@ -257,6 +276,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Armchair,
     iconColor: "#059669",
     bgColor: "#D1FAE5",
+    image: "https://images.unsplash.com/photo-1503602642458-232111445657?w=400&h=300&fit=crop",
   },
 
   // ── Plumbing & Electrical ──
@@ -269,6 +289,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Bath,
     iconColor: "#2563EB",
     bgColor: "#DBEAFE",
+    image: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&h=300&fit=crop",
   },
   {
     id: "plm-02",
@@ -279,6 +300,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Droplets,
     iconColor: "#0891B2",
     bgColor: "#CFFAFE",
+    image: "https://images.unsplash.com/photo-1585128792020-803d29415281?w=400&h=300&fit=crop",
   },
   {
     id: "plm-03",
@@ -289,6 +311,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: CircleDot,
     iconColor: "#6B7280",
     bgColor: "#F3F4F6",
+    image: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&h=300&fit=crop",
   },
   {
     id: "plm-04",
@@ -299,6 +322,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: CircleDot,
     iconColor: "#7C3AED",
     bgColor: "#EDE9FE",
+    image: "https://images.unsplash.com/photo-1564540586988-aa4e53ab3394?w=400&h=300&fit=crop",
   },
   {
     id: "plm-05",
@@ -309,6 +333,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: ShowerHead,
     iconColor: "#2563EB",
     bgColor: "#DBEAFE",
+    image: "https://images.unsplash.com/photo-1620626011761-996317b8d101?w=400&h=300&fit=crop",
   },
   {
     id: "plm-06",
@@ -319,6 +344,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Plug,
     iconColor: "#D97706",
     bgColor: "#FEF9C3",
+    image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop&q=70",
   },
   {
     id: "plm-07",
@@ -329,6 +355,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: ToggleLeft,
     iconColor: "#64748B",
     bgColor: "#F1F5F9",
+    image: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=400&h=300&fit=crop",
   },
   {
     id: "plm-08",
@@ -339,6 +366,7 @@ const ALL_PRODUCTS: Product[] = [
     icon: Lightbulb,
     iconColor: "#D97706",
     bgColor: "#FEF9C3",
+    image: "https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=400&h=300&fit=crop",
   },
   {
     id: "plm-09",
@@ -349,8 +377,121 @@ const ALL_PRODUCTS: Product[] = [
     icon: Flame,
     iconColor: "#DC2626",
     bgColor: "#FEE2E2",
+    image: "https://images.unsplash.com/photo-1585128792020-803d29415281?w=400&h=300&fit=crop&q=70",
   },
 ];
+
+// ─── Product Detail Modal ────────────────────────────────────
+
+function ProductDetailModal({
+  product,
+  quantity,
+  onClose,
+  onAdd,
+  onUpdateQuantity,
+}: {
+  product: Product;
+  quantity: number;
+  onClose: () => void;
+  onAdd: (product: Product) => void;
+  onUpdateQuantity: (productId: string, delta: number) => void;
+}) {
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl shadow-2xl max-w-lg w-full mx-4 overflow-hidden animate-in fade-in zoom-in-95 duration-200"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <div className="relative">
+          <div className="relative w-full h-64">
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              className="object-cover"
+              sizes="(max-width: 512px) 100vw, 512px"
+              unoptimized
+            />
+          </div>
+          <button
+            onClick={onClose}
+            className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/90 hover:bg-white flex items-center justify-center shadow-md transition-colors"
+          >
+            <X size={16} className="text-gray-700" />
+          </button>
+        </div>
+
+        {/* Content */}
+        <div className="p-6">
+          <h2 className="text-lg font-bold text-[#1B3A4B]">{product.name}</h2>
+          <p className="text-sm text-gray-500 mt-2 leading-relaxed">
+            {product.description}
+          </p>
+
+          {/* Price */}
+          <div className="mt-4">
+            <span className="text-2xl font-bold text-[#E8913A]">
+              &euro;{product.price.toLocaleString()}
+            </span>
+            <span className="text-sm text-gray-400 ml-1">per unit</span>
+          </div>
+
+          {/* Quantity Selector */}
+          <div className="flex items-center gap-4 mt-5">
+            <span className="text-sm font-medium text-gray-700">Quantity:</span>
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => {
+                  if (quantity > 0) onUpdateQuantity(product.id, -1);
+                }}
+                disabled={quantity === 0}
+                className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center transition-colors"
+              >
+                <Minus size={14} />
+              </button>
+              <span className="text-base font-bold text-gray-900 w-8 text-center">
+                {quantity}
+              </span>
+              <button
+                onClick={() => {
+                  if (quantity > 0) {
+                    onUpdateQuantity(product.id, 1);
+                  } else {
+                    onAdd(product);
+                  }
+                }}
+                className="w-8 h-8 rounded-lg bg-gray-100 hover:bg-gray-200 flex items-center justify-center transition-colors"
+              >
+                <Plus size={14} />
+              </button>
+            </div>
+            {quantity > 0 && (
+              <span className="text-sm text-gray-400">
+                Subtotal: &euro;{(product.price * quantity).toLocaleString()}
+              </span>
+            )}
+          </div>
+
+          {/* Add to Project Button */}
+          <button
+            onClick={() => {
+              onAdd(product);
+              onClose();
+            }}
+            className="mt-6 w-full py-3 rounded-xl bg-[#1B3A4B] text-white text-sm font-semibold hover:bg-[#24516b] transition-colors flex items-center justify-center gap-2"
+          >
+            <Plus size={16} />
+            {quantity > 0 ? "Add Another to Project" : "Add to Project"}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
 
 // ─── Component ───────────────────────────────────────────────
 
@@ -361,6 +502,7 @@ export default function ProductsPage() {
   const [activeCategory, setActiveCategory] = useState<CategoryId>("finishing");
   const [selectedProducts, setSelectedProducts] = useState<SelectedProduct[]>([]);
   const [initialized, setInitialized] = useState(false);
+  const [detailProduct, setDetailProduct] = useState<Product | null>(null);
 
   // Import modules from grid if store is empty
   useEffect(() => {
@@ -502,22 +644,22 @@ export default function ProductsPage() {
           {/* ── Product Grid ── */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {filteredProducts.map((product) => {
-              const Icon = product.icon;
               const qty = getQuantity(product.id);
               return (
                 <div
                   key={product.id}
-                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col"
+                  className="bg-white rounded-xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow flex flex-col cursor-pointer group"
+                  onClick={() => setDetailProduct(product)}
                 >
-                  {/* Icon Placeholder */}
-                  <div
-                    className="w-full h-36 flex items-center justify-center"
-                    style={{ backgroundColor: product.bgColor }}
-                  >
-                    <Icon
-                      size={40}
-                      style={{ color: product.iconColor }}
-                      strokeWidth={1.5}
+                  {/* Product Image */}
+                  <div className="relative w-full h-36 overflow-hidden">
+                    <Image
+                      src={product.image}
+                      alt={product.name}
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                      unoptimized
                     />
                   </div>
 
@@ -526,7 +668,7 @@ export default function ProductsPage() {
                     <h3 className="font-bold text-sm text-gray-900 leading-tight">
                       {product.name}
                     </h3>
-                    <p className="text-xs text-gray-500 mt-1 leading-relaxed flex-1">
+                    <p className="text-xs text-gray-500 mt-1 leading-relaxed flex-1 line-clamp-2">
                       {product.description}
                     </p>
 
@@ -544,7 +686,10 @@ export default function ProductsPage() {
 
                     {/* Add Button */}
                     <button
-                      onClick={() => addProduct(product)}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        addProduct(product);
+                      }}
                       className={`mt-3 w-full py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${
                         qty > 0
                           ? "bg-[#1B3A4B] text-white hover:bg-[#24516b]"
@@ -586,66 +731,73 @@ export default function ProductsPage() {
             </div>
           ) : (
             <div className="flex-1 space-y-2 mb-4 overflow-y-auto">
-              {selectedProducts.map((s) => {
-                const Icon = s.product.icon;
-                return (
-                  <div
-                    key={s.product.id}
-                    className="flex items-start gap-2 p-2.5 bg-gray-50 rounded-lg"
-                  >
-                    {/* Icon */}
-                    <div
-                      className="w-9 h-9 rounded flex items-center justify-center shrink-0"
-                      style={{ backgroundColor: s.product.bgColor }}
-                    >
-                      <Icon
-                        size={16}
-                        style={{ color: s.product.iconColor }}
-                        strokeWidth={1.5}
-                      />
-                    </div>
-
-                    {/* Details */}
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs font-medium text-gray-900 truncate">
-                        {s.product.name}
-                      </p>
-                      <p className="text-[10px] text-[#E8913A] font-semibold">
-                        &euro;{s.product.price.toLocaleString()} &times;{" "}
-                        {s.quantity} ={" "}
-                        &euro;{(s.product.price * s.quantity).toLocaleString()}
-                      </p>
-
-                      {/* Quantity Controls */}
-                      <div className="flex items-center gap-1 mt-1">
-                        <button
-                          onClick={() => updateQuantity(s.product.id, -1)}
-                          className="w-5 h-5 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
-                        >
-                          <Minus size={10} />
-                        </button>
-                        <span className="text-[11px] font-semibold text-gray-700 w-5 text-center">
-                          {s.quantity}
-                        </span>
-                        <button
-                          onClick={() => updateQuantity(s.product.id, 1)}
-                          className="w-5 h-5 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
-                        >
-                          <Plus size={10} />
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Remove */}
-                    <button
-                      onClick={() => removeProduct(s.product.id)}
-                      className="text-gray-400 hover:text-red-500 shrink-0 mt-0.5 transition-colors"
-                    >
-                      <X size={14} />
-                    </button>
+              {selectedProducts.map((s) => (
+                <div
+                  key={s.product.id}
+                  className="flex items-start gap-2 p-2.5 bg-gray-50 rounded-lg cursor-pointer hover:bg-gray-100 transition-colors"
+                  onClick={() => setDetailProduct(s.product)}
+                >
+                  {/* Thumbnail */}
+                  <div className="w-9 h-9 rounded overflow-hidden shrink-0 relative">
+                    <Image
+                      src={s.product.image}
+                      alt={s.product.name}
+                      fill
+                      className="object-cover"
+                      sizes="36px"
+                      unoptimized
+                    />
                   </div>
-                );
-              })}
+
+                  {/* Details */}
+                  <div className="min-w-0 flex-1">
+                    <p className="text-xs font-medium text-gray-900 truncate">
+                      {s.product.name}
+                    </p>
+                    <p className="text-[10px] text-[#E8913A] font-semibold">
+                      &euro;{s.product.price.toLocaleString()} &times;{" "}
+                      {s.quantity} ={" "}
+                      &euro;{(s.product.price * s.quantity).toLocaleString()}
+                    </p>
+
+                    {/* Quantity Controls */}
+                    <div className="flex items-center gap-1 mt-1">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(s.product.id, -1);
+                        }}
+                        className="w-5 h-5 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
+                      >
+                        <Minus size={10} />
+                      </button>
+                      <span className="text-[11px] font-semibold text-gray-700 w-5 text-center">
+                        {s.quantity}
+                      </span>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          updateQuantity(s.product.id, 1);
+                        }}
+                        className="w-5 h-5 rounded bg-gray-200 hover:bg-gray-300 flex items-center justify-center transition-colors"
+                      >
+                        <Plus size={10} />
+                      </button>
+                    </div>
+                  </div>
+
+                  {/* Remove */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      removeProduct(s.product.id);
+                    }}
+                    className="text-gray-400 hover:text-red-500 shrink-0 mt-0.5 transition-colors"
+                  >
+                    <X size={14} />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
 
@@ -709,6 +861,17 @@ export default function ProductsPage() {
           </div>
         </aside>
       </div>
+
+      {/* ── Product Detail Modal ── */}
+      {detailProduct && (
+        <ProductDetailModal
+          product={detailProduct}
+          quantity={getQuantity(detailProduct.id)}
+          onClose={() => setDetailProduct(null)}
+          onAdd={addProduct}
+          onUpdateQuantity={updateQuantity}
+        />
+      )}
     </div>
   );
 }

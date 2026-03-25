@@ -262,6 +262,10 @@ function MovementController({
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       keysRef.current.add(e.code);
+      // Prevent default for Space (page scroll) and movement keys while in pointer lock
+      if (e.code === "Space" || e.code === "ControlLeft" || e.code === "ControlRight") {
+        e.preventDefault();
+      }
     };
     const onKeyUp = (e: KeyboardEvent) => {
       keysRef.current.delete(e.code);
@@ -286,9 +290,19 @@ function MovementController({
     if (keys.has("KeyA") || keys.has("ArrowLeft")) dir.x -= 1;
     if (keys.has("KeyD") || keys.has("ArrowRight")) dir.x += 1;
 
-    if (dir.lengthSq() === 0) return;
+    // Vertical movement with Space (up) and Ctrl (down)
+    const wantsUp = keys.has("Space");
+    const wantsDown = keys.has("ControlLeft") || keys.has("ControlRight");
+    let verticalDelta = 0;
+    if (wantsUp) verticalDelta += 1;
+    if (wantsDown) verticalDelta -= 1;
 
-    dir.normalize();
+    const hasHorizontal = dir.lengthSq() > 0;
+    if (!hasHorizontal && verticalDelta === 0) return;
+
+    if (hasHorizontal) {
+      dir.normalize();
+    }
 
     // Get camera's forward and right vectors projected to XZ plane
     const forward = new THREE.Vector3();
@@ -303,14 +317,25 @@ function MovementController({
     vel.set(0, 0, 0);
     vel.addScaledVector(right, dir.x);
     vel.addScaledVector(forward, -dir.z);
-    vel.normalize();
+    if (vel.lengthSq() > 0) {
+      vel.normalize();
+    }
     vel.multiplyScalar(MOVE_SPEED * delta);
 
     // Free movement — no wall collision, camera passes through all walls
     camera.position.x += vel.x;
     camera.position.z += vel.z;
 
-    camera.position.y = EYE_HEIGHT;
+    // Apply vertical movement — clamp between 0.5 and WALL_HEIGHT * 2
+    const MIN_Y = 0.5;
+    const MAX_Y = WALL_HEIGHT * 2;
+    if (verticalDelta !== 0) {
+      camera.position.y += verticalDelta * MOVE_SPEED * delta;
+      camera.position.y = Math.max(MIN_Y, Math.min(MAX_Y, camera.position.y));
+    } else {
+      // No vertical key pressed — maintain current Y (don't snap to EYE_HEIGHT)
+    }
+
     cameraPositionRef.current.copy(camera.position);
   });
 
