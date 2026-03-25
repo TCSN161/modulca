@@ -18,24 +18,35 @@ import { MODULE_TYPES } from "@/shared/types";
 
 const TILE_LAYERS: Record<
   MapLayer,
-  { url: string; attribution: string; maxZoom: number }
+  { url: string; attribution: string; maxZoom: number; maxNativeZoom: number }
 > = {
   satellite: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri",
     maxZoom: 22,
+    maxNativeZoom: 19,
   },
   streets: {
     url: "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
     attribution:
       '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-    maxZoom: 20,
+    maxZoom: 22,
+    maxNativeZoom: 19,
   },
   hybrid: {
     url: "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
     attribution: "Tiles &copy; Esri",
     maxZoom: 22,
+    maxNativeZoom: 19,
   },
+};
+
+/* Street labels overlay for satellite/hybrid modes */
+const LABELS_OVERLAY = {
+  url: "https://stamen-tiles.a.ssl.fastly.net/toner-labels/{z}/{x}/{y}.png",
+  attribution: "Labels &copy; Stamen Design",
+  maxZoom: 22,
+  maxNativeZoom: 18,
 };
 
 /** Handle map click events for polygon drawing */
@@ -109,6 +120,18 @@ function GridOverlay() {
   );
 }
 
+/** Sync map center/zoom when store changes (e.g. from address search) */
+function MapSync() {
+  const map = useMap();
+  const { mapCenter, mapZoom } = useLandStore();
+
+  useEffect(() => {
+    map.flyTo([mapCenter.lat, mapCenter.lng], mapZoom, { duration: 1.5 });
+  }, [map, mapCenter.lat, mapCenter.lng, mapZoom]);
+
+  return null;
+}
+
 /** Fit map to polygon bounds */
 function FitBounds() {
   const map = useMap();
@@ -143,9 +166,22 @@ export default function MapView() {
         url={tile.url}
         attribution={tile.attribution}
         maxZoom={tile.maxZoom}
-        maxNativeZoom={tile.maxZoom}
+        maxNativeZoom={tile.maxNativeZoom}
       />
 
+      {/* Street/city labels on top of satellite and hybrid views */}
+      {(mapLayer === "satellite" || mapLayer === "hybrid") && (
+        <TileLayer
+          key={`${mapLayer}-labels`}
+          url={LABELS_OVERLAY.url}
+          attribution={LABELS_OVERLAY.attribution}
+          maxZoom={LABELS_OVERLAY.maxZoom}
+          maxNativeZoom={LABELS_OVERLAY.maxNativeZoom}
+          pane="overlayPane"
+        />
+      )}
+
+      <MapSync />
       <DrawHandler />
       <FitBounds />
 

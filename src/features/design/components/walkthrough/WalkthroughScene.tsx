@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useEffect, useMemo, useCallback, type ReactElement } from "react";
+import { useRef, useEffect, useMemo, type ReactElement } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PointerLockControls } from "@react-three/drei";
 import { useDesignStore } from "../../store";
@@ -86,6 +86,11 @@ function buildWall(
     return walls;
   }
 
+  if (wallType === "shared") {
+    // Shared walls between modules — fully open, no geometry at all
+    return walls;
+  }
+
   if (wallType === "solid" || wallType === "window") {
     // Solid wall (window has a wall with glass pane — simplified as solid in 3D walkthrough)
     walls.push(
@@ -94,7 +99,7 @@ function buildWall(
     return walls;
   }
 
-  // "shared" or "door" — wall with door opening
+  // "door" — wall with door opening
   const wallLen = isHorizontal ? fullSize[0] : fullSize[2];
   const doorLeft = (wallLen - DOOR_WIDTH) / 2;
   const doorRight = doorLeft + DOOR_WIDTH;
@@ -241,41 +246,11 @@ function FurnitureBox({
 /* ------------------------------------------------------------------ */
 
 interface MovementControllerProps {
-  modules: ModuleConfig[];
   controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
 }
 
-/** Check if a wall between two adjacent modules allows passage */
-function canPassThrough(
-  modules: ModuleConfig[],
-  fromRow: number,
-  fromCol: number,
-  toRow: number,
-  toCol: number,
-): boolean {
-  const fromMod = modules.find((m) => m.row === fromRow && m.col === fromCol);
-  const toMod = modules.find((m) => m.row === toRow && m.col === toCol);
-  if (!fromMod || !toMod) return false;
-
-  // Determine which wall side connects these modules
-  const dr = toRow - fromRow;
-  const dc = toCol - fromCol;
-
-  let fromSide: "north" | "south" | "east" | "west";
-  if (dr === -1 && dc === 0) fromSide = "north";
-  else if (dr === 1 && dc === 0) fromSide = "south";
-  else if (dr === 0 && dc === -1) fromSide = "west";
-  else if (dr === 0 && dc === 1) fromSide = "east";
-  else return false;
-
-  const wallType = fromMod.wallConfigs[fromSide];
-  // Allow passage through shared walls (door opening), doors, and open walls
-  return wallType === "shared" || wallType === "door" || wallType === "none";
-}
-
 function MovementController({
-  modules,
   controlsRef,
   cameraPositionRef,
 }: MovementControllerProps) {
@@ -283,19 +258,6 @@ function MovementController({
   const keysRef = useRef<Set<string>>(new Set());
   const velocityRef = useRef(new THREE.Vector3());
   const directionRef = useRef(new THREE.Vector3());
-
-  // Build bounding boxes for all modules (with smaller margin for walkable area)
-  const bounds = useMemo(() => {
-    const margin = 0.15;
-    return modules.map((m) => ({
-      row: m.row,
-      col: m.col,
-      minX: m.col * MODULE_SIZE + margin,
-      maxX: (m.col + 1) * MODULE_SIZE - margin,
-      minZ: m.row * MODULE_SIZE + margin,
-      maxZ: (m.row + 1) * MODULE_SIZE - margin,
-    }));
-  }, [modules]);
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -311,41 +273,6 @@ function MovementController({
       window.removeEventListener("keyup", onKeyUp);
     };
   }, []);
-
-  /** Find which module contains a point */
-  const getModuleAt = useCallback(
-    (x: number, z: number) => {
-      const col = Math.floor(x / MODULE_SIZE);
-      const row = Math.floor(z / MODULE_SIZE);
-      return modules.find((m) => m.row === row && m.col === col);
-    },
-    [modules],
-  );
-
-  /** Check if position is walkable (inside a module or passing through an open wall) */
-  const isWalkable = useCallback(
-    (x: number, z: number, fromX: number, fromZ: number): boolean => {
-      // First check: inside any module's bounds
-      const inBounds = bounds.some(
-        (b) => x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ,
-      );
-      if (inBounds) return true;
-
-      // Second check: in the transition zone between two modules
-      // Find current module and target module
-      const fromMod = getModuleAt(fromX, fromZ);
-      const toCol = Math.floor(x / MODULE_SIZE);
-      const toRow = Math.floor(z / MODULE_SIZE);
-      const toMod = modules.find((m) => m.row === toRow && m.col === toCol);
-
-      if (fromMod && toMod && fromMod !== toMod) {
-        return canPassThrough(modules, fromMod.row, fromMod.col, toMod.row, toMod.col);
-      }
-
-      return false;
-    },
-    [bounds, modules, getModuleAt],
-  );
 
   useFrame((_, delta) => {
     if (!controlsRef.current?.isLocked) return;
@@ -379,20 +306,9 @@ function MovementController({
     vel.normalize();
     vel.multiplyScalar(MOVE_SPEED * delta);
 
-    const newX = camera.position.x + vel.x;
-    const newZ = camera.position.z + vel.z;
-    const curX = camera.position.x;
-    const curZ = camera.position.z;
-
-    // Collision: move if destination is walkable (inside module or through passable wall)
-    if (isWalkable(newX, newZ, curX, curZ)) {
-      camera.position.x = newX;
-      camera.position.z = newZ;
-    } else if (isWalkable(newX, curZ, curX, curZ)) {
-      camera.position.x = newX;
-    } else if (isWalkable(curX, newZ, curX, curZ)) {
-      camera.position.z = newZ;
-    }
+    // Free movement — no wall collision, camera passes through all walls
+    camera.position.x += vel.x;
+    camera.position.z += vel.z;
 
     camera.position.y = EYE_HEIGHT;
     cameraPositionRef.current.copy(camera.position);
@@ -489,7 +405,8 @@ function SceneContent({
 
             {/* Furniture */}
             {furniture.map((item) => {
-              const override = mod.furnitureOverrides[item.id];
+              const presetOverrides = mod.furnitureOverrides[mod.layoutPreset] ?? {};
+              const override = presetOverrides[item.id];
               return (
                 <FurnitureBox
                   key={`${mod.row}-${mod.col}-${item.id}`}
@@ -507,7 +424,6 @@ function SceneContent({
       {/* First-person controls */}
       <PointerLockControls ref={controlsRef} />
       <MovementController
-        modules={modules}
         controlsRef={controlsRef}
         cameraPositionRef={cameraPositionRef}
       />

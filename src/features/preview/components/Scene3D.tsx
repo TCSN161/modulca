@@ -2,7 +2,7 @@
 
 import { useRef, useState, useEffect } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { OrbitControls, PerspectiveCamera, ContactShadows } from "@react-three/drei";
+import { OrbitControls, PerspectiveCamera, ContactShadows, Environment } from "@react-three/drei";
 import { useDesignStore } from "@/features/design/store";
 import { MODULE_TYPES } from "@/shared/types";
 import * as THREE from "three";
@@ -62,6 +62,68 @@ function ModuleBox({ position, color, isSelected, onClick }: ModuleBoxProps) {
         </lineSegments>
       )}
     </mesh>
+  );
+}
+
+const GRASS_COLOR = new THREE.Color("#4a7c3f");
+const GRASS_COLOR_LIGHT = new THREE.Color("#5a9a4a");
+const GRASS_COLOR_DARK = new THREE.Color("#3a6630");
+
+/** Procedural grass ground with subtle vertex-color variation */
+function GrassGround() {
+  const meshRef = useRef<THREE.Mesh>(null);
+
+  useEffect(() => {
+    if (!meshRef.current) return;
+    const geo = meshRef.current.geometry;
+    const posAttr = geo.getAttribute("position");
+    const count = posAttr.count;
+    const colors = new Float32Array(count * 3);
+    const c = new THREE.Color();
+
+    for (let i = 0; i < count; i++) {
+      // Pseudorandom variation per vertex based on position
+      const x = posAttr.getX(i);
+      const y = posAttr.getY(i);
+      const noise =
+        Math.sin(x * 1.7 + y * 2.3) * 0.3 +
+        Math.sin(x * 4.1 - y * 3.7) * 0.15 +
+        Math.cos(x * 0.5 + y * 0.8) * 0.15;
+      const t = noise * 0.5 + 0.5; // normalize to 0..1
+
+      if (t < 0.5) {
+        c.lerpColors(GRASS_COLOR_DARK, GRASS_COLOR, t * 2);
+      } else {
+        c.lerpColors(GRASS_COLOR, GRASS_COLOR_LIGHT, (t - 0.5) * 2);
+      }
+      colors[i * 3] = c.r;
+      colors[i * 3 + 1] = c.g;
+      colors[i * 3 + 2] = c.b;
+    }
+
+    geo.setAttribute("color", new THREE.BufferAttribute(colors, 3));
+  }, []);
+
+  return (
+    <mesh
+      ref={meshRef}
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, -0.01, 0]}
+      receiveShadow
+    >
+      <planeGeometry args={[100, 100, 80, 80]} />
+      <meshStandardMaterial vertexColors roughness={0.95} />
+    </mesh>
+  );
+}
+
+/** Subtle grid overlay on the grass to give spatial reference */
+function GrassGrid() {
+  return (
+    <gridHelper
+      args={[100, 40, "#6b9960", "#5a8a50"]}
+      position={[0, 0.01, 0]}
+    />
   );
 }
 
@@ -136,11 +198,14 @@ export default function Scene3D() {
         shadow-mapSize-height={2048}
       />
 
-      {/* Ground plane */}
-      <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
-        <planeGeometry args={[50, 50]} />
-        <meshStandardMaterial color="#e8e8e0" />
-      </mesh>
+      {/* Sky / environment */}
+      <color attach="background" args={["#b8d4e8"]} />
+      <fog attach="fog" args={["#b8d4e8", 40, 90]} />
+      <Environment preset="park" background={false} />
+
+      {/* Grass ground */}
+      <GrassGround />
+      <GrassGrid />
 
       {/* Contact shadows */}
       <ContactShadows
@@ -171,11 +236,6 @@ export default function Scene3D() {
         );
       })}
 
-      {/* Grid helper on ground */}
-      <gridHelper
-        args={[30, 10, "#ccc", "#e5e5e5"]}
-        position={[0, 0.01, 0]}
-      />
     </Canvas>
   );
 }

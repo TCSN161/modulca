@@ -538,7 +538,8 @@ function SceneContent({ module, furniture, floorColor, wallColor }: SceneContent
       if (!item) return;
 
       const step = e.shiftKey ? STEP_SHIFT : STEP_NORMAL;
-      const override = module.furnitureOverrides[selectedFurniture];
+      const presetOvr = module.furnitureOverrides[module.layoutPreset] ?? {};
+      const override = presetOvr[selectedFurniture];
       const curX = override?.x ?? item.x;
       const curZ = override?.z ?? item.z;
 
@@ -561,7 +562,8 @@ function SceneContent({ module, furniture, floorColor, wallColor }: SceneContent
       (e as any).nativeEvent?.target?.setPointerCapture?.((e as any).nativeEvent?.pointerId);
 
       const roomPt = toRoomCoords(e);
-      const overridePos = module.furnitureOverrides[item.id];
+      const presetOvrDrag = module.furnitureOverrides[module.layoutPreset] ?? {};
+      const overridePos = presetOvrDrag[item.id];
       const curX = overridePos?.x ?? item.x;
       const curZ = overridePos?.z ?? item.z;
 
@@ -636,7 +638,7 @@ function SceneContent({ module, furniture, floorColor, wallColor }: SceneContent
           <FurniturePiece
             key={item.id}
             item={item}
-            override={module.furnitureOverrides[item.id]}
+            override={(module.furnitureOverrides[module.layoutPreset] ?? {})[item.id]}
             isSelected={selectedFurniture === item.id}
             isDragging={dragging?.id === item.id}
             onSelect={() => setSelectedFurniture(item.id)}

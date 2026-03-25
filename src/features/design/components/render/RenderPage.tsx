@@ -11,10 +11,12 @@ import { MODULE_TYPES } from "@/shared/types";
 import StepNav from "../shared/StepNav";
 
 const RenderScene3D = dynamic(() => import("./RenderScene3D"), { ssr: false });
+const CombinedScene3D = dynamic(() => import("../visualize/CombinedScene3D"), { ssr: false });
 
 type LightingMode = "daylight" | "evening" | "night";
 type CameraAngle = "interior" | "corner" | "detail";
 type RenderMode = "template" | "ai";
+type ViewMode = "single" | "all";
 
 /** Pinterest-style recommendation images per style */
 const STYLE_PINS: Record<string, { label: string; h: number; color: string; cat: string }[]> = {
@@ -69,6 +71,7 @@ export default function RenderPage() {
   } = useDesignStore();
 
   const { saved, handleSave } = useSaveDesign();
+  const [viewMode, setViewMode] = useState<ViewMode>("single");
   const [renderMode, setRenderMode] = useState<RenderMode>("template");
   const [lighting, setLighting] = useState<LightingMode>("daylight");
   const [camera, setCamera] = useState<CameraAngle>("interior");
@@ -112,15 +115,26 @@ export default function RenderPage() {
 
   // Build default AI prompt from module data
   useEffect(() => {
+    const styleName = styleDirection ? (getStyleDirection(styleDirection)?.label || styleDirection) : "modern";
+    if (viewMode === "all") {
+      const moduleLabels = modules.map((m) => {
+        const mt = MODULE_TYPES.find((t) => t.id === m.moduleType);
+        return mt?.label || m.moduleType;
+      });
+      const uniqueLabels = [...new Set(moduleLabels)];
+      setAiPrompt(
+        `Photorealistic exterior and interior render of a modern modular building with ${uniqueLabels.join(", ")} modules, ${styleName} design style, ${lighting} lighting, professional architectural photography, high detail, 8k`
+      );
+      return;
+    }
     if (!currentMod) return;
     const modLabel = MODULE_TYPES.find((mt) => mt.id === currentMod.moduleType)?.label || currentMod.moduleType;
-    const styleName = styleDirection ? (getStyleDirection(styleDirection)?.label || styleDirection) : "modern";
     const floor = FLOOR_MATERIALS.find((f) => f.id === currentMod.floorFinish)?.label || currentMod.floorFinish;
     const wall = WALL_MATERIALS.find((w) => w.id === currentMod.wallColor)?.label || currentMod.wallColor;
     setAiPrompt(
       `Photorealistic interior render of a modern ${modLabel} with ${styleName} design style, ${lighting} lighting, ${floor} flooring, ${wall} walls, professional architectural photography, high detail, 8k`
     );
-  }, [currentMod, styleDirection, lighting]);
+  }, [currentMod, styleDirection, lighting, viewMode, modules]);
 
   // Reset AI image when prompt changes
   useEffect(() => {
@@ -329,11 +343,35 @@ export default function RenderPage() {
         <main className="flex-1 overflow-y-auto p-6">
           {currentMod && (
             <div className="flex flex-col gap-6">
+              {/* View mode toggle */}
+              {modules.length > 1 && (
+                <div className="flex items-center justify-center gap-1 rounded-full bg-gray-100 p-1 mx-auto">
+                  <button
+                    onClick={() => setViewMode("single")}
+                    className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+                      viewMode === "single" ? "bg-white text-brand-teal-800 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    Single Module
+                  </button>
+                  <button
+                    onClick={() => setViewMode("all")}
+                    className={`rounded-full px-4 py-1.5 text-xs font-medium transition-colors ${
+                      viewMode === "all" ? "bg-white text-brand-teal-800 shadow-sm" : "text-gray-500 hover:text-gray-700"
+                    }`}
+                  >
+                    All Modules
+                  </button>
+                </div>
+              )}
+
               {/* Render viewport — fixed 16:9 aspect ratio */}
               <div className="relative mx-auto w-full overflow-hidden rounded-2xl shadow-lg" style={{ maxWidth: 800 }}>
                 <div style={{ aspectRatio: "16/9", position: "relative" }}>
                   {renderedImage ? (
                     <img src={renderedImage} alt="Generated render" className="h-full w-full object-contain bg-gray-900 rounded-2xl" />
+                  ) : viewMode === "all" ? (
+                    <CombinedScene3D />
                   ) : (
                     <RenderScene3D
                       module={currentMod}

@@ -148,7 +148,7 @@ function SceneContent({ module, lighting, camera, showPlants }: SceneContentProp
           <FurniturePiece
             key={item.id}
             item={item}
-            colorOverride={module.furnitureOverrides?.[item.id]?.color}
+            colorOverride={(module.furnitureOverrides?.[module.layoutPreset] ?? {})[item.id]?.color}
           />
         ))}
 

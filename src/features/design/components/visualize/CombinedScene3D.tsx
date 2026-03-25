@@ -722,7 +722,8 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
 
             {/* Furniture */}
             {furniture.map((item) => {
-              const override = mod.furnitureOverrides[item.id];
+              const presetOvr = mod.furnitureOverrides[mod.layoutPreset] ?? {};
+              const override = presetOvr[item.id];
               return (
                 <FurniturePiece
                   key={`${mod.row}-${mod.col}-${item.id}`}

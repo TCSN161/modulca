@@ -165,7 +165,7 @@ export default function VisualizePage() {
               <div className="space-y-1">
                 {furnitureList.map((item) => {
                   const isSelected = selectedFurniture === item.id;
-                  const override = currentMod?.furnitureOverrides[item.id];
+                  const override = currentMod ? (currentMod.furnitureOverrides[currentMod.layoutPreset] ?? {})[item.id] : undefined;
                   const displayColor = override?.color || item.color;
                   return (
                     <button
@@ -198,7 +198,7 @@ export default function VisualizePage() {
                 </h4>
                 <div className="flex flex-wrap gap-2">
                   {colorPalette.map((c) => {
-                    const override = currentMod.furnitureOverrides[selectedItem.id];
+                    const override = (currentMod.furnitureOverrides[currentMod.layoutPreset] ?? {})[selectedItem.id];
                     const currentColor = override?.color || selectedItem.color;
                     const isActive = currentColor === c.color;
                     return (

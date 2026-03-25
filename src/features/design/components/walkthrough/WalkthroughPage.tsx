@@ -287,10 +287,17 @@ export default function WalkthroughPage() {
           </h3>
 
           {/* Instructions */}
-          <div className="mb-4 rounded-lg bg-brand-teal-800/5 p-3">
-            <p className="text-xs text-gray-600 leading-relaxed">
-              Click to start, <strong>WASD</strong> to move, mouse to look
-              around. Press <strong>Esc</strong> to release cursor.
+          <div className="mb-4 rounded-lg bg-brand-teal-800/5 p-3 space-y-2">
+            <p className="text-xs font-bold text-brand-teal-800">How to walk:</p>
+            <ol className="text-xs text-gray-600 leading-relaxed space-y-1 list-decimal list-inside">
+              <li>Click <strong>&quot;Start Tour&quot;</strong> or click on the 3D view</li>
+              <li>Use <strong>WASD</strong> or <strong>Arrow keys</strong> to move</li>
+              <li>Move <strong>mouse</strong> to look around</li>
+              <li>Walk freely through rooms — no wall collision</li>
+              <li>Press <strong>Esc</strong> to release cursor</li>
+            </ol>
+            <p className="text-[10px] text-brand-amber-600 font-medium">
+              💡 Click on any room name below to teleport there instantly
             </p>
           </div>
 
@@ -505,7 +512,7 @@ export default function WalkthroughPage() {
                       className="h-3 w-3 rounded border border-gray-200"
                       style={{
                         backgroundColor:
-                          currentRoom.furnitureOverrides[f.id]?.color ||
+                          (currentRoom.furnitureOverrides[currentRoom.layoutPreset] ?? {})[f.id]?.color ||
                           f.color,
                       }}
                     />

@@ -38,8 +38,14 @@ export interface ModuleConfig {
   layoutPreset: string;
   floorFinish: string;
   wallColor: string;
-  furnitureOverrides: Record<string, FurnitureOverride>;
+  /** Per-preset furniture overrides: layoutPreset → furnitureId → override */
+  furnitureOverrides: Record<string, Record<string, FurnitureOverride>>;
   wallConfigs: WallConfigs;
+}
+
+/** Get the furniture overrides for the module's current layout preset. */
+export function getPresetOverrides(mod: ModuleConfig): Record<string, FurnitureOverride> {
+  return mod.furnitureOverrides[mod.layoutPreset] ?? {};
 }
 
 interface DesignStore {
@@ -232,11 +238,16 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
     set((state) => ({
       modules: state.modules.map((m) => {
         if (m.row !== row || m.col !== col) return m;
+        const presetKey = m.layoutPreset;
+        const existingPreset = m.furnitureOverrides[presetKey] ?? {};
         return {
           ...m,
           furnitureOverrides: {
             ...m.furnitureOverrides,
-            [furnitureId]: { ...m.furnitureOverrides[furnitureId], ...override },
+            [presetKey]: {
+              ...existingPreset,
+              [furnitureId]: { ...existingPreset[furnitureId], ...override },
+            },
           },
         };
       }),
