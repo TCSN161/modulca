@@ -140,17 +140,271 @@ function Walls({ color, showFront, wallConfigs }: { color: string; showFront: bo
   );
 }
 
+/* ------------------------------------------------------------------ */
+/*  Detailed furniture geometry based on label                         */
+/* ------------------------------------------------------------------ */
+
+function darken(hex: string, amount: number): string {
+  const n = parseInt(hex.replace("#", ""), 16);
+  const r = Math.max(0, ((n >> 16) & 0xff) - amount);
+  const g = Math.max(0, ((n >> 8) & 0xff) - amount);
+  const b = Math.max(0, (n & 0xff) - amount);
+  return `#${((r << 16) | (g << 8) | b).toString(16).padStart(6, "0")}`;
+}
+
+function DetailedFurniture({ w, h, d, color, label }: { w: number; h: number; d: number; color: string; label: string }) {
+  const lbl = label.toLowerCase();
+  const legColor = darken(color, 40);
+
+  // Bed: mattress + headboard + 4 legs + pillow
+  if (lbl.includes("bed")) {
+    const legH = 0.12;
+    const mattH = h - legH - 0.08;
+    return (
+      <group>
+        {[[-1,-1],[1,-1],[1,1],[-1,1]].map(([sx,sz], i) => (
+          <mesh key={i} position={[sx*(w/2-0.04), -h/2+legH/2, sz*(d/2-0.04)]}>
+            <cylinderGeometry args={[0.025, 0.025, legH, 8]} />
+            <meshStandardMaterial color={legColor} roughness={0.7} />
+          </mesh>
+        ))}
+        <mesh position={[0, -h/2+legH+mattH/2, 0]} castShadow>
+          <boxGeometry args={[w-0.04, mattH, d-0.04]} />
+          <meshStandardMaterial color={color} roughness={0.8} />
+        </mesh>
+        <mesh position={[0, -h/2+legH+mattH+0.04, -d/2+0.03]} castShadow>
+          <boxGeometry args={[w-0.02, 0.08+mattH*0.3, 0.05]} />
+          <meshStandardMaterial color={legColor} roughness={0.6} />
+        </mesh>
+        <mesh position={[0, -h/2+legH+mattH+0.04, -d/2+0.2]}>
+          <boxGeometry args={[w*0.5, 0.06, 0.18]} />
+          <meshStandardMaterial color="#f0ede5" roughness={0.9} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Sofa/Couch: seat + backrest + armrests
+  if (lbl.includes("sofa") || lbl.includes("couch")) {
+    const seatH = h * 0.4;
+    const backH = h * 0.55;
+    const armW = 0.08;
+    return (
+      <group>
+        <mesh position={[0, -h/2+seatH/2, 0.03]} castShadow>
+          <boxGeometry args={[w-armW*2, seatH, d-0.06]} />
+          <meshStandardMaterial color={color} roughness={0.85} />
+        </mesh>
+        <mesh position={[0, -h/2+seatH+backH/2, -d/2+0.06]} castShadow>
+          <boxGeometry args={[w-armW*2, backH, 0.1]} />
+          <meshStandardMaterial color={color} roughness={0.85} />
+        </mesh>
+        <mesh position={[-w/2+armW/2, -h/2+(seatH+0.06)/2, 0]} castShadow>
+          <boxGeometry args={[armW, seatH+0.06, d]} />
+          <meshStandardMaterial color={legColor} roughness={0.7} />
+        </mesh>
+        <mesh position={[w/2-armW/2, -h/2+(seatH+0.06)/2, 0]} castShadow>
+          <boxGeometry args={[armW, seatH+0.06, d]} />
+          <meshStandardMaterial color={legColor} roughness={0.7} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Table/Desk: thin top + 4 legs
+  if (lbl.includes("table") || lbl.includes("desk")) {
+    const topH = 0.04;
+    const legH = h - topH;
+    return (
+      <group>
+        <mesh position={[0, h/2-topH/2, 0]} castShadow>
+          <boxGeometry args={[w, topH, d]} />
+          <meshStandardMaterial color={color} roughness={0.5} />
+        </mesh>
+        {[[-1,-1],[1,-1],[1,1],[-1,1]].map(([sx,sz], i) => (
+          <mesh key={i} position={[sx*(w/2-0.03), -topH/2, sz*(d/2-0.03)]}>
+            <cylinderGeometry args={[0.02, 0.02, legH, 8]} />
+            <meshStandardMaterial color={legColor} roughness={0.6} />
+          </mesh>
+        ))}
+      </group>
+    );
+  }
+
+  // Chair: seat + 4 legs + back
+  if (lbl.includes("chair")) {
+    const seatH = 0.04;
+    const seatY = h * 0.1;
+    const legH = h/2 + seatY;
+    return (
+      <group>
+        <mesh position={[0, seatY, 0.02]} castShadow>
+          <boxGeometry args={[w, seatH, d-0.04]} />
+          <meshStandardMaterial color={color} roughness={0.6} />
+        </mesh>
+        <mesh position={[0, seatY + (h/2-seatY)/2+seatH/2, -d/2+0.025]} castShadow>
+          <boxGeometry args={[w-0.04, h/2-seatY, 0.03]} />
+          <meshStandardMaterial color={color} roughness={0.6} />
+        </mesh>
+        {[[-1,-1],[1,-1],[1,1],[-1,1]].map(([sx,sz], i) => (
+          <mesh key={i} position={[sx*(w/2-0.03), -h/2+legH/2, sz*(d/2-0.03)]}>
+            <cylinderGeometry args={[0.015, 0.015, legH, 8]} />
+            <meshStandardMaterial color={legColor} roughness={0.6} />
+          </mesh>
+        ))}
+      </group>
+    );
+  }
+
+  // Wardrobe/Closet: tall box with door line
+  if (lbl.includes("wardrobe") || lbl.includes("closet")) {
+    return (
+      <group>
+        <mesh castShadow>
+          <boxGeometry args={[w, h, d]} />
+          <meshStandardMaterial color={color} roughness={0.5} />
+        </mesh>
+        <mesh position={[0, 0, d/2+0.001]}>
+          <planeGeometry args={[0.005, h-0.1]} />
+          <meshBasicMaterial color={legColor} />
+        </mesh>
+        <mesh position={[-0.03, 0, d/2+0.01]}>
+          <sphereGeometry args={[0.015, 8, 8]} />
+          <meshStandardMaterial color={legColor} metalness={0.5} />
+        </mesh>
+        <mesh position={[0.03, 0, d/2+0.01]}>
+          <sphereGeometry args={[0.015, 8, 8]} />
+          <meshStandardMaterial color={legColor} metalness={0.5} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Toilet: base + tank + seat
+  if (lbl.includes("toilet")) {
+    return (
+      <group>
+        <mesh position={[0, -h/2+h*0.2, 0.02]} castShadow>
+          <boxGeometry args={[w*0.7, h*0.4, d*0.7]} />
+          <meshStandardMaterial color="#f0f0f0" roughness={0.3} />
+        </mesh>
+        <mesh position={[0, -h/2+h*0.45, 0.04]} castShadow>
+          <cylinderGeometry args={[w*0.35, w*0.3, 0.06, 16]} />
+          <meshStandardMaterial color={color} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, -h/2+h*0.5, -d/2+0.08]} castShadow>
+          <boxGeometry args={[w*0.6, h*0.45, 0.14]} />
+          <meshStandardMaterial color="#f0f0f0" roughness={0.3} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Shower: tray + glass panel + head
+  if (lbl.includes("shower")) {
+    return (
+      <group>
+        <mesh position={[0, -h/2+0.02, 0]} castShadow>
+          <boxGeometry args={[w, 0.04, d]} />
+          <meshStandardMaterial color="#e0e0e0" roughness={0.2} />
+        </mesh>
+        <mesh position={[w/2-0.02, 0, 0]}>
+          <boxGeometry args={[0.02, h, d]} />
+          <meshStandardMaterial color="#b8d4e3" transparent opacity={0.3} roughness={0.1} />
+        </mesh>
+        <mesh position={[-w/2+0.06, 0, -d/2+0.06]}>
+          <cylinderGeometry args={[0.012, 0.012, h, 8]} />
+          <meshStandardMaterial color="#999" metalness={0.8} />
+        </mesh>
+        <mesh position={[-w/2+0.06, h/2-0.05, -d/2+0.12]}>
+          <sphereGeometry args={[0.04, 12, 12]} />
+          <meshStandardMaterial color="#bbb" metalness={0.8} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Sink: counter + bowl
+  if (lbl.includes("sink")) {
+    return (
+      <group>
+        <mesh position={[0, h/2-0.03, 0]} castShadow>
+          <boxGeometry args={[w, 0.05, d]} />
+          <meshStandardMaterial color={color} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, -0.03, 0]} castShadow>
+          <boxGeometry args={[w-0.02, h-0.06, d-0.02]} />
+          <meshStandardMaterial color={legColor} roughness={0.6} />
+        </mesh>
+        <mesh position={[0, h/2-0.01, 0.02]} rotation={[Math.PI, 0, 0]}>
+          <sphereGeometry args={[Math.min(w,d)*0.3, 16, 8, 0, Math.PI*2, 0, Math.PI/2]} />
+          <meshStandardMaterial color="#e8e8e8" roughness={0.2} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Stove/Oven: box with burner rings
+  if (lbl.includes("stove") || lbl.includes("oven")) {
+    return (
+      <group>
+        <mesh castShadow>
+          <boxGeometry args={[w, h, d]} />
+          <meshStandardMaterial color={color} roughness={0.4} />
+        </mesh>
+        {[[-1,-1],[1,-1],[1,1],[-1,1]].map(([sx,sz], i) => (
+          <mesh key={i} position={[sx*w*0.2, h/2+0.002, sz*d*0.2]} rotation={[-Math.PI/2, 0, 0]}>
+            <torusGeometry args={[0.04, 0.008, 8, 16]} />
+            <meshStandardMaterial color="#333" metalness={0.6} />
+          </mesh>
+        ))}
+      </group>
+    );
+  }
+
+  // Fridge: tall box with freezer/fridge divider
+  if (lbl.includes("fridge") || lbl.includes("refrigerator")) {
+    return (
+      <group>
+        <mesh castShadow>
+          <boxGeometry args={[w, h, d]} />
+          <meshStandardMaterial color={color} roughness={0.3} />
+        </mesh>
+        <mesh position={[0, h*0.15, d/2+0.001]}>
+          <planeGeometry args={[w-0.04, 0.005]} />
+          <meshBasicMaterial color={legColor} />
+        </mesh>
+        <mesh position={[w/2-0.04, 0, d/2+0.015]}>
+          <boxGeometry args={[0.015, h*0.25, 0.02]} />
+          <meshStandardMaterial color="#999" metalness={0.6} />
+        </mesh>
+      </group>
+    );
+  }
+
+  // Default: simple box
+  return (
+    <mesh castShadow>
+      <boxGeometry args={[w, h, d]} />
+      <meshStandardMaterial color={color} roughness={0.6} />
+    </mesh>
+  );
+}
+
 function FurniturePiece({ item, colorOverride }: { item: FurnitureItem; colorOverride?: string }) {
   const c = colorOverride || item.color;
   return (
-    <mesh
+    <group
       position={[item.x + item.width / 2, item.height / 2, item.z + item.depth / 2]}
-      castShadow
-      receiveShadow
     >
-      <boxGeometry args={[item.width, item.height, item.depth]} />
-      <meshStandardMaterial color={c} roughness={0.6} metalness={0.05} />
-    </mesh>
+      <DetailedFurniture
+        w={item.width}
+        h={item.height}
+        d={item.depth}
+        color={c}
+        label={item.label}
+      />
+    </group>
   );
 }
 
