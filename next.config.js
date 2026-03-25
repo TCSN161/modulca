@@ -2,9 +2,7 @@
 const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
 
 const nextConfig = {
-  output: "export",
-  basePath: isGitHubPages ? "/modulca" : "",
-  assetPrefix: isGitHubPages ? "/modulca/" : "",
+  ...(isGitHubPages ? { output: "export", basePath: "/modulca", assetPrefix: "/modulca/" } : {}),
   reactStrictMode: true,
   images: {
     unoptimized: true,
