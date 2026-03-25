@@ -18,9 +18,13 @@ const WALL_TYPE_LABELS: Record<WallType, string> = {
 };
 
 const WALL_TYPE_CYCLE: WallType[] = ["solid", "window", "door", "none"];
+const SHARED_WALL_CYCLE: WallType[] = ["shared", "door", "none"];
 
-function nextWallType(current: WallType): WallType {
-  if (current === "shared") return "shared"; // Can't change shared walls
+function nextWallType(current: WallType, isInterior: boolean): WallType {
+  if (isInterior) {
+    const idx = SHARED_WALL_CYCLE.indexOf(current);
+    return SHARED_WALL_CYCLE[((idx >= 0 ? idx : 0) + 1) % SHARED_WALL_CYCLE.length];
+  }
   const idx = WALL_TYPE_CYCLE.indexOf(current);
   return WALL_TYPE_CYCLE[(idx + 1) % WALL_TYPE_CYCLE.length];
 }
@@ -124,6 +128,7 @@ export default function ModuleFloorPlan({ module }: Props) {
   const mt = MODULE_TYPES.find((m) => m.id === module.moduleType);
   const color = mt?.color || "#888";
   const updateWallConfig = useDesignStore((s) => s.updateWallConfig);
+  const modules = useDesignStore((s) => s.modules);
 
   const preset = getPreset(module.moduleType, module.layoutPreset);
   const furniture = preset?.furniture || [];
@@ -131,9 +136,17 @@ export default function ModuleFloorPlan({ module }: Props) {
   const floorColor = FLOOR_MATERIALS.find((f) => f.id === module.floorFinish)?.color || "#FFFFFF";
   const wc = module.wallConfigs ?? { north: "solid" as WallType, south: "solid" as WallType, east: "solid" as WallType, west: "solid" as WallType };
 
+  // Detect interior walls (between adjacent modules)
+  const occupied = new Set(modules.map((m) => `${m.row},${m.col}`));
+  const isInterior: Record<WallSide, boolean> = {
+    north: occupied.has(`${module.row - 1},${module.col}`),
+    south: occupied.has(`${module.row + 1},${module.col}`),
+    west: occupied.has(`${module.row},${module.col - 1}`),
+    east: occupied.has(`${module.row},${module.col + 1}`),
+  };
+
   const handleWallClick = (side: WallSide) => {
-    if (wc[side] === "shared") return;
-    const next = nextWallType(wc[side]);
+    const next = nextWallType(wc[side], isInterior[side]);
     if (updateWallConfig) {
       updateWallConfig(module.row, module.col, side, next);
     }
@@ -166,7 +179,7 @@ export default function ModuleFloorPlan({ module }: Props) {
         <button
           onClick={() => handleWallClick("north")}
           className={`absolute -top-7 left-1/2 -translate-x-1/2 rounded px-2 py-0.5 text-[9px] font-bold uppercase transition-colors ${
-            wc.north === "shared" ? "bg-amber-100 text-amber-600 cursor-default" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
+            wc.north === "shared" ? "bg-amber-100 text-amber-600 hover:bg-amber-200 cursor-pointer" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
           }`}
         >
           N: {WALL_TYPE_LABELS[wc.north]}
@@ -175,7 +188,7 @@ export default function ModuleFloorPlan({ module }: Props) {
         <button
           onClick={() => handleWallClick("south")}
           className={`absolute -bottom-7 left-1/2 -translate-x-1/2 rounded px-2 py-0.5 text-[9px] font-bold uppercase transition-colors ${
-            wc.south === "shared" ? "bg-amber-100 text-amber-600 cursor-default" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
+            wc.south === "shared" ? "bg-amber-100 text-amber-600 hover:bg-amber-200 cursor-pointer" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
           }`}
         >
           S: {WALL_TYPE_LABELS[wc.south]}
@@ -184,7 +197,7 @@ export default function ModuleFloorPlan({ module }: Props) {
         <button
           onClick={() => handleWallClick("west")}
           className={`absolute -left-16 top-1/2 -translate-y-1/2 rounded px-2 py-0.5 text-[9px] font-bold uppercase transition-colors ${
-            wc.west === "shared" ? "bg-amber-100 text-amber-600 cursor-default" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
+            wc.west === "shared" ? "bg-amber-100 text-amber-600 hover:bg-amber-200 cursor-pointer" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
           }`}
         >
           W: {WALL_TYPE_LABELS[wc.west]}
@@ -193,7 +206,7 @@ export default function ModuleFloorPlan({ module }: Props) {
         <button
           onClick={() => handleWallClick("east")}
           className={`absolute -right-16 top-1/2 -translate-y-1/2 rounded px-2 py-0.5 text-[9px] font-bold uppercase transition-colors ${
-            wc.east === "shared" ? "bg-amber-100 text-amber-600 cursor-default" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
+            wc.east === "shared" ? "bg-amber-100 text-amber-600 hover:bg-amber-200 cursor-pointer" : "bg-gray-100 text-gray-600 hover:bg-brand-teal-100 hover:text-brand-teal-800 cursor-pointer"
           }`}
         >
           E: {WALL_TYPE_LABELS[wc.east]}

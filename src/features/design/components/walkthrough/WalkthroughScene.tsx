@@ -21,20 +21,6 @@ const DOOR_WIDTH = 0.9;
 const DOOR_HEIGHT = 2.1;
 
 /* ------------------------------------------------------------------ */
-/*  Helper: check if a neighbor exists                                 */
-/* ------------------------------------------------------------------ */
-
-function hasNeighbor(
-  modules: ModuleConfig[],
-  row: number,
-  col: number,
-  dRow: number,
-  dCol: number,
-): boolean {
-  return modules.some((m) => m.row === row + dRow && m.col === col + dCol);
-}
-
-/* ------------------------------------------------------------------ */
 /*  Floor                                                              */
 /* ------------------------------------------------------------------ */
 
@@ -84,247 +70,115 @@ function WallSegment({
 /*  Walls for a single module, removing shared walls and adding doors   */
 /* ------------------------------------------------------------------ */
 
+/** Build wall geometry based on wall type config */
+function buildWall(
+  key: string,
+  pos: [number, number, number],
+  fullSize: [number, number, number],
+  wallType: string,
+  wallColor: string,
+  isHorizontal: boolean,
+): ReactElement[] {
+  const walls: ReactElement[] = [];
+
+  if (wallType === "none") {
+    // No wall at all — fully open
+    return walls;
+  }
+
+  if (wallType === "solid" || wallType === "window") {
+    // Solid wall (window has a wall with glass pane — simplified as solid in 3D walkthrough)
+    walls.push(
+      <WallSegment key={key} position={pos} size={fullSize} color={wallType === "window" ? "#c8dde8" : wallColor} />,
+    );
+    return walls;
+  }
+
+  // "shared" or "door" — wall with door opening
+  const wallLen = isHorizontal ? fullSize[0] : fullSize[2];
+  const doorLeft = (wallLen - DOOR_WIDTH) / 2;
+  const doorRight = doorLeft + DOOR_WIDTH;
+  const rightWidth = wallLen - doorRight;
+  const topHeight = WALL_HEIGHT - DOOR_HEIGHT;
+
+  if (isHorizontal) {
+    // Along X axis
+    const baseX = pos[0] - wallLen / 2;
+    const baseZ = pos[2];
+    walls.push(
+      <WallSegment key={`${key}-l`} position={[baseX + doorLeft / 2, HALF_HEIGHT, baseZ]} size={[doorLeft, WALL_HEIGHT, WALL_THICKNESS]} color={wallColor} />,
+    );
+    walls.push(
+      <WallSegment key={`${key}-r`} position={[baseX + doorRight + rightWidth / 2, HALF_HEIGHT, baseZ]} size={[rightWidth, WALL_HEIGHT, WALL_THICKNESS]} color={wallColor} />,
+    );
+    walls.push(
+      <WallSegment key={`${key}-t`} position={[pos[0], DOOR_HEIGHT + topHeight / 2, baseZ]} size={[DOOR_WIDTH, topHeight, WALL_THICKNESS]} color={wallColor} />,
+    );
+  } else {
+    // Along Z axis
+    const baseX = pos[0];
+    const baseZ = pos[2] - wallLen / 2;
+    walls.push(
+      <WallSegment key={`${key}-l`} position={[baseX, HALF_HEIGHT, baseZ + doorLeft / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, doorLeft]} color={wallColor} />,
+    );
+    walls.push(
+      <WallSegment key={`${key}-r`} position={[baseX, HALF_HEIGHT, baseZ + doorRight + rightWidth / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, rightWidth]} color={wallColor} />,
+    );
+    walls.push(
+      <WallSegment key={`${key}-t`} position={[baseX, DOOR_HEIGHT + topHeight / 2, pos[2]]} size={[WALL_THICKNESS, topHeight, DOOR_WIDTH]} color={wallColor} />,
+    );
+  }
+
+  return walls;
+}
+
 function ModuleWalls({
   mod,
-  modules,
   wallColor,
 }: {
   mod: ModuleConfig;
-  modules: ModuleConfig[];
   wallColor: string;
 }) {
   const ox = mod.col * MODULE_SIZE;
   const oz = mod.row * MODULE_SIZE;
   const walls: ReactElement[] = [];
+  const wc = mod.wallConfigs;
 
-  const hasTop = hasNeighbor(modules, mod.row, mod.col, -1, 0);
-  const hasBottom = hasNeighbor(modules, mod.row, mod.col, 1, 0);
-  const hasLeft = hasNeighbor(modules, mod.row, mod.col, 0, -1);
-  const hasRight = hasNeighbor(modules, mod.row, mod.col, 0, 1);
+  // North wall (z = oz, along X)
+  walls.push(
+    ...buildWall(
+      "back", [ox + MODULE_SIZE / 2, HALF_HEIGHT, oz + HALF_THICK],
+      [MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS],
+      wc.north, wallColor, true,
+    ),
+  );
 
-  // Back wall (z = oz, along X) — neighbor at row-1
-  if (!hasTop) {
-    walls.push(
-      <WallSegment
-        key="back"
-        position={[ox + MODULE_SIZE / 2, HALF_HEIGHT, oz + HALF_THICK]}
-        size={[MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-  } else {
-    // Shared wall with door opening
-    const doorLeft = (MODULE_SIZE - DOOR_WIDTH) / 2;
-    const doorRight = doorLeft + DOOR_WIDTH;
-    // Left segment
-    walls.push(
-      <WallSegment
-        key="back-l"
-        position={[
-          ox + doorLeft / 2,
-          HALF_HEIGHT,
-          oz + HALF_THICK,
-        ]}
-        size={[doorLeft, WALL_HEIGHT, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-    // Right segment
-    const rightWidth = MODULE_SIZE - doorRight;
-    walls.push(
-      <WallSegment
-        key="back-r"
-        position={[
-          ox + doorRight + rightWidth / 2,
-          HALF_HEIGHT,
-          oz + HALF_THICK,
-        ]}
-        size={[rightWidth, WALL_HEIGHT, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-    // Top segment above door
-    const topHeight = WALL_HEIGHT - DOOR_HEIGHT;
-    walls.push(
-      <WallSegment
-        key="back-t"
-        position={[
-          ox + MODULE_SIZE / 2,
-          DOOR_HEIGHT + topHeight / 2,
-          oz + HALF_THICK,
-        ]}
-        size={[DOOR_WIDTH, topHeight, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-  }
+  // South wall (z = oz + MODULE_SIZE, along X)
+  walls.push(
+    ...buildWall(
+      "front", [ox + MODULE_SIZE / 2, HALF_HEIGHT, oz + MODULE_SIZE - HALF_THICK],
+      [MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS],
+      wc.south, wallColor, true,
+    ),
+  );
 
-  // Front wall (z = oz + MODULE_SIZE, along X) — neighbor at row+1
-  if (!hasBottom) {
-    walls.push(
-      <WallSegment
-        key="front"
-        position={[
-          ox + MODULE_SIZE / 2,
-          HALF_HEIGHT,
-          oz + MODULE_SIZE - HALF_THICK,
-        ]}
-        size={[MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-  } else {
-    const doorLeft = (MODULE_SIZE - DOOR_WIDTH) / 2;
-    const doorRight = doorLeft + DOOR_WIDTH;
-    walls.push(
-      <WallSegment
-        key="front-l"
-        position={[
-          ox + doorLeft / 2,
-          HALF_HEIGHT,
-          oz + MODULE_SIZE - HALF_THICK,
-        ]}
-        size={[doorLeft, WALL_HEIGHT, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-    const rightWidth = MODULE_SIZE - doorRight;
-    walls.push(
-      <WallSegment
-        key="front-r"
-        position={[
-          ox + doorRight + rightWidth / 2,
-          HALF_HEIGHT,
-          oz + MODULE_SIZE - HALF_THICK,
-        ]}
-        size={[rightWidth, WALL_HEIGHT, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-    const topHeight = WALL_HEIGHT - DOOR_HEIGHT;
-    walls.push(
-      <WallSegment
-        key="front-t"
-        position={[
-          ox + MODULE_SIZE / 2,
-          DOOR_HEIGHT + topHeight / 2,
-          oz + MODULE_SIZE - HALF_THICK,
-        ]}
-        size={[DOOR_WIDTH, topHeight, WALL_THICKNESS]}
-        color={wallColor}
-      />,
-    );
-  }
+  // West wall (x = ox, along Z)
+  walls.push(
+    ...buildWall(
+      "left", [ox + HALF_THICK, HALF_HEIGHT, oz + MODULE_SIZE / 2],
+      [WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE],
+      wc.west, wallColor, false,
+    ),
+  );
 
-  // Left wall (x = ox, along Z) — neighbor at col-1
-  if (!hasLeft) {
-    walls.push(
-      <WallSegment
-        key="left"
-        position={[ox + HALF_THICK, HALF_HEIGHT, oz + MODULE_SIZE / 2]}
-        size={[WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE]}
-        color={wallColor}
-      />,
-    );
-  } else {
-    const doorLeft = (MODULE_SIZE - DOOR_WIDTH) / 2;
-    const doorRight = doorLeft + DOOR_WIDTH;
-    walls.push(
-      <WallSegment
-        key="left-l"
-        position={[
-          ox + HALF_THICK,
-          HALF_HEIGHT,
-          oz + doorLeft / 2,
-        ]}
-        size={[WALL_THICKNESS, WALL_HEIGHT, doorLeft]}
-        color={wallColor}
-      />,
-    );
-    const rightWidth = MODULE_SIZE - doorRight;
-    walls.push(
-      <WallSegment
-        key="left-r"
-        position={[
-          ox + HALF_THICK,
-          HALF_HEIGHT,
-          oz + doorRight + rightWidth / 2,
-        ]}
-        size={[WALL_THICKNESS, WALL_HEIGHT, rightWidth]}
-        color={wallColor}
-      />,
-    );
-    const topHeight = WALL_HEIGHT - DOOR_HEIGHT;
-    walls.push(
-      <WallSegment
-        key="left-t"
-        position={[
-          ox + HALF_THICK,
-          DOOR_HEIGHT + topHeight / 2,
-          oz + MODULE_SIZE / 2,
-        ]}
-        size={[WALL_THICKNESS, topHeight, DOOR_WIDTH]}
-        color={wallColor}
-      />,
-    );
-  }
-
-  // Right wall (x = ox + MODULE_SIZE, along Z) — neighbor at col+1
-  if (!hasRight) {
-    walls.push(
-      <WallSegment
-        key="right"
-        position={[
-          ox + MODULE_SIZE - HALF_THICK,
-          HALF_HEIGHT,
-          oz + MODULE_SIZE / 2,
-        ]}
-        size={[WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE]}
-        color={wallColor}
-      />,
-    );
-  } else {
-    const doorLeft = (MODULE_SIZE - DOOR_WIDTH) / 2;
-    const doorRight = doorLeft + DOOR_WIDTH;
-    walls.push(
-      <WallSegment
-        key="right-l"
-        position={[
-          ox + MODULE_SIZE - HALF_THICK,
-          HALF_HEIGHT,
-          oz + doorLeft / 2,
-        ]}
-        size={[WALL_THICKNESS, WALL_HEIGHT, doorLeft]}
-        color={wallColor}
-      />,
-    );
-    const rightWidth = MODULE_SIZE - doorRight;
-    walls.push(
-      <WallSegment
-        key="right-r"
-        position={[
-          ox + MODULE_SIZE - HALF_THICK,
-          HALF_HEIGHT,
-          oz + doorRight + rightWidth / 2,
-        ]}
-        size={[WALL_THICKNESS, WALL_HEIGHT, rightWidth]}
-        color={wallColor}
-      />,
-    );
-    const topHeight = WALL_HEIGHT - DOOR_HEIGHT;
-    walls.push(
-      <WallSegment
-        key="right-t"
-        position={[
-          ox + MODULE_SIZE - HALF_THICK,
-          DOOR_HEIGHT + topHeight / 2,
-          oz + MODULE_SIZE / 2,
-        ]}
-        size={[WALL_THICKNESS, topHeight, DOOR_WIDTH]}
-        color={wallColor}
-      />,
-    );
-  }
+  // East wall (x = ox + MODULE_SIZE, along Z)
+  walls.push(
+    ...buildWall(
+      "right", [ox + MODULE_SIZE - HALF_THICK, HALF_HEIGHT, oz + MODULE_SIZE / 2],
+      [WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE],
+      wc.east, wallColor, false,
+    ),
+  );
 
   return <group>{walls}</group>;
 }
@@ -392,6 +246,34 @@ interface MovementControllerProps {
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
 }
 
+/** Check if a wall between two adjacent modules allows passage */
+function canPassThrough(
+  modules: ModuleConfig[],
+  fromRow: number,
+  fromCol: number,
+  toRow: number,
+  toCol: number,
+): boolean {
+  const fromMod = modules.find((m) => m.row === fromRow && m.col === fromCol);
+  const toMod = modules.find((m) => m.row === toRow && m.col === toCol);
+  if (!fromMod || !toMod) return false;
+
+  // Determine which wall side connects these modules
+  const dr = toRow - fromRow;
+  const dc = toCol - fromCol;
+
+  let fromSide: "north" | "south" | "east" | "west";
+  if (dr === -1 && dc === 0) fromSide = "north";
+  else if (dr === 1 && dc === 0) fromSide = "south";
+  else if (dr === 0 && dc === -1) fromSide = "west";
+  else if (dr === 0 && dc === 1) fromSide = "east";
+  else return false;
+
+  const wallType = fromMod.wallConfigs[fromSide];
+  // Allow passage through shared walls (door opening), doors, and open walls
+  return wallType === "shared" || wallType === "door" || wallType === "none";
+}
+
 function MovementController({
   modules,
   controlsRef,
@@ -402,10 +284,12 @@ function MovementController({
   const velocityRef = useRef(new THREE.Vector3());
   const directionRef = useRef(new THREE.Vector3());
 
-  // Build bounding boxes for all modules
+  // Build bounding boxes for all modules (with smaller margin for walkable area)
   const bounds = useMemo(() => {
-    const margin = 0.2;
+    const margin = 0.15;
     return modules.map((m) => ({
+      row: m.row,
+      col: m.col,
       minX: m.col * MODULE_SIZE + margin,
       maxX: (m.col + 1) * MODULE_SIZE - margin,
       minZ: m.row * MODULE_SIZE + margin,
@@ -428,13 +312,39 @@ function MovementController({
     };
   }, []);
 
-  const isInsideBounds = useCallback(
-    (x: number, z: number): boolean => {
-      return bounds.some(
+  /** Find which module contains a point */
+  const getModuleAt = useCallback(
+    (x: number, z: number) => {
+      const col = Math.floor(x / MODULE_SIZE);
+      const row = Math.floor(z / MODULE_SIZE);
+      return modules.find((m) => m.row === row && m.col === col);
+    },
+    [modules],
+  );
+
+  /** Check if position is walkable (inside a module or passing through an open wall) */
+  const isWalkable = useCallback(
+    (x: number, z: number, fromX: number, fromZ: number): boolean => {
+      // First check: inside any module's bounds
+      const inBounds = bounds.some(
         (b) => x >= b.minX && x <= b.maxX && z >= b.minZ && z <= b.maxZ,
       );
+      if (inBounds) return true;
+
+      // Second check: in the transition zone between two modules
+      // Find current module and target module
+      const fromMod = getModuleAt(fromX, fromZ);
+      const toCol = Math.floor(x / MODULE_SIZE);
+      const toRow = Math.floor(z / MODULE_SIZE);
+      const toMod = modules.find((m) => m.row === toRow && m.col === toCol);
+
+      if (fromMod && toMod && fromMod !== toMod) {
+        return canPassThrough(modules, fromMod.row, fromMod.col, toMod.row, toMod.col);
+      }
+
+      return false;
     },
-    [bounds],
+    [bounds, modules, getModuleAt],
   );
 
   useFrame((_, delta) => {
@@ -471,14 +381,16 @@ function MovementController({
 
     const newX = camera.position.x + vel.x;
     const newZ = camera.position.z + vel.z;
+    const curX = camera.position.x;
+    const curZ = camera.position.z;
 
-    // Simple collision: only move if destination is inside some module
-    if (isInsideBounds(newX, newZ)) {
+    // Collision: move if destination is walkable (inside module or through passable wall)
+    if (isWalkable(newX, newZ, curX, curZ)) {
       camera.position.x = newX;
       camera.position.z = newZ;
-    } else if (isInsideBounds(newX, camera.position.z)) {
+    } else if (isWalkable(newX, curZ, curX, curZ)) {
       camera.position.x = newX;
-    } else if (isInsideBounds(camera.position.x, newZ)) {
+    } else if (isWalkable(curX, newZ, curX, curZ)) {
       camera.position.z = newZ;
     }
 
@@ -572,7 +484,7 @@ function SceneContent({
         return (
           <group key={`mod-${mod.row}-${mod.col}`}>
             <ModuleFloor x={ox} z={oz} color={floorColor} />
-            <ModuleWalls mod={mod} modules={modules} wallColor={wallColor} />
+            <ModuleWalls mod={mod} wallColor={wallColor} />
             <ModuleCeiling x={ox} z={oz} />
 
             {/* Furniture */}

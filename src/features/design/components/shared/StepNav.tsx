@@ -14,6 +14,7 @@ const STEPS = [
   { label: "Technical", href: "/project/demo/technical" },
   { label: "Walkthrough", href: "/project/demo/walkthrough" },
   { label: "Products", href: "/project/demo/products" },
+  { label: "Finalize", href: "/project/demo/finalize" },
 ];
 
 interface StepNavProps {

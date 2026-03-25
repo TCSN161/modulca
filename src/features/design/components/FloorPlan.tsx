@@ -10,8 +10,14 @@ const PADDING = 40;
 const WALL_HIT_ZONE = 10; // clickable edge thickness in pixels
 
 const WALL_TYPE_CYCLE: WallType[] = ["solid", "window", "door", "none"];
+const SHARED_WALL_CYCLE: WallType[] = ["shared", "door", "none"];
 
 function nextWallType(current: WallType): WallType {
+  if (current === "shared" || SHARED_WALL_CYCLE.includes(current)) {
+    // For interior (shared) walls: cycle shared → door → none → shared
+    const idx = SHARED_WALL_CYCLE.indexOf(current);
+    if (idx >= 0) return SHARED_WALL_CYCLE[(idx + 1) % SHARED_WALL_CYCLE.length];
+  }
   const idx = WALL_TYPE_CYCLE.indexOf(current);
   return WALL_TYPE_CYCLE[(idx + 1) % WALL_TYPE_CYCLE.length];
 }
@@ -45,11 +51,31 @@ export default function FloorPlan() {
   const { modules, selectedModule, setSelectedModule, updateWallConfig } = useDesignStore();
   const router = useRouter();
 
+  // Track which walls are interior (between adjacent modules)
+  const interiorWalls = useMemo(() => {
+    const set = new Set<string>();
+    const occupied = new Set(modules.map((m) => `${m.row},${m.col}`));
+    for (const m of modules) {
+      if (occupied.has(`${m.row - 1},${m.col}`)) set.add(`${m.row},${m.col},north`);
+      if (occupied.has(`${m.row + 1},${m.col}`)) set.add(`${m.row},${m.col},south`);
+      if (occupied.has(`${m.row},${m.col - 1}`)) set.add(`${m.row},${m.col},west`);
+      if (occupied.has(`${m.row},${m.col + 1}`)) set.add(`${m.row},${m.col},east`);
+    }
+    return set;
+  }, [modules]);
+
   const handleWallClick = useCallback(
-    (row: number, col: number, side: WallSide, currentType: WallType, e: React.MouseEvent) => {
+    (row: number, col: number, side: WallSide, currentType: WallType, isInterior: boolean, e: React.MouseEvent) => {
       e.stopPropagation();
-      if (currentType === "shared") return; // shared walls are not editable
-      updateWallConfig(row, col, side, nextWallType(currentType));
+      let next: WallType;
+      if (isInterior) {
+        // Interior walls cycle: shared → door → none → shared
+        const idx = SHARED_WALL_CYCLE.indexOf(currentType);
+        next = SHARED_WALL_CYCLE[((idx >= 0 ? idx : 0) + 1) % SHARED_WALL_CYCLE.length];
+      } else {
+        next = nextWallType(currentType);
+      }
+      updateWallConfig(row, col, side, next);
     },
     [updateWallConfig]
   );
@@ -196,40 +222,40 @@ export default function FloorPlan() {
                       x={x} y={y - WALL_HIT_ZONE / 2}
                       width={CELL_PX} height={WALL_HIT_ZONE}
                       fill="transparent"
-                      className={wc.north !== "shared" ? "cursor-pointer" : "cursor-not-allowed"}
-                      onClick={(e) => handleWallClick(mod.row, mod.col, "north", wc.north, e)}
+                      className="cursor-pointer"
+                      onClick={(e) => handleWallClick(mod.row, mod.col, "north", wc.north, interiorWalls.has(`${mod.row},${mod.col},north`), e)}
                     >
-                      <title>{`North: ${wc.north}`}</title>
+                      <title>{`North: ${wc.north} (click to change)`}</title>
                     </rect>
                     {/* South hit zone */}
                     <rect
                       x={x} y={y + CELL_PX - WALL_HIT_ZONE / 2}
                       width={CELL_PX} height={WALL_HIT_ZONE}
                       fill="transparent"
-                      className={wc.south !== "shared" ? "cursor-pointer" : "cursor-not-allowed"}
-                      onClick={(e) => handleWallClick(mod.row, mod.col, "south", wc.south, e)}
+                      className="cursor-pointer"
+                      onClick={(e) => handleWallClick(mod.row, mod.col, "south", wc.south, interiorWalls.has(`${mod.row},${mod.col},south`), e)}
                     >
-                      <title>{`South: ${wc.south}`}</title>
+                      <title>{`South: ${wc.south} (click to change)`}</title>
                     </rect>
                     {/* West hit zone */}
                     <rect
                       x={x - WALL_HIT_ZONE / 2} y={y}
                       width={WALL_HIT_ZONE} height={CELL_PX}
                       fill="transparent"
-                      className={wc.west !== "shared" ? "cursor-pointer" : "cursor-not-allowed"}
-                      onClick={(e) => handleWallClick(mod.row, mod.col, "west", wc.west, e)}
+                      className="cursor-pointer"
+                      onClick={(e) => handleWallClick(mod.row, mod.col, "west", wc.west, interiorWalls.has(`${mod.row},${mod.col},west`), e)}
                     >
-                      <title>{`West: ${wc.west}`}</title>
+                      <title>{`West: ${wc.west} (click to change)`}</title>
                     </rect>
                     {/* East hit zone */}
                     <rect
                       x={x + CELL_PX - WALL_HIT_ZONE / 2} y={y}
                       width={WALL_HIT_ZONE} height={CELL_PX}
                       fill="transparent"
-                      className={wc.east !== "shared" ? "cursor-pointer" : "cursor-not-allowed"}
-                      onClick={(e) => handleWallClick(mod.row, mod.col, "east", wc.east, e)}
+                      className="cursor-pointer"
+                      onClick={(e) => handleWallClick(mod.row, mod.col, "east", wc.east, interiorWalls.has(`${mod.row},${mod.col},east`), e)}
                     >
-                      <title>{`East: ${wc.east}`}</title>
+                      <title>{`East: ${wc.east} (click to change)`}</title>
                     </rect>
 
                     {/* Wall type indicators (small labels on each edge) */}
