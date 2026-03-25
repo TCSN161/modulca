@@ -1,8 +1,10 @@
 /** @type {import('next').NextConfig} */
+const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
+
 const nextConfig = {
   output: "export",
-  basePath: "/modulca",
-  assetPrefix: "/modulca/",
+  basePath: isGitHubPages ? "/modulca" : "",
+  assetPrefix: isGitHubPages ? "/modulca/" : "",
   reactStrictMode: true,
   images: {
     unoptimized: true,
