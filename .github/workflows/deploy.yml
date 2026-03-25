@@ -17,12 +17,22 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      DATABASE_URL: "postgresql://placeholder:placeholder@localhost:5432/modulca"
+      NEXTAUTH_SECRET: "build-time-placeholder"
+      NEXTAUTH_URL: "https://tcsn161.github.io/modulca"
+      NEXT_PUBLIC_MAPBOX_TOKEN: "pk.placeholder"
+      NEXT_PUBLIC_SUPABASE_URL: "https://placeholder.supabase.co"
+      NEXT_PUBLIC_SUPABASE_ANON_KEY: "placeholder"
+      SUPABASE_SERVICE_ROLE_KEY: "placeholder"
+      NEXT_PUBLIC_APP_URL: "https://tcsn161.github.io/modulca"
+      NEXT_PUBLIC_APP_NAME: "ModulCA"
     steps:
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "22"
           cache: "npm"
 
       - run: npm ci
