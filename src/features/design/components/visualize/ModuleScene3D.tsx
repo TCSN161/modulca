@@ -879,26 +879,12 @@ function FurniturePiece({
           />
         )}
 
-        {/* Hover/selection glow overlay */}
-        {(hovered || isSelected) && (
-          <mesh>
-            <boxGeometry args={[item.width, item.height, item.depth]} />
-            <meshStandardMaterial
-              color={displayColor}
-              transparent
-              opacity={0.15}
-              emissive={isSelected ? "#4488ff" : "#666666"}
-              emissiveIntensity={isSelected ? 0.5 : 0.2}
-            />
-          </mesh>
-        )}
-
-        {/* Selection wireframe outline */}
+        {/* Selection wireframe outline only (no opaque overlay) */}
         {isSelected && (
-          <mesh>
-            <boxGeometry args={[item.width + 0.02, item.height + 0.02, item.depth + 0.02]} />
-            <meshBasicMaterial color="#4488ff" wireframe />
-          </mesh>
+          <lineSegments>
+            <edgesGeometry args={[new THREE.BoxGeometry(item.width + 0.02, item.height + 0.02, item.depth + 0.02)]} />
+            <lineBasicMaterial color="#4488ff" />
+          </lineSegments>
         )}
       </group>
 

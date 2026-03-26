@@ -19,7 +19,7 @@ type RenderMode = "template" | "ai";
 type ViewMode = "single" | "all";
 type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | "custom";
 type RenderResolution = "draft" | "standard" | "high";
-type PollinationsModel = "flux" | "turbo";
+type PollinationsModel = "flux" | "zimage" | "gptimage";
 
 const PROMPT_TEMPLATES: Record<PromptTemplate, { label: string; description: string; suffix: string }> = {
   magazine: {
@@ -253,7 +253,7 @@ export default function RenderPage() {
       .slice(0, 500);                       // Pollinations prompt length limit
 
     const encoded = encodeURIComponent(sanitized);
-    const url = `https://image.pollinations.ai/prompt/${encoded}?width=${res.width}&height=${res.height}&model=${model}&nologo=true&nofeed=true&seed=${Date.now()}`;
+    const url = `https://gen.pollinations.ai/image/${encoded}?width=${res.width}&height=${res.height}&model=${model}&nologo=true&nofeed=true&enhance=true&seed=${Date.now()}`;
 
     // Log URL for debugging
     console.log("[AI Render] URL:", url);
@@ -282,15 +282,15 @@ export default function RenderPage() {
         clearTimeout(timer);
         if (err.name === "AbortError") {
           if (model === "flux") {
-            console.log("[AI Render] Timeout with flux, retrying with turbo...");
-            handleGenerateAiRender("turbo");
+            console.log("[AI Render] Timeout with flux, retrying with zimage...");
+            handleGenerateAiRender("zimage");
           } else {
             setAiError("AI render timed out. Try a shorter prompt or Draft resolution.");
             setAiLoading(false);
           }
         } else if (model === "flux") {
-          console.log("[AI Render] Error with flux, retrying with turbo...", err);
-          handleGenerateAiRender("turbo");
+          console.log("[AI Render] Error with flux, retrying with zimage...", err);
+          handleGenerateAiRender("zimage");
         } else {
           console.error("[AI Render] Failed:", err);
           setAiError("Failed to generate AI render. Please try again or adjust your prompt.");
@@ -453,7 +453,7 @@ export default function RenderPage() {
               <div className="mb-3">
                 <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Model</label>
                 <div className="flex gap-1">
-                  {(["flux", "turbo"] as PollinationsModel[]).map((m) => (
+                  {(["flux", "zimage", "gptimage"] as PollinationsModel[]).map((m) => (
                     <button key={m} onClick={() => setPollinationsModel(m)}
                       className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors ${pollinationsModel === m ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
                       {m}
