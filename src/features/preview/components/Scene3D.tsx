@@ -1,10 +1,10 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, ContactShadows, Environment } from "@react-three/drei";
 import { useDesignStore } from "@/features/design/store";
-import { MODULE_TYPES } from "@/shared/types";
+import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import * as THREE from "three";
 
 const MODULE_SIZE = 3;
@@ -15,7 +15,7 @@ interface ModuleBoxProps {
   position: [number, number, number];
   color: string;
   isSelected: boolean;
-  onClick: () => void;
+  onClick: (nativeEvent: MouseEvent) => void;
 }
 
 function ModuleBox({ position, color, isSelected, onClick }: ModuleBoxProps) {
@@ -36,7 +36,7 @@ function ModuleBox({ position, color, isSelected, onClick }: ModuleBoxProps) {
       position={[position[0], position[1] + MODULE_HEIGHT / 2, position[2]]}
       onClick={(e) => {
         e.stopPropagation();
-        onClick();
+        onClick(e.nativeEvent);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -152,8 +152,84 @@ function ZoomController() {
   return null;
 }
 
+/** Invisible ground plane that deselects modules when clicked */
+function ClickCatcher({ onDeselect }: { onDeselect: () => void }) {
+  return (
+    <mesh
+      rotation={[-Math.PI / 2, 0, 0]}
+      position={[0, -0.02, 0]}
+      onClick={(e) => {
+        e.stopPropagation();
+        onDeselect();
+      }}
+    >
+      <planeGeometry args={[100, 100]} />
+      <meshBasicMaterial visible={false} />
+    </mesh>
+  );
+}
+
+/** Floating info panel rendered in HTML overlay */
+function ModuleInfoPanel({
+  mod,
+  position,
+}: {
+  mod: { label: string; moduleType: string; row: number; col: number };
+  position: { x: number; y: number };
+}) {
+  const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+  const finishLevel = useDesignStore((s) => s.finishLevel);
+  const finish = FINISH_LEVELS.find((f) => f.id === finishLevel);
+  const cost = finish?.pricePerModule ?? 0;
+
+  return (
+    <div
+      className="pointer-events-none absolute z-10 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm"
+      style={{
+        left: position.x + 16,
+        top: position.y - 40,
+        minWidth: 180,
+      }}
+    >
+      <div className="flex items-center gap-2 mb-2">
+        <div
+          className="h-3 w-3 rounded"
+          style={{ backgroundColor: mt?.color || "#888" }}
+        />
+        <span className="text-sm font-bold text-brand-teal-800">
+          {mod.label}
+        </span>
+      </div>
+      <div className="space-y-1 text-[11px]">
+        <div className="flex justify-between">
+          <span className="text-gray-500">Type</span>
+          <span className="font-medium text-brand-teal-800">{mt?.label ?? mod.moduleType}</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500">Size</span>
+          <span className="font-medium text-brand-teal-800">3.0 x 3.0 m</span>
+        </div>
+        <div className="flex justify-between">
+          <span className="text-gray-500">Grid</span>
+          <span className="font-medium text-brand-teal-800">Row {mod.row}, Col {mod.col}</span>
+        </div>
+        <div className="flex justify-between pt-1 border-t border-gray-100">
+          <span className="text-gray-500 font-semibold">Est. Cost</span>
+          <span className="font-bold text-brand-amber-600">&euro;{cost.toLocaleString()}</span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 export default function Scene3D() {
   const { modules, selectedModule, setSelectedModule } = useDesignStore();
+  const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null);
+
+  const handleDeselect = useCallback(() => {
+    setSelectedModule(null);
+    setClickPos(null);
+  }, [setSelectedModule]);
 
   // Compute center offset so the building is centered at origin
   const minRow = modules.length > 0 ? Math.min(...modules.map((m) => m.row)) : 0;
@@ -163,79 +239,102 @@ export default function Scene3D() {
   const centerX = ((minCol + maxCol) / 2) * MODULE_SIZE;
   const centerZ = ((minRow + maxRow) / 2) * MODULE_SIZE;
 
+  const selectedMod = selectedModule
+    ? modules.find((m) => m.row === selectedModule.row && m.col === selectedModule.col)
+    : null;
+
   if (modules.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-gray-400">
-        No modules to preview. Complete Steps 1 & 2 first.
+        No modules to preview. Complete Steps 1 &amp; 2 first.
       </div>
     );
   }
 
   return (
-    <Canvas
-      shadows
-      className="h-full w-full"
-      onClick={() => setSelectedModule(null)}
-    >
-      <ZoomController />
-      <PerspectiveCamera makeDefault position={[12, 10, 12]} fov={45} />
-      <OrbitControls
-        enablePan
-        enableZoom
-        enableRotate
-        minPolarAngle={0.2}
-        maxPolarAngle={Math.PI / 2.2}
-        target={[0, MODULE_HEIGHT / 2, 0]}
-      />
+    <div className="relative h-full w-full">
+      {/* Info panel overlay */}
+      {selectedMod && clickPos && (
+        <ModuleInfoPanel mod={selectedMod} position={clickPos} />
+      )}
 
-      {/* Lighting */}
-      <ambientLight intensity={0.5} />
-      <directionalLight
-        position={[10, 15, 10]}
-        intensity={1.2}
-        castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
-      />
+      <Canvas
+        shadows
+        className="h-full w-full"
+      >
+        <ZoomController />
+        <PerspectiveCamera makeDefault position={[12, 10, 12]} fov={45} />
+        <OrbitControls
+          enablePan
+          enableZoom
+          enableRotate
+          minPolarAngle={0.2}
+          maxPolarAngle={Math.PI / 2.2}
+          target={[0, MODULE_HEIGHT / 2, 0]}
+        />
 
-      {/* Sky / environment */}
-      <color attach="background" args={["#b8d4e8"]} />
-      <fog attach="fog" args={["#b8d4e8", 200, 500]} />
-      <Environment preset="park" background={false} />
+        {/* Lighting */}
+        <ambientLight intensity={0.5} />
+        <directionalLight
+          position={[10, 15, 10]}
+          intensity={1.2}
+          castShadow
+          shadow-mapSize-width={2048}
+          shadow-mapSize-height={2048}
+        />
 
-      {/* Grass ground */}
-      <GrassGround />
-      <GrassGrid />
+        {/* Sky / environment */}
+        <color attach="background" args={["#b8d4e8"]} />
+        <fog attach="fog" args={["#b8d4e8", 200, 500]} />
+        <Environment preset="park" background={false} />
 
-      {/* Contact shadows */}
-      <ContactShadows
-        position={[0, 0, 0]}
-        opacity={0.3}
-        scale={30}
-        blur={2}
-        far={10}
-      />
+        {/* Grass ground */}
+        <GrassGround />
+        <GrassGrid />
 
-      {/* Module boxes */}
-      {modules.map((mod) => {
-        const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
-        const color = mt?.color || "#888";
-        const x = mod.col * MODULE_SIZE - centerX;
-        const z = mod.row * MODULE_SIZE - centerZ;
-        const isSelected =
-          selectedModule?.row === mod.row && selectedModule?.col === mod.col;
+        {/* Invisible click catcher for deselection */}
+        <ClickCatcher onDeselect={handleDeselect} />
 
-        return (
-          <ModuleBox
-            key={`${mod.row}-${mod.col}`}
-            position={[x, 0, z]}
-            color={color}
-            isSelected={isSelected}
-            onClick={() => setSelectedModule({ row: mod.row, col: mod.col })}
-          />
-        );
-      })}
+        {/* Contact shadows */}
+        <ContactShadows
+          position={[0, 0, 0]}
+          opacity={0.3}
+          scale={30}
+          blur={2}
+          far={10}
+        />
 
-    </Canvas>
+        {/* Module boxes */}
+        {modules.map((mod) => {
+          const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+          const color = mt?.color || "#888";
+          const x = mod.col * MODULE_SIZE - centerX;
+          const z = mod.row * MODULE_SIZE - centerZ;
+          const isSelected =
+            selectedModule?.row === mod.row && selectedModule?.col === mod.col;
+
+          return (
+            <ModuleBox
+              key={`${mod.row}-${mod.col}`}
+              position={[x, 0, z]}
+              color={color}
+              isSelected={isSelected}
+              onClick={(nativeEvent: MouseEvent) => {
+                setSelectedModule({ row: mod.row, col: mod.col });
+                const canvas = (nativeEvent.target as HTMLElement)?.closest?.("canvas");
+                const rect = canvas?.getBoundingClientRect();
+                if (rect) {
+                  setClickPos({
+                    x: nativeEvent.clientX - rect.left,
+                    y: nativeEvent.clientY - rect.top,
+                  });
+                }
+              }}
+            />
+          );
+        })}
+
+      </Canvas>
+    </div>
   );
 }

@@ -262,13 +262,14 @@ export default function VisualizePage() {
           </aside>
         )}
 
-        {/* Center — 3D scene */}
-        <main className="flex-1 overflow-hidden">
-          {viewMode === "all" ? (
+        {/* Center — 3D scene — keep both mounted to prevent Canvas remount flicker */}
+        <main className="flex-1 overflow-hidden relative">
+          <div className={viewMode === "all" ? "absolute inset-0" : "hidden"}>
             <CombinedScene3D />
-          ) : (
-            currentMod && <ModuleScene3D module={currentMod} />
-          )}
+          </div>
+          <div className={viewMode === "single" ? "absolute inset-0" : "hidden"}>
+            {currentMod && <ModuleScene3D module={currentMod} />}
+          </div>
         </main>
 
         {/* Right — config panel (only in single mode) */}

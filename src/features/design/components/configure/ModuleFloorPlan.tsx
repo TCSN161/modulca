@@ -1,7 +1,7 @@
 "use client";
 
 import { MODULE_TYPES } from "@/shared/types";
-import type { ModuleConfig, WallType, WallSide } from "../../store";
+import type { ModuleConfig, WallType, WallSide, WallConfigs } from "../../store";
 import { useDesignStore } from "../../store";
 import { getPreset, FLOOR_MATERIALS } from "../../layouts";
 
@@ -223,11 +223,17 @@ export default function ModuleFloorPlan({ module }: Props) {
   const updateWallConfig = useDesignStore((s) => s.updateWallConfig);
   const modules = useDesignStore((s) => s.modules);
 
-  const preset = getPreset(module.moduleType, module.layoutPreset);
+  // Read the live module from the store so wall config changes via dropdowns
+  // trigger a re-render of this component (the prop alone may be stale).
+  const liveModule = modules.find(
+    (m) => m.row === module.row && m.col === module.col
+  ) ?? module;
+
+  const preset = getPreset(liveModule.moduleType, liveModule.layoutPreset);
   const furniture = preset?.furniture || [];
 
-  const floorColor = FLOOR_MATERIALS.find((f) => f.id === module.floorFinish)?.color || "#FFFFFF";
-  const wc = module.wallConfigs ?? { north: "solid" as WallType, south: "solid" as WallType, east: "solid" as WallType, west: "solid" as WallType };
+  const floorColor = FLOOR_MATERIALS.find((f) => f.id === liveModule.floorFinish)?.color || "#FFFFFF";
+  const wc: WallConfigs = liveModule.wallConfigs ?? { north: "solid", south: "solid", east: "solid", west: "solid" };
 
   // Detect interior walls (between adjacent modules)
   const occupied = new Set(modules.map((m) => `${m.row},${m.col}`));

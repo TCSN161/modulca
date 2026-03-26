@@ -17,6 +17,43 @@ type LightingMode = "daylight" | "evening" | "night";
 type CameraAngle = "interior" | "corner" | "detail";
 type RenderMode = "template" | "ai";
 type ViewMode = "single" | "all";
+type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | "custom";
+type RenderResolution = "draft" | "standard" | "high";
+type PollinationsModel = "flux" | "turbo";
+
+const PROMPT_TEMPLATES: Record<PromptTemplate, { label: string; description: string; suffix: string }> = {
+  magazine: {
+    label: "Magazine Cover Shot",
+    description: "Wide angle, dramatic lighting",
+    suffix: "wide angle lens, dramatic lighting, interior design magazine cover, award-winning architectural photography, ultra high resolution, cinematic composition",
+  },
+  cozy: {
+    label: "Cozy Interior",
+    description: "Warm lighting, detail focused",
+    suffix: "warm ambient lighting, cozy atmosphere, soft textures, hygge style, detail focused macro photography, shallow depth of field, inviting space",
+  },
+  realestate: {
+    label: "Real Estate Listing",
+    description: "Bright, clean, professional",
+    suffix: "bright natural daylight, clean and airy, professional real estate photography, HDR, wide angle, well-staged, inviting and spacious feel",
+  },
+  blueprint: {
+    label: "Blueprint Overlay",
+    description: "Technical + render hybrid",
+    suffix: "architectural blueprint overlay, technical drawing blended with photorealistic render, wireframe accents, engineering precision, hybrid visualization",
+  },
+  custom: {
+    label: "Custom",
+    description: "Edit prompt freely",
+    suffix: "",
+  },
+};
+
+const RENDER_RESOLUTIONS: Record<RenderResolution, { label: string; width: number; height: number; note: string }> = {
+  draft: { label: "Draft", width: 512, height: 288, note: "Fast" },
+  standard: { label: "Standard", width: 1024, height: 576, note: "Default" },
+  high: { label: "High", width: 1536, height: 864, note: "Slower" },
+};
 
 /** Pinterest-style recommendation images per style */
 const STYLE_PINS: Record<string, { label: string; h: number; color: string; cat: string }[]> = {
@@ -84,6 +121,11 @@ export default function RenderPage() {
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [promptTemplate, setPromptTemplate] = useState<PromptTemplate>("magazine");
+  const [renderResolution, setRenderResolution] = useState<RenderResolution>("standard");
+  const [pollinationsModel, setPollinationsModel] = useState<PollinationsModel>("flux");
+  const [includePeople, setIncludePeople] = useState(false);
+  const [includePlants, setIncludePlants] = useState(false);
   const captureRef = useRef<(() => string | null) | null>(null);
 
   const handleSceneReady = useCallback((capture: () => string | null) => {
@@ -116,15 +158,21 @@ export default function RenderPage() {
 
   // Build default AI prompt from module data
   useEffect(() => {
+    if (promptTemplate === "custom") return; // Don't overwrite custom prompts
     const styleName = styleDirection ? (getStyleDirection(styleDirection)?.label || styleDirection) : "modern";
+    const templateSuffix = PROMPT_TEMPLATES[promptTemplate].suffix;
+
     if (viewMode === "all") {
       const moduleLabels = modules.map((m) => {
         const mt = MODULE_TYPES.find((t) => t.id === m.moduleType);
         return mt?.label || m.moduleType;
       });
       const uniqueLabels = [...new Set(moduleLabels)];
+      const extras: string[] = [];
+      if (includePeople) extras.push("people living in the space, lifestyle photography");
+      if (includePlants) extras.push("indoor plants, greenery, biophilic design");
       setAiPrompt(
-        `Photorealistic exterior and interior render of a modern modular building with ${uniqueLabels.join(", ")} modules, ${styleName} design style, ${lighting} lighting, professional architectural photography, high detail, 8k`
+        `Photorealistic exterior and interior render of a modern modular building with ${uniqueLabels.join(", ")} modules, ${styleName} design style, ${lighting} lighting, professional architectural photography, interior design magazine, 8k, photorealistic, soft natural lighting${extras.length ? ", " + extras.join(", ") : ""}${templateSuffix ? ", " + templateSuffix : ""}`
       );
       return;
     }
@@ -132,10 +180,41 @@ export default function RenderPage() {
     const modLabel = MODULE_TYPES.find((mt) => mt.id === currentMod.moduleType)?.label || currentMod.moduleType;
     const floor = FLOOR_MATERIALS.find((f) => f.id === currentMod.floorFinish)?.label || currentMod.floorFinish;
     const wall = WALL_MATERIALS.find((w) => w.id === currentMod.wallColor)?.label || currentMod.wallColor;
-    setAiPrompt(
-      `Photorealistic interior render of a modern ${modLabel} with ${styleName} design style, ${lighting} lighting, ${floor} flooring, ${wall} walls, professional architectural photography, high detail, 8k`
-    );
-  }, [currentMod, styleDirection, lighting, viewMode, modules]);
+
+    // Describe wall features (windows, doors)
+    const wallFeatures: string[] = [];
+    const wc = currentMod.wallConfigs;
+    if (wc) {
+      const sides = ["north", "south", "east", "west"] as const;
+      const windowCount = sides.filter((s) => wc[s] === "window").length;
+      const doorCount = sides.filter((s) => wc[s] === "door").length;
+      if (windowCount > 0) wallFeatures.push(`${windowCount} large window${windowCount > 1 ? "s" : ""} with natural light`);
+      if (doorCount > 0) wallFeatures.push(`${doorCount} door${doorCount > 1 ? "s" : ""}`);
+    }
+
+    // Describe furniture from layout preset
+    const furnitureDesc = preset?.furniture.map((f) => f.label).join(", ") || "";
+
+    // People and plants toggles
+    const extras: string[] = [];
+    if (includePeople) extras.push("people living in the space, lifestyle photography");
+    if (includePlants) extras.push("indoor plants, greenery, biophilic design");
+
+    const parts = [
+      `Photorealistic interior render of a modern ${modLabel}`,
+      `${styleName} design style`,
+      `${lighting} lighting`,
+      `${floor} flooring`,
+      `${wall} walls`,
+      wallFeatures.length ? wallFeatures.join(", ") : "",
+      furnitureDesc ? `furnished with ${furnitureDesc}` : "",
+      ...extras,
+      "professional architectural photography, interior design magazine, 8k, photorealistic, soft natural lighting",
+      templateSuffix,
+    ].filter(Boolean);
+
+    setAiPrompt(parts.join(", "));
+  }, [currentMod, styleDirection, lighting, viewMode, modules, promptTemplate, includePeople, includePlants, preset]);
 
   // Reset AI image when prompt changes
   useEffect(() => {
@@ -158,7 +237,8 @@ export default function RenderPage() {
     setAiLoading(true);
     setAiError(null);
     setAiImageUrl(null);
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(aiPrompt.trim())}?width=1024&height=576&model=flux&nologo=true`;
+    const res = RENDER_RESOLUTIONS[renderResolution];
+    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(aiPrompt.trim())}?width=${res.width}&height=${res.height}&model=${pollinationsModel}&nologo=true`;
     // Preload the image to detect load/error before showing
     const img = new Image();
     img.onload = () => {
@@ -307,12 +387,74 @@ export default function RenderPage() {
             </>
           ) : (
             <>
+              {/* Prompt Template */}
+              <div className="mb-3">
+                <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Prompt Template</label>
+                <select
+                  value={promptTemplate}
+                  onChange={(e) => setPromptTemplate(e.target.value as PromptTemplate)}
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
+                >
+                  {(Object.keys(PROMPT_TEMPLATES) as PromptTemplate[]).map((key) => (
+                    <option key={key} value={key}>{PROMPT_TEMPLATES[key].label}</option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[10px] text-gray-400">{PROMPT_TEMPLATES[promptTemplate].description}</p>
+              </div>
+
+              {/* AI Model */}
+              <div className="mb-3">
+                <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Model</label>
+                <div className="flex gap-1">
+                  {(["flux", "turbo"] as PollinationsModel[]).map((m) => (
+                    <button key={m} onClick={() => setPollinationsModel(m)}
+                      className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors ${pollinationsModel === m ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Resolution */}
+              <div className="mb-3">
+                <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Resolution</label>
+                <div className="flex gap-1">
+                  {(Object.keys(RENDER_RESOLUTIONS) as RenderResolution[]).map((r) => (
+                    <button key={r} onClick={() => setRenderResolution(r)}
+                      className={`flex-1 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors ${renderResolution === r ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                      <div>{RENDER_RESOLUTIONS[r].label}</div>
+                      <div className="text-[8px] opacity-70">{RENDER_RESOLUTIONS[r].width}x{RENDER_RESOLUTIONS[r].height}</div>
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              {/* Include People / Plants toggles */}
+              <div className="mb-3 space-y-2">
+                <label className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 cursor-pointer">
+                  <span className="text-xs text-gray-700">Include People</span>
+                  <button type="button" role="switch" aria-checked={includePeople}
+                    onClick={() => setIncludePeople((p) => !p)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${includePeople ? "bg-brand-amber-500" : "bg-gray-300"}`}>
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${includePeople ? "translate-x-4" : "translate-x-0.5"}`} />
+                  </button>
+                </label>
+                <label className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 cursor-pointer">
+                  <span className="text-xs text-gray-700">Include Plants</span>
+                  <button type="button" role="switch" aria-checked={includePlants}
+                    onClick={() => setIncludePlants((p) => !p)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${includePlants ? "bg-brand-amber-500" : "bg-gray-300"}`}>
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${includePlants ? "translate-x-4" : "translate-x-0.5"}`} />
+                  </button>
+                </label>
+              </div>
+
               {/* AI prompt textarea */}
               <div className="mb-3">
                 <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Prompt</label>
                 <textarea
                   value={aiPrompt}
-                  onChange={(e) => setAiPrompt(e.target.value)}
+                  onChange={(e) => { setAiPrompt(e.target.value); if (promptTemplate !== "custom") setPromptTemplate("custom"); }}
                   rows={5}
                   className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500 resize-none"
                   placeholder="Describe the render you want..."
@@ -323,7 +465,7 @@ export default function RenderPage() {
                 disabled={aiLoading || !aiPrompt.trim()}
                 className="w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors disabled:opacity-50 disabled:cursor-wait"
               >
-                {aiLoading ? "Generating..." : "Generate AI Render"}
+                {aiLoading ? "Generating..." : `Generate AI Render (${RENDER_RESOLUTIONS[renderResolution].label})`}
               </button>
               {aiImageUrl && (
                 <a
@@ -655,10 +797,46 @@ export default function RenderPage() {
                   ) : (
                     <>
                       <div className="mb-3">
+                        <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Prompt Template</label>
+                        <select value={promptTemplate} onChange={(e) => setPromptTemplate(e.target.value as PromptTemplate)}
+                          className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none">
+                          {(Object.keys(PROMPT_TEMPLATES) as PromptTemplate[]).map((key) => (
+                            <option key={key} value={key}>{PROMPT_TEMPLATES[key].label}</option>
+                          ))}
+                        </select>
+                      </div>
+                      <div className="mb-3">
+                        <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Resolution</label>
+                        <div className="flex gap-1">
+                          {(Object.keys(RENDER_RESOLUTIONS) as RenderResolution[]).map((r) => (
+                            <button key={r} onClick={() => setRenderResolution(r)}
+                              className={`flex-1 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors ${renderResolution === r ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                              {RENDER_RESOLUTIONS[r].label}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div className="mb-3 space-y-2">
+                        <label className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 cursor-pointer">
+                          <span className="text-xs text-gray-700">Include People</span>
+                          <button type="button" role="switch" aria-checked={includePeople} onClick={() => setIncludePeople((p) => !p)}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${includePeople ? "bg-brand-amber-500" : "bg-gray-300"}`}>
+                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${includePeople ? "translate-x-4" : "translate-x-0.5"}`} />
+                          </button>
+                        </label>
+                        <label className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 cursor-pointer">
+                          <span className="text-xs text-gray-700">Include Plants</span>
+                          <button type="button" role="switch" aria-checked={includePlants} onClick={() => setIncludePlants((p) => !p)}
+                            className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors ${includePlants ? "bg-brand-amber-500" : "bg-gray-300"}`}>
+                            <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${includePlants ? "translate-x-4" : "translate-x-0.5"}`} />
+                          </button>
+                        </label>
+                      </div>
+                      <div className="mb-3">
                         <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Prompt</label>
                         <textarea
                           value={aiPrompt}
-                          onChange={(e) => setAiPrompt(e.target.value)}
+                          onChange={(e) => { setAiPrompt(e.target.value); if (promptTemplate !== "custom") setPromptTemplate("custom"); }}
                           rows={5}
                           className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none resize-none"
                           placeholder="Describe the render you want..."
@@ -669,7 +847,7 @@ export default function RenderPage() {
                         disabled={aiLoading || !aiPrompt.trim()}
                         className="w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors disabled:opacity-50"
                       >
-                        {aiLoading ? "Generating..." : "Generate AI Render"}
+                        {aiLoading ? "Generating..." : `Generate AI Render (${RENDER_RESOLUTIONS[renderResolution].label})`}
                       </button>
                     </>
                   )}

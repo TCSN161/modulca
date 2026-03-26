@@ -245,46 +245,112 @@ function Ceiling() {
 /* ------------------------------------------------------------------ */
 
 const LABEL_TO_GLB: Record<string, string> = {
-  bed: "/models/bedDouble.glb",
+  // Beds
+  "king bed": "/models/bedDouble.glb",
   "single bed": "/models/bedSingle.glb",
+  bed: "/models/bedDouble.glb",
+  daybed: "/models/bedSingle.glb",
+
+  // Sofas & seating
+  "l-sofa": "/models/loungeSofaCorner.glb",
+  "recliner sofa": "/models/loungeSofa.glb",
   sofa: "/models/loungeSofa.glb",
   couch: "/models/loungeSofa.glb",
-  "l-sofa": "/models/loungeSofaCorner.glb",
-  chair: "/models/chair.glb",
+  "lounge chair": "/models/loungeChair.glb",
+  armchair: "/models/loungeChair.glb",
+
+  // Chairs & stools
   "office chair": "/models/chairDesk.glb",
   "desk chair": "/models/chairDesk.glb",
+  "bar stool": "/models/chair.glb",
+  "work stool": "/models/chair.glb",
+  chair: "/models/chair.glb",
+
+  // Desks & tables
+  "l-desk": "/models/desk.glb",
+  "desk 1": "/models/desk.glb",
+  "desk 2": "/models/desk.glb",
   desk: "/models/desk.glb",
-  table: "/models/table.glb",
   "dining table": "/models/table.glb",
   "round table": "/models/tableRound.glb",
-  "coffee table": "/models/tableRound.glb",
+  "coffee table": "/models/sideTable.glb",
+  table: "/models/table.glb",
+  "kitchen island": "/models/table.glb",
+  workbench: "/models/table.glb",
+
+  // Side tables & small furniture
   nightstand: "/models/sideTable.glb",
   "side table": "/models/sideTable.glb",
+
+  // Storage & cabinets
   wardrobe: "/models/cabinetBedDrawer.glb",
   closet: "/models/cabinetBedDrawer.glb",
   dresser: "/models/cabinetBedDrawer.glb",
+  bookshelf: "/models/cabinetBedDrawer.glb",
+  "shared shelf": "/models/cabinetBedDrawer.glb",
+  sideboard: "/models/cabinetBedDrawer.glb",
+  "media console": "/models/cabinetBedDrawer.glb",
+  "tv unit": "/models/cabinetBedDrawer.glb",
+  "file cabinet": "/models/cabinetBedDrawer.glb",
+  "storage cabinet": "/models/cabinetBedDrawer.glb",
+
+  // Shelving (map to cabinet as closest match)
+  "left shelves": "/models/cabinetBedDrawer.glb",
+  "right shelves": "/models/cabinetBedDrawer.glb",
+  "back shelves": "/models/cabinetBedDrawer.glb",
+  "drying rack": "/models/cabinetBedDrawer.glb",
+
+  // Bathroom
   toilet: "/models/toilet.glb",
+  "raised toilet": "/models/toilet.glb",
   wc: "/models/toilet.glb",
   shower: "/models/shower.glb",
+  "rain shower": "/models/shower.glb",
+  "roll-in shower": "/models/shower.glb",
   bathtub: "/models/bathtub.glb",
+  "freestanding tub": "/models/bathtub.glb",
   bath: "/models/bathtub.glb",
+  vanity: "/models/bathroomSink.glb",
+  "low vanity": "/models/bathroomSink.glb",
   sink: "/models/bathroomSink.glb",
+  "utility sink": "/models/kitchenSink.glb",
   "kitchen sink": "/models/kitchenSink.glb",
+
+  // Kitchen counters (use kitchenSink as closest match)
+  "back counter": "/models/kitchenSink.glb",
+  "side counter": "/models/kitchenSink.glb",
+  "left counter": "/models/kitchenSink.glb",
+  "right counter": "/models/kitchenSink.glb",
+
+  // Appliances (use kitchenSink for counter-like, cabinet for box-like)
+  fridge: "/models/cabinetBedDrawer.glb",
+  refrigerator: "/models/cabinetBedDrawer.glb",
+  washer: "/models/cabinetBedDrawer.glb",
+  dryer: "/models/cabinetBedDrawer.glb",
+  "water heater": "/models/cabinetBedDrawer.glb",
+
+  // Lamps & plants
   lamp: "/models/lampRoundFloor.glb",
   "floor lamp": "/models/lampRoundFloor.glb",
   "table lamp": "/models/lampRoundTable.glb",
   "desk lamp": "/models/lampRoundTable.glb",
   plant: "/models/pottedPlant.glb",
-  armchair: "/models/loungeChair.glb",
 };
 
+/**
+ * Resolve a furniture label to a GLB model path.
+ * Uses exact match first (case-insensitive), then tries partial matching.
+ * Longer keys are checked first during partial matching so that
+ * "lounge chair" matches before "chair".
+ */
 function getGlbPath(label: string): string | null {
   const lbl = label.toLowerCase();
   // Try exact match first
   if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
-  // Try partial match
-  for (const [key, path] of Object.entries(LABEL_TO_GLB)) {
-    if (lbl.includes(key) || key.includes(lbl)) return path;
+  // Try partial match — sort keys longest-first so more specific keys win
+  const sortedKeys = Object.keys(LABEL_TO_GLB).sort((a, b) => b.length - a.length);
+  for (const key of sortedKeys) {
+    if (lbl.includes(key) || key.includes(lbl)) return LABEL_TO_GLB[key];
   }
   return null;
 }
@@ -301,21 +367,23 @@ function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: number; d
     ref.current.add(cloned);
 
     // Compute bounding box to scale model to fit the designated dimensions
+    // Use per-axis (non-uniform) scaling so furniture fills its bounding box
     const box = new THREE.Box3().setFromObject(cloned);
     const size = box.getSize(new THREE.Vector3());
     const scaleX = size.x > 0 ? w / size.x : 1;
     const scaleY = size.y > 0 ? h / size.y : 1;
     const scaleZ = size.z > 0 ? d / size.z : 1;
-    const s = Math.min(scaleX, scaleY, scaleZ);
-    cloned.scale.set(s, s, s);
+    cloned.scale.set(scaleX, scaleY, scaleZ);
 
-    // Re-compute after scale
+    // Re-compute after scale and position so the bottom sits at y=0
     const box2 = new THREE.Box3().setFromObject(cloned);
     const center = box2.getCenter(new THREE.Vector3());
     const minY = box2.min.y;
     cloned.position.set(-center.x, -minY, -center.z);
   }, [scene, w, h, d]);
 
+  // Position the group so the bottom of the model is at the parent's -h/2
+  // (the parent places center at halfH, so bottom at y=0 world)
   return <group ref={ref} position={[0, -h / 2, 0]} />;
 }
 
