@@ -1,8 +1,9 @@
 "use client";
 
 import { useRef, useState, useCallback, useEffect } from "react";
+import * as THREE from "three";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
-import { OrbitControls, Text, ContactShadows, useCursor } from "@react-three/drei";
+import { OrbitControls, Text, ContactShadows, useCursor, useGLTF } from "@react-three/drei";
 import type { ModuleConfig, WallConfigs } from "../../store";
 import { useDesignStore } from "../../store";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
@@ -240,7 +241,86 @@ function Ceiling() {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Detailed furniture geometry based on label                         */
+/*  GLB Model loader — maps furniture labels to Kenney models          */
+/* ------------------------------------------------------------------ */
+
+const LABEL_TO_GLB: Record<string, string> = {
+  bed: "/models/bedDouble.glb",
+  "single bed": "/models/bedSingle.glb",
+  sofa: "/models/loungeSofa.glb",
+  couch: "/models/loungeSofa.glb",
+  "l-sofa": "/models/loungeSofaCorner.glb",
+  chair: "/models/chair.glb",
+  "office chair": "/models/chairDesk.glb",
+  "desk chair": "/models/chairDesk.glb",
+  desk: "/models/desk.glb",
+  table: "/models/table.glb",
+  "dining table": "/models/table.glb",
+  "round table": "/models/tableRound.glb",
+  "coffee table": "/models/tableRound.glb",
+  nightstand: "/models/sideTable.glb",
+  "side table": "/models/sideTable.glb",
+  wardrobe: "/models/cabinetBedDrawer.glb",
+  closet: "/models/cabinetBedDrawer.glb",
+  dresser: "/models/cabinetBedDrawer.glb",
+  toilet: "/models/toilet.glb",
+  wc: "/models/toilet.glb",
+  shower: "/models/shower.glb",
+  bathtub: "/models/bathtub.glb",
+  bath: "/models/bathtub.glb",
+  sink: "/models/bathroomSink.glb",
+  "kitchen sink": "/models/kitchenSink.glb",
+  lamp: "/models/lampRoundFloor.glb",
+  "floor lamp": "/models/lampRoundFloor.glb",
+  "table lamp": "/models/lampRoundTable.glb",
+  "desk lamp": "/models/lampRoundTable.glb",
+  plant: "/models/pottedPlant.glb",
+  armchair: "/models/loungeChair.glb",
+};
+
+function getGlbPath(label: string): string | null {
+  const lbl = label.toLowerCase();
+  // Try exact match first
+  if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
+  // Try partial match
+  for (const [key, path] of Object.entries(LABEL_TO_GLB)) {
+    if (lbl.includes(key) || key.includes(lbl)) return path;
+  }
+  return null;
+}
+
+function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: number; d: number }) {
+  const { scene } = useGLTF(path);
+  const ref = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const cloned = scene.clone(true);
+    // Clear previous children
+    while (ref.current.children.length) ref.current.remove(ref.current.children[0]);
+    ref.current.add(cloned);
+
+    // Compute bounding box to scale model to fit the designated dimensions
+    const box = new THREE.Box3().setFromObject(cloned);
+    const size = box.getSize(new THREE.Vector3());
+    const scaleX = size.x > 0 ? w / size.x : 1;
+    const scaleY = size.y > 0 ? h / size.y : 1;
+    const scaleZ = size.z > 0 ? d / size.z : 1;
+    const s = Math.min(scaleX, scaleY, scaleZ);
+    cloned.scale.set(s, s, s);
+
+    // Re-compute after scale
+    const box2 = new THREE.Box3().setFromObject(cloned);
+    const center = box2.getCenter(new THREE.Vector3());
+    const minY = box2.min.y;
+    cloned.position.set(-center.x, -minY, -center.z);
+  }, [scene, w, h, d]);
+
+  return <group ref={ref} position={[0, -h / 2, 0]} />;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Detailed furniture geometry based on label (fallback)              */
 /* ------------------------------------------------------------------ */
 
 function darken(hex: string, amount: number): string {
@@ -573,14 +653,23 @@ function FurniturePiece({
 
       {/* Rotated group containing furniture geometry */}
       <group rotation={[0, rotationY, 0]}>
-        {/* Detailed geometry */}
-        <DetailedFurniture
-          w={item.width}
-          h={item.height}
-          d={item.depth}
-          color={displayColor}
-          label={item.label}
-        />
+        {/* GLB model or fallback detailed geometry */}
+        {getGlbPath(item.label) ? (
+          <GlbFurniture
+            path={getGlbPath(item.label)!}
+            w={item.width}
+            h={item.height}
+            d={item.depth}
+          />
+        ) : (
+          <DetailedFurniture
+            w={item.width}
+            h={item.height}
+            d={item.depth}
+            color={displayColor}
+            label={item.label}
+          />
+        )}
 
         {/* Hover/selection glow overlay */}
         {(hovered || isSelected) && (
