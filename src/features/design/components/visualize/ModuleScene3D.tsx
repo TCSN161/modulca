@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useCallback, useEffect } from "react";
+import { useRef, useState, useCallback, useEffect, Suspense, Component } from "react";
+import type { ReactNode, ReactElement } from "react";
 import * as THREE from "three";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, Text, ContactShadows, useCursor, useGLTF } from "@react-three/drei";
@@ -9,7 +10,90 @@ import { useDesignStore } from "../../store";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import type { FurnitureItem } from "../../layouts";
 import type { FurnitureOverride } from "../../store";
-import type { ReactElement } from "react";
+
+/* ------------------------------------------------------------------ */
+/*  Error boundary for R3F Canvas contents                             */
+/* ------------------------------------------------------------------ */
+
+interface CanvasErrorBoundaryProps {
+  children: ReactNode;
+  fallback?: ReactNode;
+}
+
+interface CanvasErrorBoundaryState {
+  hasError: boolean;
+}
+
+class CanvasErrorBoundary extends Component<CanvasErrorBoundaryProps, CanvasErrorBoundaryState> {
+  constructor(props: CanvasErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): CanvasErrorBoundaryState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error("[ModuleScene3D] Canvas error caught by boundary:", error);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback ?? null;
+    }
+    return this.props.children;
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  HTML overlay shown when Canvas encounters an error                 */
+/* ------------------------------------------------------------------ */
+
+function CanvasErrorFallback() {
+  return (
+    <div
+      style={{
+        position: "absolute",
+        inset: 0,
+        display: "flex",
+        alignItems: "center",
+        justifyContent: "center",
+        background: "#f8f8f6",
+      }}
+    >
+      <div style={{ textAlign: "center", color: "#888", fontSize: 14 }}>
+        <p style={{ fontWeight: 600 }}>3D view failed to load</p>
+        <p style={{ fontSize: 12, marginTop: 4 }}>
+          Try switching modules or refreshing the page.
+        </p>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Loading spinner shown inside the Canvas while GLBs load            */
+/* ------------------------------------------------------------------ */
+
+function LoadingIndicator() {
+  const ref = useRef<THREE.Mesh>(null);
+  useEffect(() => {
+    let id: number;
+    const spin = () => {
+      if (ref.current) ref.current.rotation.y += 0.03;
+      id = requestAnimationFrame(spin);
+    };
+    id = requestAnimationFrame(spin);
+    return () => cancelAnimationFrame(id);
+  }, []);
+  return (
+    <mesh ref={ref} position={[0, 1, 0]}>
+      <torusGeometry args={[0.3, 0.06, 8, 24]} />
+      <meshStandardMaterial color="#888" transparent opacity={0.5} />
+    </mesh>
+  );
+}
 
 const MODULE_SIZE = 3; // 3m
 const WALL_HEIGHT = 2.7;
@@ -387,6 +471,60 @@ function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: number; d
   return <group ref={ref} position={[0, -h / 2, 0]} />;
 }
 
+/**
+ * Error-boundary wrapper for GlbFurniture inside the R3F Canvas tree.
+ * If the GLB fails to load (network error, corrupt file, etc.) we fall
+ * back to the procedural DetailedFurniture geometry instead of crashing
+ * the entire Canvas.
+ */
+interface SafeGlbFurnitureProps {
+  path: string;
+  w: number;
+  h: number;
+  d: number;
+  color: string;
+  label: string;
+}
+
+interface SafeGlbState {
+  hasError: boolean;
+}
+
+class SafeGlbFurniture extends Component<SafeGlbFurnitureProps, SafeGlbState> {
+  constructor(props: SafeGlbFurnitureProps) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError(): SafeGlbState {
+    return { hasError: true };
+  }
+
+  componentDidCatch(error: Error) {
+    console.error(`[SafeGlbFurniture] Failed to load GLB "${this.props.path}":`, error);
+  }
+
+  render() {
+    const { path, w, h, d, color, label } = this.props;
+    if (this.state.hasError) {
+      // Fall back to procedural geometry when GLB fails
+      return <DetailedFurniture w={w} h={h} d={d} color={color} label={label} />;
+    }
+    return (
+      <Suspense
+        fallback={
+          <mesh>
+            <boxGeometry args={[w, h, d]} />
+            <meshStandardMaterial color={color} transparent opacity={0.3} wireframe />
+          </mesh>
+        }
+      >
+        <GlbFurniture path={path} w={w} h={h} d={d} />
+      </Suspense>
+    );
+  }
+}
+
 /* ------------------------------------------------------------------ */
 /*  Detailed furniture geometry based on label (fallback)              */
 /* ------------------------------------------------------------------ */
@@ -721,13 +859,15 @@ function FurniturePiece({
 
       {/* Rotated group containing furniture geometry */}
       <group rotation={[0, rotationY, 0]}>
-        {/* GLB model or fallback detailed geometry */}
+        {/* GLB model (with error boundary + Suspense) or fallback geometry */}
         {getGlbPath(item.label) ? (
-          <GlbFurniture
+          <SafeGlbFurniture
             path={getGlbPath(item.label)!}
             w={item.width}
             h={item.height}
             d={item.depth}
+            color={displayColor}
+            label={item.label}
           />
         ) : (
           <DetailedFurniture
@@ -1046,24 +1186,28 @@ export default function ModuleScene3D({ module }: ModuleScene3DProps) {
   const wallColor = WALL_MATERIALS.find((w) => w.id === module.wallColor)?.color || "#F0EDE5";
 
   return (
-    <div style={{ position: "relative", width: "100%", height: "100%" }}>
-      <Canvas
-        shadows
-        camera={{
-          position: [5.5, 4.5, 5.5],
-          fov: 35,
-          near: 0.1,
-          far: 100,
-        }}
-        style={{ background: "#f8f8f6", width: "100%", height: "100%" }}
-      >
-        <SceneContent
-          module={module}
-          furniture={furniture}
-          floorColor={floorColor}
-          wallColor={wallColor}
-        />
-      </Canvas>
+    <div style={{ position: "relative", width: "100%", height: "100%", minHeight: 200 }}>
+      <CanvasErrorBoundary fallback={<CanvasErrorFallback />}>
+        <Canvas
+          shadows
+          camera={{
+            position: [5.5, 4.5, 5.5],
+            fov: 35,
+            near: 0.1,
+            far: 100,
+          }}
+          style={{ background: "#f8f8f6", width: "100%", height: "100%" }}
+        >
+          <Suspense fallback={<LoadingIndicator />}>
+            <SceneContent
+              module={module}
+              furniture={furniture}
+              floorColor={floorColor}
+              wallColor={wallColor}
+            />
+          </Suspense>
+        </Canvas>
+      </CanvasErrorBoundary>
       {/* Controls hint overlay */}
       <div
         style={{

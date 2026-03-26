@@ -3,8 +3,9 @@
 import { useRef, useState, useEffect, useCallback } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, ContactShadows, Environment } from "@react-three/drei";
-import { useDesignStore } from "@/features/design/store";
+import { useDesignStore, type ModuleConfig } from "@/features/design/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
+import { FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
 import * as THREE from "three";
 
 const MODULE_SIZE = 3;
@@ -169,26 +170,43 @@ function ClickCatcher({ onDeselect }: { onDeselect: () => void }) {
   );
 }
 
+type InfoSection = "geometry" | "material" | "metadata";
+
 /** Floating info panel rendered in HTML overlay */
 function ModuleInfoPanel({
   mod,
   position,
 }: {
-  mod: { label: string; moduleType: string; row: number; col: number };
+  mod: ModuleConfig;
   position: { x: number; y: number };
 }) {
+  const [activeSection, setActiveSection] = useState<InfoSection | null>(null);
   const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
   const finishLevel = useDesignStore((s) => s.finishLevel);
   const finish = FINISH_LEVELS.find((f) => f.id === finishLevel);
   const cost = finish?.pricePerModule ?? 0;
 
+  const floorMat = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish);
+  const wallMat = WALL_MATERIALS.find((w) => w.id === mod.wallColor);
+
+  // Count walls, doors, windows
+  const wc = mod.wallConfigs;
+  const sides = ["north", "south", "east", "west"] as const;
+  const wallCount = wc ? sides.filter((s) => wc[s] === "solid").length : 4;
+  const doorCount = wc ? sides.filter((s) => wc[s] === "door").length : 0;
+  const windowCount = wc ? sides.filter((s) => wc[s] === "window").length : 0;
+
+  const toggleSection = (section: InfoSection) => {
+    setActiveSection((prev) => (prev === section ? null : section));
+  };
+
   return (
     <div
-      className="pointer-events-none absolute z-10 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm"
+      className="pointer-events-auto absolute z-10 rounded-lg border border-gray-200 bg-white/95 px-4 py-3 shadow-lg backdrop-blur-sm"
       style={{
         left: position.x + 16,
         top: position.y - 40,
-        minWidth: 180,
+        minWidth: 200,
       }}
     >
       <div className="flex items-center gap-2 mb-2">
@@ -218,6 +236,89 @@ function ModuleInfoPanel({
           <span className="font-bold text-brand-amber-600">&euro;{cost.toLocaleString()}</span>
         </div>
       </div>
+
+      {/* Section toggle buttons */}
+      <div className="flex gap-1 mt-3 pt-2 border-t border-gray-100">
+        {(["geometry", "material", "metadata"] as InfoSection[]).map((section) => (
+          <button
+            key={section}
+            onClick={() => toggleSection(section)}
+            className={`flex-1 rounded-md px-2 py-1 text-[10px] font-medium capitalize transition-colors ${
+              activeSection === section
+                ? "bg-brand-teal-800 text-white"
+                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+            }`}
+          >
+            {section}
+          </button>
+        ))}
+      </div>
+
+      {/* Section details */}
+      {activeSection === "geometry" && (
+        <div className="mt-2 space-y-1 text-[11px] rounded-md bg-gray-50 p-2">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Dimensions</span>
+            <span className="font-medium text-brand-teal-800">3.0 x 3.0 m</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Height</span>
+            <span className="font-medium text-brand-teal-800">2.8 m</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Solid Walls</span>
+            <span className="font-medium text-brand-teal-800">{wallCount}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Doors</span>
+            <span className="font-medium text-brand-teal-800">{doorCount}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Windows</span>
+            <span className="font-medium text-brand-teal-800">{windowCount}</span>
+          </div>
+        </div>
+      )}
+
+      {activeSection === "material" && (
+        <div className="mt-2 space-y-1 text-[11px] rounded-md bg-gray-50 p-2">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-500">Floor Finish</span>
+            <span className="flex items-center gap-1 font-medium text-brand-teal-800">
+              {floorMat && <span className="inline-block h-2 w-2 rounded" style={{ backgroundColor: floorMat.color }} />}
+              {floorMat?.label ?? mod.floorFinish}
+            </span>
+          </div>
+          <div className="flex justify-between items-center">
+            <span className="text-gray-500">Wall Material</span>
+            <span className="flex items-center gap-1 font-medium text-brand-teal-800">
+              {wallMat && <span className="inline-block h-2 w-2 rounded" style={{ backgroundColor: wallMat.color }} />}
+              {wallMat?.label ?? mod.wallColor}
+            </span>
+          </div>
+        </div>
+      )}
+
+      {activeSection === "metadata" && (
+        <div className="mt-2 space-y-1 text-[11px] rounded-md bg-gray-50 p-2">
+          <div className="flex justify-between">
+            <span className="text-gray-500">Module Type</span>
+            <span className="font-medium text-brand-teal-800">{mt?.label ?? mod.moduleType}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Layout Preset</span>
+            <span className="font-medium text-brand-teal-800">{mod.layoutPreset}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Grid Position</span>
+            <span className="font-medium text-brand-teal-800">Row {mod.row}, Col {mod.col}</span>
+          </div>
+          <div className="flex justify-between">
+            <span className="text-gray-500">Created</span>
+            <span className="font-medium text-brand-teal-800">{new Date().toLocaleDateString()}</span>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

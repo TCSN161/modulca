@@ -262,12 +262,20 @@ export default function VisualizePage() {
           </aside>
         )}
 
-        {/* Center — 3D scene — keep both mounted to prevent Canvas remount flicker */}
+        {/* Center — 3D scene — keep both mounted to prevent Canvas remount flicker.
+            Use visibility:hidden + absolute positioning instead of display:none (Tailwind "hidden")
+            because display:none destroys the WebGL context and causes the 3D view to disappear. */}
         <main className="flex-1 overflow-hidden relative">
-          <div className={viewMode === "all" ? "absolute inset-0" : "hidden"}>
+          <div
+            className="absolute inset-0"
+            style={{ visibility: viewMode === "all" ? "visible" : "hidden" }}
+          >
             <CombinedScene3D />
           </div>
-          <div className={viewMode === "single" ? "absolute inset-0" : "hidden"}>
+          <div
+            className="absolute inset-0"
+            style={{ visibility: viewMode === "single" ? "visible" : "hidden" }}
+          >
             {currentMod && <ModuleScene3D module={currentMod} />}
           </div>
         </main>

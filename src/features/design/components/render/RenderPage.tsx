@@ -232,25 +232,73 @@ export default function RenderPage() {
     }, 500);
   };
 
-  const handleGenerateAiRender = () => {
+  const handleGenerateAiRender = useCallback((modelOverride?: PollinationsModel | React.MouseEvent) => {
+    // When called as onClick handler, ignore the mouse event argument
+    const effectiveModel: PollinationsModel =
+      typeof modelOverride === "string" ? modelOverride : pollinationsModel;
+
     if (!aiPrompt.trim()) return;
     setAiLoading(true);
     setAiError(null);
     setAiImageUrl(null);
+
+    const model = effectiveModel;
     const res = RENDER_RESOLUTIONS[renderResolution];
-    const url = `https://image.pollinations.ai/prompt/${encodeURIComponent(aiPrompt.trim())}?width=${res.width}&height=${res.height}&model=${pollinationsModel}&nologo=true`;
-    // Preload the image to detect load/error before showing
-    const img = new Image();
+
+    // Sanitize prompt: remove special chars that break the URL, limit length
+    const sanitized = aiPrompt
+      .trim()
+      .replace(/[^\w\s,.\-!?']/g, " ")   // keep only safe chars
+      .replace(/\s+/g, " ")                // collapse whitespace
+      .slice(0, 500);                       // Pollinations prompt length limit
+
+    const encoded = encodeURIComponent(sanitized);
+    const url = `https://image.pollinations.ai/prompt/${encoded}?width=${res.width}&height=${res.height}&model=${model}&nologo=true&seed=${Date.now()}`;
+
+    // Log URL for debugging
+    console.log("[AI Render] URL:", url);
+    console.log("[AI Render] model:", model, "resolution:", res.width, "x", res.height);
+
+    const img = new window.Image();
+    let timedOut = false;
+
+    // 15-second timeout
+    const timer = setTimeout(() => {
+      timedOut = true;
+      img.src = ""; // abort load
+      // Fallback: if flux failed, retry with turbo automatically
+      if (model === "flux") {
+        console.log("[AI Render] Timeout with flux, retrying with turbo...");
+        handleGenerateAiRender("turbo");
+      } else {
+        setAiError("AI render timed out. Try a shorter prompt or lower resolution.");
+        setAiLoading(false);
+      }
+    }, 15000);
+
     img.onload = () => {
+      if (timedOut) return;
+      clearTimeout(timer);
       setAiImageUrl(url);
       setAiLoading(false);
     };
+
     img.onerror = () => {
-      setAiError("Failed to generate AI render. Please try again or adjust your prompt.");
-      setAiLoading(false);
+      if (timedOut) return;
+      clearTimeout(timer);
+      // Fallback: if flux failed, retry with turbo automatically
+      if (model === "flux") {
+        console.log("[AI Render] Error with flux, retrying with turbo...");
+        handleGenerateAiRender("turbo");
+      } else {
+        setAiError("Failed to generate AI render. Please try again or adjust your prompt.");
+        setAiLoading(false);
+      }
     };
+
+    img.crossOrigin = "anonymous";
     img.src = url;
-  };
+  }, [aiPrompt, pollinationsModel, renderResolution]);
 
   if (modules.length === 0) {
     return (
