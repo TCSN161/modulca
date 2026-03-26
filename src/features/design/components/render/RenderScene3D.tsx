@@ -1,8 +1,9 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { Suspense, useEffect, useRef } from "react";
+import * as THREE from "three";
 import { Canvas, useThree } from "@react-three/fiber";
-import { OrbitControls, ContactShadows } from "@react-three/drei";
+import { OrbitControls, ContactShadows, useGLTF } from "@react-three/drei";
 import type { ModuleConfig } from "../../store";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import type { FurnitureItem } from "../../layouts";
@@ -141,7 +142,85 @@ function Walls({ color, showFront, wallConfigs }: { color: string; showFront: bo
 }
 
 /* ------------------------------------------------------------------ */
-/*  Detailed furniture geometry based on label                         */
+/*  GLB Model loader (same as ModuleScene3D)                           */
+/* ------------------------------------------------------------------ */
+
+const LABEL_TO_GLB: Record<string, string> = {
+  bed: "/models/bedDouble.glb", "single bed": "/models/bedSingle.glb",
+  sofa: "/models/loungeSofa.glb", couch: "/models/loungeSofa.glb",
+  "l-sofa": "/models/loungeSofaCorner.glb", chair: "/models/chair.glb",
+  "office chair": "/models/chairDesk.glb", "desk chair": "/models/chairDesk.glb",
+  desk: "/models/desk.glb", table: "/models/table.glb",
+  "dining table": "/models/table.glb", "round table": "/models/tableRound.glb",
+  "coffee table": "/models/tableRound.glb", nightstand: "/models/sideTable.glb",
+  "side table": "/models/sideTable.glb", wardrobe: "/models/cabinetBedDrawer.glb",
+  closet: "/models/cabinetBedDrawer.glb", dresser: "/models/cabinetBedDrawer.glb",
+  toilet: "/models/toilet.glb", wc: "/models/toilet.glb",
+  shower: "/models/shower.glb", bathtub: "/models/bathtub.glb",
+  bath: "/models/bathtub.glb", sink: "/models/bathroomSink.glb",
+  "kitchen sink": "/models/kitchenSink.glb", lamp: "/models/lampRoundFloor.glb",
+  "floor lamp": "/models/lampRoundFloor.glb", "table lamp": "/models/lampRoundTable.glb",
+  plant: "/models/pottedPlant.glb", armchair: "/models/loungeChair.glb",
+  "tv unit": "/models/cabinetBedDrawer.glb", bookshelf: "/models/cabinetBedDrawer.glb",
+  fridge: "/models/cabinetBedDrawer.glb", counter: "/models/kitchenSink.glb",
+  stove: "/models/table.glb", vanity: "/models/bathroomSink.glb",
+  shelves: "/models/cabinetBedDrawer.glb", cabinet: "/models/cabinetBedDrawer.glb",
+};
+
+function getGlbPath(label: string): string | null {
+  const lbl = label.toLowerCase();
+  if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
+  const sorted = Object.entries(LABEL_TO_GLB).sort((a, b) => b[0].length - a[0].length);
+  for (const [key, path] of sorted) {
+    if (lbl.includes(key) || key.includes(lbl)) return path;
+  }
+  return null;
+}
+
+function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: number; d: number }) {
+  const { scene } = useGLTF(path);
+  const ref = useRef<THREE.Group>(null);
+
+  useEffect(() => {
+    if (!ref.current) return;
+    const cloned = scene.clone(true);
+    while (ref.current.children.length) ref.current.remove(ref.current.children[0]);
+    ref.current.add(cloned);
+    const box = new THREE.Box3().setFromObject(cloned);
+    const size = box.getSize(new THREE.Vector3());
+    const scaleX = size.x > 0 ? w / size.x : 1;
+    const scaleY = size.y > 0 ? h / size.y : 1;
+    const scaleZ = size.z > 0 ? d / size.z : 1;
+    cloned.scale.set(scaleX, scaleY, scaleZ);
+    const box2 = new THREE.Box3().setFromObject(cloned);
+    const center = box2.getCenter(new THREE.Vector3());
+    const minY = box2.min.y;
+    cloned.position.set(-center.x, -minY, -center.z);
+  }, [scene, w, h, d]);
+
+  return <group ref={ref} position={[0, -h / 2, 0]} />;
+}
+
+class SafeGlbFurniture extends React.Component<
+  { path: string; w: number; h: number; d: number; color: string; label: string },
+  { hasError: boolean }
+> {
+  state = { hasError: false };
+  static getDerivedStateFromError() { return { hasError: true }; }
+  render() {
+    if (this.state.hasError) {
+      return <DetailedFurniture w={this.props.w} h={this.props.h} d={this.props.d} color={this.props.color} label={this.props.label} />;
+    }
+    return (
+      <Suspense fallback={<mesh><boxGeometry args={[this.props.w, this.props.h, this.props.d]} /><meshStandardMaterial color={this.props.color} wireframe /></mesh>}>
+        <GlbFurniture path={this.props.path} w={this.props.w} h={this.props.h} d={this.props.d} />
+      </Suspense>
+    );
+  }
+}
+
+/* ------------------------------------------------------------------ */
+/*  Detailed furniture geometry based on label (fallback)              */
 /* ------------------------------------------------------------------ */
 
 function darken(hex: string, amount: number): string {
@@ -394,18 +473,17 @@ function DetailedFurniture({ w, h, d, color, label }: { w: number; h: number; d:
 function FurniturePiece({ item, colorOverride, rotationOverride }: { item: FurnitureItem; colorOverride?: string; rotationOverride?: number }) {
   const c = colorOverride || item.color;
   const rotY = rotationOverride ?? 0;
+  const glbPath = getGlbPath(item.label);
   return (
     <group
       position={[item.x + item.width / 2, item.height / 2, item.z + item.depth / 2]}
     >
       <group rotation={[0, rotY, 0]}>
-        <DetailedFurniture
-          w={item.width}
-          h={item.height}
-          d={item.depth}
-          color={c}
-          label={item.label}
-        />
+        {glbPath ? (
+          <SafeGlbFurniture path={glbPath} w={item.width} h={item.height} d={item.depth} color={c} label={item.label} />
+        ) : (
+          <DetailedFurniture w={item.width} h={item.height} d={item.depth} color={c} label={item.label} />
+        )}
       </group>
     </group>
   );
