@@ -253,50 +253,56 @@ export default function RenderPage() {
       .slice(0, 500);                       // Pollinations prompt length limit
 
     const encoded = encodeURIComponent(sanitized);
-    const url = `https://gen.pollinations.ai/image/${encoded}?width=${res.width}&height=${res.height}&model=${model}&nologo=true&nofeed=true&enhance=true&seed=${Date.now()}`;
+    // Use image.pollinations.ai (redirects to gen.pollinations.ai — browsers follow this)
+    const url = `https://image.pollinations.ai/prompt/${encoded}?width=${res.width}&height=${res.height}&model=${model}&nologo=true&nofeed=true&enhance=true&seed=${Date.now()}`;
 
     // Log URL for debugging
     console.log("[AI Render] URL:", url);
     console.log("[AI Render] model:", model, "resolution:", res.width, "x", res.height);
 
-    // Use fetch to follow redirects, then create object URL
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 60000); // 60s timeout
+    // Use <img> tag approach — browsers handle redirects and CORS for images natively
+    const img = new window.Image();
+    let timedOut = false;
 
-    fetch(url, { signal: controller.signal })
-      .then((resp) => {
-        if (!resp.ok) throw new Error(`HTTP ${resp.status}`);
-        return resp.blob();
-      })
-      .then((blob) => {
-        clearTimeout(timer);
-        if (blob.type.startsWith("image/")) {
-          const objectUrl = URL.createObjectURL(blob);
-          setAiImageUrl(objectUrl);
-          setAiLoading(false);
-        } else {
-          throw new Error("Response was not an image");
-        }
-      })
-      .catch((err) => {
-        clearTimeout(timer);
-        if (err.name === "AbortError") {
-          if (model === "flux") {
-            console.log("[AI Render] Timeout with flux, retrying with zimage...");
-            handleGenerateAiRender("zimage");
-          } else {
-            setAiError("AI render timed out. Try a shorter prompt or Draft resolution.");
-            setAiLoading(false);
-          }
-        } else if (model === "flux") {
-          console.log("[AI Render] Error with flux, retrying with zimage...", err);
-          handleGenerateAiRender("zimage");
-        } else {
-          console.error("[AI Render] Failed:", err);
-          setAiError("Failed to generate AI render. Please try again or adjust your prompt.");
-          setAiLoading(false);
-        }
-      });
+    // 90-second timeout (AI image generation can take a while)
+    const timer = setTimeout(() => {
+      timedOut = true;
+      // Don't set img.src="" as it triggers onerror
+      if (model === "flux") {
+        console.log("[AI Render] Timeout with flux, retrying with zimage...");
+        handleGenerateAiRender("zimage");
+      } else {
+        setAiError("AI render timed out. Try Draft resolution or a shorter prompt.");
+        setAiLoading(false);
+      }
+    }, 90000);
+
+    img.onload = () => {
+      if (timedOut) return;
+      clearTimeout(timer);
+      // Verify it's a real image (not a 1x1 error pixel)
+      if (img.naturalWidth > 10 && img.naturalHeight > 10) {
+        setAiImageUrl(url);
+        setAiLoading(false);
+      } else {
+        img.onerror?.(new Event("error"));
+      }
+    };
+
+    img.onerror = () => {
+      if (timedOut) return;
+      clearTimeout(timer);
+      if (model === "flux") {
+        console.log("[AI Render] Error with flux, retrying with zimage...");
+        handleGenerateAiRender("zimage");
+      } else {
+        setAiError("Failed to generate AI render. Please try again or adjust your prompt.");
+        setAiLoading(false);
+      }
+    };
+
+    // crossOrigin not needed for display (only for canvas export)
+    img.src = url;
   }, [aiPrompt, pollinationsModel, renderResolution]);
 
   if (modules.length === 0) {

@@ -11,6 +11,7 @@ const nextConfig = {
       { protocol: "https", hostname: "api.mapbox.com" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "image.pollinations.ai" },
+      { protocol: "https", hostname: "gen.pollinations.ai" },
     ],
   },
   webpack: (config, { isServer }) => {
