@@ -19,14 +19,19 @@ export default function HomePage() {
               Modul<span className="text-brand-amber-500">CA</span>
             </span>
           </div>
+          <div className="hidden items-center gap-6 sm:flex">
+            <Link href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">How It Works</Link>
+            <Link href="/project/demo/land" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">Pricing</Link>
+            <Link href="/project/demo/land" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">For Builders</Link>
+          </div>
           <div className="flex items-center gap-4">
             <Link
-              href="/login"
+              href="/dashboard"
               className="text-sm font-medium text-gray-600 transition-colors hover:text-brand-teal-800"
             >
-              Sign In
+              Login
             </Link>
-            <Link href="/register" className="btn-accent text-sm">
+            <Link href="/project/demo/land" className="btn-accent text-sm">
               Get Started
             </Link>
           </div>
