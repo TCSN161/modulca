@@ -132,6 +132,17 @@ export default function RenderPage() {
     captureRef.current = capture;
   }, []);
 
+  // Load Puter.js for AI rendering
+  useEffect(() => {
+    if (!document.getElementById("puter-js")) {
+      const s = document.createElement("script");
+      s.id = "puter-js";
+      s.src = "https://js.puter.com/v2/";
+      s.async = true;
+      document.head.appendChild(s);
+    }
+  }, []);
+
   useEffect(() => {
     if (modules.length > 0 && !selectedModule) {
       setSelectedModule({ row: modules[0].row, col: modules[0].col });
@@ -232,76 +243,82 @@ export default function RenderPage() {
     }, 500);
   };
 
-  const handleGenerateAiRender = useCallback((modelOverride?: PollinationsModel | React.MouseEvent) => {
-    // When called as onClick handler, ignore the mouse event argument
-    const effectiveModel: PollinationsModel =
-      typeof modelOverride === "string" ? modelOverride : pollinationsModel;
-
+  const handleGenerateAiRender = useCallback(async () => {
     if (!aiPrompt.trim()) return;
     setAiLoading(true);
     setAiError(null);
     setAiImageUrl(null);
 
-    const model = effectiveModel;
-    const res = RENDER_RESOLUTIONS[renderResolution];
-
-    // Sanitize prompt: remove special chars that break the URL, limit length
+    // Sanitize prompt
     const sanitized = aiPrompt
       .trim()
-      .replace(/[^\w\s,.\-!?']/g, " ")   // keep only safe chars
-      .replace(/\s+/g, " ")                // collapse whitespace
-      .slice(0, 500);                       // Pollinations prompt length limit
+      .replace(/[^\w\s,.\-!?']/g, " ")
+      .replace(/\s+/g, " ")
+      .slice(0, 500);
 
+    console.log("[AI Render] Prompt:", sanitized);
+    console.log("[AI Render] Model:", pollinationsModel);
+
+    // Try Puter.js first (free, no API key)
+    const puter = (window as unknown as Record<string, unknown>).puter as
+      | { ai?: { txt2img?: (prompt: string, opts?: Record<string, unknown>) => Promise<{ src?: string } | Blob | HTMLImageElement> } }
+      | undefined;
+
+    if (puter?.ai?.txt2img) {
+      try {
+        console.log("[AI Render] Using Puter.js...");
+        const result = await puter.ai.txt2img(sanitized, { model: "dall-e-3" });
+        let url: string;
+        if (result instanceof Blob) {
+          url = URL.createObjectURL(result);
+        } else if (result instanceof HTMLImageElement) {
+          url = result.src;
+        } else if (typeof result === "object" && result !== null && "src" in result && typeof result.src === "string") {
+          url = result.src;
+        } else {
+          // Try to use result as blob
+          url = URL.createObjectURL(result as Blob);
+        }
+        setAiImageUrl(url);
+        setAiLoading(false);
+        return;
+      } catch (err) {
+        console.warn("[AI Render] Puter.js failed, trying Pollinations fallback...", err);
+      }
+    }
+
+    // Fallback: Pollinations via <img> tag
+    const res = RENDER_RESOLUTIONS[renderResolution];
     const encoded = encodeURIComponent(sanitized);
-    // Use image.pollinations.ai (redirects to gen.pollinations.ai — browsers follow this)
-    const url = `https://image.pollinations.ai/prompt/${encoded}?width=${res.width}&height=${res.height}&model=${model}&nologo=true&nofeed=true&enhance=true&seed=${Date.now()}`;
+    const url = `https://image.pollinations.ai/prompt/${encoded}?width=${res.width}&height=${res.height}&model=${pollinationsModel}&nologo=true&nofeed=true&seed=${Date.now()}`;
 
-    // Log URL for debugging
-    console.log("[AI Render] URL:", url);
-    console.log("[AI Render] model:", model, "resolution:", res.width, "x", res.height);
+    console.log("[AI Render] Pollinations fallback URL:", url);
 
-    // Use <img> tag approach — browsers handle redirects and CORS for images natively
     const img = new window.Image();
     let timedOut = false;
-
-    // 90-second timeout (AI image generation can take a while)
     const timer = setTimeout(() => {
       timedOut = true;
-      // Don't set img.src="" as it triggers onerror
-      if (model === "flux") {
-        console.log("[AI Render] Timeout with flux, retrying with zimage...");
-        handleGenerateAiRender("zimage");
-      } else {
-        setAiError("AI render timed out. Try Draft resolution or a shorter prompt.");
-        setAiLoading(false);
-      }
+      setAiError("AI render timed out. Please try again.");
+      setAiLoading(false);
     }, 90000);
 
     img.onload = () => {
       if (timedOut) return;
       clearTimeout(timer);
-      // Verify it's a real image (not a 1x1 error pixel)
-      if (img.naturalWidth > 10 && img.naturalHeight > 10) {
+      if (img.naturalWidth > 10) {
         setAiImageUrl(url);
         setAiLoading(false);
       } else {
-        img.onerror?.(new Event("error"));
-      }
-    };
-
-    img.onerror = () => {
-      if (timedOut) return;
-      clearTimeout(timer);
-      if (model === "flux") {
-        console.log("[AI Render] Error with flux, retrying with zimage...");
-        handleGenerateAiRender("zimage");
-      } else {
-        setAiError("Failed to generate AI render. Please try again or adjust your prompt.");
+        setAiError("AI render returned an invalid image. Try a different prompt.");
         setAiLoading(false);
       }
     };
-
-    // crossOrigin not needed for display (only for canvas export)
+    img.onerror = () => {
+      if (timedOut) return;
+      clearTimeout(timer);
+      setAiError("AI render failed. Puter.js is loading — please wait a moment and try again.");
+      setAiLoading(false);
+    };
     img.src = url;
   }, [aiPrompt, pollinationsModel, renderResolution]);
 
