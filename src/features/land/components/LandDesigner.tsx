@@ -1,12 +1,114 @@
 "use client";
 
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import Link from "next/link";
 import Toolbar from "./Toolbar";
 import ModulePalette from "./ModulePalette";
 import AddressSearch from "./AddressSearch";
 import { useLandStore } from "../store";
+import type { GridCell } from "../store";
 import { MODULE_TYPES } from "@/shared/types";
+
+/* ------------------------------------------------------------------ */
+/*  Predefined building layouts                                        */
+/* ------------------------------------------------------------------ */
+
+interface PresetLayout {
+  id: string;
+  label: string;
+  description: string;
+  icon: string;
+  modules: number;
+  area: string;
+  cells: GridCell[];
+}
+
+const PRESET_LAYOUTS: PresetLayout[] = [
+  {
+    id: "studio",
+    label: "Studio",
+    description: "Open-plan living + kitchenette",
+    icon: "🏠",
+    modules: 2,
+    area: "18m²",
+    cells: [
+      { row: 0, col: 0, moduleType: "living" },
+      { row: 0, col: 1, moduleType: "bathroom" },
+    ],
+  },
+  {
+    id: "small-house",
+    label: "Small House",
+    description: "1 bedroom, kitchen, bathroom",
+    icon: "🏡",
+    modules: 4,
+    area: "36m²",
+    cells: [
+      { row: 0, col: 0, moduleType: "bedroom" },
+      { row: 0, col: 1, moduleType: "bathroom" },
+      { row: 1, col: 0, moduleType: "living" },
+      { row: 1, col: 1, moduleType: "kitchen" },
+    ],
+  },
+  {
+    id: "family-home",
+    label: "Family Home",
+    description: "2 bedrooms, living, kitchen, bath",
+    icon: "🏘️",
+    modules: 6,
+    area: "54m²",
+    cells: [
+      { row: 0, col: 0, moduleType: "bedroom" },
+      { row: 0, col: 1, moduleType: "bedroom" },
+      { row: 0, col: 2, moduleType: "bathroom" },
+      { row: 1, col: 0, moduleType: "living" },
+      { row: 1, col: 1, moduleType: "kitchen" },
+      { row: 1, col: 2, moduleType: "storage" },
+    ],
+  },
+  {
+    id: "large-home",
+    label: "Large Home",
+    description: "3 bed, office, 2 bath, living, kitchen",
+    icon: "🏛️",
+    modules: 9,
+    area: "81m²",
+    cells: [
+      { row: 0, col: 0, moduleType: "bedroom" },
+      { row: 0, col: 1, moduleType: "bedroom" },
+      { row: 0, col: 2, moduleType: "bedroom" },
+      { row: 1, col: 0, moduleType: "bathroom" },
+      { row: 1, col: 1, moduleType: "living" },
+      { row: 1, col: 2, moduleType: "bathroom" },
+      { row: 2, col: 0, moduleType: "office" },
+      { row: 2, col: 1, moduleType: "kitchen" },
+      { row: 2, col: 2, moduleType: "storage" },
+    ],
+  },
+  {
+    id: "villa",
+    label: "Villa",
+    description: "4 bed, office, 2 bath, living, dining, kitchen, storage",
+    icon: "🏰",
+    modules: 12,
+    area: "108m²",
+    cells: [
+      { row: 0, col: 0, moduleType: "bedroom" },
+      { row: 0, col: 1, moduleType: "bedroom" },
+      { row: 0, col: 2, moduleType: "bathroom" },
+      { row: 0, col: 3, moduleType: "storage" },
+      { row: 1, col: 0, moduleType: "bedroom" },
+      { row: 1, col: 1, moduleType: "living" },
+      { row: 1, col: 2, moduleType: "living" },
+      { row: 1, col: 3, moduleType: "office" },
+      { row: 2, col: 0, moduleType: "bedroom" },
+      { row: 2, col: 1, moduleType: "kitchen" },
+      { row: 2, col: 2, moduleType: "kitchen" },
+      { row: 2, col: 3, moduleType: "bathroom" },
+    ],
+  },
+];
 
 const MapView = dynamic(() => import("./MapView"), {
   ssr: false,
@@ -24,9 +126,17 @@ const STEPS = [
 ];
 
 export default function LandDesigner() {
-  const { phase, gridCells } = useLandStore();
+  const { phase, gridCells, setGridCells, setPhase } = useLandStore();
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
   const currentStep = 1;
+  const [showPresets, setShowPresets] = useState(true);
+
+  /** Apply a preset layout — sets grid cells and skips to modules phase */
+  const applyPreset = (preset: PresetLayout) => {
+    setGridCells(preset.cells);
+    setPhase("modules");
+    setShowPresets(false);
+  };
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
@@ -90,6 +200,47 @@ export default function LandDesigner() {
           <p className="mb-5 text-sm text-gray-500">
             Search for your location, then click and drag on the map to draw your building area.
           </p>
+
+          {/* Quick Start Presets */}
+          {showPresets && phase === "map" && gridCells.length === 0 && (
+            <div className="mb-5 rounded-lg border border-brand-amber-200 bg-brand-amber-50 p-4">
+              <h4 className="mb-1 text-xs font-bold text-brand-amber-700 uppercase tracking-wider flex items-center gap-1.5">
+                ⚡ Quick Start
+              </h4>
+              <p className="mb-3 text-[11px] text-brand-amber-600">
+                Choose a preset layout to get started quickly, or draw your own area on the map.
+              </p>
+              <div className="space-y-2">
+                {PRESET_LAYOUTS.map((preset) => (
+                  <button
+                    key={preset.id}
+                    onClick={() => applyPreset(preset)}
+                    className="w-full flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-2.5
+                               hover:border-brand-amber-400 hover:bg-brand-amber-25 transition-colors text-left group"
+                  >
+                    <span className="text-xl flex-shrink-0">{preset.icon}</span>
+                    <div className="flex-1 min-w-0">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm font-semibold text-brand-teal-800 group-hover:text-brand-teal-600">
+                          {preset.label}
+                        </span>
+                        <span className="text-[10px] font-bold text-gray-400">
+                          {preset.modules} mod · {preset.area}
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-gray-500">{preset.description}</span>
+                    </div>
+                  </button>
+                ))}
+              </div>
+              <button
+                onClick={() => setShowPresets(false)}
+                className="mt-2 w-full text-center text-[10px] text-gray-400 hover:text-gray-600 transition-colors"
+              >
+                Skip — I&apos;ll draw my own area
+              </button>
+            </div>
+          )}
 
           {/* Address Search */}
           <div className="mb-5">

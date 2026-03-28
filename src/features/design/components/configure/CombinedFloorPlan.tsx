@@ -1,13 +1,15 @@
 "use client";
 
+import React from "react";
 import { MODULE_TYPES } from "@/shared/types";
-import type { ModuleConfig } from "../../store";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
+import type { ModuleConfig, WallType } from "../../store";
+import { getPreset, FLOOR_MATERIALS } from "../../layouts";
 
 const CELL = 300; // px per 3m module
 const WALL = 12;
 const SCALE = CELL / 3; // 100px per meter
 const OPENING_WIDTH = 60; // px width of shared-wall opening
+const WINDOW_WIDTH = 120; // px width of window opening
 const PADDING = 40; // px padding around the whole SVG
 
 interface Props {
@@ -16,9 +18,101 @@ interface Props {
   onSelectModule: (m: { row: number; col: number }) => void;
 }
 
-/** Check if a neighbour exists at (row, col) */
-function hasNeighbour(modules: ModuleConfig[], row: number, col: number): boolean {
-  return modules.some((m) => m.row === row && m.col === col);
+/** Render an SVG wall segment based on its type */
+function renderWall(
+  key: string,
+  wallType: WallType,
+  x1: number, y1: number, x2: number, y2: number,
+  color: string,
+  isHorizontal: boolean,
+): React.ReactNode[] {
+  const elements: React.ReactNode[] = [];
+
+  if (wallType === "none") return elements;
+
+  if (wallType === "solid") {
+    elements.push(
+      <line key={key} x1={x1} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={WALL} />
+    );
+    return elements;
+  }
+
+  const midX = (x1 + x2) / 2;
+  const midY = (y1 + y2) / 2;
+
+  if (wallType === "window") {
+    // Solid wall with a glass (blue) section in the middle
+    if (isHorizontal) {
+      elements.push(
+        <line key={`${key}-l`} x1={x1} y1={y1} x2={midX - WINDOW_WIDTH / 2} y2={y1} stroke={color} strokeWidth={WALL} />,
+        <line key={`${key}-r`} x1={midX + WINDOW_WIDTH / 2} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={WALL} />,
+        <line key={`${key}-glass`} x1={midX - WINDOW_WIDTH / 2} y1={y1} x2={midX + WINDOW_WIDTH / 2} y2={y1} stroke="#5bb8f0" strokeWidth={WALL - 2} strokeLinecap="round" />,
+        // Window tick marks
+        <line key={`${key}-t1`} x1={midX - WINDOW_WIDTH / 2} y1={y1 - WALL / 2 - 2} x2={midX - WINDOW_WIDTH / 2} y2={y1 + WALL / 2 + 2} stroke={color} strokeWidth={2} />,
+        <line key={`${key}-t2`} x1={midX + WINDOW_WIDTH / 2} y1={y1 - WALL / 2 - 2} x2={midX + WINDOW_WIDTH / 2} y2={y1 + WALL / 2 + 2} stroke={color} strokeWidth={2} />,
+      );
+    } else {
+      elements.push(
+        <line key={`${key}-l`} x1={x1} y1={y1} x2={x1} y2={midY - WINDOW_WIDTH / 2} stroke={color} strokeWidth={WALL} />,
+        <line key={`${key}-r`} x1={x1} y1={midY + WINDOW_WIDTH / 2} x2={x2} y2={y2} stroke={color} strokeWidth={WALL} />,
+        <line key={`${key}-glass`} x1={x1} y1={midY - WINDOW_WIDTH / 2} x2={x1} y2={midY + WINDOW_WIDTH / 2} stroke="#5bb8f0" strokeWidth={WALL - 2} strokeLinecap="round" />,
+        <line key={`${key}-t1`} x1={x1 - WALL / 2 - 2} y1={midY - WINDOW_WIDTH / 2} x2={x1 + WALL / 2 + 2} y2={midY - WINDOW_WIDTH / 2} stroke={color} strokeWidth={2} />,
+        <line key={`${key}-t2`} x1={x1 - WALL / 2 - 2} y1={midY + WINDOW_WIDTH / 2} x2={x1 + WALL / 2 + 2} y2={midY + WINDOW_WIDTH / 2} stroke={color} strokeWidth={2} />,
+      );
+    }
+    return elements;
+  }
+
+  if (wallType === "door") {
+    // Wall with door opening + arc
+    if (isHorizontal) {
+      elements.push(
+        <line key={`${key}-l`} x1={x1} y1={y1} x2={midX - OPENING_WIDTH / 2} y2={y1} stroke={color} strokeWidth={WALL} />,
+        <line key={`${key}-r`} x1={midX + OPENING_WIDTH / 2} y1={y1} x2={x2} y2={y2} stroke={color} strokeWidth={WALL} />,
+        <path
+          key={`${key}-arc`}
+          d={`M ${midX - OPENING_WIDTH / 2} ${y1} A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 1 ${midX + OPENING_WIDTH / 2} ${y1}`}
+          fill="none" stroke="#9ca3af" strokeWidth={1} strokeDasharray="3 2"
+        />,
+      );
+    } else {
+      elements.push(
+        <line key={`${key}-l`} x1={x1} y1={y1} x2={x1} y2={midY - OPENING_WIDTH / 2} stroke={color} strokeWidth={WALL} />,
+        <line key={`${key}-r`} x1={x1} y1={midY + OPENING_WIDTH / 2} x2={x2} y2={y2} stroke={color} strokeWidth={WALL} />,
+        <path
+          key={`${key}-arc`}
+          d={`M ${x1} ${midY - OPENING_WIDTH / 2} A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 0 ${x1} ${midY + OPENING_WIDTH / 2}`}
+          fill="none" stroke="#9ca3af" strokeWidth={1} strokeDasharray="3 2"
+        />,
+      );
+    }
+    return elements;
+  }
+
+  // "shared" — dashed interior wall with opening
+  if (isHorizontal) {
+    elements.push(
+      <line key={`${key}-l`} x1={x1} y1={y1} x2={midX - OPENING_WIDTH / 2} y2={y1} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
+      <line key={`${key}-r`} x1={midX + OPENING_WIDTH / 2} y1={y1} x2={x2} y2={y2} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
+      <path
+        key={`${key}-arc`}
+        d={`M ${midX - OPENING_WIDTH / 2} ${y1} A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 1 ${midX + OPENING_WIDTH / 2} ${y1}`}
+        fill="none" stroke="#9ca3af" strokeWidth={1} strokeDasharray="3 2"
+      />,
+    );
+  } else {
+    elements.push(
+      <line key={`${key}-l`} x1={x1} y1={y1} x2={x1} y2={midY - OPENING_WIDTH / 2} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
+      <line key={`${key}-r`} x1={x1} y1={midY + OPENING_WIDTH / 2} x2={x2} y2={y2} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
+      <path
+        key={`${key}-arc`}
+        d={`M ${x1} ${midY - OPENING_WIDTH / 2} A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 0 ${x1} ${midY + OPENING_WIDTH / 2}`}
+        fill="none" stroke="#9ca3af" strokeWidth={1} strokeDasharray="3 2"
+      />,
+    );
+  }
+
+  return elements;
 }
 
 export default function CombinedFloorPlan({ modules, selectedModule, onSelectModule }: Props) {
@@ -49,8 +143,6 @@ export default function CombinedFloorPlan({ modules, selectedModule, onSelectMod
           const furniture = preset?.furniture || [];
           const floorColor =
             FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish)?.color || "#FFFFFF";
-          const wallMat =
-            WALL_MATERIALS.find((w) => w.id === mod.wallColor)?.color || "#E5E7EB";
 
           const isSelected =
             selectedModule?.row === mod.row && selectedModule?.col === mod.col;
@@ -58,12 +150,6 @@ export default function CombinedFloorPlan({ modules, selectedModule, onSelectMod
           // Position of this module's top-left corner in SVG
           const ox = PADDING + WALL + (mod.col - minCol) * CELL;
           const oy = PADDING + WALL + (mod.row - minRow) * CELL;
-
-          // Adjacency
-          const hasTop = hasNeighbour(modules, mod.row - 1, mod.col);
-          const hasBottom = hasNeighbour(modules, mod.row + 1, mod.col);
-          const hasLeft = hasNeighbour(modules, mod.row, mod.col - 1);
-          const hasRight = hasNeighbour(modules, mod.row, mod.col + 1);
 
           return (
             <g
@@ -88,170 +174,26 @@ export default function CombinedFloorPlan({ modules, selectedModule, onSelectMod
                 />
               )}
 
-              {/* Walls — draw each side, skip or add opening for shared walls */}
-              {/* Top wall */}
-              {!hasTop ? (
-                <line
-                  x1={ox}
-                  y1={oy}
-                  x2={ox + CELL}
-                  y2={oy}
-                  stroke={color}
-                  strokeWidth={WALL}
-                />
-              ) : (
-                <>
-                  <line
-                    x1={ox}
-                    y1={oy}
-                    x2={ox + CELL / 2 - OPENING_WIDTH / 2}
-                    y2={oy}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  <line
-                    x1={ox + CELL / 2 + OPENING_WIDTH / 2}
-                    y1={oy}
-                    x2={ox + CELL}
-                    y2={oy}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  {/* Door arc */}
-                  <path
-                    d={`M ${ox + CELL / 2 - OPENING_WIDTH / 2} ${oy}
-                        A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 1 ${ox + CELL / 2 + OPENING_WIDTH / 2} ${oy}`}
-                    fill="none"
-                    stroke="#9ca3af"
-                    strokeWidth={1}
-                    strokeDasharray="3 2"
-                  />
-                </>
+              {/* Walls — render based on wallConfigs (solid/window/door/none/shared) */}
+              {/* North wall (top) */}
+              {renderWall(
+                `${mod.row}-${mod.col}-n`, mod.wallConfigs.north,
+                ox, oy, ox + CELL, oy, color, true,
               )}
-
-              {/* Bottom wall */}
-              {!hasBottom ? (
-                <line
-                  x1={ox}
-                  y1={oy + CELL}
-                  x2={ox + CELL}
-                  y2={oy + CELL}
-                  stroke={color}
-                  strokeWidth={WALL}
-                />
-              ) : (
-                <>
-                  <line
-                    x1={ox}
-                    y1={oy + CELL}
-                    x2={ox + CELL / 2 - OPENING_WIDTH / 2}
-                    y2={oy + CELL}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  <line
-                    x1={ox + CELL / 2 + OPENING_WIDTH / 2}
-                    y1={oy + CELL}
-                    x2={ox + CELL}
-                    y2={oy + CELL}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  <path
-                    d={`M ${ox + CELL / 2 - OPENING_WIDTH / 2} ${oy + CELL}
-                        A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 0 ${ox + CELL / 2 + OPENING_WIDTH / 2} ${oy + CELL}`}
-                    fill="none"
-                    stroke="#9ca3af"
-                    strokeWidth={1}
-                    strokeDasharray="3 2"
-                  />
-                </>
+              {/* South wall (bottom) */}
+              {renderWall(
+                `${mod.row}-${mod.col}-s`, mod.wallConfigs.south,
+                ox, oy + CELL, ox + CELL, oy + CELL, color, true,
               )}
-
-              {/* Left wall */}
-              {!hasLeft ? (
-                <line
-                  x1={ox}
-                  y1={oy}
-                  x2={ox}
-                  y2={oy + CELL}
-                  stroke={color}
-                  strokeWidth={WALL}
-                />
-              ) : (
-                <>
-                  <line
-                    x1={ox}
-                    y1={oy}
-                    x2={ox}
-                    y2={oy + CELL / 2 - OPENING_WIDTH / 2}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  <line
-                    x1={ox}
-                    y1={oy + CELL / 2 + OPENING_WIDTH / 2}
-                    x2={ox}
-                    y2={oy + CELL}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  <path
-                    d={`M ${ox} ${oy + CELL / 2 - OPENING_WIDTH / 2}
-                        A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 0 ${ox} ${oy + CELL / 2 + OPENING_WIDTH / 2}`}
-                    fill="none"
-                    stroke="#9ca3af"
-                    strokeWidth={1}
-                    strokeDasharray="3 2"
-                  />
-                </>
+              {/* West wall (left) */}
+              {renderWall(
+                `${mod.row}-${mod.col}-w`, mod.wallConfigs.west,
+                ox, oy, ox, oy + CELL, color, false,
               )}
-
-              {/* Right wall */}
-              {!hasRight ? (
-                <line
-                  x1={ox + CELL}
-                  y1={oy}
-                  x2={ox + CELL}
-                  y2={oy + CELL}
-                  stroke={color}
-                  strokeWidth={WALL}
-                />
-              ) : (
-                <>
-                  <line
-                    x1={ox + CELL}
-                    y1={oy}
-                    x2={ox + CELL}
-                    y2={oy + CELL / 2 - OPENING_WIDTH / 2}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  <line
-                    x1={ox + CELL}
-                    y1={oy + CELL / 2 + OPENING_WIDTH / 2}
-                    x2={ox + CELL}
-                    y2={oy + CELL}
-                    stroke={wallMat}
-                    strokeWidth={WALL / 2}
-                    strokeDasharray="4 3"
-                  />
-                  <path
-                    d={`M ${ox + CELL} ${oy + CELL / 2 - OPENING_WIDTH / 2}
-                        A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 1 ${ox + CELL} ${oy + CELL / 2 + OPENING_WIDTH / 2}`}
-                    fill="none"
-                    stroke="#9ca3af"
-                    strokeWidth={1}
-                    strokeDasharray="3 2"
-                  />
-                </>
+              {/* East wall (right) */}
+              {renderWall(
+                `${mod.row}-${mod.col}-e`, mod.wallConfigs.east,
+                ox + CELL, oy, ox + CELL, oy + CELL, color, false,
               )}
 
               {/* Furniture */}
@@ -324,8 +266,12 @@ export default function CombinedFloorPlan({ modules, selectedModule, onSelectMod
           )
         )}
         <div className="ml-4 flex items-center gap-1.5">
+          <div className="h-px w-8 bg-blue-400" style={{ height: 3 }} />
+          <span>Window</span>
+        </div>
+        <div className="flex items-center gap-1.5">
           <div className="h-px w-8 border-t-2 border-dashed border-gray-400" />
-          <span>Shared wall / opening</span>
+          <span>Door / Shared</span>
         </div>
         <div className="flex items-center gap-1.5">
           <div className="h-3 w-3 rounded border-2 border-amber-400" />

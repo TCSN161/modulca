@@ -836,7 +836,7 @@ function FurniturePiece({
 
   return (
     <group position={[posX + item.width / 2, halfH, posZ + item.depth / 2]}>
-      {/* Invisible hitbox for interaction (not rotated so drag stays consistent) */}
+      {/* Invisible hitbox for interaction — uses max(w,d) so it covers any rotation angle */}
       <mesh
         visible={false}
         onPointerOver={(e) => {
@@ -853,7 +853,7 @@ function FurniturePiece({
           onDragStart(e, item);
         }}
       >
-        <boxGeometry args={[item.width, item.height, item.depth]} />
+        <boxGeometry args={[Math.max(item.width, item.depth), item.height, Math.max(item.width, item.depth)]} />
         <meshBasicMaterial transparent opacity={0} />
       </mesh>
 
