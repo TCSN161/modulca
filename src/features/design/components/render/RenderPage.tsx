@@ -132,16 +132,7 @@ export default function RenderPage() {
     captureRef.current = capture;
   }, []);
 
-  // Load Puter.js for AI rendering
-  useEffect(() => {
-    if (!document.getElementById("puter-js")) {
-      const s = document.createElement("script");
-      s.id = "puter-js";
-      s.src = "https://js.puter.com/v2/";
-      s.async = true;
-      document.head.appendChild(s);
-    }
-  }, []);
+  // Puter.js removed — requires account login which blocks rendering
 
   useEffect(() => {
     if (modules.length > 0 && !selectedModule) {
@@ -249,58 +240,27 @@ export default function RenderPage() {
     setAiError(null);
     setAiImageUrl(null);
 
-    // Sanitize prompt
     const sanitized = aiPrompt
       .trim()
       .replace(/[^\w\s,.\-!?']/g, " ")
       .replace(/\s+/g, " ")
       .slice(0, 500);
 
-    console.log("[AI Render] Prompt:", sanitized);
-    console.log("[AI Render] Model:", pollinationsModel);
-
-    // Try Puter.js first (free, no API key)
-    const puter = (window as unknown as Record<string, unknown>).puter as
-      | { ai?: { txt2img?: (prompt: string, opts?: Record<string, unknown>) => Promise<{ src?: string } | Blob | HTMLImageElement> } }
-      | undefined;
-
-    if (puter?.ai?.txt2img) {
-      try {
-        console.log("[AI Render] Using Puter.js...");
-        const result = await puter.ai.txt2img(sanitized, { model: "dall-e-3" });
-        let url: string;
-        if (result instanceof Blob) {
-          url = URL.createObjectURL(result);
-        } else if (result instanceof HTMLImageElement) {
-          url = result.src;
-        } else if (typeof result === "object" && result !== null && "src" in result && typeof result.src === "string") {
-          url = result.src;
-        } else {
-          // Try to use result as blob
-          url = URL.createObjectURL(result as Blob);
-        }
-        setAiImageUrl(url);
-        setAiLoading(false);
-        return;
-      } catch (err) {
-        console.warn("[AI Render] Puter.js failed, trying Pollinations fallback...", err);
-      }
-    }
-
-    // Fallback: Pollinations via <img> tag
     const res = RENDER_RESOLUTIONS[renderResolution];
     const encoded = encodeURIComponent(sanitized);
     const url = `https://image.pollinations.ai/prompt/${encoded}?width=${res.width}&height=${res.height}&model=${pollinationsModel}&nologo=true&nofeed=true&seed=${Date.now()}`;
 
-    console.log("[AI Render] Pollinations fallback URL:", url);
+    console.log("[AI Render] Pollinations URL:", url, "Model:", pollinationsModel);
 
+    // Pollinations works via <img> tag (handles 301 redirects internally)
     const img = new window.Image();
+    img.crossOrigin = "anonymous";
     let timedOut = false;
     const timer = setTimeout(() => {
       timedOut = true;
-      setAiError("AI render timed out. Please try again.");
+      setAiError("AI render timed out (2 min). The service may be busy — try again or use a shorter prompt.");
       setAiLoading(false);
-    }, 90000);
+    }, 120000);
 
     img.onload = () => {
       if (timedOut) return;
@@ -316,7 +276,7 @@ export default function RenderPage() {
     img.onerror = () => {
       if (timedOut) return;
       clearTimeout(timer);
-      setAiError("AI render failed. Puter.js is loading — please wait a moment and try again.");
+      setAiError("AI render failed. Try a different model (flux/zimage/gptimage) or simplify the prompt.");
       setAiLoading(false);
     };
     img.src = url;
