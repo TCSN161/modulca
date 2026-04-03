@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { pollinationsEngine } from "./engines/pollinations";
 import { aiHordeEngine } from "./engines/aihorde";
 import { stabilityEngine } from "./engines/stability";
+import { togetherEngine } from "./engines/together";
+import { leonardoEngine } from "./engines/leonardo";
 import type { AiRenderEngine, AiRenderRequest, EngineInfo } from "./engines/types";
 
 /**
@@ -50,12 +52,30 @@ const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo }> = {
       speed: "medium",
     },
   },
+  together: {
+    fn: togetherEngine,
+    info: {
+      id: "together",
+      label: "Together.ai FLUX",
+      description: "Free unlimited for 3 months. Fast, high quality FLUX model.",
+      speed: "fast",
+    },
+  },
+  leonardo: {
+    fn: leonardoEngine,
+    info: {
+      id: "leonardo",
+      label: "Leonardo.ai",
+      description: "150 free/day. Photorealistic with alchemy enhancement.",
+      speed: "medium",
+    },
+  },
 };
 
 /** Default engine order for text-to-image fallback chain */
-const FALLBACK_ORDER = ["pollinations", "ai-horde"];
+const FALLBACK_ORDER = ["together", "pollinations", "leonardo", "ai-horde"];
 /** Engines that support img2img (prefer these when baseImage is provided) */
-const IMG2IMG_FALLBACK = ["stability", "pollinations", "ai-horde"];
+const IMG2IMG_FALLBACK = ["stability", "together", "pollinations", "ai-horde"];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */

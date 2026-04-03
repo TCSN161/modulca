@@ -25,6 +25,18 @@ const ENGINE_LIST: EngineInfo[] = [
     description: "Uses 3D scene as base. Requires API key.",
     speed: "medium",
   },
+  {
+    id: "together",
+    label: "Together.ai FLUX",
+    description: "Free unlimited 3 months. Fast FLUX model.",
+    speed: "fast",
+  },
+  {
+    id: "leonardo",
+    label: "Leonardo.ai",
+    description: "150 free/day. Photorealistic alchemy.",
+    speed: "medium",
+  },
 ];
 
 export async function GET() {

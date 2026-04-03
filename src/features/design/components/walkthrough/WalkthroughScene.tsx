@@ -94,12 +94,14 @@ function SceneContent({
   onTeleportDone,
   controlsRef,
   cameraPositionRef,
+  enhanced,
 }: {
   modules: ModuleConfig[];
   teleportTarget: { row: number; col: number } | null;
   onTeleportDone: () => void;
   controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
+  enhanced: boolean;
 }) {
   const { camera } = useThree();
 
@@ -115,16 +117,40 @@ function SceneContent({
 
   return (
     <>
-      <ambientLight intensity={0.4} />
-      <directionalLight position={[15, 20, 10]} intensity={1.0} castShadow shadow-mapSize-width={2048} shadow-mapSize-height={2048} />
-      <directionalLight position={[-10, 15, -5]} intensity={0.3} />
+      {/* Lighting — enhanced mode has richer, more realistic lighting */}
+      <ambientLight intensity={enhanced ? 0.25 : 0.4} />
+      <directionalLight
+        position={[15, 20, 10]}
+        intensity={enhanced ? 1.4 : 1.0}
+        castShadow
+        shadow-mapSize-width={enhanced ? 4096 : 2048}
+        shadow-mapSize-height={enhanced ? 4096 : 2048}
+        shadow-bias={-0.0001}
+        shadow-camera-left={-20}
+        shadow-camera-right={20}
+        shadow-camera-top={20}
+        shadow-camera-bottom={-20}
+      />
+      <directionalLight position={[-10, 15, -5]} intensity={enhanced ? 0.5 : 0.3} />
+      {enhanced && (
+        <>
+          {/* Warm fill light from below for enhanced mode */}
+          <hemisphereLight args={["#ffeedd", "#88aacc", 0.3]} />
+          {/* Soft backlight for depth */}
+          <directionalLight position={[-5, 8, -15]} intensity={0.2} color="#aaccff" />
+        </>
+      )}
 
       {/* Per-module point lights */}
       {modules.map((mod) => (
         <pointLight
           key={`light-${mod.row}-${mod.col}`}
           position={[mod.col * MODULE_SIZE + MODULE_SIZE / 2, WALL_HEIGHT - 0.3, mod.row * MODULE_SIZE + MODULE_SIZE / 2]}
-          intensity={0.6} distance={5} decay={2} color="#fff5e6"
+          intensity={enhanced ? 0.9 : 0.6}
+          distance={enhanced ? 7 : 5}
+          decay={2}
+          color={enhanced ? "#fff0d6" : "#fff5e6"}
+          castShadow={enhanced}
         />
       ))}
 
@@ -178,10 +204,11 @@ interface WalkthroughSceneProps {
   onTeleportDone: () => void;
   controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
+  enhanced?: boolean;
 }
 
 export default function WalkthroughScene({
-  teleportTarget, onTeleportDone, controlsRef, cameraPositionRef,
+  teleportTarget, onTeleportDone, controlsRef, cameraPositionRef, enhanced = false,
 }: WalkthroughSceneProps) {
   const modules = useDesignStore((s) => s.modules);
 
@@ -201,7 +228,8 @@ export default function WalkthroughScene({
     <Canvas
       shadows
       camera={{ position: initialPos, fov: 70, near: 0.1, far: 200 }}
-      style={{ background: "#e8e5e0", width: "100%", height: "100%" }}
+      style={{ background: enhanced ? "#d4d0ca" : "#e8e5e0", width: "100%", height: "100%" }}
+      gl={{ antialias: true, toneMapping: enhanced ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping, toneMappingExposure: enhanced ? 1.2 : 1 }}
     >
       <SceneContent
         modules={modules}
@@ -209,6 +237,7 @@ export default function WalkthroughScene({
         onTeleportDone={onTeleportDone}
         controlsRef={controlsRef}
         cameraPositionRef={cameraPositionRef}
+        enhanced={enhanced}
       />
     </Canvas>
   );

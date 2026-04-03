@@ -18,6 +18,25 @@ const WalkthroughScene = dynamic(() => import("./WalkthroughScene"), {
 
 const MODULE_SIZE = 3;
 
+type WalkthroughQuality = "standard" | "enhanced" | "gaussian";
+
+const WALKTHROUGH_ENGINES: Record<WalkthroughQuality, { label: string; description: string; badge?: string }> = {
+  standard: {
+    label: "Standard (Three.js)",
+    description: "Default 3D walkthrough",
+  },
+  enhanced: {
+    label: "Enhanced (Post-Processing)",
+    description: "Better lighting, shadows, and ambient occlusion",
+    badge: "FREE",
+  },
+  gaussian: {
+    label: "Premium (Gaussian Splatting)",
+    description: "Photorealistic walkthrough from captured scenes",
+    badge: "COMING SOON",
+  },
+};
+
 
 /* ------------------------------------------------------------------ */
 /*  Minimap SVG                                                        */
@@ -113,6 +132,7 @@ export default function WalkthroughPage() {
   const [cameraPos, setCameraPos] = useState({ x: 0, z: 0 });
   const [shareCopied, setShareCopied] = useState(false);
   const [recordTooltip, setRecordTooltip] = useState(false);
+  const [walkthroughQuality, setWalkthroughQuality] = useState<WalkthroughQuality>("standard");
 
   // Import modules from grid if store is empty
   useEffect(() => {
@@ -304,10 +324,34 @@ export default function WalkthroughPage() {
           {/* Start Tour button */}
           <button
             onClick={handleStartTour}
-            className="mb-5 w-full rounded-lg bg-brand-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors"
+            className="mb-4 w-full rounded-lg bg-brand-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors"
           >
             Start Tour
           </button>
+
+          {/* 3D Engine Quality Selector */}
+          <div className="mb-5">
+            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">3D Engine</label>
+            <select
+              value={walkthroughQuality}
+              onChange={(e) => setWalkthroughQuality(e.target.value as WalkthroughQuality)}
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
+            >
+              {(Object.keys(WALKTHROUGH_ENGINES) as WalkthroughQuality[]).map((key) => (
+                <option key={key} value={key} disabled={key === "gaussian"}>
+                  {WALKTHROUGH_ENGINES[key].label}
+                  {WALKTHROUGH_ENGINES[key].badge ? ` [${WALKTHROUGH_ENGINES[key].badge}]` : ""}
+                </option>
+              ))}
+            </select>
+            <p className="mt-1 text-[10px] text-gray-400">{WALKTHROUGH_ENGINES[walkthroughQuality].description}</p>
+            {walkthroughQuality === "gaussian" && (
+              <p className="mt-1 text-[10px] text-brand-amber-600">
+                Gaussian Splatting will be available in the premium tier.
+                Uses photorealistic 3D captured from real photos.
+              </p>
+            )}
+          </div>
 
           {/* Room list */}
           <div className="mb-5">
@@ -415,6 +459,7 @@ export default function WalkthroughPage() {
             onTeleportDone={handleTeleportDone}
             controlsRef={controlsRef}
             cameraPositionRef={cameraPositionRef}
+            enhanced={walkthroughQuality === "enhanced"}
           />
 
           {/* Crosshair overlay */}

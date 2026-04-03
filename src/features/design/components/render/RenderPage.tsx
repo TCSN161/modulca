@@ -20,13 +20,15 @@ type RenderMode = "template" | "ai";
 type ViewMode = "single" | "all";
 type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | "custom";
 type RenderResolution = "draft" | "standard" | "high";
-type AiEngine = "auto" | "pollinations" | "ai-horde" | "stability";
+type AiEngine = "auto" | "pollinations" | "ai-horde" | "stability" | "together" | "leonardo";
 
 const AI_ENGINES: Record<AiEngine, { label: string; description: string; speed: string }> = {
   auto: { label: "Auto (Best Available)", description: "Tries engines in order until one succeeds", speed: "" },
-  pollinations: { label: "Pollinations AI", description: "Free, fast (~30-90s)", speed: "Fast" },
+  together: { label: "Together.ai FLUX", description: "Free unlimited 3 months, high quality", speed: "Fast" },
+  pollinations: { label: "Pollinations AI", description: "Free, no account needed", speed: "Fast" },
+  leonardo: { label: "Leonardo.ai", description: "150 free/day, photorealistic", speed: "Medium" },
+  stability: { label: "Stability AI", description: "img2img — uses 3D scene as base", speed: "Medium" },
   "ai-horde": { label: "AI Horde", description: "Free community GPUs, reliable", speed: "Slow" },
-  stability: { label: "Stability AI", description: "img2img — uses 3D scene as base (needs API key)", speed: "Medium" },
 };
 
 const PROMPT_TEMPLATES: Record<PromptTemplate, { label: string; description: string; suffix: string }> = {
