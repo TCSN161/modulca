@@ -282,6 +282,86 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
       },
     ],
   },
+  // ─── Hallway ─────────────────────────────────────────────
+  {
+    moduleType: "hallway",
+    presets: [
+      {
+        id: "corridor",
+        label: "Corridor",
+        description: "Simple pass-through hallway with coat hooks",
+        tier: "free",
+        furniture: [
+          { id: "coat-rack", label: "Coat Rack", x: 0.1, z: 0.1, width: 0.4, depth: 0.4, height: 1.8, color: "#8B7355" },
+          { id: "shoe-bench", label: "Shoe Bench", x: 0.1, z: 1.2, width: 0.5, depth: 1.0, height: 0.45, color: "#D4A76A" },
+          { id: "console", label: "Console Table", x: 2.3, z: 1.0, width: 0.5, depth: 1.0, height: 0.8, color: "#8B7355" },
+        ],
+      },
+      {
+        id: "entry",
+        label: "Entryway",
+        description: "Welcoming entrance with mirror & storage",
+        tier: "free",
+        furniture: [
+          { id: "wardrobe", label: "Hall Wardrobe", x: 0.1, z: 0.1, width: 0.6, depth: 1.4, height: 2.0, color: "#F0EDE5" },
+          { id: "mirror", label: "Mirror", x: 2.5, z: 0.8, width: 0.1, depth: 0.8, height: 1.4, color: "#C0C0C0" },
+          { id: "bench", label: "Hall Bench", x: 1.0, z: 2.4, width: 0.5, depth: 1.2, height: 0.45, color: "#D4A76A" },
+        ],
+      },
+      {
+        id: "gallery",
+        label: "Gallery Hall",
+        description: "Display hallway with shelving",
+        tier: "free",
+        furniture: [
+          { id: "shelf-l", label: "Display Shelf", x: 0.1, z: 0.2, width: 0.3, depth: 2.0, height: 1.8, color: "#F0EDE5" },
+          { id: "shelf-r", label: "Display Shelf", x: 2.6, z: 0.2, width: 0.3, depth: 2.0, height: 1.8, color: "#F0EDE5" },
+          { id: "runner", label: "Hall Runner", x: 0.8, z: 0.2, width: 0.01, depth: 2.6, height: 0.01, color: "#B8860B" },
+        ],
+      },
+    ],
+  },
+  // ─── Terrace ─────────────────────────────────────────────
+  {
+    moduleType: "terrace",
+    presets: [
+      {
+        id: "lounge",
+        label: "Outdoor Lounge",
+        description: "Relaxing outdoor seating area",
+        tier: "free",
+        furniture: [
+          { id: "outdoor-sofa", label: "Outdoor Sofa", x: 0.2, z: 0.2, width: 1.8, depth: 0.8, height: 0.7, color: "#8B7355" },
+          { id: "coffee-table", label: "Coffee Table", x: 0.5, z: 1.2, width: 0.8, depth: 0.8, height: 0.4, color: "#D4A76A" },
+          { id: "planter", label: "Planter", x: 2.4, z: 0.2, width: 0.5, depth: 0.5, height: 0.6, color: "#68B584" },
+        ],
+      },
+      {
+        id: "dining",
+        label: "Outdoor Dining",
+        description: "Al fresco dining space with BBQ",
+        tier: "free",
+        furniture: [
+          { id: "dining-table", label: "Dining Table", x: 0.6, z: 0.6, width: 1.4, depth: 1.4, height: 0.75, color: "#8B7355" },
+          { id: "bench-1", label: "Bench", x: 0.2, z: 0.8, width: 0.4, depth: 1.2, height: 0.45, color: "#D4A76A" },
+          { id: "bench-2", label: "Bench", x: 2.0, z: 0.8, width: 0.4, depth: 1.2, height: 0.45, color: "#D4A76A" },
+          { id: "bbq", label: "BBQ Grill", x: 2.3, z: 2.2, width: 0.6, depth: 0.5, height: 1.0, color: "#333333" },
+        ],
+      },
+      {
+        id: "garden",
+        label: "Garden Terrace",
+        description: "Green space with planters & seating",
+        tier: "free",
+        furniture: [
+          { id: "planter-1", label: "Large Planter", x: 0.1, z: 0.1, width: 0.8, depth: 0.8, height: 0.5, color: "#68B584" },
+          { id: "planter-2", label: "Large Planter", x: 2.1, z: 0.1, width: 0.8, depth: 0.8, height: 0.5, color: "#68B584" },
+          { id: "lounger", label: "Sun Lounger", x: 0.5, z: 1.5, width: 0.7, depth: 1.8, height: 0.4, color: "#F5F3EF" },
+          { id: "side-table", label: "Side Table", x: 1.4, z: 1.8, width: 0.4, depth: 0.4, height: 0.5, color: "#D4A76A" },
+        ],
+      },
+    ],
+  },
 ];
 
 /** Get the presets for a given module type */

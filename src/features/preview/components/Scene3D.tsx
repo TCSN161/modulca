@@ -324,8 +324,16 @@ function ModuleInfoPanel({
 }
 
 export default function Scene3D() {
-  const { modules, selectedModule, setSelectedModule } = useDesignStore();
+  const { modules, selectedModule, setSelectedModule, loadFromLocalStorage } = useDesignStore();
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null);
+  const [waited, setWaited] = useState(false);
+
+  // Try to hydrate from localStorage if modules are empty
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+    const t = setTimeout(() => setWaited(true), 200);
+    return () => clearTimeout(t);
+  }, [modules.length, loadFromLocalStorage]);
 
   const handleDeselect = useCallback(() => {
     setSelectedModule(null);
@@ -347,7 +355,7 @@ export default function Scene3D() {
   if (modules.length === 0) {
     return (
       <div className="flex h-full items-center justify-center text-gray-400">
-        No modules to preview. Complete Steps 1 &amp; 2 first.
+        {waited ? "No modules to preview. Complete Steps 1 & 2 first." : "Loading 3D scene..."}
       </div>
     );
   }

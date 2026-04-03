@@ -20,7 +20,13 @@ const Scene3D = dynamic(() => import("./Scene3D"), {
 
 export default function PreviewPage() {
   const { gridCells, gridRotation } = useLandStore();
-  const { setModulesFromGrid, modules } = useDesignStore();
+  const { setModulesFromGrid, modules, loadFromLocalStorage } = useDesignStore();
+  // Ensure design store is hydrated from localStorage before rendering 3D
+  useEffect(() => {
+    if (modules.length === 0) {
+      loadFromLocalStorage();
+    }
+  }, [loadFromLocalStorage, modules.length]);
 
   // Import modules from Step 1 if not already done
   useEffect(() => {

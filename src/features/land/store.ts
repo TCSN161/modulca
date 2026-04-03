@@ -45,6 +45,8 @@ interface LandStore {
   setSelectedModuleType: (type: string | null) => void;
   placeModule: (row: number, col: number) => void;
   removeModule: (row: number, col: number) => void;
+  placePreset: (cells: [number, number, string][]) => void;
+  clearAllModules: () => void;
 
   // Phase
   phase: "map" | "draw" | "grid" | "modules";
@@ -96,6 +98,22 @@ export const useLandStore = create<LandStore>((set) => ({
           ? { ...cell, moduleType: null }
           : cell
       ),
+    })),
+
+  placePreset: (cells) =>
+    set((state) => {
+      const lookup = new Map(cells.map(([r, c, t]) => [`${r},${c}`, t]));
+      return {
+        gridCells: state.gridCells.map((cell) => {
+          const key = `${cell.row},${cell.col}`;
+          return lookup.has(key) ? { ...cell, moduleType: lookup.get(key)! } : cell;
+        }),
+      };
+    }),
+
+  clearAllModules: () =>
+    set((state) => ({
+      gridCells: state.gridCells.map((cell) => ({ ...cell, moduleType: null })),
     })),
 
   phase: "map",

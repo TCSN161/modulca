@@ -35,6 +35,116 @@ export const MODULE_TYPES: ModuleType[] = [
   { id: "living",   label: "Living Room", color: "#6BBF59", icon: "🛋️" },
   { id: "office",   label: "Office",     color: "#8B6DB5", icon: "💼" },
   { id: "storage",  label: "Storage",    color: "#8E99A4", icon: "📦" },
+  { id: "hallway",  label: "Hallway",    color: "#D4A76A", icon: "🚪" },
+  { id: "terrace",  label: "Terrace",    color: "#68B584", icon: "🌿" },
+];
+
+/** Pre-built building layouts that place multiple modules at once */
+export interface BuildingPreset {
+  id: string;
+  label: string;
+  description: string;
+  category: "house" | "studio" | "cabin";
+  /** Grid cells to fill: [row, col, moduleType][] */
+  cells: [number, number, string][];
+}
+
+export const BUILDING_PRESETS: BuildingPreset[] = [
+  // ─── Houses ────────────────────────────────────────────
+  {
+    id: "house-compact",
+    label: "Compact House",
+    description: "2BR, 1BA — Perfect starter home",
+    category: "house",
+    cells: [
+      [0, 0, "living"],  [0, 1, "kitchen"],
+      [1, 0, "bedroom"], [1, 1, "bathroom"],
+    ],
+  },
+  {
+    id: "house-family",
+    label: "Family House",
+    description: "3BR, 2BA + hallway — Comfortable family living",
+    category: "house",
+    cells: [
+      [0, 0, "living"],  [0, 1, "kitchen"],  [0, 2, "terrace"],
+      [1, 0, "hallway"], [1, 1, "bathroom"], [1, 2, "bedroom"],
+      [2, 0, "bedroom"], [2, 1, "bedroom"],  [2, 2, "bathroom"],
+    ],
+  },
+  {
+    id: "house-lshape",
+    label: "L-Shape Villa",
+    description: "3BR, 2BA + office — Open plan L-layout with terrace",
+    category: "house",
+    cells: [
+      [0, 0, "terrace"], [0, 1, "living"],  [0, 2, "kitchen"],
+                          [1, 1, "hallway"], [1, 2, "bathroom"],
+                          [2, 1, "bedroom"], [2, 2, "bedroom"],
+                          [3, 1, "office"],  [3, 2, "bedroom"],
+    ],
+  },
+  // ─── Studios ───────────────────────────────────────────
+  {
+    id: "studio-mini",
+    label: "Mini Studio",
+    description: "1BR all-in-one — Tiny living",
+    category: "studio",
+    cells: [
+      [0, 0, "living"], [0, 1, "bathroom"],
+    ],
+  },
+  {
+    id: "studio-artist",
+    label: "Artist Studio",
+    description: "Open plan with office — Work from home",
+    category: "studio",
+    cells: [
+      [0, 0, "office"],  [0, 1, "living"],
+      [1, 0, "kitchen"], [1, 1, "bathroom"],
+    ],
+  },
+  {
+    id: "studio-loft",
+    label: "Loft Studio",
+    description: "Open plan with bedroom — Modern urban living",
+    category: "studio",
+    cells: [
+      [0, 0, "living"], [0, 1, "kitchen"], [0, 2, "bedroom"],
+    ],
+  },
+  // ─── Cabins ────────────────────────────────────────────
+  {
+    id: "cabin-retreat",
+    label: "Mountain Retreat",
+    description: "1BR cabin with terrace — Weekend getaway",
+    category: "cabin",
+    cells: [
+      [0, 0, "terrace"],
+      [1, 0, "living"],
+      [2, 0, "bedroom"],
+    ],
+  },
+  {
+    id: "cabin-glamping",
+    label: "Glamping Pod",
+    description: "Single module — Luxury camping",
+    category: "cabin",
+    cells: [
+      [0, 0, "bedroom"],
+    ],
+  },
+  {
+    id: "cabin-lakehouse",
+    label: "Lake House",
+    description: "2BR with terrace — Waterside retreat",
+    category: "cabin",
+    cells: [
+      [0, 0, "terrace"], [0, 1, "terrace"],
+      [1, 0, "living"],  [1, 1, "kitchen"],
+      [2, 0, "bedroom"], [2, 1, "bedroom"],
+    ],
+  },
 ];
 
 export const FINISH_LEVELS: FinishLevel[] = [

@@ -24,6 +24,15 @@ export interface MoodboardPin {
   source: "upload" | "curated" | "url";
 }
 
+export interface SavedRender {
+  id: string;
+  imageUrl: string; // base64 data URL
+  label: string;
+  engine: string;
+  moduleType: string;
+  createdAt: string;
+}
+
 export interface WallConfigs {
   north: WallType;
   south: WallType;
@@ -69,6 +78,15 @@ interface DesignStore {
   addMoodboardPin: (pin: MoodboardPin) => void;
   removeMoodboardPin: (id: string) => void;
   reorderMoodboardPins: (pins: MoodboardPin[]) => void;
+
+  // Saved AI renders for presentation
+  savedRenders: SavedRender[];
+  addSavedRender: (render: SavedRender) => void;
+  removeSavedRender: (id: string) => void;
+
+  // Module fixtures (electrical, plumbing, smart home)
+  moduleFixtures: Record<string, string[]>; // "row,col" → fixture ids
+  setModuleFixtures: (row: number, col: number, fixtures: string[]) => void;
 
   // Actions
   setModulesFromGrid: (cells: GridCell[], rotation: number) => void;
@@ -169,10 +187,18 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
   styleDescription: "",
   stylePhoto: null,
   moodboardPins: [],
+  savedRenders: [],
+  moduleFixtures: {},
 
   addMoodboardPin: (pin) => set((s) => ({ moodboardPins: [...s.moodboardPins, pin] })),
   removeMoodboardPin: (id) => set((s) => ({ moodboardPins: s.moodboardPins.filter((p) => p.id !== id) })),
   reorderMoodboardPins: (pins) => set({ moodboardPins: pins }),
+
+  addSavedRender: (render) => set((s) => ({ savedRenders: [...s.savedRenders, render] })),
+  removeSavedRender: (id) => set((s) => ({ savedRenders: s.savedRenders.filter((r) => r.id !== id) })),
+
+  setModuleFixtures: (row, col, fixtures) =>
+    set((s) => ({ moduleFixtures: { ...s.moduleFixtures, [`${row},${col}`]: fixtures } })),
 
   setStyleDirection: (dir) => set({ styleDirection: dir }),
   setStyleDescription: (desc) => set({ styleDescription: desc }),
@@ -258,8 +284,8 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
   setSelectedFurniture: (id) => set({ selectedFurniture: id }),
 
   saveToLocalStorage: () => {
-    const { modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins } = get();
-    const data = { modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins };
+    const { modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins, savedRenders, moduleFixtures } = get();
+    const data = { modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins, savedRenders, moduleFixtures };
     try {
       localStorage.setItem("modulca-design", JSON.stringify(data));
     } catch {
@@ -287,6 +313,8 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
         styleDescription: data.styleDescription ?? "",
         stylePhoto: data.stylePhoto ?? null,
         moodboardPins: data.moodboardPins ?? [],
+        savedRenders: data.savedRenders ?? [],
+        moduleFixtures: data.moduleFixtures ?? {},
       });
     } catch {
       // corrupted or unavailable

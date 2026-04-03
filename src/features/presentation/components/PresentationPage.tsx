@@ -63,15 +63,43 @@ const DEFAULT_SLIDES: SlideConfig[] = [
   { id: "modules", label: "Module Details", description: "Per-room specs, furniture, materials", enabled: true },
   { id: "renders", label: "AI Renders", description: "Photorealistic visualizations", enabled: true },
   { id: "materials", label: "Materials & Finishes", description: "Floor, wall, finish specifications", enabled: true },
-  { id: "products", label: "Products", description: "Selected items with quantities", enabled: false },
+  { id: "products", label: "Products", description: "Selected items with quantities", enabled: true },
   { id: "cost", label: "Cost Summary", description: "Full pricing breakdown", enabled: true },
   { id: "next", label: "Next Steps", description: "Contact, timeline, builder info", enabled: true },
 ];
+
+/** Product catalog for matching localStorage IDs */
+const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
+  "flooring-oak": { name: "Oak Flooring", price: 45 },
+  "flooring-concrete": { name: "Polished Concrete", price: 35 },
+  "wall-panels": { name: "Decorative Wall Panels", price: 28 },
+  "insulation-premium": { name: "Premium Insulation", price: 22 },
+  "windows-double": { name: "Double-Glazed Windows", price: 320 },
+  "door-interior": { name: "Interior Doors", price: 180 },
+  "paint-interior": { name: "Interior Paint", price: 35 },
+  "tiles-bathroom": { name: "Bathroom Tiles", price: 42 },
+  "sofa-modular": { name: "Modular Sofa", price: 890 },
+  "rug-area": { name: "Area Rug", price: 220 },
+  "curtains-blackout": { name: "Blackout Curtains", price: 85 },
+  "shelving-unit": { name: "Shelving Unit", price: 340 },
+  "pendant-light": { name: "Pendant Lights", price: 120 },
+  "mirror-wall": { name: "Wall Mirror", price: 95 },
+  "bathtub-freestanding": { name: "Freestanding Bathtub", price: 1200 },
+  "faucet-set": { name: "Faucet Set", price: 180 },
+  "sink-kitchen": { name: "Kitchen Sink", price: 280 },
+  "toilet-modern": { name: "Modern Toilet", price: 450 },
+  "shower-system": { name: "Rain Shower System", price: 380 },
+  "outlet-smart": { name: "Smart Outlets", price: 25 },
+  "switch-dimmer": { name: "Dimmer Switches", price: 35 },
+  "light-recessed": { name: "Recessed Lighting", price: 45 },
+  "heater-water": { name: "Tankless Water Heater", price: 680 },
+};
 
 export default function PresentationPage() {
   const { gridCells, gridRotation, polygon, mapCenter } = useLandStore();
   const {
     modules, setModulesFromGrid, styleDirection, finishLevel, getStats,
+    moodboardPins, savedRenders,
   } = useDesignStore();
 
   const [template, setTemplate] = useState<PresentationTemplate>("minimal");
@@ -93,6 +121,21 @@ export default function PresentationPage() {
   const tmpl = TEMPLATES[template];
   const finishInfo = FINISH_LEVELS.find((f) => f.id === finishLevel);
   const enabledSlides = slides.filter((s) => s.enabled);
+
+  // Load products from localStorage
+  const [products, setProducts] = useState<{ id: string; name: string; quantity: number; price: number }[]>([]);
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("modulca-selected-products");
+      if (raw) {
+        const items: { id: string; quantity: number }[] = JSON.parse(raw);
+        setProducts(items.map((item) => {
+          const p = PRODUCT_CATALOG[item.id];
+          return p ? { id: item.id, name: p.name, quantity: item.quantity, price: p.price } : null;
+        }).filter((x): x is { id: string; name: string; quantity: number; price: number } => x !== null));
+      }
+    } catch { /* ignore */ }
+  }, []);
 
   const toggleSlide = useCallback((id: SlideId) => {
     setSlides((prev) =>
@@ -379,13 +422,20 @@ export default function PresentationPage() {
                   </div>
                   <div className="space-y-2">
                     <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: tmpl.text, opacity: 0.4 }}>Mood Board</p>
-                    {style?.moodImages?.slice(0, 4).map((img, i) => (
+                    {moodboardPins.length > 0 ? (
+                      moodboardPins.slice(0, 4).map((pin, i) => (
+                        <div key={`pin-${i}`} className="rounded-lg overflow-hidden bg-gray-200 aspect-video">
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={pin.imageUrl} alt={pin.label || `Pin ${i + 1}`} className="h-full w-full object-cover" />
+                        </div>
+                      ))
+                    ) : style?.moodImages?.slice(0, 4).map((img, i) => (
                       <div key={i} className="rounded-lg overflow-hidden bg-gray-200 aspect-video">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={img.url} alt={img.label} className="h-full w-full object-cover" />
                       </div>
                     ))}
-                    {!style?.moodImages?.length && (
+                    {!moodboardPins.length && !style?.moodImages?.length && (
                       <div className="rounded-lg bg-gray-100 aspect-video flex items-center justify-center">
                         <p className="text-xs text-gray-400">Moodboard images from Step 4</p>
                       </div>
@@ -445,14 +495,34 @@ export default function PresentationPage() {
             {activeSlide === "renders" && slides.find((s) => s.id === "renders")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
                 <SlideHeader accent={tmpl.accent} text={tmpl.text} number={6} title="AI Renders" />
-                <div className="mt-6 text-center">
-                  <div className="rounded-xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center mb-4">
-                    <p className="text-sm text-gray-500">AI renders generated in Step 7 will appear here</p>
+                {savedRenders.length > 0 ? (
+                  <div className="mt-6 grid grid-cols-2 gap-4">
+                    {savedRenders.slice(0, 5).map((render) => (
+                      <div key={render.id} className="rounded-xl overflow-hidden border" style={{ borderColor: tmpl.text + "20" }}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={render.imageUrl} alt={render.label} className="w-full aspect-video object-cover" />
+                        <div className="p-2">
+                          <p className="text-xs font-medium" style={{ color: tmpl.text }}>{render.label}</p>
+                          <p className="text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Engine: {render.engine}</p>
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
-                    Photorealistic renders generated by AI engines (Pollinations, Stability, Together.ai, Leonardo)
+                ) : (
+                  <div className="mt-6 text-center">
+                    <div className="rounded-xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center mb-4">
+                      <p className="text-sm text-gray-500">Save renders from Step 7 to see them here</p>
+                    </div>
+                    <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
+                      Use the &quot;Save to Presentation&quot; button in the Render step
+                    </p>
+                  </div>
+                )}
+                {savedRenders.length > 5 && (
+                  <p className="text-[10px] mt-2 text-center" style={{ color: tmpl.text, opacity: 0.3 }}>
+                    Showing 5 of {savedRenders.length} renders (upgrade to Premium for unlimited)
                   </p>
-                </div>
+                )}
               </SlideCard>
             )}
 
@@ -503,6 +573,37 @@ export default function PresentationPage() {
                     <span className="text-sm font-bold" style={{ color: tmpl.accent }}>{finishInfo?.label || "Standard"}</span>
                   </div>
                 </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "products" && slides.find((s) => s.id === "products")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={8} title="Selected Products" />
+                {products.length > 0 ? (
+                  <div className="mt-6">
+                    <div className="space-y-2">
+                      {products.map((p) => (
+                        <div key={p.id} className="flex items-center justify-between rounded-lg p-3" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
+                          <div>
+                            <span className="text-sm font-medium" style={{ color: tmpl.text }}>{p.name}</span>
+                            <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Qty: {p.quantity} × EUR{p.price}</span>
+                          </div>
+                          <span className="text-sm font-bold" style={{ color: tmpl.accent }}>EUR{(p.quantity * p.price).toLocaleString()}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="mt-4 pt-3 border-t flex justify-between" style={{ borderColor: tmpl.text + "20" }}>
+                      <span className="text-sm font-bold" style={{ color: tmpl.text }}>Products Total</span>
+                      <span className="text-sm font-bold" style={{ color: tmpl.accent }}>
+                        EUR{products.reduce((sum, p) => sum + p.quantity * p.price, 0).toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="mt-6 text-center py-12">
+                    <p className="text-sm" style={{ color: tmpl.text, opacity: 0.4 }}>No products selected yet. Add products in Step 10.</p>
+                  </div>
+                )}
               </SlideCard>
             )}
 

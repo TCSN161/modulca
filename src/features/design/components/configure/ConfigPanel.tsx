@@ -5,16 +5,31 @@ import { useDesignStore } from "../../store";
 import { FINISH_LEVELS } from "@/shared/types";
 import { getPresetsForType, getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 
+/** All available fixture options */
+const FIXTURE_OPTIONS = [
+  { id: "led-lighting", label: "Integrated Lighting", description: "LED cove & spot lighting", category: "electrical" },
+  { id: "smart-thermostat", label: "Smart Thermostat", description: "Individual climate control", category: "smart" },
+  { id: "usb-c-outlets", label: "USB-C Power Outlets", description: "2× integrated USB-C ports", category: "electrical" },
+  { id: "ethernet", label: "Ethernet Port", description: "Cat6 network connection", category: "electrical" },
+  { id: "tv-cable", label: "TV Cable Outlet", description: "Coaxial TV connection", category: "electrical" },
+  { id: "smart-blinds", label: "Smart Blinds", description: "Motorized window blinds", category: "smart" },
+  { id: "underfloor-heating", label: "Underfloor Heating", description: "Electric radiant floor", category: "plumbing" },
+  { id: "water-supply", label: "Water Supply Point", description: "Hot & cold water connection", category: "plumbing" },
+  { id: "drain-point", label: "Drain Point", description: "Wastewater connection", category: "plumbing" },
+  { id: "smart-speaker", label: "Smart Speaker Mount", description: "Built-in speaker wiring", category: "smart" },
+  { id: "security-sensor", label: "Security Sensor", description: "Motion & door sensor", category: "smart" },
+  { id: "ev-charger-prep", label: "EV Charger Prep", description: "240V outlet for EV charging", category: "electrical" },
+];
+
 interface ConfigPanelProps {
   moduleRow: number;
   moduleCol: number;
 }
 
 export default function ConfigPanel({ moduleRow, moduleCol }: ConfigPanelProps) {
-  const { modules, updateModuleConfig, finishLevel } = useDesignStore();
+  const { modules, updateModuleConfig, finishLevel, moduleFixtures, setModuleFixtures } = useDesignStore();
   const mod = modules.find((m) => m.row === moduleRow && m.col === moduleCol);
   const [activeTab, setActiveTab] = useState<"layouts" | "materials" | "fixtures" | "review">("layouts");
-  const [lightingEnabled, setLightingEnabled] = useState(true);
 
   if (!mod) return null;
 
@@ -181,56 +196,45 @@ export default function ConfigPanel({ moduleRow, moduleCol }: ConfigPanelProps) 
         {activeTab === "fixtures" && (
           <div className="space-y-4">
             <h4 className="text-xs font-bold text-gray-500 uppercase tracking-wider">
-              Fixtures
+              Fixtures & Installations
             </h4>
-            <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-white p-4">
-              <div>
-                <div className="text-sm font-semibold text-brand-teal-800">
-                  Integrated Lighting
+            <p className="text-[10px] text-gray-400">
+              Toggle fixtures for this module. These affect cost and technical drawings.
+            </p>
+            {(["electrical", "plumbing", "smart"] as const).map((cat) => {
+              const items = FIXTURE_OPTIONS.filter((f) => f.category === cat);
+              return (
+                <div key={cat}>
+                  <h5 className="mb-2 text-[10px] font-bold text-brand-amber-600 uppercase tracking-wider">
+                    {cat === "electrical" ? "Electrical" : cat === "plumbing" ? "Plumbing" : "Smart Home"}
+                  </h5>
+                  <div className="space-y-1.5">
+                    {items.map((fixture) => {
+                      const key = `${moduleRow},${moduleCol}`;
+                      const current = moduleFixtures[key] || [];
+                      const isOn = current.includes(fixture.id);
+                      return (
+                        <div key={fixture.id} className="flex items-center justify-between rounded-lg border border-gray-100 bg-white p-3">
+                          <div>
+                            <div className="text-sm font-semibold text-brand-teal-800">{fixture.label}</div>
+                            <div className="text-[10px] text-gray-500">{fixture.description}</div>
+                          </div>
+                          <button
+                            onClick={() => {
+                              const next = isOn ? current.filter((id) => id !== fixture.id) : [...current, fixture.id];
+                              setModuleFixtures(moduleRow, moduleCol, next);
+                            }}
+                            className={`h-6 w-11 rounded-full p-0.5 transition-colors ${isOn ? "bg-brand-teal-800" : "bg-gray-200"}`}
+                          >
+                            <div className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${isOn ? "translate-x-5" : "translate-x-0"}`} />
+                          </button>
+                        </div>
+                      );
+                    })}
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500">
-                  LED cove & spot lighting
-                </div>
-              </div>
-              <button
-                onClick={() => setLightingEnabled(!lightingEnabled)}
-                className={`h-6 w-11 rounded-full p-0.5 transition-colors ${
-                  lightingEnabled ? "bg-brand-teal-800" : "bg-gray-200"
-                }`}
-              >
-                <div
-                  className={`h-5 w-5 rounded-full bg-white shadow-sm transition-transform ${
-                    lightingEnabled ? "translate-x-5" : "translate-x-0"
-                  }`}
-                />
-              </button>
-            </div>
-            <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-white p-4">
-              <div>
-                <div className="text-sm font-semibold text-brand-teal-800">
-                  Smart Thermostat
-                </div>
-                <div className="text-xs text-gray-500">
-                  Individual climate control
-                </div>
-              </div>
-              <div className="h-6 w-11 rounded-full bg-gray-200 p-0.5">
-                <div className="h-5 w-5 rounded-full bg-white shadow-sm" />
-              </div>
-            </div>
-            <div className="flex items-center justify-between rounded-lg border border-gray-100 bg-white p-4">
-              <div>
-                <div className="text-sm font-semibold text-brand-teal-800">
-                  USB-C Power Outlets
-                </div>
-                <div className="text-xs text-gray-500">
-                  2× integrated USB-C ports
-                </div>
-              </div>
-              <div className="h-6 w-11 rounded-full bg-brand-teal-800 p-0.5">
-                <div className="h-5 w-5 translate-x-5 rounded-full bg-white shadow-sm" />
-              </div>
-            </div>
+              );
+            })}
           </div>
         )}
 

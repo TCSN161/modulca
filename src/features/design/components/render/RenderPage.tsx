@@ -3,7 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useDesignStore } from "../../store";
+import { useDesignStore, type SavedRender } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { getStyleDirection } from "../../styles";
@@ -632,6 +632,35 @@ export default function RenderPage() {
                     className="block w-full rounded-lg border border-brand-amber-500 px-4 py-2 text-center text-xs font-semibold text-brand-amber-600 hover:bg-brand-amber-50 transition-colors"
                   >
                     📤 Share with Friends
+                  </button>
+                  <button
+                    onClick={async () => {
+                      try {
+                        const resp = await fetch(aiImageUrl);
+                        const blob = await resp.blob();
+                        const reader = new FileReader();
+                        reader.onloadend = () => {
+                          const base64 = reader.result as string;
+                          const render: SavedRender = {
+                            id: `render-${Date.now()}`,
+                            imageUrl: base64,
+                            label: `${currentMod?.label || "Module"} — AI Render`,
+                            engine: aiUsedEngine || "AI",
+                            moduleType: currentMod?.moduleType || "unknown",
+                            createdAt: new Date().toISOString(),
+                          };
+                          useDesignStore.getState().addSavedRender(render);
+                          useDesignStore.getState().saveToLocalStorage();
+                          alert("Render saved to your presentation!");
+                        };
+                        reader.readAsDataURL(blob);
+                      } catch {
+                        alert("Failed to save render.");
+                      }
+                    }}
+                    className="block w-full rounded-lg bg-brand-teal-800 px-4 py-2 text-center text-xs font-semibold text-white hover:bg-brand-teal-700 transition-colors"
+                  >
+                    🎨 Save to Presentation
                   </button>
                 </div>
               )}

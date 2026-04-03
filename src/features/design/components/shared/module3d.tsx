@@ -298,7 +298,7 @@ export function ModuleWalls({
 /*  GLB model loader                                                   */
 /* ------------------------------------------------------------------ */
 
-export function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: number; d: number }) {
+export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number; h: number; d: number; color?: string }) {
   const { scene } = useGLTF(path);
   const ref = useRef<THREE.Group>(null);
 
@@ -307,6 +307,20 @@ export function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: nu
     const cloned = scene.clone(true);
     while (ref.current.children.length) ref.current.remove(ref.current.children[0]);
     ref.current.add(cloned);
+
+    // Apply color override to all meshes if provided
+    if (color) {
+      const threeColor = new THREE.Color(color);
+      cloned.traverse((child) => {
+        if (child instanceof THREE.Mesh && child.material) {
+          const mat = child.material as THREE.MeshStandardMaterial;
+          if (mat.isMeshStandardMaterial) {
+            child.material = mat.clone();
+            (child.material as THREE.MeshStandardMaterial).color.copy(threeColor);
+          }
+        }
+      });
+    }
 
     const box = new THREE.Box3().setFromObject(cloned);
     const size = box.getSize(new THREE.Vector3());
@@ -319,7 +333,7 @@ export function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: nu
     const center = box2.getCenter(new THREE.Vector3());
     const minY = box2.min.y;
     cloned.position.set(-center.x, -minY, -center.z);
-  }, [scene, w, h, d]);
+  }, [scene, w, h, d, color]);
 
   return <group ref={ref} position={[0, -h / 2, 0]} />;
 }
@@ -348,7 +362,7 @@ export class SafeGlbFurniture extends Component<SafeGlbProps, { hasError: boolea
     }
     return (
       <Suspense fallback={<mesh><boxGeometry args={[w, h, d]} /><meshStandardMaterial color={color} transparent opacity={0.3} wireframe /></mesh>}>
-        <GlbFurniture path={path} w={w} h={h} d={d} />
+        <GlbFurniture path={path} w={w} h={h} d={d} color={color} />
       </Suspense>
     );
   }
