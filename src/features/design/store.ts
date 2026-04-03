@@ -320,3 +320,30 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
     };
   },
 }));
+
+/* ------------------------------------------------------------------ */
+/*  Auto-persistence: save on every module change, hydrate on startup  */
+/* ------------------------------------------------------------------ */
+
+if (typeof window !== "undefined") {
+  // Auto-save whenever modules change
+  useDesignStore.subscribe(
+    (state, prev) => {
+      if (state.modules !== prev.modules && state.modules.length > 0) {
+        state.saveToLocalStorage();
+      }
+    },
+  );
+
+  // Auto-hydrate from localStorage on first load (client-only)
+  const stored = localStorage.getItem("modulca-design");
+  if (stored) {
+    // Defer to avoid hydration mismatch with SSR
+    queueMicrotask(() => {
+      const { modules } = useDesignStore.getState();
+      if (modules.length === 0) {
+        useDesignStore.getState().loadFromLocalStorage();
+      }
+    });
+  }
+}

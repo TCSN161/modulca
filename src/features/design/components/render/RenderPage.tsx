@@ -5,6 +5,7 @@ import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useDesignStore } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
+import { useLandStore } from "@/features/land/store";
 import { getStyleDirection } from "../../styles";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import { MODULE_TYPES } from "@/shared/types";
@@ -19,7 +20,14 @@ type RenderMode = "template" | "ai";
 type ViewMode = "single" | "all";
 type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | "custom";
 type RenderResolution = "draft" | "standard" | "high";
-type PollinationsModel = "flux" | "zimage" | "gptimage";
+type AiEngine = "auto" | "pollinations" | "ai-horde" | "stability";
+
+const AI_ENGINES: Record<AiEngine, { label: string; description: string; speed: string }> = {
+  auto: { label: "Auto (Best Available)", description: "Tries engines in order until one succeeds", speed: "" },
+  pollinations: { label: "Pollinations AI", description: "Free, fast (~30-90s)", speed: "Fast" },
+  "ai-horde": { label: "AI Horde", description: "Free community GPUs, reliable", speed: "Slow" },
+  stability: { label: "Stability AI", description: "img2img — uses 3D scene as base (needs API key)", speed: "Medium" },
+};
 
 const PROMPT_TEMPLATES: Record<PromptTemplate, { label: string; description: string; suffix: string }> = {
   magazine: {
@@ -102,9 +110,10 @@ const STYLE_PINS: Record<string, { label: string; h: number; color: string; cat:
 };
 
 export default function RenderPage() {
+  const { gridCells, gridRotation } = useLandStore();
   const {
     modules, selectedModule, setSelectedModule,
-    styleDirection, finishLevel, getStats,
+    setModulesFromGrid, styleDirection, finishLevel, getStats,
   } = useDesignStore();
 
   const { saved, handleSave } = useSaveDesign();
@@ -123,16 +132,24 @@ export default function RenderPage() {
   const [aiError, setAiError] = useState<string | null>(null);
   const [promptTemplate, setPromptTemplate] = useState<PromptTemplate>("magazine");
   const [renderResolution, setRenderResolution] = useState<RenderResolution>("standard");
-  const [pollinationsModel, setPollinationsModel] = useState<PollinationsModel>("flux");
   const [includePeople, setIncludePeople] = useState(false);
   const [includePlants, setIncludePlants] = useState(false);
+  const [aiElapsed, setAiElapsed] = useState(0);
+  const [aiEngine, setAiEngine] = useState<AiEngine>("auto");
+  const [aiUsedEngine, setAiUsedEngine] = useState<string | null>(null);
+  const [useSceneAsBase, setUseSceneAsBase] = useState(false);
   const captureRef = useRef<(() => string | null) | null>(null);
 
   const handleSceneReady = useCallback((capture: () => string | null) => {
     captureRef.current = capture;
   }, []);
 
-  // Puter.js removed — requires account login which blocks rendering
+  // Initialize modules from land store if needed
+  useEffect(() => {
+    if (gridCells.length > 0 && modules.length === 0) {
+      setModulesFromGrid(gridCells, gridRotation);
+    }
+  }, [gridCells, gridRotation, setModulesFromGrid, modules.length]);
 
   useEffect(() => {
     if (modules.length > 0 && !selectedModule) {
@@ -234,53 +251,114 @@ export default function RenderPage() {
     }, 500);
   };
 
-  const handleGenerateAiRender = useCallback(async () => {
-    if (!aiPrompt.trim()) return;
-    setAiLoading(true);
-    setAiError(null);
-    setAiImageUrl(null);
+  // Elapsed time ticker for AI loading
+  const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-    const sanitized = aiPrompt
+  /** Build sanitized prompt */
+  const sanitizePrompt = useCallback((prompt: string) => {
+    return prompt
       .trim()
       .replace(/[^\w\s,.\-!?']/g, " ")
       .replace(/\s+/g, " ")
-      .slice(0, 500);
+      .slice(0, 300);
+  }, []);
 
+  const handleGenerateAiRender = useCallback(async () => {
+    if (!aiPrompt.trim()) return;
+
+    const sanitized = sanitizePrompt(aiPrompt);
     const res = RENDER_RESOLUTIONS[renderResolution];
-    const encoded = encodeURIComponent(sanitized);
-    const url = `https://image.pollinations.ai/prompt/${encoded}?width=${res.width}&height=${res.height}&model=${pollinationsModel}&nologo=true&nofeed=true&seed=${Date.now()}`;
+    const seed = String(Date.now());
 
-    console.log("[AI Render] Pollinations URL:", url, "Model:", pollinationsModel);
-
-    // Pollinations works via <img> tag (handles 301 redirects internally)
-    const img = new window.Image();
-    img.crossOrigin = "anonymous";
-    let timedOut = false;
-    const timer = setTimeout(() => {
-      timedOut = true;
-      setAiError("AI render timed out (2 min). The service may be busy — try again or use a shorter prompt.");
-      setAiLoading(false);
-    }, 120000);
-
-    img.onload = () => {
-      if (timedOut) return;
-      clearTimeout(timer);
-      if (img.naturalWidth > 10) {
-        setAiImageUrl(url);
-        setAiLoading(false);
-      } else {
-        setAiError("AI render returned an invalid image. Try a different prompt.");
-        setAiLoading(false);
+    // Capture 3D scene as base image if img2img is enabled
+    let baseImage: string | null = null;
+    if (useSceneAsBase && captureRef.current) {
+      const dataUrl = captureRef.current();
+      if (dataUrl) {
+        // Extract base64 from data URL (remove "data:image/png;base64," prefix)
+        baseImage = dataUrl.replace(/^data:image\/\w+;base64,/, "");
+        console.log("[AI Render] Captured 3D scene for img2img, base64 length:", baseImage.length);
       }
-    };
-    img.onerror = () => {
-      if (timedOut) return;
-      clearTimeout(timer);
-      setAiError("AI render failed. Try a different model (flux/zimage/gptimage) or simplify the prompt.");
+    }
+
+    setAiError(null);
+    setAiImageUrl(null);
+    setAiUsedEngine(null);
+    setAiLoading(true);
+    setAiElapsed(0);
+    // Start elapsed timer
+    if (tickerRef.current) clearInterval(tickerRef.current);
+    const start = Date.now();
+    tickerRef.current = setInterval(() => {
+      setAiElapsed(Math.floor((Date.now() - start) / 1000));
+    }, 1000);
+
+    try {
+      let response: Response;
+
+      if (baseImage) {
+        // POST mode: send base image for img2img
+        console.log("[AI Render] Using POST (img2img) mode");
+        response = await fetch("/api/ai-render", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            prompt: sanitized,
+            width: res.width,
+            height: res.height,
+            seed,
+            engine: aiEngine !== "auto" ? aiEngine : null,
+            baseImage,
+          }),
+        });
+      } else {
+        // GET mode: text-to-image
+        const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
+        const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}`;
+        console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
+        response = await fetch(proxyUrl);
+      }
+
+      if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
+
+      if (!response.ok) {
+        const errText = await response.text().catch(() => "");
+        console.error("[AI Render] Proxy error:", response.status, errText);
+        setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
+        setAiLoading(false);
+        return;
+      }
+
+      const contentType = response.headers.get("content-type") || "";
+      if (!contentType.startsWith("image/")) {
+        console.error("[AI Render] Unexpected content type:", contentType);
+        setAiError("Unexpected response from AI. Try again.");
+        setAiLoading(false);
+        return;
+      }
+
+      const blob = await response.blob();
+      console.log("[AI Render] Success! Size:", blob.size, "type:", blob.type);
+
+      if (blob.size < 500) {
+        setAiError("AI returned an empty image. Try a shorter prompt.");
+        setAiLoading(false);
+        return;
+      }
+
+      const usedEngine = response.headers.get("x-ai-engine") || aiEngine;
+      const objectUrl = URL.createObjectURL(blob);
+      setAiImageUrl(objectUrl);
+      setAiUsedEngine(usedEngine);
       setAiLoading(false);
-    };
-    img.src = url;
-  }, [aiPrompt, pollinationsModel, renderResolution]);
+    } catch (err) {
+      if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
+      console.error("[AI Render] Error:", err);
+      setAiError("Network error. Please try again.");
+      setAiLoading(false);
+    }
+  }, [aiPrompt, renderResolution, sanitizePrompt, aiEngine, useSceneAsBase]);
+
 
   if (modules.length === 0) {
     return (
@@ -432,19 +510,6 @@ export default function RenderPage() {
                 <p className="mt-1 text-[10px] text-gray-400">{PROMPT_TEMPLATES[promptTemplate].description}</p>
               </div>
 
-              {/* AI Model */}
-              <div className="mb-3">
-                <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Model</label>
-                <div className="flex gap-1">
-                  {(["flux", "zimage", "gptimage"] as PollinationsModel[]).map((m) => (
-                    <button key={m} onClick={() => setPollinationsModel(m)}
-                      className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors ${pollinationsModel === m ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                      {m}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Resolution */}
               <div className="mb-3">
                 <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Resolution</label>
@@ -457,6 +522,41 @@ export default function RenderPage() {
                     </button>
                   ))}
                 </div>
+              </div>
+
+              {/* AI Engine selector */}
+              <div className="mb-3">
+                <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Engine</label>
+                <select
+                  value={aiEngine}
+                  onChange={(e) => setAiEngine(e.target.value as AiEngine)}
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
+                >
+                  {(Object.keys(AI_ENGINES) as AiEngine[]).map((key) => (
+                    <option key={key} value={key}>
+                      {AI_ENGINES[key].label}{AI_ENGINES[key].speed ? ` (${AI_ENGINES[key].speed})` : ""}
+                    </option>
+                  ))}
+                </select>
+                <p className="mt-1 text-[10px] text-gray-400">{AI_ENGINES[aiEngine].description}</p>
+              </div>
+
+              {/* Use 3D Scene as Base (img2img) */}
+              <div className="mb-3">
+                <label className="flex items-center justify-between rounded-lg bg-brand-teal-50 border border-brand-teal-200 px-3 py-2.5 cursor-pointer">
+                  <div>
+                    <span className="text-xs font-medium text-brand-teal-800">Use 3D Scene as Base</span>
+                    <p className="text-[10px] text-brand-teal-600 mt-0.5">Captures the 3D view and uses it as reference for AI</p>
+                  </div>
+                  <button type="button" role="switch" aria-checked={useSceneAsBase}
+                    onClick={() => setUseSceneAsBase((p) => !p)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ml-2 ${useSceneAsBase ? "bg-brand-teal-700" : "bg-gray-300"}`}>
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${useSceneAsBase ? "translate-x-4" : "translate-x-0.5"}`} />
+                  </button>
+                </label>
+                {useSceneAsBase && aiEngine === "auto" && (
+                  <p className="mt-1 text-[10px] text-brand-amber-600">Tip: Select &quot;Stability AI&quot; engine for best img2img results</p>
+                )}
               </div>
 
               {/* Include People / Plants toggles */}
@@ -495,18 +595,43 @@ export default function RenderPage() {
                 disabled={aiLoading || !aiPrompt.trim()}
                 className="w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors disabled:opacity-50 disabled:cursor-wait"
               >
-                {aiLoading ? "Generating..." : `Generate AI Render (${RENDER_RESOLUTIONS[renderResolution].label})`}
+                {aiLoading
+                  ? `Generating... ${aiElapsed}s`
+                  : `Generate with ${aiEngine === "auto" ? "AI" : AI_ENGINES[aiEngine].label}`}
               </button>
               {aiImageUrl && (
-                <a
-                  href={aiImageUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  download={`ai-render-${currentMod?.label || "module"}-${lighting}.png`}
-                  className="mt-2 block w-full rounded-lg border border-brand-teal-800 px-4 py-2 text-center text-xs font-semibold text-brand-teal-800 hover:bg-brand-teal-50"
-                >
-                  Download PNG
-                </a>
+                <div className="mt-3 space-y-2">
+                  {aiUsedEngine && (
+                    <p className="text-center text-[10px] text-gray-400">
+                      Generated by <span className="font-semibold text-brand-teal-700">{aiUsedEngine}</span>
+                    </p>
+                  )}
+                  <a
+                    href={aiImageUrl}
+                    download={`modulca-render-${currentMod?.label || "module"}-${Date.now()}.png`}
+                    className="block w-full rounded-lg border border-brand-teal-800 px-4 py-2 text-center text-xs font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
+                  >
+                    💾 Save Image
+                  </a>
+                  <button
+                    onClick={() => {
+                      if (navigator.share && aiImageUrl) {
+                        fetch(aiImageUrl)
+                          .then((r) => r.blob())
+                          .then((blob) => {
+                            const file = new File([blob], `modulca-render.png`, { type: blob.type });
+                            navigator.share({ title: "ModulCA AI Render", text: "Check out my modular home design!", files: [file] }).catch(() => {});
+                          })
+                          .catch(() => {});
+                      } else if (aiImageUrl) {
+                        navigator.clipboard.writeText(window.location.href).then(() => alert("Link copied to clipboard!")).catch(() => {});
+                      }
+                    }}
+                    className="block w-full rounded-lg border border-brand-amber-500 px-4 py-2 text-center text-xs font-semibold text-brand-amber-600 hover:bg-brand-amber-50 transition-colors"
+                  >
+                    📤 Share with Friends
+                  </button>
+                </div>
               )}
             </>
           )}
@@ -555,37 +680,43 @@ export default function RenderPage() {
                     />
                   )}
 
-                  {/* AI render overlay */}
-                  {renderMode === "ai" && !aiImageUrl && (
+                  {/* AI generated image (from blob URL) */}
+                  {renderMode === "ai" && aiImageUrl && !aiLoading && (
+                    <div className="absolute inset-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={aiImageUrl} alt="AI generated render" className="h-full w-full object-cover rounded-2xl" />
+                    </div>
+                  )}
+                  {/* AI overlay: loading spinner, error, or initial prompt */}
+                  {renderMode === "ai" && (aiLoading || aiError || !aiImageUrl) && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm rounded-2xl">
                       {aiLoading ? (
                         <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl">
                           <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-amber-500 border-t-transparent" />
-                          <p className="text-sm font-medium text-brand-teal-800">Generating AI render...</p>
-                          <p className="text-xs text-gray-400">This may take 10-30 seconds</p>
+                          <p className="text-sm font-medium text-brand-teal-800">
+                            Generating with {aiEngine === "auto" ? "AI" : AI_ENGINES[aiEngine].label}...
+                          </p>
+                          <p className="text-xs text-gray-400">{aiElapsed}s elapsed — typically takes 30-90 seconds</p>
+                          <p className="text-[10px] text-gray-300">Please wait — the AI is creating your image</p>
                         </div>
                       ) : aiError ? (
-                        <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl">
+                        <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl max-w-sm">
                           <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700 uppercase tracking-wider">Error</span>
-                          <p className="text-center text-sm text-gray-600 max-w-xs">{aiError}</p>
+                          <p className="text-center text-sm text-gray-600">{aiError}</p>
                           <button onClick={handleGenerateAiRender} className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600">
                             Try Again
                           </button>
+                          <p className="text-[10px] text-gray-400 text-center">Tip: try &quot;Draft&quot; resolution for faster results</p>
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl">
-                          <span className="rounded-full bg-brand-amber-100 px-3 py-1 text-xs font-bold text-brand-amber-700 uppercase tracking-wider">AI Render</span>
-                          <p className="text-center text-sm text-gray-600 max-w-xs">Configure your prompt below and click &quot;Generate AI Render&quot;</p>
-                          <p className="text-xs text-gray-400">Powered by Pollinations.ai — Free, no API key needed</p>
+                          <span className="rounded-full bg-brand-amber-100 px-3 py-1 text-xs font-bold text-brand-amber-700 uppercase tracking-wider">
+                            {aiEngine === "auto" ? "AI Render" : AI_ENGINES[aiEngine].label}
+                          </span>
+                          <p className="text-center text-sm text-gray-600 max-w-xs">Click the generate button to create a photorealistic render</p>
+                          <p className="text-xs text-gray-400">Free AI image generation — no account needed</p>
                         </div>
                       )}
-                    </div>
-                  )}
-                  {/* AI generated image */}
-                  {renderMode === "ai" && aiImageUrl && (
-                    <div className="absolute inset-0">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={aiImageUrl} alt="AI generated render" className="h-full w-full object-cover rounded-2xl" />
                     </div>
                   )}
 
@@ -846,6 +977,16 @@ export default function RenderPage() {
                           ))}
                         </div>
                       </div>
+                      {/* AI Engine selector (mobile) */}
+                      <div className="mb-3">
+                        <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Engine</label>
+                        <select value={aiEngine} onChange={(e) => setAiEngine(e.target.value as AiEngine)}
+                          className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none">
+                          {(Object.keys(AI_ENGINES) as AiEngine[]).map((key) => (
+                            <option key={key} value={key}>{AI_ENGINES[key].label}</option>
+                          ))}
+                        </select>
+                      </div>
                       <div className="mb-3 space-y-2">
                         <label className="flex items-center justify-between rounded-lg bg-gray-50 px-3 py-2 cursor-pointer">
                           <span className="text-xs text-gray-700">Include People</span>
@@ -877,7 +1018,7 @@ export default function RenderPage() {
                         disabled={aiLoading || !aiPrompt.trim()}
                         className="w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors disabled:opacity-50"
                       >
-                        {aiLoading ? "Generating..." : `Generate AI Render (${RENDER_RESOLUTIONS[renderResolution].label})`}
+                        {aiLoading ? `Generating... ${aiElapsed}s` : `Generate with ${aiEngine === "auto" ? "AI" : AI_ENGINES[aiEngine].label}`}
                       </button>
                     </>
                   )}

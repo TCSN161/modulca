@@ -20,9 +20,9 @@ export default function HomePage() {
             </span>
           </div>
           <div className="hidden items-center gap-6 sm:flex">
-            <Link href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">How It Works</Link>
-            <Link href="/project/demo/land" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">Pricing</Link>
-            <Link href="/project/demo/land" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">For Builders</Link>
+            <a href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">How It Works</a>
+            <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">Pricing</a>
+            <a href="#for-builders" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">For Builders</a>
           </div>
           <div className="flex items-center gap-4">
             <Link
@@ -57,9 +57,9 @@ export default function HomePage() {
             <Link href="/project/demo/land" className="btn-accent px-8 py-4 text-base">
               Try the Land Designer
             </Link>
-            <Link href="#how-it-works" className="btn-outline px-8 py-4 text-base">
+            <a href="#how-it-works" className="btn-outline px-8 py-4 text-base">
               See How It Works
-            </Link>
+            </a>
           </div>
         </div>
 
@@ -108,6 +108,71 @@ export default function HomePage() {
                 <p className="text-sm text-gray-600">{item.description}</p>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* Pricing */}
+        <section id="pricing" className="w-full max-w-5xl pb-20">
+          <h2 className="mb-12 text-center text-2xl font-bold text-brand-teal-800 sm:text-3xl">
+            Simple, Transparent Pricing
+          </h2>
+          <div className="grid gap-8 sm:grid-cols-3">
+            {[
+              {
+                name: "Starter",
+                price: "Free",
+                description: "Explore the designer and get a feel for modular layouts.",
+                features: ["Land designer access", "Up to 4 modules", "Basic cost estimate"],
+              },
+              {
+                name: "Pro",
+                price: "€49",
+                description: "Full design tools with detailed estimates and PDF export.",
+                features: ["Unlimited modules", "Detailed cost breakdown", "PDF export", "Save & share projects"],
+              },
+              {
+                name: "Enterprise",
+                price: "Custom",
+                description: "For builders and developers managing multiple projects.",
+                features: ["Everything in Pro", "Builder dashboard", "Client management", "Priority support"],
+              },
+            ].map((plan) => (
+              <div
+                key={plan.name}
+                className="rounded-xl border border-gray-100 bg-white p-6 text-center shadow-sm transition-shadow hover:shadow-md"
+              >
+                <h3 className="mb-1 text-lg font-semibold text-brand-teal-800">{plan.name}</h3>
+                <div className="mb-3 text-3xl font-bold text-brand-amber-500">{plan.price}</div>
+                <p className="mb-4 text-sm text-gray-600">{plan.description}</p>
+                <ul className="space-y-2 text-left text-sm text-gray-600">
+                  {plan.features.map((f) => (
+                    <li key={f} className="flex items-center gap-2">
+                      <span className="text-brand-teal-600">✓</span> {f}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* For Builders */}
+        <section id="for-builders" className="w-full max-w-5xl pb-20">
+          <h2 className="mb-12 text-center text-2xl font-bold text-brand-teal-800 sm:text-3xl">
+            For Builders
+          </h2>
+          <div className="rounded-xl border border-gray-100 bg-white p-8 shadow-sm sm:p-12">
+            <div className="mx-auto max-w-2xl text-center">
+              <p className="mb-6 text-lg text-gray-600">
+                Join our network of certified modular builders. Receive qualified leads,
+                manage projects through our dashboard, and grow your business.
+              </p>
+              <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
+                <Link href="/project/demo/land" className="btn-accent px-8 py-3 text-sm">
+                  See a Demo Project
+                </Link>
+              </div>
+            </div>
           </div>
         </section>
       </main>
