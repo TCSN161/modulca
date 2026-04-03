@@ -1,0 +1,644 @@
+"use client";
+
+import { useEffect, useState, useRef, useCallback } from "react";
+import Link from "next/link";
+import { useDesignStore } from "@/features/design/store";
+import { useLandStore } from "@/features/land/store";
+import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
+import { getStyleDirection } from "@/features/design/styles";
+import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
+import StepNav from "@/features/design/components/shared/StepNav";
+
+type PresentationTemplate = "minimal" | "bold" | "classic";
+type SlideId =
+  | "cover"
+  | "site"
+  | "floorplan"
+  | "vision"
+  | "modules"
+  | "renders"
+  | "materials"
+  | "products"
+  | "cost"
+  | "next";
+
+interface SlideConfig {
+  id: SlideId;
+  label: string;
+  description: string;
+  enabled: boolean;
+}
+
+const TEMPLATES: Record<PresentationTemplate, { label: string; description: string; accent: string; bg: string; text: string }> = {
+  minimal: {
+    label: "Minimal White",
+    description: "Clean, modern — inspired by Zaha Hadid Architects",
+    accent: "#C8956C",
+    bg: "#FFFFFF",
+    text: "#1a1a1a",
+  },
+  bold: {
+    label: "Dark Contrast",
+    description: "Bold, dramatic — inspired by BIG (Bjarke Ingels)",
+    accent: "#F59E0B",
+    bg: "#111111",
+    text: "#FFFFFF",
+  },
+  classic: {
+    label: "Classic Architectural",
+    description: "Traditional, elegant — inspired by Foster + Partners",
+    accent: "#1D6B6B",
+    bg: "#F8F6F2",
+    text: "#2A2A2A",
+  },
+};
+
+const DEFAULT_SLIDES: SlideConfig[] = [
+  { id: "cover", label: "Cover Page", description: "Project name, hero render, date", enabled: true },
+  { id: "site", label: "Site Plan", description: "Location map, terrain area, coordinates", enabled: true },
+  { id: "floorplan", label: "Floor Plan", description: "Technical drawing, module layout", enabled: true },
+  { id: "vision", label: "Design Vision", description: "Style direction, moodboard, palette", enabled: true },
+  { id: "modules", label: "Module Details", description: "Per-room specs, furniture, materials", enabled: true },
+  { id: "renders", label: "AI Renders", description: "Photorealistic visualizations", enabled: true },
+  { id: "materials", label: "Materials & Finishes", description: "Floor, wall, finish specifications", enabled: true },
+  { id: "products", label: "Products", description: "Selected items with quantities", enabled: false },
+  { id: "cost", label: "Cost Summary", description: "Full pricing breakdown", enabled: true },
+  { id: "next", label: "Next Steps", description: "Contact, timeline, builder info", enabled: true },
+];
+
+export default function PresentationPage() {
+  const { gridCells, gridRotation, polygon, mapCenter } = useLandStore();
+  const {
+    modules, setModulesFromGrid, styleDirection, finishLevel, getStats,
+  } = useDesignStore();
+
+  const [template, setTemplate] = useState<PresentationTemplate>("minimal");
+  const [slides, setSlides] = useState<SlideConfig[]>(DEFAULT_SLIDES);
+  const [projectName, setProjectName] = useState("My Modular Home");
+  const [clientName, setClientName] = useState("");
+  const [activeSlide, setActiveSlide] = useState<SlideId>("cover");
+  const [generating, setGenerating] = useState(false);
+  const previewRef = useRef<HTMLDivElement>(null);
+
+  // Initialize modules from land store if needed
+  useEffect(() => {
+    if (gridCells.length > 0 && modules.length === 0) {
+      setModulesFromGrid(gridCells, gridRotation);
+    }
+  }, [gridCells, gridRotation, setModulesFromGrid, modules.length]);
+
+  const stats = getStats();
+  const style = styleDirection ? getStyleDirection(styleDirection) : null;
+  const tmpl = TEMPLATES[template];
+  const finishInfo = FINISH_LEVELS.find((f) => f.id === finishLevel);
+  const enabledSlides = slides.filter((s) => s.enabled);
+
+  const toggleSlide = useCallback((id: SlideId) => {
+    setSlides((prev) =>
+      prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s))
+    );
+  }, []);
+
+  const handleDownloadPdf = useCallback(async () => {
+    setGenerating(true);
+    // Use print-to-PDF as initial implementation
+    setTimeout(() => {
+      window.print();
+      setGenerating(false);
+    }, 500);
+  }, []);
+
+  const handleShareLink = useCallback(() => {
+    navigator.clipboard.writeText(window.location.href);
+    alert("Presentation link copied to clipboard!");
+  }, []);
+
+  if (modules.length === 0) {
+    return (
+      <div className="flex h-screen items-center justify-center">
+        <div className="text-center">
+          <p className="text-gray-500">No modules configured yet.</p>
+          <Link href="/project/demo/land" className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white">
+            Go to Step 1
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen flex-col bg-gray-50">
+      {/* Top Nav */}
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6 print:hidden">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-xl font-bold text-brand-teal-800">
+            Modul<span className="text-brand-amber-500">CA</span>
+          </span>
+        </Link>
+        <StepNav activeStep={11} />
+        <div className="flex items-center gap-2">
+          <button onClick={handleShareLink} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50">
+            Share Link
+          </button>
+          <button
+            onClick={handleDownloadPdf}
+            disabled={generating}
+            className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 disabled:opacity-50"
+          >
+            {generating ? "Generating..." : "Download PDF"}
+          </button>
+        </div>
+      </header>
+
+      <div className="flex flex-1 overflow-hidden">
+        {/* Left Sidebar — Settings */}
+        <aside className="w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4 print:hidden">
+          <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Presentation Settings</h3>
+
+          {/* Project Name */}
+          <div className="mb-4">
+            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Project Name</label>
+            <input
+              type="text"
+              value={projectName}
+              onChange={(e) => setProjectName(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-brand-amber-500 focus:outline-none"
+            />
+          </div>
+
+          {/* Client Name */}
+          <div className="mb-4">
+            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Client Name (optional)</label>
+            <input
+              type="text"
+              value={clientName}
+              onChange={(e) => setClientName(e.target.value)}
+              placeholder="Your name or company"
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-brand-amber-500 focus:outline-none"
+            />
+          </div>
+
+          {/* Template Selector */}
+          <div className="mb-5">
+            <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">Template</label>
+            <div className="space-y-2">
+              {(Object.keys(TEMPLATES) as PresentationTemplate[]).map((key) => (
+                <button
+                  key={key}
+                  onClick={() => setTemplate(key)}
+                  className={`w-full rounded-lg border-2 p-3 text-left transition-all ${
+                    template === key
+                      ? "border-brand-amber-500 bg-brand-amber-50"
+                      : "border-gray-100 hover:border-gray-200"
+                  }`}
+                >
+                  <div className="flex items-center gap-2">
+                    <div
+                      className="h-6 w-6 rounded-full border border-gray-200"
+                      style={{ background: `linear-gradient(135deg, ${TEMPLATES[key].bg} 50%, ${TEMPLATES[key].accent} 50%)` }}
+                    />
+                    <span className="text-xs font-semibold text-gray-800">{TEMPLATES[key].label}</span>
+                  </div>
+                  <p className="mt-1 text-[10px] text-gray-400">{TEMPLATES[key].description}</p>
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Slide Toggle */}
+          <div className="mb-5">
+            <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">
+              Slides ({enabledSlides.length} of {slides.length})
+            </label>
+            <div className="space-y-1">
+              {slides.map((slide) => (
+                <label
+                  key={slide.id}
+                  className="flex items-center justify-between rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50"
+                >
+                  <div>
+                    <span className="text-xs font-medium text-gray-700">{slide.label}</span>
+                    <p className="text-[9px] text-gray-400">{slide.description}</p>
+                  </div>
+                  <button
+                    type="button"
+                    role="switch"
+                    aria-checked={slide.enabled}
+                    onClick={() => toggleSlide(slide.id)}
+                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ml-2 ${
+                      slide.enabled ? "bg-brand-amber-500" : "bg-gray-300"
+                    }`}
+                  >
+                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${slide.enabled ? "translate-x-4" : "translate-x-0.5"}`} />
+                  </button>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {/* Navigation */}
+          <div className="space-y-2">
+            <Link href="/project/demo/finalize" className="block text-center text-sm text-gray-500 hover:text-brand-teal-800">
+              &larr; Back to Finalize
+            </Link>
+          </div>
+        </aside>
+
+        {/* Center — Slide Preview */}
+        <main className="flex-1 overflow-y-auto p-6">
+          {/* Slide navigation tabs */}
+          <div className="mb-4 flex items-center gap-1 overflow-x-auto print:hidden">
+            {enabledSlides.map((slide, i) => (
+              <button
+                key={slide.id}
+                onClick={() => setActiveSlide(slide.id)}
+                className={`whitespace-nowrap rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
+                  activeSlide === slide.id
+                    ? "bg-brand-teal-800 text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                {i + 1}. {slide.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Slide Preview Area */}
+          <div ref={previewRef} className="mx-auto" style={{ maxWidth: 900 }}>
+            {/* Each slide is a card styled per template */}
+            {(activeSlide === "cover" || typeof window !== "undefined" && window.matchMedia("print").matches) && slides.find((s) => s.id === "cover")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <div className="flex flex-col items-center justify-center min-h-[500px] text-center">
+                  <div className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: tmpl.accent }}>
+                    ModulCA Project Presentation
+                  </div>
+                  <h1 className="text-4xl font-bold mb-4" style={{ color: tmpl.text }}>{projectName}</h1>
+                  {clientName && (
+                    <p className="text-lg mb-2" style={{ color: tmpl.text, opacity: 0.6 }}>Prepared for {clientName}</p>
+                  )}
+                  <p className="text-sm mb-8" style={{ color: tmpl.text, opacity: 0.4 }}>
+                    {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                  </p>
+                  <div className="flex items-center gap-6 text-xs" style={{ color: tmpl.text, opacity: 0.5 }}>
+                    <span>{modules.length} Modules</span>
+                    <span>{stats.totalArea}m2 Total Area</span>
+                    <span>{style?.label || "Modern"} Style</span>
+                    <span>{finishInfo?.label || "Standard"} Finish</span>
+                  </div>
+                  <div className="mt-12 h-1 w-24 rounded" style={{ backgroundColor: tmpl.accent }} />
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "site" && slides.find((s) => s.id === "site")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={2} title="Site Plan" />
+                <div className="grid grid-cols-2 gap-6 mt-6">
+                  <div className="rounded-xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center">
+                    <p className="text-sm text-gray-500">Map view from Step 1</p>
+                  </div>
+                  <div className="space-y-4">
+                    <DetailRow label="Location" value={`${mapCenter.lat.toFixed(4)}, ${mapCenter.lng.toFixed(4)}`} text={tmpl.text} />
+                    <DetailRow label="Terrain Area" value={polygon.length > 0 ? `~${(polygon.length * 50).toFixed(0)}m2 (estimated)` : "Not defined"} text={tmpl.text} />
+                    <DetailRow label="Grid Configuration" value={`${modules.length} modules placed`} text={tmpl.text} />
+                    <DetailRow label="Grid Rotation" value={`${gridRotation}deg`} text={tmpl.text} />
+                    <DetailRow label="Total Built Area" value={`${stats.totalArea}m2`} text={tmpl.text} />
+                    <DetailRow label="Usable Area" value={`${stats.usableArea}m2`} text={tmpl.text} />
+                  </div>
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "floorplan" && slides.find((s) => s.id === "floorplan")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={3} title="Floor Plan" />
+                <div className="mt-6 flex justify-center">
+                  <div className="grid gap-1" style={{
+                    gridTemplateColumns: `repeat(${Math.max(...modules.map((m) => m.col)) - Math.min(...modules.map((m) => m.col)) + 1}, 80px)`,
+                  }}>
+                    {modules.map((mod) => {
+                      const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+                      return (
+                        <div
+                          key={`${mod.row}-${mod.col}`}
+                          className="rounded-lg border p-2 text-center"
+                          style={{
+                            gridColumn: mod.col - Math.min(...modules.map((m) => m.col)) + 1,
+                            gridRow: mod.row - Math.min(...modules.map((m) => m.row)) + 1,
+                            backgroundColor: mt?.color + "30",
+                            borderColor: mt?.color || "#ccc",
+                          }}
+                        >
+                          <div className="text-[9px] font-bold" style={{ color: tmpl.text }}>{mod.label}</div>
+                          <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.5 }}>{mt?.label}</div>
+                          <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.4 }}>3m x 3m</div>
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+                <div className="mt-6 flex justify-center gap-4">
+                  {Array.from(new Set(modules.map((m) => m.moduleType))).map((type) => {
+                    const mt = MODULE_TYPES.find((m) => m.id === type);
+                    const count = modules.filter((m) => m.moduleType === type).length;
+                    return (
+                      <div key={type} className="flex items-center gap-2 text-xs" style={{ color: tmpl.text }}>
+                        <div className="h-3 w-3 rounded" style={{ backgroundColor: mt?.color }} />
+                        <span>{mt?.label} x{count}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "vision" && slides.find((s) => s.id === "vision")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={4} title="Design Vision" />
+                <div className="mt-6 grid grid-cols-3 gap-6">
+                  <div className="col-span-2">
+                    <h3 className="text-xl font-bold mb-2" style={{ color: tmpl.text }}>{style?.label || "Modern Design"}</h3>
+                    <p className="text-sm leading-relaxed mb-6" style={{ color: tmpl.text, opacity: 0.6 }}>
+                      {style?.description || "A carefully curated design direction that balances aesthetics with functionality."}
+                    </p>
+                    {/* Color palette */}
+                    {style?.palette && (
+                      <div>
+                        <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: tmpl.text, opacity: 0.4 }}>Color Palette</p>
+                        <div className="flex gap-2">
+                          {style.palette.map((swatch, i) => (
+                            <div key={i} className="text-center">
+                              <div className="h-12 w-12 rounded-lg border border-gray-200 shadow-sm" style={{ backgroundColor: swatch.color }} />
+                              <span className="text-[8px] mt-1 block" style={{ color: tmpl.text, opacity: 0.4 }}>{swatch.label}</span>
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: tmpl.text, opacity: 0.4 }}>Mood Board</p>
+                    {style?.moodImages?.slice(0, 4).map((img, i) => (
+                      <div key={i} className="rounded-lg overflow-hidden bg-gray-200 aspect-video">
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={img.url} alt={img.label} className="h-full w-full object-cover" />
+                      </div>
+                    ))}
+                    {!style?.moodImages?.length && (
+                      <div className="rounded-lg bg-gray-100 aspect-video flex items-center justify-center">
+                        <p className="text-xs text-gray-400">Moodboard images from Step 4</p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "modules" && slides.find((s) => s.id === "modules")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={5} title="Module Details" />
+                <div className="mt-6 space-y-4">
+                  {modules.map((mod) => {
+                    const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+                    const preset = getPreset(mod.moduleType, mod.layoutPreset);
+                    const floor = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish);
+                    const wall = WALL_MATERIALS.find((w) => w.id === mod.wallColor);
+                    return (
+                      <div key={`${mod.row}-${mod.col}`} className="rounded-xl p-4" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
+                        <div className="flex items-center gap-3 mb-3">
+                          <div className="h-5 w-5 rounded" style={{ backgroundColor: mt?.color }} />
+                          <h4 className="text-sm font-bold" style={{ color: tmpl.text }}>{mod.label}</h4>
+                          <span className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>{mt?.label} | {preset?.label}</span>
+                        </div>
+                        <div className="grid grid-cols-4 gap-4 text-xs">
+                          <div>
+                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Floor</span>
+                            <div className="flex items-center gap-1 mt-1">
+                              <div className="h-3 w-3 rounded border" style={{ backgroundColor: floor?.color }} />
+                              <span style={{ color: tmpl.text }}>{floor?.label}</span>
+                            </div>
+                          </div>
+                          <div>
+                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Walls</span>
+                            <div className="flex items-center gap-1 mt-1">
+                              <div className="h-3 w-3 rounded border" style={{ backgroundColor: wall?.color }} />
+                              <span style={{ color: tmpl.text }}>{wall?.label}</span>
+                            </div>
+                          </div>
+                          <div>
+                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Furniture</span>
+                            <span className="block mt-1" style={{ color: tmpl.text }}>{preset?.furniture.length || 0} pieces</span>
+                          </div>
+                          <div>
+                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Area</span>
+                            <span className="block mt-1" style={{ color: tmpl.text }}>9m2 (7m2 usable)</span>
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "renders" && slides.find((s) => s.id === "renders")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={6} title="AI Renders" />
+                <div className="mt-6 text-center">
+                  <div className="rounded-xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center mb-4">
+                    <p className="text-sm text-gray-500">AI renders generated in Step 7 will appear here</p>
+                  </div>
+                  <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
+                    Photorealistic renders generated by AI engines (Pollinations, Stability, Together.ai, Leonardo)
+                  </p>
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "materials" && slides.find((s) => s.id === "materials")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={7} title="Materials & Finishes" />
+                <div className="mt-6 grid grid-cols-2 gap-8">
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: tmpl.text, opacity: 0.4 }}>Floor Materials</p>
+                    <div className="space-y-2">
+                      {Array.from(new Set(modules.map((m) => m.floorFinish))).map((floorId) => {
+                        const floor = FLOOR_MATERIALS.find((f) => f.id === floorId);
+                        const count = modules.filter((m) => m.floorFinish === floorId).length;
+                        return (
+                          <div key={floorId} className="flex items-center gap-3 rounded-lg p-2" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
+                            <div className="h-10 w-10 rounded-lg border" style={{ backgroundColor: floor?.color }} />
+                            <div>
+                              <span className="text-xs font-medium" style={{ color: tmpl.text }}>{floor?.label}</span>
+                              <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Used in {count} module{count > 1 ? "s" : ""}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: tmpl.text, opacity: 0.4 }}>Wall Finishes</p>
+                    <div className="space-y-2">
+                      {Array.from(new Set(modules.map((m) => m.wallColor))).map((wallId) => {
+                        const wall = WALL_MATERIALS.find((w) => w.id === wallId);
+                        const count = modules.filter((m) => m.wallColor === wallId).length;
+                        return (
+                          <div key={wallId} className="flex items-center gap-3 rounded-lg p-2" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
+                            <div className="h-10 w-10 rounded-lg border" style={{ backgroundColor: wall?.color }} />
+                            <div>
+                              <span className="text-xs font-medium" style={{ color: tmpl.text }}>{wall?.label}</span>
+                              <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Used in {count} module{count > 1 ? "s" : ""}</span>
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
+                <div className="mt-6">
+                  <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: tmpl.text, opacity: 0.4 }}>Finish Level</p>
+                  <div className="inline-block rounded-lg px-4 py-2" style={{ backgroundColor: tmpl.accent + "20" }}>
+                    <span className="text-sm font-bold" style={{ color: tmpl.accent }}>{finishInfo?.label || "Standard"}</span>
+                  </div>
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "cost" && slides.find((s) => s.id === "cost")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={9} title="Cost Summary" />
+                <div className="mt-8 max-w-md mx-auto space-y-3">
+                  <CostRow label={`Module cost (${finishInfo?.label || "Standard"})`} value={`EUR${stats.moduleCost.toLocaleString()}`} text={tmpl.text} />
+                  {stats.sharedWallDiscount > 0 && (
+                    <CostRow label="Shared wall discount" value={`-EUR${stats.sharedWallDiscount.toLocaleString()}`} text={tmpl.text} green />
+                  )}
+                  <CostRow label="Design fee (8%)" value={`EUR${stats.designFee.toLocaleString()}`} text={tmpl.text} />
+                  <div className="border-t pt-3 mt-3" style={{ borderColor: tmpl.text + "20" }}>
+                    <div className="flex justify-between">
+                      <span className="text-lg font-bold" style={{ color: tmpl.text }}>Total Estimate</span>
+                      <span className="text-lg font-bold" style={{ color: tmpl.accent }}>EUR{stats.totalEstimate.toLocaleString()}</span>
+                    </div>
+                  </div>
+                  <p className="text-[10px] text-center mt-4" style={{ color: tmpl.text, opacity: 0.3 }}>
+                    * Estimate based on {finishInfo?.label || "Standard"} finish level. Final price may vary based on local conditions and builder quotes.
+                  </p>
+                </div>
+              </SlideCard>
+            )}
+
+            {activeSlide === "next" && slides.find((s) => s.id === "next")?.enabled && (
+              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={10} title="Next Steps" />
+                <div className="mt-8 max-w-lg mx-auto space-y-6">
+                  {[
+                    { step: "1", title: "Request a Builder Quote", desc: "Share this presentation with certified modular builders for detailed quotes." },
+                    { step: "2", title: "Book a Consultation", desc: "Schedule a session with our architects to refine your design." },
+                    { step: "3", title: "Secure Financing", desc: "Use this presentation for bank mortgage applications and investor meetings." },
+                    { step: "4", title: "Begin Construction", desc: "Once approved, your modular home can be manufactured and assembled in weeks." },
+                  ].map((item) => (
+                    <div key={item.step} className="flex gap-4">
+                      <div className="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: tmpl.accent }}>
+                        {item.step}
+                      </div>
+                      <div>
+                        <h4 className="text-sm font-bold" style={{ color: tmpl.text }}>{item.title}</h4>
+                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{item.desc}</p>
+                      </div>
+                    </div>
+                  ))}
+                  <div className="text-center pt-6">
+                    <div className="h-1 w-16 rounded mx-auto mb-4" style={{ backgroundColor: tmpl.accent }} />
+                    <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
+                      Generated with ModulCA | modulca.com
+                    </p>
+                  </div>
+                </div>
+              </SlideCard>
+            )}
+          </div>
+        </main>
+
+        {/* Right Sidebar — Slide Navigator */}
+        <aside className="w-56 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4 print:hidden">
+          <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Slides</h3>
+          <div className="space-y-1">
+            {enabledSlides.map((slide, i) => (
+              <button
+                key={slide.id}
+                onClick={() => setActiveSlide(slide.id)}
+                className={`w-full rounded-lg px-3 py-2 text-left transition-all ${
+                  activeSlide === slide.id
+                    ? "bg-brand-amber-50 border border-brand-amber-300"
+                    : "hover:bg-gray-50 border border-transparent"
+                }`}
+              >
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-bold rounded bg-gray-100 px-1.5 py-0.5 text-gray-500">{i + 1}</span>
+                  <span className={`text-xs ${activeSlide === slide.id ? "font-semibold text-brand-teal-800" : "text-gray-600"}`}>
+                    {slide.label}
+                  </span>
+                </div>
+              </button>
+            ))}
+          </div>
+
+          <div className="mt-6 rounded-lg bg-gray-50 p-3">
+            <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Quick Stats</p>
+            <div className="space-y-1 text-xs text-gray-600">
+              <div className="flex justify-between"><span>Modules</span><span className="font-medium">{modules.length}</span></div>
+              <div className="flex justify-between"><span>Area</span><span className="font-medium">{stats.totalArea}m2</span></div>
+              <div className="flex justify-between"><span>Style</span><span className="font-medium">{style?.label || "Modern"}</span></div>
+              <div className="flex justify-between"><span>Total</span><span className="font-bold text-brand-amber-600">EUR{stats.totalEstimate.toLocaleString()}</span></div>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Shared slide components                                            */
+/* ------------------------------------------------------------------ */
+
+function SlideCard({ bg, text, children }: { bg: string; text: string; accent?: string; children: React.ReactNode }) {
+  return (
+    <div
+      className="rounded-2xl shadow-lg mb-6 p-8 print:shadow-none print:rounded-none print:mb-0 print:break-after-page"
+      style={{ backgroundColor: bg, color: text, minHeight: 500 }}
+    >
+      {children}
+    </div>
+  );
+}
+
+function SlideHeader({ accent, text, number, title }: { accent: string; text: string; number: number; title: string }) {
+  return (
+    <div className="flex items-center gap-4">
+      <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: accent }}>
+        {number}
+      </div>
+      <h2 className="text-2xl font-bold" style={{ color: text }}>{title}</h2>
+      <div className="flex-1 h-px" style={{ backgroundColor: text + "15" }} />
+    </div>
+  );
+}
+
+function DetailRow({ label, value, text }: { label: string; value: string; text: string }) {
+  return (
+    <div className="flex justify-between text-sm">
+      <span style={{ color: text, opacity: 0.5 }}>{label}</span>
+      <span className="font-medium" style={{ color: text }}>{value}</span>
+    </div>
+  );
+}
+
+function CostRow({ label, value, text, green }: { label: string; value: string; text: string; green?: boolean }) {
+  return (
+    <div className="flex justify-between text-sm">
+      <span style={{ color: text, opacity: 0.6 }}>{label}</span>
+      <span className={`font-medium ${green ? "text-green-600" : ""}`} style={green ? {} : { color: text }}>{value}</span>
+    </div>
+  );
+}

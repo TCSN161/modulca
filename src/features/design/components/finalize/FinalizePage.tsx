@@ -245,21 +245,26 @@ export default function FinalizePage() {
           {/* Next steps */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
             <h2 className="text-lg font-semibold text-brand-teal-800 mb-4">What&apos;s Next?</h2>
-            <div className="grid grid-cols-3 gap-4">
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+              <Link href="/project/demo/presentation" className="text-center p-4 rounded-lg bg-brand-amber-50 border border-brand-amber-200 hover:bg-brand-amber-100 transition-colors">
+                <div className="text-2xl mb-2">🎨</div>
+                <div className="text-xs font-semibold text-brand-amber-700 mb-1">Create Presentation</div>
+                <div className="text-[10px] text-gray-400">Generate a professional PDF deck</div>
+              </Link>
               <div className="text-center p-4 rounded-lg bg-gray-50">
                 <div className="text-2xl mb-2">📋</div>
                 <div className="text-xs font-semibold text-gray-700 mb-1">Request a Quote</div>
-                <div className="text-[10px] text-gray-400">Get a detailed quote from our construction team</div>
+                <div className="text-[10px] text-gray-400">Get a detailed quote from our team</div>
               </div>
               <div className="text-center p-4 rounded-lg bg-gray-50">
                 <div className="text-2xl mb-2">📞</div>
                 <div className="text-xs font-semibold text-gray-700 mb-1">Book Consultation</div>
-                <div className="text-[10px] text-gray-400">Speak with an architect about your design</div>
+                <div className="text-[10px] text-gray-400">Speak with an architect</div>
               </div>
               <div className="text-center p-4 rounded-lg bg-gray-50">
                 <div className="text-2xl mb-2">🔄</div>
                 <div className="text-xs font-semibold text-gray-700 mb-1">Revise Design</div>
-                <div className="text-[10px] text-gray-400">Go back to any step and make changes</div>
+                <div className="text-[10px] text-gray-400">Go back and make changes</div>
               </div>
             </div>
           </div>
@@ -272,12 +277,20 @@ export default function FinalizePage() {
             >
               &larr; Back to Products
             </Link>
-            <Link
-              href="/dashboard"
-              className="px-6 py-3 rounded-lg bg-brand-teal-800 text-white text-sm font-semibold hover:bg-brand-teal-700 transition-colors"
-            >
-              Go to My Projects
-            </Link>
+            <div className="flex items-center gap-3">
+              <Link
+                href="/project/demo/presentation"
+                className="px-6 py-3 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors"
+              >
+                Create Presentation &rarr;
+              </Link>
+              <Link
+                href="/dashboard"
+                className="px-6 py-3 rounded-lg bg-brand-teal-800 text-white text-sm font-semibold hover:bg-brand-teal-700 transition-colors"
+              >
+                My Projects
+              </Link>
+            </div>
           </div>
         </div>
       </div>
