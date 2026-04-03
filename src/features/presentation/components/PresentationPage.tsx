@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react";
 import Link from "next/link";
 import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
@@ -8,6 +8,8 @@ import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getStyleDirection } from "@/features/design/styles";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
 import StepNav from "@/features/design/components/shared/StepNav";
+
+const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
 type PresentationTemplate = "minimal" | "bold" | "classic";
 type SlideId =
@@ -77,7 +79,6 @@ export default function PresentationPage() {
   const [projectName, setProjectName] = useState("My Modular Home");
   const [clientName, setClientName] = useState("");
   const [activeSlide, setActiveSlide] = useState<SlideId>("cover");
-  const [generating, setGenerating] = useState(false);
   const previewRef = useRef<HTMLDivElement>(null);
 
   // Initialize modules from land store if needed
@@ -99,14 +100,7 @@ export default function PresentationPage() {
     );
   }, []);
 
-  const handleDownloadPdf = useCallback(async () => {
-    setGenerating(true);
-    // Use print-to-PDF as initial implementation
-    setTimeout(() => {
-      window.print();
-      setGenerating(false);
-    }, 500);
-  }, []);
+  // PDF generation handled by PdfDownloadButton component
 
   const handleShareLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
@@ -140,13 +134,20 @@ export default function PresentationPage() {
           <button onClick={handleShareLink} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50">
             Share Link
           </button>
-          <button
-            onClick={handleDownloadPdf}
-            disabled={generating}
-            className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 disabled:opacity-50"
-          >
-            {generating ? "Generating..." : "Download PDF"}
-          </button>
+          <Suspense fallback={<span className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white opacity-50">Loading...</span>}>
+            <PdfDownloadButton
+              template={template}
+              slides={slides}
+              projectName={projectName}
+              clientName={clientName}
+              modules={modules}
+              stats={stats}
+              style={style ?? null}
+              finishLabel={finishInfo?.label || "Standard"}
+              polygon={polygon}
+              mapCenter={mapCenter}
+            />
+          </Suspense>
         </div>
       </header>
 
