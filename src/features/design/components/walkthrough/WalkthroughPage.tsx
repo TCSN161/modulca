@@ -138,14 +138,15 @@ export default function WalkthroughPage() {
   const [mobilePanel, setMobilePanel] = useState<"none" | "controls" | "room">("none");
 
   useEffect(() => {
-    if (modules.length === 0) loadFromLocalStorage();
-  }, [loadFromLocalStorage, modules.length]);
-
-  useEffect(() => {
-    if (modules.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
+    if (modules.length > 0) return;
+    // Try localStorage first (preserves furnitureOverrides, materials, etc.)
+    loadFromLocalStorage();
+    // After load, check if we got modules — if not, fall back to grid
+    const loaded = useDesignStore.getState().modules;
+    if (loaded.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);
     }
-  }, [modules.length, gridCells, gridRotation, setModulesFromGrid]);
+  }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
   // Default select first module
   useEffect(() => {

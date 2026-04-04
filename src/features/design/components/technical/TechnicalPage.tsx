@@ -16,6 +16,8 @@ import {
   printDrawing,
 } from "./exportDrawing";
 import KnowledgeBasePanel from "./KnowledgeBasePanel";
+import PermitTracker from "./PermitTracker";
+import DrawingPresentation from "./DrawingPresentation";
 
 
 const DRAWING_TYPES = [
@@ -51,18 +53,19 @@ export default function TechnicalPage() {
   const [activeDrawing, setActiveDrawing] = useState("floor-plan");
   const [zoom, setZoom] = useState(100);
   const [kbOpen, setKbOpen] = useState(false);
+  const [permitOpen, setPermitOpen] = useState(false);
+  const [presentationOpen, setPresentationOpen] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<"none" | "drawings" | "specs">("none");
   const drawingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (modules.length === 0) loadFromLocalStorage();
-  }, [loadFromLocalStorage, modules.length]);
-
-  useEffect(() => {
-    if (modules.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
+    if (modules.length > 0) return;
+    loadFromLocalStorage();
+    const loaded = useDesignStore.getState().modules;
+    if (loaded.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);
     }
-  }, [modules.length, gridCells, gridRotation, setModulesFromGrid]);
+  }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
   // Default to first module if none selected
   useEffect(() => {
@@ -285,10 +288,21 @@ export default function TechnicalPage() {
             >
               Export All Sheets
             </button>
+            <button
+              onClick={() => setPresentationOpen(true)}
+              className="w-full rounded-lg border border-brand-teal-800 px-4 py-2.5 text-sm font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
+            >
+              <span className="flex items-center justify-center gap-2">
+                <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M7 4v16M17 4v16M3 8h4m10 0h4M3 12h18M3 16h4m10 0h4M4 20h16a1 1 0 001-1V5a1 1 0 00-1-1H4a1 1 0 00-1 1v14a1 1 0 001 1z" />
+                </svg>
+                View All Drawings
+              </span>
+            </button>
           </div>
 
           {/* Knowledge Base / Construction Manual */}
-          <div className="mt-5 pt-4 border-t border-gray-200">
+          <div className="mt-5 pt-4 border-t border-gray-200 space-y-2">
             <button
               onClick={() => setKbOpen(true)}
               className="w-full rounded-lg border-2 border-dashed border-brand-teal-300 bg-brand-teal-50/50 px-4 py-3 text-left hover:border-brand-teal-500 hover:bg-brand-teal-50 transition-colors group"
@@ -303,6 +317,25 @@ export default function TechnicalPage() {
                   </div>
                   <div className="text-[10px] text-brand-teal-600 mt-0.5">
                     Standards, dimensions, regulations
+                  </div>
+                </div>
+              </div>
+            </button>
+
+            <button
+              onClick={() => setPermitOpen(true)}
+              className="w-full rounded-lg border-2 border-dashed border-brand-amber-300 bg-brand-amber-50/50 px-4 py-3 text-left hover:border-brand-amber-500 hover:bg-brand-amber-50 transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-brand-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <div>
+                  <div className="text-xs font-bold text-brand-amber-700 group-hover:text-brand-amber-800">
+                    Permit Tracker
+                  </div>
+                  <div className="text-[10px] text-brand-amber-600 mt-0.5">
+                    Building authorization process
                   </div>
                 </div>
               </div>
@@ -627,8 +660,14 @@ export default function TechnicalPage() {
                   <button onClick={() => { handleDownloadPdf(); setMobilePanel("none"); }} className="w-full rounded-lg bg-brand-amber-500 py-2 text-sm font-bold text-white">
                     Export PDF
                   </button>
+                  <button onClick={() => { setPresentationOpen(true); setMobilePanel("none"); }} className="w-full rounded-lg border border-brand-teal-800 py-2 text-sm font-semibold text-brand-teal-800">
+                    View All Drawings
+                  </button>
                   <button onClick={() => { setKbOpen(true); setMobilePanel("none"); }} className="w-full rounded-lg border border-dashed border-brand-teal-300 py-2 text-sm font-bold text-brand-teal-800">
                     Construction Manual
+                  </button>
+                  <button onClick={() => { setPermitOpen(true); setMobilePanel("none"); }} className="w-full rounded-lg border border-dashed border-brand-amber-300 py-2 text-sm font-bold text-brand-amber-700">
+                    Permit Tracker
                   </button>
                 </div>
               </>
@@ -660,6 +699,12 @@ export default function TechnicalPage() {
 
       {/* Knowledge Base slide-over panel */}
       <KnowledgeBasePanel open={kbOpen} onClose={() => setKbOpen(false)} />
+
+      {/* Building Permit Tracker slide-over panel */}
+      <PermitTracker open={permitOpen} onClose={() => setPermitOpen(false)} />
+
+      {/* Full-screen drawing presentation */}
+      <DrawingPresentation open={presentationOpen} onClose={() => setPresentationOpen(false)} />
     </div>
   );
 }

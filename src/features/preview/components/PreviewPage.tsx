@@ -21,19 +21,16 @@ const Scene3D = dynamic(() => import("./Scene3D"), {
 export default function PreviewPage() {
   const { gridCells, gridRotation } = useLandStore();
   const { setModulesFromGrid, modules, loadFromLocalStorage } = useDesignStore();
-  // Ensure design store is hydrated from localStorage before rendering 3D
+  // Ensure design store is hydrated from localStorage before rendering 3D,
+  // then fall back to grid if nothing was persisted.
   useEffect(() => {
-    if (modules.length === 0) {
-      loadFromLocalStorage();
-    }
-  }, [loadFromLocalStorage, modules.length]);
-
-  // Import modules from Step 1 if not already done
-  useEffect(() => {
-    if (gridCells.length > 0 && modules.length === 0) {
+    if (modules.length > 0) return;
+    loadFromLocalStorage();
+    const loaded = useDesignStore.getState().modules;
+    if (loaded.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);
     }
-  }, [gridCells, gridRotation, setModulesFromGrid, modules.length]);
+  }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
   const dispatchZoom = useCallback((delta: number) => {
     window.dispatchEvent(new CustomEvent("modulca-zoom", { detail: { delta } }));

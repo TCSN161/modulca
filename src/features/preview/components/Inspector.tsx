@@ -132,7 +132,7 @@ export default function Inspector() {
                   <div>
                     <label className="text-[10px] text-gray-400">Height (Y)</label>
                     <div className="mt-0.5 flex items-center rounded border border-gray-200 bg-white px-2 py-1.5">
-                      <span className="text-sm font-medium text-brand-teal-800">2.70</span>
+                      <span className="text-sm font-medium text-brand-teal-800">3.00</span>
                       <span className="ml-auto text-xs text-gray-400">m</span>
                     </div>
                   </div>

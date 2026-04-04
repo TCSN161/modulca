@@ -17,9 +17,10 @@ interface ModuleBoxProps {
   color: string;
   isSelected: boolean;
   onClick: (nativeEvent: MouseEvent) => void;
+  onContextMenu: (nativeEvent: MouseEvent) => void;
 }
 
-function ModuleBox({ position, color, isSelected, onClick }: ModuleBoxProps) {
+function ModuleBox({ position, color, isSelected, onClick, onContextMenu }: ModuleBoxProps) {
   const meshRef = useRef<THREE.Mesh>(null);
   const [hovered, setHovered] = useState(false);
 
@@ -38,6 +39,10 @@ function ModuleBox({ position, color, isSelected, onClick }: ModuleBoxProps) {
       onClick={(e) => {
         e.stopPropagation();
         onClick(e.nativeEvent);
+      }}
+      onContextMenu={(e) => {
+        e.stopPropagation();
+        onContextMenu(e.nativeEvent);
       }}
       onPointerOver={(e) => {
         e.stopPropagation();
@@ -323,10 +328,21 @@ function ModuleInfoPanel({
   );
 }
 
+type ContextMenuState = {
+  x: number;
+  y: number;
+  row: number;
+  col: number;
+} | null;
+
+type SwapState = { row: number; col: number } | null;
+
 export default function Scene3D() {
-  const { modules, selectedModule, setSelectedModule, loadFromLocalStorage } = useDesignStore();
+  const { modules, selectedModule, setSelectedModule, loadFromLocalStorage, swapModules } = useDesignStore();
   const [clickPos, setClickPos] = useState<{ x: number; y: number } | null>(null);
   const [waited, setWaited] = useState(false);
+  const [contextMenu, setContextMenu] = useState<ContextMenuState>(null);
+  const [swapSource, setSwapSource] = useState<SwapState>(null);
 
   // Try to hydrate from localStorage if modules are empty
   useEffect(() => {
@@ -338,7 +354,28 @@ export default function Scene3D() {
   const handleDeselect = useCallback(() => {
     setSelectedModule(null);
     setClickPos(null);
+    setContextMenu(null);
   }, [setSelectedModule]);
+
+  const handleContextMenu = useCallback((row: number, col: number, nativeEvent: MouseEvent) => {
+    nativeEvent.preventDefault();
+    const canvas = (nativeEvent.target as HTMLElement)?.closest?.("canvas");
+    const rect = canvas?.getBoundingClientRect();
+    if (!rect) return;
+    setContextMenu({
+      x: nativeEvent.clientX - rect.left,
+      y: nativeEvent.clientY - rect.top,
+      row,
+      col,
+    });
+  }, []);
+
+  // Close context menu on click anywhere
+  useEffect(() => {
+    const close = () => setContextMenu(null);
+    window.addEventListener("click", close);
+    return () => window.removeEventListener("click", close);
+  }, []);
 
   // Compute center offset so the building is centered at origin
   const minRow = modules.length > 0 ? Math.min(...modules.map((m) => m.row)) : 0;
@@ -429,6 +466,14 @@ export default function Scene3D() {
               color={color}
               isSelected={isSelected}
               onClick={(nativeEvent: MouseEvent) => {
+                // If we're in swap mode, complete the swap
+                if (swapSource) {
+                  if (swapSource.row !== mod.row || swapSource.col !== mod.col) {
+                    swapModules(swapSource, { row: mod.row, col: mod.col });
+                  }
+                  setSwapSource(null);
+                  return;
+                }
                 setSelectedModule({ row: mod.row, col: mod.col });
                 const canvas = (nativeEvent.target as HTMLElement)?.closest?.("canvas");
                 const rect = canvas?.getBoundingClientRect();
@@ -439,11 +484,85 @@ export default function Scene3D() {
                   });
                 }
               }}
+              onContextMenu={(nativeEvent: MouseEvent) => handleContextMenu(mod.row, mod.col, nativeEvent)}
             />
           );
         })}
 
       </Canvas>
+
+      {/* Right-click context menu */}
+      {contextMenu && (
+        <div
+          className="absolute z-50 rounded-lg bg-white shadow-xl border border-gray-200 py-1 min-w-[160px]"
+          style={{ left: contextMenu.x, top: contextMenu.y }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          {(() => {
+            const mod = modules.find((m) => m.row === contextMenu.row && m.col === contextMenu.col);
+            const mt = MODULE_TYPES.find((m) => m.id === mod?.moduleType);
+            return (
+              <>
+                <div className="px-3 py-1.5 border-b border-gray-100">
+                  <span className="text-xs font-bold text-brand-teal-800">{mod?.label || "Module"}</span>
+                  <span className="text-[10px] text-gray-400 ml-1">{mt?.label}</span>
+                </div>
+                <button
+                  onClick={() => {
+                    setSelectedModule({ row: contextMenu.row, col: contextMenu.col });
+                    setContextMenu(null);
+                  }}
+                  className="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  Properties
+                </button>
+                <button
+                  onClick={() => {
+                    setSwapSource({ row: contextMenu.row, col: contextMenu.col });
+                    setContextMenu(null);
+                  }}
+                  className="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
+                  </svg>
+                  Swap With...
+                </button>
+                <button
+                  onClick={() => {
+                    setSelectedModule({ row: contextMenu.row, col: contextMenu.col });
+                    setContextMenu(null);
+                  }}
+                  className="w-full px-3 py-1.5 text-left text-xs text-gray-700 hover:bg-gray-50 flex items-center gap-2"
+                >
+                  <svg className="h-3.5 w-3.5 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path strokeLinecap="round" strokeLinejoin="round" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                  View Details
+                </button>
+              </>
+            );
+          })()}
+        </div>
+      )}
+
+      {/* Swap mode indicator */}
+      {swapSource && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-40 rounded-lg bg-brand-amber-500 px-4 py-2 shadow-lg flex items-center gap-3">
+          <span className="text-sm font-bold text-white">
+            Click another module to swap with {modules.find((m) => m.row === swapSource.row && m.col === swapSource.col)?.label}
+          </span>
+          <button
+            onClick={() => setSwapSource(null)}
+            className="rounded bg-white/20 px-2 py-0.5 text-xs font-medium text-white hover:bg-white/30"
+          >
+            Cancel
+          </button>
+        </div>
+      )}
     </div>
   );
 }

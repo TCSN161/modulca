@@ -16,14 +16,13 @@ export default function LayoutDesigner() {
   const [mobilePanel, setMobilePanel] = useState<"none" | "layers" | "stats">("none");
 
   useEffect(() => {
-    if (modules.length === 0) loadFromLocalStorage();
-  }, [loadFromLocalStorage, modules.length]);
-
-  useEffect(() => {
-    if (gridCells.length > 0 && modules.length === 0) {
+    if (modules.length > 0) return;
+    loadFromLocalStorage();
+    const loaded = useDesignStore.getState().modules;
+    if (loaded.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);
     }
-  }, [gridCells, gridRotation, setModulesFromGrid, modules.length]);
+  }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">

@@ -29,14 +29,13 @@ export default function VisualizePage() {
   const { saved, handleSave } = useSaveDesign();
 
   useEffect(() => {
-    if (modules.length === 0) loadFromLocalStorage();
-  }, [loadFromLocalStorage, modules.length]);
-
-  useEffect(() => {
-    if (gridCells.length > 0 && modules.length === 0) {
+    if (modules.length > 0) return;
+    loadFromLocalStorage();
+    const loaded = useDesignStore.getState().modules;
+    if (loaded.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);
     }
-  }, [gridCells, gridRotation, setModulesFromGrid, modules.length]);
+  }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
   useEffect(() => {
     if (modules.length > 0 && !selectedModule) {

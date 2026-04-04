@@ -505,14 +505,13 @@ export default function ProductsPage() {
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
 
   useEffect(() => {
-    if (modules.length === 0) loadFromLocalStorage();
-  }, [loadFromLocalStorage, modules.length]);
-
-  useEffect(() => {
-    if (modules.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
+    if (modules.length > 0) return;
+    loadFromLocalStorage();
+    const loaded = useDesignStore.getState().modules;
+    if (loaded.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);
     }
-  }, [modules.length, gridCells, gridRotation, setModulesFromGrid]);
+  }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
   // Load from localStorage on mount
   useEffect(() => {

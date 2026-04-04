@@ -110,14 +110,13 @@ export default function PresentationPage() {
   const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (modules.length === 0) loadFromLocalStorage();
-  }, [loadFromLocalStorage, modules.length]);
-
-  useEffect(() => {
-    if (gridCells.length > 0 && modules.length === 0) {
+    if (modules.length > 0) return;
+    loadFromLocalStorage();
+    const loaded = useDesignStore.getState().modules;
+    if (loaded.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);
     }
-  }, [gridCells, gridRotation, setModulesFromGrid, modules.length]);
+  }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
   const stats = getStats();
   const style = styleDirection ? getStyleDirection(styleDirection) : null;
@@ -342,16 +341,22 @@ export default function PresentationPage() {
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
                 <SlideHeader accent={tmpl.accent} text={tmpl.text} number={2} title="Site Plan" />
                 <div className="grid grid-cols-2 gap-6 mt-6">
-                  <div className="rounded-xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center">
-                    <p className="text-sm text-gray-500">Map view from Step 1</p>
+                  {/* SVG Site Plan — shows modules on terrain */}
+                  <div className="rounded-xl overflow-hidden bg-emerald-50 border border-emerald-200 aspect-video flex items-center justify-center p-4">
+                    {modules.length > 0 ? (
+                      <SitePlanSvg modules={modules} accent={tmpl.accent} />
+                    ) : (
+                      <p className="text-sm text-gray-400">No modules placed yet</p>
+                    )}
                   </div>
                   <div className="space-y-4">
-                    <DetailRow label="Location" value={`${mapCenter.lat.toFixed(4)}, ${mapCenter.lng.toFixed(4)}`} text={tmpl.text} />
-                    <DetailRow label="Terrain Area" value={polygon.length > 0 ? `~${(polygon.length * 50).toFixed(0)}m2 (estimated)` : "Not defined"} text={tmpl.text} />
-                    <DetailRow label="Grid Configuration" value={`${modules.length} modules placed`} text={tmpl.text} />
-                    <DetailRow label="Grid Rotation" value={`${gridRotation}deg`} text={tmpl.text} />
-                    <DetailRow label="Total Built Area" value={`${stats.totalArea}m2`} text={tmpl.text} />
-                    <DetailRow label="Usable Area" value={`${stats.usableArea}m2`} text={tmpl.text} />
+                    <DetailRow label="Location" value={mapCenter.lat !== 44.4268 ? `${mapCenter.lat.toFixed(4)}, ${mapCenter.lng.toFixed(4)}` : "Romania (default)"} text={tmpl.text} />
+                    <DetailRow label="Terrain Area" value={polygon.length > 2 ? `~${Math.round(polygon.length * 50)} m\u00B2 (estimated)` : `~${stats.totalArea * 4} m\u00B2 (auto-sized)`} text={tmpl.text} />
+                    <DetailRow label="Grid Configuration" value={`${modules.length} module${modules.length !== 1 ? "s" : ""} placed`} text={tmpl.text} />
+                    <DetailRow label="Grid Rotation" value={`${gridRotation}\u00B0`} text={tmpl.text} />
+                    <DetailRow label="Total Built Area" value={`${stats.totalArea} m\u00B2`} text={tmpl.text} />
+                    <DetailRow label="Usable Area" value={`${stats.usableArea} m\u00B2`} text={tmpl.text} />
+                    <DetailRow label="Building Footprint" value={`${Math.ceil(Math.sqrt(stats.totalArea))} \u00D7 ${Math.ceil(Math.sqrt(stats.totalArea))} m approx.`} text={tmpl.text} />
                   </div>
                 </div>
               </SlideCard>
@@ -746,5 +751,59 @@ function CostRow({ label, value, text, green }: { label: string; value: string; 
       <span style={{ color: text, opacity: 0.6 }}>{label}</span>
       <span className={`font-medium ${green ? "text-green-600" : ""}`} style={green ? {} : { color: text }}>{value}</span>
     </div>
+  );
+}
+
+/** SVG site plan showing module layout on a terrain outline */
+function SitePlanSvg({ modules, accent }: { modules: { row: number; col: number; moduleType: string; label: string }[]; accent: string }) {
+  if (modules.length === 0) return null;
+  const minR = Math.min(...modules.map((m) => m.row));
+  const maxR = Math.max(...modules.map((m) => m.row));
+  const minC = Math.min(...modules.map((m) => m.col));
+  const maxC = Math.max(...modules.map((m) => m.col));
+  const cols = maxC - minC + 1;
+  const rows = maxR - minR + 1;
+  const cellPx = 40;
+  const pad = 60; // terrain padding around building
+  const svgW = cols * cellPx + pad * 2;
+  const svgH = rows * cellPx + pad * 2;
+
+  return (
+    <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-full" style={{ maxHeight: 200 }}>
+      {/* Terrain outline — slightly larger than building */}
+      <rect
+        x={12} y={12}
+        width={svgW - 24} height={svgH - 24}
+        rx={6}
+        fill="#d1fae5" stroke="#6ee7b7" strokeWidth={1.5} strokeDasharray="6,3"
+      />
+      {/* Terrain label */}
+      <text x={svgW / 2} y={24} textAnchor="middle" fontSize={8} fill="#065f46" fontFamily="sans-serif">TERRAIN BOUNDARY</text>
+      {/* North arrow */}
+      <text x={svgW - 20} y={28} fontSize={10} fill="#065f46" fontFamily="sans-serif" fontWeight="bold">N</text>
+      <line x1={svgW - 17} y1={30} x2={svgW - 17} y2={40} stroke="#065f46" strokeWidth={1} markerEnd="" />
+      {/* Module cells */}
+      {modules.map((mod) => {
+        const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+        const x = pad + (mod.col - minC) * cellPx;
+        const y = pad + (mod.row - minR) * cellPx;
+        return (
+          <g key={`${mod.row}-${mod.col}`}>
+            <rect x={x + 1} y={y + 1} width={cellPx - 2} height={cellPx - 2} rx={3}
+              fill={mt?.color || "#ccc"} fillOpacity={0.7} stroke={accent} strokeWidth={1.5} />
+            <text x={x + cellPx / 2} y={y + cellPx / 2 - 3} textAnchor="middle" fontSize={7} fill="#1a1a1a" fontWeight="bold" fontFamily="sans-serif">
+              {mod.label}
+            </text>
+            <text x={x + cellPx / 2} y={y + cellPx / 2 + 7} textAnchor="middle" fontSize={5} fill="#555" fontFamily="sans-serif">
+              3x3m
+            </text>
+          </g>
+        );
+      })}
+      {/* Dimension line */}
+      <text x={pad + (cols * cellPx) / 2} y={svgH - 10} textAnchor="middle" fontSize={7} fill="#555" fontFamily="sans-serif">
+        {(cols * 3).toFixed(0)}m x {(rows * 3).toFixed(0)}m footprint
+      </text>
+    </svg>
   );
 }

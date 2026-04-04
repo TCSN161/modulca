@@ -99,6 +99,9 @@ interface DesignStore {
   setSelectedModule: (m: { row: number; col: number } | null) => void;
   setSelectedFurniture: (id: string | null) => void;
 
+  // Module operations
+  swapModules: (a: { row: number; col: number }, b: { row: number; col: number }) => void;
+
   // Persistence
   saveToLocalStorage: () => void;
   loadFromLocalStorage: () => void;
@@ -282,6 +285,25 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 
   setSelectedModule: (m) => set({ selectedModule: m, selectedFurniture: null }),
   setSelectedFurniture: (id) => set({ selectedFurniture: id }),
+
+  swapModules: (a, b) =>
+    set((state) => {
+      const modA = state.modules.find((m) => m.row === a.row && m.col === a.col);
+      const modB = state.modules.find((m) => m.row === b.row && m.col === b.col);
+      if (!modA || !modB) return state;
+      return {
+        modules: state.modules.map((m) => {
+          if (m.row === a.row && m.col === a.col) {
+            // Swap content (type, layout, materials, overrides) but keep position
+            return { ...m, moduleType: modB.moduleType, label: modB.label, layoutPreset: modB.layoutPreset, floorFinish: modB.floorFinish, wallColor: modB.wallColor, furnitureOverrides: modB.furnitureOverrides };
+          }
+          if (m.row === b.row && m.col === b.col) {
+            return { ...m, moduleType: modA.moduleType, label: modA.label, layoutPreset: modA.layoutPreset, floorFinish: modA.floorFinish, wallColor: modA.wallColor, furnitureOverrides: modA.furnitureOverrides };
+          }
+          return m;
+        }),
+      };
+    }),
 
   saveToLocalStorage: () => {
     const { modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins, savedRenders, moduleFixtures } = get();
