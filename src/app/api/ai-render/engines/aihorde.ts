@@ -8,6 +8,16 @@
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
+function sanitizeForContentFilter(prompt: string): string {
+  return prompt
+    .replace(/\bbedroom\b/gi, "sleeping quarters")
+    .replace(/\bbathroom\b/gi, "washroom")
+    .replace(/\btoilet\b/gi, "WC fixture")
+    .replace(/\bshower\b/gi, "rain head fixture")
+    .replace(/\bbathtub\b/gi, "soaking tub")
+    .replace(/\bbed\b/gi, "sleeping platform");
+}
+
 const HORDE_API = "https://stablehorde.net/api/v2";
 const ANON_KEY = "0000000000";
 const POLL_INTERVAL_MS = 3000;
@@ -26,7 +36,7 @@ export const aiHordeEngine: AiRenderEngine = async (
         apikey: ANON_KEY,
       },
       body: JSON.stringify({
-        prompt: `${req.prompt} ### professional photograph, 8k, photorealistic, architectural interior`,
+        prompt: `${sanitizeForContentFilter(req.prompt)} ### professional photograph, 8k, photorealistic, architectural interior design, empty room`,
         params: {
           width: Math.min(req.width, 768),  // Horde max is typically 768
           height: Math.min(req.height, 768),

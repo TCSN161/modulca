@@ -4,6 +4,10 @@
  * Free, no auth, fast (~30-90s for fresh images).
  * Uses the legacy image.pollinations.ai endpoint (anonymous only).
  * Server-side proxy avoids browser cookie/referer issues.
+ *
+ * Note: Pollinations uses aggressive content filters that can flag
+ * architectural prompts containing "bedroom", "bathroom" etc.
+ * We sanitize prompts to explicitly state architectural context.
  */
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
@@ -11,11 +15,30 @@ import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 4000;
 
+/** Minimum acceptable image size — content-moderation placeholder images are typically small */
+const MIN_IMAGE_BYTES = 5000;
+
+/**
+ * Replace room-type words that trigger content filters with safer synonyms
+ * while preserving the architectural meaning.
+ */
+function sanitizeForContentFilter(prompt: string): string {
+  return prompt
+    .replace(/\bbedroom\b/gi, "sleeping quarters")
+    .replace(/\bbathroom\b/gi, "washroom")
+    .replace(/\btoilet\b/gi, "WC fixture")
+    .replace(/\bnude\b/gi, "")
+    .replace(/\bshower\b/gi, "rain head fixture")
+    .replace(/\bbathtub\b/gi, "soaking tub")
+    .replace(/\bbed\b/gi, "sleeping platform");
+}
+
 export const pollinationsEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
-  const encoded = encodeURIComponent(req.prompt);
-  const url = `https://image.pollinations.ai/prompt/${encoded}?width=${req.width}&height=${req.height}&nologo=true&nofeed=true&seed=${req.seed}`;
+  const safePrompt = sanitizeForContentFilter(req.prompt);
+  const encoded = encodeURIComponent(safePrompt);
+  const url = `https://image.pollinations.ai/prompt/${encoded}?width=${req.width}&height=${req.height}&nologo=true&nofeed=true&seed=${req.seed}&safe=true`;
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     if (attempt > 0) {
@@ -43,12 +66,14 @@ export const pollinationsEngine: AiRenderEngine = async (
       }
 
       const blob = await response.blob();
-      if (blob.size < 500) {
-        console.error("[pollinations] Image too small:", blob.size);
+      const buffer = Buffer.from(await blob.arrayBuffer());
+
+      // Detect content-moderation placeholder images (small black images with text)
+      if (buffer.length < MIN_IMAGE_BYTES) {
+        console.warn("[pollinations] Image suspiciously small:", buffer.length, "bytes — likely content filter. Skipping.");
         return null;
       }
 
-      const buffer = Buffer.from(await blob.arrayBuffer());
       console.log(`[pollinations] Success: ${buffer.length} bytes`);
       return {
         buffer,

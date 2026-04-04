@@ -7,6 +7,12 @@ import { leonardoEngine } from "./engines/leonardo";
 import type { AiRenderEngine, AiRenderRequest, EngineInfo } from "./engines/types";
 
 /**
+ * Static export compatibility for GitHub Pages.
+ * API routes become no-ops in static builds; they only work on real servers.
+ */
+export const dynamic = "force-static";
+
+/**
  * Modular AI Render Proxy
  *
  * Each engine is a separate module in ./engines/.
@@ -72,14 +78,18 @@ const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo }> = {
   },
 };
 
-/** Default engine order for text-to-image fallback chain */
-const FALLBACK_ORDER = ["together", "pollinations", "leonardo", "ai-horde"];
+/** Default engine order for text-to-image fallback chain.
+ *  Together (best quality, no content filter issues) → AI Horde → Leonardo → Pollinations (most aggressive filter, last resort) */
+const FALLBACK_ORDER = ["together", "ai-horde", "leonardo", "pollinations"];
 /** Engines that support img2img (prefer these when baseImage is provided) */
-const IMG2IMG_FALLBACK = ["stability", "together", "pollinations", "ai-horde"];
+const IMG2IMG_FALLBACK = ["stability", "together", "ai-horde", "pollinations"];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
+
+/** Minimum size for a valid render image — content moderation placeholders are typically <10KB */
+const MIN_VALID_IMAGE_BYTES = 8000;
 
 function imageResponse(result: { buffer: Buffer; contentType: string; engine: string }) {
   return new NextResponse(new Uint8Array(result.buffer), {
@@ -93,6 +103,11 @@ function imageResponse(result: { buffer: Buffer; contentType: string; engine: st
   });
 }
 
+/** Check if a result looks like a content-moderation placeholder instead of a real render */
+function isContentFilterImage(result: { buffer: Buffer }): boolean {
+  return result.buffer.length < MIN_VALID_IMAGE_BYTES;
+}
+
 async function tryEngines(
   renderReq: AiRenderRequest,
   engineParam: string | null,
@@ -102,7 +117,13 @@ async function tryEngines(
   if (engineParam && ENGINES[engineParam]) {
     console.log(`[ai-render] Using engine: ${engineParam}`);
     const result = await ENGINES[engineParam].fn(renderReq);
-    if (result) return imageResponse(result);
+    if (result) {
+      if (isContentFilterImage(result)) {
+        console.warn(`[ai-render] Engine "${engineParam}" returned content-filter image (${result.buffer.length} bytes), falling back...`);
+      } else {
+        return imageResponse(result);
+      }
+    }
     console.log(`[ai-render] Engine "${engineParam}" failed, falling back to others...`);
   }
 
@@ -113,7 +134,13 @@ async function tryEngines(
     if (!engine) continue;
     console.log(`[ai-render] Trying engine: ${engineId}`);
     const result = await engine.fn(renderReq);
-    if (result) return imageResponse(result);
+    if (result) {
+      if (isContentFilterImage(result)) {
+        console.warn(`[ai-render] Engine "${engineId}" returned content-filter image (${result.buffer.length} bytes), trying next...`);
+        continue;
+      }
+      return imageResponse(result);
+    }
     console.log(`[ai-render] Engine "${engineId}" failed, trying next...`);
   }
 

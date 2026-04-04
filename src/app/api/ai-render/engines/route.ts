@@ -1,6 +1,9 @@
 import { NextResponse } from "next/server";
 import type { EngineInfo } from "./types";
 
+/** Static export compatibility for GitHub Pages. */
+export const dynamic = "force-static";
+
 /**
  * GET /api/ai-render/engines
  * Returns the list of available AI render engines for the UI dropdown.
