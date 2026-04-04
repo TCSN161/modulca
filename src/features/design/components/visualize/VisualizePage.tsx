@@ -22,11 +22,15 @@ export default function VisualizePage() {
   const {
     setModulesFromGrid, modules, selectedModule, setSelectedModule,
     selectedFurniture, setSelectedFurniture, updateFurnitureOverride,
-    styleDirection,
+    styleDirection, loadFromLocalStorage,
   } = useDesignStore();
   const [viewMode, setViewMode] = useState<ViewMode>("single");
   const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
   const { saved, handleSave } = useSaveDesign();
+
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+  }, [loadFromLocalStorage, modules.length]);
 
   useEffect(() => {
     if (gridCells.length > 0 && modules.length === 0) {

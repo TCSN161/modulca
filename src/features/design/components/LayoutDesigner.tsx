@@ -1,19 +1,23 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
 import FloorPlan from "./FloorPlan";
 import ProjectStats from "./ProjectStats";
-import ProjectLayers from "./ProjectLayers";
+import ProjectLayers, { DEFAULT_LAYERS, type LayerVisibility } from "./ProjectLayers";
 import { useDesignStore } from "../store";
 import { useLandStore } from "@/features/land/store";
 import StepNav from "./shared/StepNav";
 
 export default function LayoutDesigner() {
   const { gridCells, gridRotation } = useLandStore();
-  const { setModulesFromGrid, modules } = useDesignStore();
+  const { setModulesFromGrid, modules, loadFromLocalStorage } = useDesignStore();
+  const [layers, setLayers] = useState<LayerVisibility>(DEFAULT_LAYERS);
 
-  // Import modules from Step 1 on mount
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+  }, [loadFromLocalStorage, modules.length]);
+
   useEffect(() => {
     if (gridCells.length > 0 && modules.length === 0) {
       setModulesFromGrid(gridCells, gridRotation);
@@ -50,12 +54,12 @@ export default function LayoutDesigner() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left sidebar — project layers */}
         <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-white">
-          <ProjectLayers />
+          <ProjectLayers visible={layers} onChange={setLayers} />
         </aside>
 
         {/* Center — floor plan */}
         <main className="flex-1 overflow-auto">
-          <FloorPlan />
+          <FloorPlan layers={layers} />
         </main>
 
         {/* Right sidebar — stats, cost, BIM */}

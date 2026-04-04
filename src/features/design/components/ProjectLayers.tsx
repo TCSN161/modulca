@@ -1,7 +1,5 @@
 "use client";
 
-import { useState } from "react";
-
 interface Layer {
   id: string;
   label: string;
@@ -16,10 +14,18 @@ const LAYERS: Layer[] = [
   { id: "grids", label: "Drafting Grids", icon: "◎" },
 ];
 
-export default function ProjectLayers() {
-  const [visible, setVisible] = useState<Record<string, boolean>>(
-    Object.fromEntries(LAYERS.map((l) => [l.id, true]))
-  );
+export type LayerVisibility = Record<string, boolean>;
+
+export const DEFAULT_LAYERS: LayerVisibility = Object.fromEntries(
+  LAYERS.map((l) => [l.id, true])
+);
+
+interface ProjectLayersProps {
+  visible: LayerVisibility;
+  onChange: (v: LayerVisibility) => void;
+}
+
+export default function ProjectLayers({ visible, onChange }: ProjectLayersProps) {
 
   return (
     <div className="p-4">
@@ -32,7 +38,7 @@ export default function ProjectLayers() {
             key={layer.id}
             onClick={() =>
               !layer.locked &&
-              setVisible((v) => ({ ...v, [layer.id]: !v[layer.id] }))
+              onChange({ ...visible, [layer.id]: !visible[layer.id] })
             }
             className={`flex w-full items-center gap-3 rounded-lg px-3 py-2 text-left text-sm transition-colors ${
               visible[layer.id]

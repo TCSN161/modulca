@@ -99,7 +99,7 @@ export default function PresentationPage() {
   const { gridCells, gridRotation, polygon, mapCenter } = useLandStore();
   const {
     modules, setModulesFromGrid, styleDirection, finishLevel, getStats,
-    moodboardPins, savedRenders,
+    moodboardPins, savedRenders, loadFromLocalStorage,
   } = useDesignStore();
 
   const [template, setTemplate] = useState<PresentationTemplate>("minimal");
@@ -109,7 +109,10 @@ export default function PresentationPage() {
   const [activeSlide, setActiveSlide] = useState<SlideId>("cover");
   const previewRef = useRef<HTMLDivElement>(null);
 
-  // Initialize modules from land store if needed
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+  }, [loadFromLocalStorage, modules.length]);
+
   useEffect(() => {
     if (gridCells.length > 0 && modules.length === 0) {
       setModulesFromGrid(gridCells, gridRotation);

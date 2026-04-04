@@ -496,7 +496,7 @@ function ProductDetailModal({
 // ─── Component ───────────────────────────────────────────────
 
 export default function ProductsPage() {
-  const { modules, setModulesFromGrid, getStats } = useDesignStore();
+  const { modules, setModulesFromGrid, getStats, loadFromLocalStorage } = useDesignStore();
   const { gridCells, gridRotation } = useLandStore();
 
   const [activeCategory, setActiveCategory] = useState<CategoryId>("finishing");
@@ -504,7 +504,10 @@ export default function ProductsPage() {
   const [initialized, setInitialized] = useState(false);
   const [detailProduct, setDetailProduct] = useState<Product | null>(null);
 
-  // Import modules from grid if store is empty
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+  }, [loadFromLocalStorage, modules.length]);
+
   useEffect(() => {
     if (modules.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);

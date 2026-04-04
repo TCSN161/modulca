@@ -174,13 +174,16 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
 
 export default function ConfigurePage() {
   const { gridCells, gridRotation } = useLandStore();
-  const { setModulesFromGrid, modules, selectedModule, setSelectedModule } =
+  const { setModulesFromGrid, modules, selectedModule, setSelectedModule, loadFromLocalStorage } =
     useDesignStore();
   const [viewMode, setViewMode] = useState<ViewMode>("single");
   const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
   const { saved, handleSave } = useSaveDesign();
 
-  // Import modules from Step 1 if needed
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+  }, [loadFromLocalStorage, modules.length]);
+
   useEffect(() => {
     if (gridCells.length > 0 && modules.length === 0) {
       setModulesFromGrid(gridCells, gridRotation);

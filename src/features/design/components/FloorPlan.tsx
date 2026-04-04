@@ -45,10 +45,20 @@ const LABEL_ABBREV: Record<string, string> = {
   living: "LIV",
   office: "OFC",
   storage: "STR",
+  hallway: "HAL",
+  terrace: "TER",
 };
 
-export default function FloorPlan() {
-  const { modules, selectedModule, setSelectedModule, updateWallConfig } = useDesignStore();
+interface FloorPlanProps {
+  layers?: Record<string, boolean>;
+}
+
+export default function FloorPlan({ layers }: FloorPlanProps) {
+  const showWalls = layers?.walls ?? true;
+  const showAnnotations = layers?.annotations ?? true;
+  const showPlumbing = layers?.plumbing ?? true;
+  const showGrids = layers?.grids ?? true;
+  const { modules, selectedModule, setSelectedModule, updateWallConfig, moduleFixtures } = useDesignStore();
   const router = useRouter();
 
   // Track which walls are interior (between adjacent modules)
@@ -114,29 +124,33 @@ export default function FloorPlan() {
 
         {/* Grid */}
         <svg width={width} height={height} className="rounded-xl bg-white shadow-sm border border-gray-200">
-          {/* Grid lines (light) */}
-          {Array.from({ length: rows + 1 }).map((_, i) => (
-            <line
-              key={`h${i}`}
-              x1={PADDING}
-              y1={PADDING + i * CELL_PX}
-              x2={PADDING + cols * CELL_PX}
-              y2={PADDING + i * CELL_PX}
-              stroke="#e5e7eb"
-              strokeWidth={0.5}
-            />
-          ))}
-          {Array.from({ length: cols + 1 }).map((_, i) => (
-            <line
-              key={`v${i}`}
-              x1={PADDING + i * CELL_PX}
-              y1={PADDING}
-              x2={PADDING + i * CELL_PX}
-              y2={PADDING + rows * CELL_PX}
-              stroke="#e5e7eb"
-              strokeWidth={0.5}
-            />
-          ))}
+          {/* Grid lines (light) — toggled by grids layer */}
+          {showGrids && (
+            <>
+              {Array.from({ length: rows + 1 }).map((_, i) => (
+                <line
+                  key={`h${i}`}
+                  x1={PADDING}
+                  y1={PADDING + i * CELL_PX}
+                  x2={PADDING + cols * CELL_PX}
+                  y2={PADDING + i * CELL_PX}
+                  stroke="#e5e7eb"
+                  strokeWidth={0.5}
+                />
+              ))}
+              {Array.from({ length: cols + 1 }).map((_, i) => (
+                <line
+                  key={`v${i}`}
+                  x1={PADDING + i * CELL_PX}
+                  y1={PADDING}
+                  x2={PADDING + i * CELL_PX}
+                  y2={PADDING + rows * CELL_PX}
+                  stroke="#e5e7eb"
+                  strokeWidth={0.5}
+                />
+              ))}
+            </>
+          )}
 
           {/* Module cells */}
           {modules.map((mod) => {
@@ -193,26 +207,30 @@ export default function FloorPlan() {
                 )}
 
                 {/* Walls — styled per wall config type */}
-                {/* North (top) */}
-                <line
-                  x1={x} y1={y} x2={x + CELL_PX} y2={y}
-                  {...wallStroke(wc.north)}
-                />
-                {/* South (bottom) */}
-                <line
-                  x1={x} y1={y + CELL_PX} x2={x + CELL_PX} y2={y + CELL_PX}
-                  {...wallStroke(wc.south)}
-                />
-                {/* West (left) */}
-                <line
-                  x1={x} y1={y} x2={x} y2={y + CELL_PX}
-                  {...wallStroke(wc.west)}
-                />
-                {/* East (right) */}
-                <line
-                  x1={x + CELL_PX} y1={y} x2={x + CELL_PX} y2={y + CELL_PX}
-                  {...wallStroke(wc.east)}
-                />
+                {showWalls && (
+                  <>
+                    {/* North (top) */}
+                    <line
+                      x1={x} y1={y} x2={x + CELL_PX} y2={y}
+                      {...wallStroke(wc.north)}
+                    />
+                    {/* South (bottom) */}
+                    <line
+                      x1={x} y1={y + CELL_PX} x2={x + CELL_PX} y2={y + CELL_PX}
+                      {...wallStroke(wc.south)}
+                    />
+                    {/* West (left) */}
+                    <line
+                      x1={x} y1={y} x2={x} y2={y + CELL_PX}
+                      {...wallStroke(wc.west)}
+                    />
+                    {/* East (right) */}
+                    <line
+                      x1={x + CELL_PX} y1={y} x2={x + CELL_PX} y2={y + CELL_PX}
+                      {...wallStroke(wc.east)}
+                    />
+                  </>
+                )}
 
                 {/* Clickable wall hit zones (visible on selected module) */}
                 {isSelected && (
@@ -282,47 +300,76 @@ export default function FloorPlan() {
                   </>
                 )}
 
-                {/* Label */}
-                <text
-                  x={x + CELL_PX / 2}
-                  y={y + CELL_PX / 2 - 8}
-                  textAnchor="middle"
-                  className="text-xs font-bold"
-                  fill="#1B3A4B"
-                >
-                  {mod.label}
-                </text>
+                {/* Label & annotations */}
+                {showAnnotations && (
+                  <>
+                    <text
+                      x={x + CELL_PX / 2}
+                      y={y + CELL_PX / 2 - 8}
+                      textAnchor="middle"
+                      className="text-xs font-bold"
+                      fill="#1B3A4B"
+                    >
+                      {mod.label}
+                    </text>
+                    <text
+                      x={x + CELL_PX / 2}
+                      y={y + CELL_PX / 2 + 10}
+                      textAnchor="middle"
+                      className="text-[10px]"
+                      fill="#6b7280"
+                    >
+                      9.0m²
+                    </text>
+                    <rect
+                      x={x + CELL_PX - 36}
+                      y={y + 6}
+                      width={30}
+                      height={16}
+                      rx={3}
+                      fill={color}
+                      fillOpacity={0.3}
+                    />
+                    <text
+                      x={x + CELL_PX - 21}
+                      y={y + 17}
+                      textAnchor="middle"
+                      className="text-[9px] font-bold"
+                      fill={color}
+                    >
+                      {abbrev}
+                    </text>
+                  </>
+                )}
 
-                {/* Size label */}
-                <text
-                  x={x + CELL_PX / 2}
-                  y={y + CELL_PX / 2 + 10}
-                  textAnchor="middle"
-                  className="text-[10px]"
-                  fill="#6b7280"
-                >
-                  9.0m²
-                </text>
-
-                {/* Abbreviation badge */}
-                <rect
-                  x={x + CELL_PX - 36}
-                  y={y + 6}
-                  width={30}
-                  height={16}
-                  rx={3}
-                  fill={color}
-                  fillOpacity={0.3}
-                />
-                <text
-                  x={x + CELL_PX - 21}
-                  y={y + 17}
-                  textAnchor="middle"
-                  className="text-[9px] font-bold"
-                  fill={color}
-                >
-                  {abbrev}
-                </text>
+                {/* Plumbing layer indicators */}
+                {showPlumbing && (() => {
+                  const key = `${mod.row},${mod.col}`;
+                  const fixtures = moduleFixtures[key] || [];
+                  const plumbingFixtures = fixtures.filter((f) =>
+                    ["underfloor-heating", "water-supply", "drain-point"].includes(f)
+                  );
+                  if (plumbingFixtures.length === 0) return null;
+                  const icons: Record<string, string> = {
+                    "water-supply": "💧",
+                    "drain-point": "🔽",
+                    "underfloor-heating": "🔥",
+                  };
+                  return (
+                    <g>
+                      {plumbingFixtures.map((f, i) => (
+                        <text
+                          key={f}
+                          x={x + 10 + i * 16}
+                          y={y + CELL_PX - 8}
+                          className="text-[10px]"
+                        >
+                          {icons[f] || "●"}
+                        </text>
+                      ))}
+                    </g>
+                  );
+                })()}
               </g>
             );
           })}

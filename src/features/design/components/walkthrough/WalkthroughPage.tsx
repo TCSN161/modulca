@@ -117,6 +117,7 @@ export default function WalkthroughPage() {
     selectedModule,
     setSelectedModule,
     styleDirection,
+    loadFromLocalStorage,
   } = useDesignStore();
 
   const { saved, handleSave } = useSaveDesign();
@@ -134,7 +135,10 @@ export default function WalkthroughPage() {
   const [recordTooltip, setRecordTooltip] = useState(false);
   const [walkthroughQuality, setWalkthroughQuality] = useState<WalkthroughQuality>("standard");
 
-  // Import modules from grid if store is empty
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+  }, [loadFromLocalStorage, modules.length]);
+
   useEffect(() => {
     if (modules.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);

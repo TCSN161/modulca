@@ -116,6 +116,7 @@ export default function RenderPage() {
   const {
     modules, selectedModule, setSelectedModule,
     setModulesFromGrid, styleDirection, finishLevel, getStats,
+    loadFromLocalStorage,
   } = useDesignStore();
 
   const { saved, handleSave } = useSaveDesign();
@@ -146,7 +147,14 @@ export default function RenderPage() {
     captureRef.current = capture;
   }, []);
 
-  // Initialize modules from land store if needed
+  // Hydrate from localStorage first (preserves furnitureOverrides from Step 6)
+  useEffect(() => {
+    if (modules.length === 0) {
+      loadFromLocalStorage();
+    }
+  }, [loadFromLocalStorage, modules.length]);
+
+  // Fall back to land store if localStorage had nothing
   useEffect(() => {
     if (gridCells.length > 0 && modules.length === 0) {
       setModulesFromGrid(gridCells, gridRotation);
@@ -256,13 +264,15 @@ export default function RenderPage() {
   // Elapsed time ticker for AI loading
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  /** Build sanitized prompt */
+  /** Build sanitized prompt with architectural context to avoid API false-positive content filters */
   const sanitizePrompt = useCallback((prompt: string) => {
-    return prompt
+    const cleaned = prompt
       .trim()
       .replace(/[^\w\s,.\-!?']/g, " ")
       .replace(/\s+/g, " ")
       .slice(0, 300);
+    // Prefix with explicit architectural context to reduce content-filter false positives
+    return `architectural interior design visualization, empty furnished room, ${cleaned}`;
   }, []);
 
   const handleGenerateAiRender = useCallback(async () => {

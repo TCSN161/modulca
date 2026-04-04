@@ -41,6 +41,7 @@ export default function TechnicalPage() {
     selectedModule,
     setSelectedModule,
     setModulesFromGrid,
+    loadFromLocalStorage,
   } = useDesignStore();
 
   const { gridCells, gridRotation } = useLandStore();
@@ -50,7 +51,10 @@ export default function TechnicalPage() {
   const [zoom, setZoom] = useState(100);
   const drawingRef = useRef<HTMLDivElement>(null);
 
-  // Import modules from grid if store is empty
+  useEffect(() => {
+    if (modules.length === 0) loadFromLocalStorage();
+  }, [loadFromLocalStorage, modules.length]);
+
   useEffect(() => {
     if (modules.length === 0 && gridCells.some((c) => c.moduleType !== null)) {
       setModulesFromGrid(gridCells, gridRotation);

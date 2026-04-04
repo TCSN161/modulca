@@ -8,7 +8,7 @@ import type { ModuleConfig } from "../../store";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import {
   MODULE_SIZE, WALL_HEIGHT,
-  ModuleWalls, ModuleFloor, ModuleCeiling,
+  ModuleWalls, ModuleFloor,
   StaticFurniturePiece,
 } from "../shared/module3d";
 
@@ -119,7 +119,7 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
           <group key={`mod-${mod.row}-${mod.col}`}>
             <ModuleFloor offsetX={ox} offsetZ={oz} color={floorColor} />
             <ModuleWalls wallConfigs={mod.wallConfigs} wallColor={wallColor} offsetX={ox} offsetZ={oz} />
-            <ModuleCeiling offsetX={ox} offsetZ={oz} />
+            {/* No ceiling in combined view — allows orbital camera to see interiors */}
 
             {furniture.map((item) => (
               <StaticFurniturePiece
