@@ -192,6 +192,7 @@ export default function PresentationPage() {
               finishLabel={finishInfo?.label || "Standard"}
               polygon={polygon}
               mapCenter={mapCenter}
+              savedRenders={savedRenders}
             />
           </Suspense>
         </div>

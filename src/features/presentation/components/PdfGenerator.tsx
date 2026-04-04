@@ -6,10 +6,11 @@ import {
   Page,
   Text,
   View,
+  Image,
   StyleSheet,
   pdf,
 } from "@react-pdf/renderer";
-import type { ModuleConfig } from "@/features/design/store";
+import type { ModuleConfig, SavedRender } from "@/features/design/store";
 import type { StyleDirection } from "@/features/design/styles";
 
 /* ------------------------------------------------------------------ */
@@ -39,6 +40,7 @@ interface PdfGeneratorProps {
   polygon: { lat: number; lng: number }[];
   mapCenter: { lat: number; lng: number };
   products: { name: string; quantity: number; price: number }[];
+  savedRenders: SavedRender[];
 }
 
 /* ------------------------------------------------------------------ */
@@ -332,14 +334,30 @@ function PresentationDocument(props: PdfGeneratorProps) {
           <SlidePage key="renders" slideLabel="AI Renders" pageNum={pn} total={total} s={s}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>AI Renders</Text>
-            <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
-              <Text style={{ ...s.body, opacity: 0.4, fontSize: 14 }}>
-                AI-generated renders are available in the web application.
-              </Text>
-              <Text style={{ ...s.body, opacity: 0.3, marginTop: 8 }}>
-                Visit your project at modulca.com to view and download high-resolution renders.
-              </Text>
-            </View>
+            {props.savedRenders.length > 0 ? (
+              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 8 }}>
+                {props.savedRenders.slice(0, 4).map((render, i) => (
+                  <View key={i} style={{ width: "48%", marginBottom: 8 }}>
+                    <Image
+                      src={render.imageUrl}
+                      style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 4 }}
+                    />
+                    <Text style={{ fontSize: 8, color: t.text, marginTop: 4 }}>
+                      {render.label} — {render.engine}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            ) : (
+              <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
+                <Text style={{ ...s.body, opacity: 0.4, fontSize: 14 }}>
+                  No AI renders saved yet.
+                </Text>
+                <Text style={{ ...s.body, opacity: 0.3, marginTop: 8 }}>
+                  Generate renders in Step 7 and click &quot;Save to Presentation&quot;.
+                </Text>
+              </View>
+            )}
           </SlidePage>
         );
         break;
@@ -533,6 +551,7 @@ export default function PdfDownloadButton({
   finishLabel,
   polygon,
   mapCenter,
+  savedRenders,
 }: Omit<PdfGeneratorProps, "products">) {
   const [loading, setLoading] = useState(false);
 
@@ -553,6 +572,7 @@ export default function PdfDownloadButton({
           polygon={polygon}
           mapCenter={mapCenter}
           products={products}
+          savedRenders={savedRenders}
         />
       );
       const blob = await pdf(doc).toBlob();
