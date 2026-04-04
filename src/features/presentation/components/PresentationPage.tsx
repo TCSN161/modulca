@@ -200,7 +200,7 @@ export default function PresentationPage() {
 
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar — Settings */}
-        <aside className="w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4 print:hidden">
+        <aside className="w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4 print:hidden hidden md:block">
           <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Presentation Settings</h3>
 
           {/* Project Name */}

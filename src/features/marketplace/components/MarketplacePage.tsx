@@ -1,10 +1,12 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { useMarketplaceStore, filterTerrains } from "../store";
 import type { Terrain } from "../store";
+
+type LandMode = "choose" | "have-land" | "want-land";
 
 /* ------------------------------------------------------------------ */
 /*  Zoning color map                                                   */
@@ -30,6 +32,7 @@ export default function MarketplacePage() {
   const { terrains, filters, favorites, setFilter, clearFilters, toggleFavorite } =
     useMarketplaceStore();
 
+  const [mode, setMode] = useState<LandMode>("choose");
   const [detailId, setDetailId] = useState<string | null>(null);
 
   const filtered = useMemo(() => filterTerrains(terrains, filters), [terrains, filters]);
@@ -49,146 +52,437 @@ export default function MarketplacePage() {
         <div className="w-24" />
       </header>
 
-      <div className="flex flex-1 overflow-hidden">
-        {/* Filters Sidebar */}
-        <aside className="w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Filters</h3>
-            <button onClick={clearFilters} className="text-[10px] text-brand-amber-500 hover:underline">
-              Clear all
-            </button>
-          </div>
+      {/* Mode Chooser — shown initially */}
+      {mode === "choose" ? (
+        <LandModeChooser onSelect={setMode} />
+      ) : mode === "have-land" ? (
+        <HaveLandFlow onBack={() => setMode("choose")} />
+      ) : (
+        /* want-land = existing marketplace browse */
+        <>
+          <div className="flex flex-1 overflow-hidden">
+            {/* Filters Sidebar */}
+            <aside className="w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-xs font-bold text-gray-500 uppercase tracking-wider">Filters</h3>
+                <div className="flex items-center gap-3">
+                  <button onClick={() => setMode("choose")} className="text-[10px] text-brand-teal-800 hover:underline">
+                    Back
+                  </button>
+                  <button onClick={clearFilters} className="text-[10px] text-brand-amber-500 hover:underline">
+                    Clear all
+                  </button>
+                </div>
+              </div>
 
-          {/* Area range */}
-          <FilterSection label="Area (m²)">
-            <div className="flex gap-2">
-              <NumberInput
-                placeholder="Min"
-                value={filters.minArea}
-                onChange={(v) => setFilter("minArea", v)}
-              />
-              <NumberInput
-                placeholder="Max"
-                value={filters.maxArea}
-                onChange={(v) => setFilter("maxArea", v)}
-              />
-            </div>
-          </FilterSection>
+              {/* Area range */}
+              <FilterSection label="Area (m²)">
+                <div className="flex gap-2">
+                  <NumberInput
+                    placeholder="Min"
+                    value={filters.minArea}
+                    onChange={(v) => setFilter("minArea", v)}
+                  />
+                  <NumberInput
+                    placeholder="Max"
+                    value={filters.maxArea}
+                    onChange={(v) => setFilter("maxArea", v)}
+                  />
+                </div>
+              </FilterSection>
 
-          {/* Price range */}
-          <FilterSection label="Price (EUR)">
-            <div className="flex gap-2">
-              <NumberInput
-                placeholder="Min"
-                value={filters.minPrice}
-                onChange={(v) => setFilter("minPrice", v)}
-              />
-              <NumberInput
-                placeholder="Max"
-                value={filters.maxPrice}
-                onChange={(v) => setFilter("maxPrice", v)}
-              />
-            </div>
-          </FilterSection>
+              {/* Price range */}
+              <FilterSection label="Price (EUR)">
+                <div className="flex gap-2">
+                  <NumberInput
+                    placeholder="Min"
+                    value={filters.minPrice}
+                    onChange={(v) => setFilter("minPrice", v)}
+                  />
+                  <NumberInput
+                    placeholder="Max"
+                    value={filters.maxPrice}
+                    onChange={(v) => setFilter("maxPrice", v)}
+                  />
+                </div>
+              </FilterSection>
 
-          {/* Zoning */}
-          <FilterSection label="Zoning">
-            <select
-              value={filters.zoning || ""}
-              onChange={(e) => setFilter("zoning", e.target.value || null)}
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
-            >
-              <option value="">All types</option>
-              <option value="residential">Residential</option>
-              <option value="mixed">Mixed</option>
-              <option value="commercial">Commercial</option>
-            </select>
-          </FilterSection>
+              {/* Zoning */}
+              <FilterSection label="Zoning">
+                <select
+                  value={filters.zoning || ""}
+                  onChange={(e) => setFilter("zoning", e.target.value || null)}
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                >
+                  <option value="">All types</option>
+                  <option value="residential">Residential</option>
+                  <option value="mixed">Mixed</option>
+                  <option value="commercial">Commercial</option>
+                </select>
+              </FilterSection>
 
-          {/* City */}
-          <FilterSection label="City">
-            <select
-              value={filters.city || ""}
-              onChange={(e) => setFilter("city", e.target.value || null)}
-              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
-            >
-              <option value="">All cities</option>
-              {cities.map((c) => (
-                <option key={c} value={c}>{c}</option>
-              ))}
-            </select>
-          </FilterSection>
+              {/* City */}
+              <FilterSection label="City">
+                <select
+                  value={filters.city || ""}
+                  onChange={(e) => setFilter("city", e.target.value || null)}
+                  className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm"
+                >
+                  <option value="">All cities</option>
+                  {cities.map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
+              </FilterSection>
 
-          {/* Suitability score */}
-          <FilterSection label="Min Suitability Score">
-            <input
-              type="range"
-              min={0}
-              max={100}
-              step={5}
-              value={filters.minScore ?? 0}
-              onChange={(e) => {
-                const v = parseInt(e.target.value);
-                setFilter("minScore", v > 0 ? v : null);
-              }}
-              className="w-full accent-brand-amber-500"
-            />
-            <div className="flex justify-between text-[10px] text-gray-400 mt-1">
-              <span>0</span>
-              <span className="font-bold text-brand-teal-800">{filters.minScore ?? 0}+</span>
-              <span>100</span>
-            </div>
-          </FilterSection>
-
-          {/* Results count */}
-          <div className="mt-6 rounded-lg bg-brand-teal-800 p-3 text-center">
-            <span className="text-2xl font-bold text-white">{filtered.length}</span>
-            <span className="block text-[10px] text-brand-teal-200 uppercase tracking-wider">
-              {filtered.length === 1 ? "terrain found" : "terrains found"}
-            </span>
-          </div>
-        </aside>
-
-        {/* Main Grid */}
-        <main className="flex-1 overflow-y-auto p-6">
-          <div className="mb-6">
-            <h1 className="text-2xl font-bold text-brand-teal-800">Land Marketplace</h1>
-            <p className="text-sm text-gray-500 mt-1">Browse available terrains for your modular project</p>
-          </div>
-
-          {filtered.length === 0 ? (
-            <div className="flex flex-col items-center justify-center py-20 text-center">
-              <div className="text-4xl mb-4">🏗️</div>
-              <p className="text-gray-500">No terrains match your filters.</p>
-              <button onClick={clearFilters} className="mt-3 text-sm text-brand-amber-500 hover:underline">
-                Clear filters
-              </button>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-              {filtered.map((t) => (
-                <TerrainCard
-                  key={t.id}
-                  terrain={t}
-                  isFavorite={favorites.includes(t.id)}
-                  onToggleFavorite={() => toggleFavorite(t.id)}
-                  onViewDetails={() => setDetailId(t.id)}
+              {/* Suitability score */}
+              <FilterSection label="Min Suitability Score">
+                <input
+                  type="range"
+                  min={0}
+                  max={100}
+                  step={5}
+                  value={filters.minScore ?? 0}
+                  onChange={(e) => {
+                    const v = parseInt(e.target.value);
+                    setFilter("minScore", v > 0 ? v : null);
+                  }}
+                  className="w-full accent-brand-amber-500"
                 />
-              ))}
+                <div className="flex justify-between text-[10px] text-gray-400 mt-1">
+                  <span>0</span>
+                  <span className="font-bold text-brand-teal-800">{filters.minScore ?? 0}+</span>
+                  <span>100</span>
+                </div>
+              </FilterSection>
+
+              {/* Results count */}
+              <div className="mt-6 rounded-lg bg-brand-teal-800 p-3 text-center">
+                <span className="text-2xl font-bold text-white">{filtered.length}</span>
+                <span className="block text-[10px] text-brand-teal-200 uppercase tracking-wider">
+                  {filtered.length === 1 ? "terrain found" : "terrains found"}
+                </span>
+              </div>
+            </aside>
+
+            {/* Main Grid */}
+            <main className="flex-1 overflow-y-auto p-6">
+              <div className="mb-6">
+                <h1 className="text-2xl font-bold text-brand-teal-800">Land Marketplace</h1>
+                <p className="text-sm text-gray-500 mt-1">Browse available terrains for your modular project</p>
+              </div>
+
+              {filtered.length === 0 ? (
+                <div className="flex flex-col items-center justify-center py-20 text-center">
+                  <div className="text-4xl mb-4">🏗️</div>
+                  <p className="text-gray-500">No terrains match your filters.</p>
+                  <button onClick={clearFilters} className="mt-3 text-sm text-brand-amber-500 hover:underline">
+                    Clear filters
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+                  {filtered.map((t) => (
+                    <TerrainCard
+                      key={t.id}
+                      terrain={t}
+                      isFavorite={favorites.includes(t.id)}
+                      onToggleFavorite={() => toggleFavorite(t.id)}
+                      onViewDetails={() => setDetailId(t.id)}
+                    />
+                  ))}
+                </div>
+              )}
+            </main>
+          </div>
+
+          {/* Detail Modal */}
+          {detailTerrain && (
+            <TerrainDetailModal
+              terrain={detailTerrain}
+              isFavorite={favorites.includes(detailTerrain.id)}
+              onToggleFavorite={() => toggleFavorite(detailTerrain.id)}
+              onClose={() => setDetailId(null)}
+            />
+          )}
+        </>
+      )}
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  Land Mode Chooser — "I have land" vs "I want land"                 */
+/* ------------------------------------------------------------------ */
+
+function LandModeChooser({ onSelect }: { onSelect: (mode: LandMode) => void }) {
+  return (
+    <div className="flex-1 flex items-center justify-center p-8">
+      <div className="max-w-3xl w-full">
+        <div className="text-center mb-10">
+          <h1 className="text-3xl font-bold text-brand-teal-800 mb-2">
+            Let&apos;s find your perfect spot
+          </h1>
+          <p className="text-gray-500">
+            Do you already own land, or are you looking for the right terrain?
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* I Have Land */}
+          <button
+            onClick={() => onSelect("have-land")}
+            className="group rounded-2xl border-2 border-gray-200 bg-white p-8 text-left hover:border-brand-teal-500 hover:shadow-lg transition-all"
+          >
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-3xl group-hover:bg-emerald-200 transition-colors">
+              🏡
+            </div>
+            <h2 className="text-lg font-bold text-brand-teal-800 mb-2">
+              I have land
+            </h2>
+            <p className="text-sm text-gray-500 leading-relaxed mb-4">
+              I already own a terrain and want to design my modular home on it.
+              Enter your land details and jump straight into planning.
+            </p>
+            <div className="flex items-center gap-1 text-sm font-semibold text-brand-teal-800 group-hover:text-brand-amber-500 transition-colors">
+              Start designing
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
+
+          {/* I Want Land */}
+          <button
+            onClick={() => onSelect("want-land")}
+            className="group rounded-2xl border-2 border-gray-200 bg-white p-8 text-left hover:border-brand-amber-500 hover:shadow-lg transition-all"
+          >
+            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-3xl group-hover:bg-amber-200 transition-colors">
+              🔍
+            </div>
+            <h2 className="text-lg font-bold text-brand-teal-800 mb-2">
+              I want land
+            </h2>
+            <p className="text-sm text-gray-500 leading-relaxed mb-4">
+              I&apos;m looking for the perfect terrain to buy. Browse available
+              plots across Romania with suitability scores for modular building.
+            </p>
+            <div className="flex items-center gap-1 text-sm font-semibold text-brand-teal-800 group-hover:text-brand-amber-500 transition-colors">
+              Browse marketplace
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
+        </div>
+
+        {/* Sell your land CTA */}
+        <div className="mt-8 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
+          <p className="text-sm text-gray-500">
+            <span className="font-semibold text-brand-teal-800">Own land you&apos;d like to sell?</span>{" "}
+            List your terrain on the ModulCA marketplace and reach buyers who are ready to build.
+          </p>
+          <button
+            onClick={() => onSelect("have-land")}
+            className="mt-3 rounded-lg border border-brand-teal-800 px-4 py-2 text-sm font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
+          >
+            List My Land
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/*  "I Have Land" Flow                                                  */
+/* ------------------------------------------------------------------ */
+
+function HaveLandFlow({ onBack }: { onBack: () => void }) {
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [county, setCounty] = useState("");
+  const [area, setArea] = useState("");
+  const [zoning, setZoning] = useState("residential");
+  const [hasWater, setHasWater] = useState(true);
+  const [hasElectricity, setHasElectricity] = useState(true);
+  const [hasGas, setHasGas] = useState(false);
+  const [hasSewer, setHasSewer] = useState(false);
+  const [hasCU, setHasCU] = useState(false);
+  const [notes, setNotes] = useState("");
+
+  const canProceed = address.trim() && city.trim() && area.trim();
+
+  const buildQueryString = useCallback(() => {
+    const params = new URLSearchParams();
+    if (address) params.set("address", address);
+    if (city) params.set("city", city);
+    if (area) params.set("area", area);
+    return params.toString();
+  }, [address, city, area]);
+
+  return (
+    <div className="flex-1 overflow-y-auto">
+      <div className="mx-auto max-w-2xl p-8">
+        <button
+          onClick={onBack}
+          className="mb-6 flex items-center gap-1 text-sm text-brand-teal-800 hover:underline"
+        >
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          Back
+        </button>
+
+        <h1 className="text-2xl font-bold text-brand-teal-800 mb-1">Your Land Details</h1>
+        <p className="text-sm text-gray-500 mb-8">
+          Tell us about your terrain so we can help you plan the optimal modular layout.
+        </p>
+
+        <div className="space-y-6">
+          {/* Location */}
+          <div className="rounded-xl border border-gray-200 bg-white p-5">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Location</h3>
+            <div className="space-y-3">
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-1">Street Address *</label>
+                <input
+                  type="text"
+                  value={address}
+                  onChange={(e) => setAddress(e.target.value)}
+                  placeholder="e.g., Str. Principala 42"
+                  className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">City / Town *</label>
+                  <input
+                    type="text"
+                    value={city}
+                    onChange={(e) => setCity(e.target.value)}
+                    placeholder="e.g., Cluj-Napoca"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">County</label>
+                  <input
+                    type="text"
+                    value={county}
+                    onChange={(e) => setCounty(e.target.value)}
+                    placeholder="e.g., Cluj"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Terrain Details */}
+          <div className="rounded-xl border border-gray-200 bg-white p-5">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Terrain Details</h3>
+            <div className="space-y-3">
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Area (m²) *</label>
+                  <input
+                    type="number"
+                    value={area}
+                    onChange={(e) => setArea(e.target.value)}
+                    placeholder="e.g., 500"
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-medium text-gray-600 mb-1">Zoning</label>
+                  <select
+                    value={zoning}
+                    onChange={(e) => setZoning(e.target.value)}
+                    className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-brand-amber-500 focus:outline-none"
+                  >
+                    <option value="residential">Residential</option>
+                    <option value="mixed">Mixed Use</option>
+                    <option value="commercial">Commercial</option>
+                  </select>
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-medium text-gray-600 mb-2">Available Utilities</label>
+                <div className="flex flex-wrap gap-3">
+                  <ToggleChip label="Water" active={hasWater} onToggle={() => setHasWater(!hasWater)} />
+                  <ToggleChip label="Electricity" active={hasElectricity} onToggle={() => setHasElectricity(!hasElectricity)} />
+                  <ToggleChip label="Gas" active={hasGas} onToggle={() => setHasGas(!hasGas)} />
+                  <ToggleChip label="Sewer" active={hasSewer} onToggle={() => setHasSewer(!hasSewer)} />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Permits */}
+          <div className="rounded-xl border border-gray-200 bg-white p-5">
+            <h3 className="text-xs font-bold text-gray-400 uppercase tracking-wider mb-4">Documentation</h3>
+            <label className="flex items-center gap-3 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={hasCU}
+                onChange={(e) => setHasCU(e.target.checked)}
+                className="h-4 w-4 rounded border-gray-300 text-brand-amber-500 accent-brand-amber-500"
+              />
+              <div>
+                <span className="text-sm font-medium text-gray-700">I have a Certificat de Urbanism (CU)</span>
+                <p className="text-[11px] text-gray-400 mt-0.5">The urban planning certificate from your local city hall</p>
+              </div>
+            </label>
+            <div className="mt-4">
+              <label className="block text-xs font-medium text-gray-600 mb-1">Additional Notes</label>
+              <textarea
+                value={notes}
+                onChange={(e) => setNotes(e.target.value)}
+                rows={3}
+                placeholder="e.g., Slope direction, access road width, existing structures..."
+                className="w-full rounded-lg border border-gray-200 px-3 py-2.5 text-sm focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500 resize-none"
+              />
+            </div>
+          </div>
+
+          {/* Summary + CTA */}
+          {canProceed && (
+            <div className="rounded-xl border border-emerald-200 bg-emerald-50 p-5">
+              <h3 className="text-xs font-bold text-emerald-700 uppercase tracking-wider mb-3">Quick Estimate</h3>
+              <div className="space-y-1 text-sm text-gray-600">
+                <div className="flex justify-between">
+                  <span>Terrain area</span>
+                  <span className="font-medium">{Number(area).toLocaleString()} m²</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Estimated max modules</span>
+                  <span className="font-medium">{Math.max(2, Math.floor(Number(area) / 40))}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span>Recommended layout</span>
+                  <span className="font-medium">
+                    {Number(area) >= 600 ? "Villa (12 modules)" : Number(area) >= 300 ? "Family Home (9 modules)" : "Compact House (4 modules)"}
+                  </span>
+                </div>
+              </div>
             </div>
           )}
-        </main>
-      </div>
 
-      {/* Detail Modal */}
-      {detailTerrain && (
-        <TerrainDetailModal
-          terrain={detailTerrain}
-          isFavorite={favorites.includes(detailTerrain.id)}
-          onToggleFavorite={() => toggleFavorite(detailTerrain.id)}
-          onClose={() => setDetailId(null)}
-        />
-      )}
+          <div className="flex gap-3 pt-2">
+            <Link
+              href={`/project/demo/land?${buildQueryString()}`}
+              className={`flex-1 rounded-lg py-3 text-center text-sm font-bold text-white transition-colors ${
+                canProceed
+                  ? "bg-brand-amber-500 hover:bg-brand-amber-600"
+                  : "bg-gray-300 pointer-events-none"
+              }`}
+            >
+              Start Designing on My Land
+            </Link>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
@@ -477,5 +771,20 @@ function MetricCard({ label, value, valueClass }: { label: string; value: string
       <div className="text-[10px] text-gray-400 uppercase tracking-wider mb-1">{label}</div>
       <div className={`text-sm font-bold ${valueClass || "text-brand-teal-800"}`}>{value}</div>
     </div>
+  );
+}
+
+function ToggleChip({ label, active, onToggle }: { label: string; active: boolean; onToggle: () => void }) {
+  return (
+    <button
+      onClick={onToggle}
+      className={`rounded-full px-3 py-1.5 text-xs font-medium transition-colors ${
+        active
+          ? "bg-emerald-100 text-emerald-700 border border-emerald-300"
+          : "bg-gray-100 text-gray-400 border border-gray-200"
+      }`}
+    >
+      {active ? "✓" : "✗"} {label}
+    </button>
   );
 }

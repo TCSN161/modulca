@@ -15,6 +15,7 @@ import {
   downloadSvg,
   printDrawing,
 } from "./exportDrawing";
+import KnowledgeBasePanel from "./KnowledgeBasePanel";
 
 
 const DRAWING_TYPES = [
@@ -49,6 +50,8 @@ export default function TechnicalPage() {
   const { saved, handleSave } = useSaveDesign();
   const [activeDrawing, setActiveDrawing] = useState("floor-plan");
   const [zoom, setZoom] = useState(100);
+  const [kbOpen, setKbOpen] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<"none" | "drawings" | "specs">("none");
   const drawingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -125,7 +128,7 @@ export default function TechnicalPage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* ── Top Nav ── */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -140,7 +143,7 @@ export default function TechnicalPage() {
       </header>
 
       {/* ── Module selector bar ── */}
-      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-6 py-3 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-3 md:px-6 py-2 md:py-3 overflow-x-auto">
         {modules.map((mod) => {
           const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
           const isActive =
@@ -197,9 +200,9 @@ export default function TechnicalPage() {
       </div>
 
       {/* ── Main Content (3-column) ── */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-1 overflow-hidden relative">
         {/* ── Left Sidebar ── */}
-        <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
+        <aside className={`w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4 hidden md:block`}>
           <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
             Drawing Set
           </h3>
@@ -283,6 +286,28 @@ export default function TechnicalPage() {
               Export All Sheets
             </button>
           </div>
+
+          {/* Knowledge Base / Construction Manual */}
+          <div className="mt-5 pt-4 border-t border-gray-200">
+            <button
+              onClick={() => setKbOpen(true)}
+              className="w-full rounded-lg border-2 border-dashed border-brand-teal-300 bg-brand-teal-50/50 px-4 py-3 text-left hover:border-brand-teal-500 hover:bg-brand-teal-50 transition-colors group"
+            >
+              <div className="flex items-center gap-2">
+                <svg className="h-5 w-5 text-brand-teal-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
+                </svg>
+                <div>
+                  <div className="text-xs font-bold text-brand-teal-800 group-hover:text-brand-teal-900">
+                    Construction Manual
+                  </div>
+                  <div className="text-[10px] text-brand-teal-600 mt-0.5">
+                    Standards, dimensions, regulations
+                  </div>
+                </div>
+              </div>
+            </button>
+          </div>
         </aside>
 
         {/* ── Center — Drawing Display ── */}
@@ -345,7 +370,7 @@ export default function TechnicalPage() {
         </main>
 
         {/* ── Right Sidebar ── */}
-        <aside className="w-80 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4">
+        <aside className="w-80 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4 hidden md:block">
           <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
             Specifications
           </h3>
@@ -543,6 +568,98 @@ export default function TechnicalPage() {
           )}
         </aside>
       </div>
+
+      {/* Mobile FABs — visible only on small screens */}
+      <div className="fixed bottom-4 right-4 flex flex-col gap-2 md:hidden z-40">
+        <button
+          onClick={() => setMobilePanel(mobilePanel === "drawings" ? "none" : "drawings")}
+          className="h-12 w-12 rounded-full bg-brand-teal-800 text-white shadow-lg flex items-center justify-center"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+        </button>
+        <button
+          onClick={() => setMobilePanel(mobilePanel === "specs" ? "none" : "specs")}
+          className="h-12 w-12 rounded-full bg-brand-amber-500 text-white shadow-lg flex items-center justify-center"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile slide-over panels */}
+      {mobilePanel !== "none" && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-black/20" onClick={() => setMobilePanel("none")} />
+          <div className="absolute inset-y-0 right-0 w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto p-4">
+            <button
+              onClick={() => setMobilePanel("none")}
+              className="mb-3 rounded-lg p-1 text-gray-400 hover:bg-gray-100"
+            >
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            {mobilePanel === "drawings" && (
+              <>
+                <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase">Drawing Set</h3>
+                <div className="space-y-1">
+                  {DRAWING_TYPES.map((dt) => (
+                    <button
+                      key={dt.id}
+                      onClick={() => { setActiveDrawing(dt.id); setMobilePanel("none"); }}
+                      className={`w-full rounded-lg px-3 py-2 text-left text-sm font-medium transition-colors ${
+                        activeDrawing === dt.id
+                          ? "bg-brand-teal-800 text-white"
+                          : "bg-gray-50 text-gray-600 hover:bg-gray-100"
+                      }`}
+                    >
+                      {dt.label}
+                    </button>
+                  ))}
+                </div>
+                <div className="mt-4 space-y-2">
+                  <button onClick={() => { handlePrint(); setMobilePanel("none"); }} className="w-full rounded-lg border border-brand-teal-800 py-2 text-sm font-semibold text-brand-teal-800">
+                    Print Drawing
+                  </button>
+                  <button onClick={() => { handleDownloadPdf(); setMobilePanel("none"); }} className="w-full rounded-lg bg-brand-amber-500 py-2 text-sm font-bold text-white">
+                    Export PDF
+                  </button>
+                  <button onClick={() => { setKbOpen(true); setMobilePanel("none"); }} className="w-full rounded-lg border border-dashed border-brand-teal-300 py-2 text-sm font-bold text-brand-teal-800">
+                    Construction Manual
+                  </button>
+                </div>
+              </>
+            )}
+            {mobilePanel === "specs" && currentMod && (
+              <>
+                <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase">Specifications</h3>
+                <div className="text-xs text-gray-600 space-y-2">
+                  <div className="flex justify-between"><span>Exterior</span><span className="font-medium">3000 x 3000mm</span></div>
+                  <div className="flex justify-between"><span>Interior</span><span className="font-medium">2400 x 2400mm</span></div>
+                  <div className="flex justify-between"><span>Wall</span><span className="font-medium">300mm</span></div>
+                  <div className="flex justify-between"><span>Ceiling</span><span className="font-medium">2700mm</span></div>
+                  <div className="flex justify-between"><span>Floor</span><span className="font-medium">{floorMat?.label || currentMod.floorFinish}</span></div>
+                  <div className="flex justify-between"><span>Walls</span><span className="font-medium">{wallMat?.label || currentMod.wallColor}</span></div>
+                </div>
+                <div className="mt-4 space-y-2">
+                  <button onClick={() => { handleDownloadSvg(); setMobilePanel("none"); }} className="w-full rounded-lg bg-brand-amber-500 py-2 text-sm font-bold text-white">
+                    Download SVG
+                  </button>
+                  <button onClick={() => { handleDownloadPdf(); setMobilePanel("none"); }} className="w-full rounded-lg bg-brand-amber-500 py-2 text-sm font-bold text-white">
+                    Download PDF
+                  </button>
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Knowledge Base slide-over panel */}
+      <KnowledgeBasePanel open={kbOpen} onClose={() => setKbOpen(false)} />
     </div>
   );
 }

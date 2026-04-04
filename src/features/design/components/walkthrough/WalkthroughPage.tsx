@@ -134,6 +134,8 @@ export default function WalkthroughPage() {
   const [shareCopied, setShareCopied] = useState(false);
   const [recordTooltip, setRecordTooltip] = useState(false);
   const [walkthroughQuality, setWalkthroughQuality] = useState<WalkthroughQuality>("standard");
+  const [autoTour, setAutoTour] = useState(false);
+  const [mobilePanel, setMobilePanel] = useState<"none" | "controls" | "room">("none");
 
   useEffect(() => {
     if (modules.length === 0) loadFromLocalStorage();
@@ -239,7 +241,7 @@ export default function WalkthroughPage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* ── Top Nav ── */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -252,7 +254,7 @@ export default function WalkthroughPage() {
       </header>
 
       {/* ── Module selector bar ── */}
-      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-6 py-3 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-3 md:px-6 py-2 md:py-3 overflow-x-auto">
         {modules.map((mod) => {
           const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
           const isActive =
@@ -305,7 +307,7 @@ export default function WalkthroughPage() {
       {/* ── Main Content (3-column) ── */}
       <div className="flex flex-1 overflow-hidden">
         {/* ── Left Sidebar ── */}
-        <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4">
+        <aside className="w-64 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4 hidden md:block">
           <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
             Walkthrough
           </h3>
@@ -325,13 +327,26 @@ export default function WalkthroughPage() {
             </p>
           </div>
 
-          {/* Start Tour button */}
-          <button
-            onClick={handleStartTour}
-            className="mb-4 w-full rounded-lg bg-brand-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors"
-          >
-            Start Tour
-          </button>
+          {/* Start Tour buttons */}
+          <div className="mb-4 space-y-2">
+            <button
+              onClick={handleStartTour}
+              className="w-full rounded-lg bg-brand-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors"
+            >
+              Start Free Walk
+            </button>
+            <button
+              onClick={() => setAutoTour(true)}
+              disabled={autoTour}
+              className={`w-full rounded-lg border-2 px-4 py-2.5 text-sm font-bold transition-colors ${
+                autoTour
+                  ? "border-green-400 bg-green-50 text-green-700"
+                  : "border-brand-teal-800 text-brand-teal-800 hover:bg-brand-teal-50"
+              }`}
+            >
+              {autoTour ? "Touring..." : "Auto-Guided Tour"}
+            </button>
+          </div>
 
           {/* 3D Engine Quality Selector */}
           <div className="mb-5">
@@ -464,6 +479,8 @@ export default function WalkthroughPage() {
             controlsRef={controlsRef}
             cameraPositionRef={cameraPositionRef}
             enhanced={walkthroughQuality === "enhanced"}
+            autoTour={autoTour}
+            onAutoTourFinished={() => setAutoTour(false)}
           />
 
           {/* Crosshair overlay */}
@@ -478,7 +495,7 @@ export default function WalkthroughPage() {
         </main>
 
         {/* ── Right Sidebar ── */}
-        <aside className="w-72 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4">
+        <aside className="w-72 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4 hidden md:block">
           <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">
             Current Room
           </h3>
@@ -663,6 +680,71 @@ export default function WalkthroughPage() {
           </div>
         </aside>
       </div>
+
+      {/* Mobile floating controls — visible only on small screens */}
+      <div className="fixed bottom-4 left-1/2 -translate-x-1/2 flex gap-2 md:hidden z-40">
+        <button
+          onClick={handleStartTour}
+          className="rounded-full bg-brand-amber-500 px-5 py-3 text-sm font-bold text-white shadow-lg"
+        >
+          Start Tour
+        </button>
+        <button
+          onClick={() => setAutoTour(true)}
+          disabled={autoTour}
+          className={`rounded-full px-4 py-3 text-sm font-bold shadow-lg ${
+            autoTour ? "bg-green-500 text-white" : "bg-white text-brand-teal-800 border border-gray-200"
+          }`}
+        >
+          {autoTour ? "Touring..." : "Auto Tour"}
+        </button>
+      </div>
+
+      {/* Mobile room list FAB */}
+      <div className="fixed top-20 right-3 md:hidden z-40">
+        <button
+          onClick={() => setMobilePanel(mobilePanel === "controls" ? "none" : "controls")}
+          className="h-10 w-10 rounded-full bg-brand-teal-800 text-white shadow-lg flex items-center justify-center text-sm"
+        >
+          <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M4 6h16M4 12h16M4 18h16" />
+          </svg>
+        </button>
+      </div>
+
+      {/* Mobile slide-over for room list */}
+      {mobilePanel !== "none" && (
+        <div className="fixed inset-0 z-50 md:hidden">
+          <div className="absolute inset-0 bg-black/20" onClick={() => setMobilePanel("none")} />
+          <div className="absolute inset-y-0 right-0 w-72 max-w-[85vw] bg-white shadow-xl overflow-y-auto p-4">
+            <button onClick={() => setMobilePanel("none")} className="mb-3 rounded-lg p-1 text-gray-400 hover:bg-gray-100">
+              <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase">Rooms</h3>
+            <div className="space-y-1">
+              {modules.map((mod) => {
+                const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+                const isCurrent = currentRoom?.row === mod.row && currentRoom?.col === mod.col;
+                return (
+                  <button
+                    key={`mob-${mod.row}-${mod.col}`}
+                    onClick={() => { handleTeleport(mod.row, mod.col); setMobilePanel("none"); }}
+                    className={`flex w-full items-center gap-2 rounded-lg px-3 py-2 text-left text-sm ${
+                      isCurrent ? "bg-brand-amber-50 font-semibold text-brand-teal-800" : "text-gray-600"
+                    }`}
+                  >
+                    <div className="h-3 w-3 rounded-full flex-shrink-0" style={{ backgroundColor: mt?.color || "#888" }} />
+                    <span>{mod.label}</span>
+                    {isCurrent && <span className="ml-auto text-[9px] font-bold text-brand-amber-500">HERE</span>}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

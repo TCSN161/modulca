@@ -16,6 +16,8 @@ import * as THREE from "three";
 
 const MOVE_SPEED = 3; // m/s
 const EYE_HEIGHT = 1.6;
+const AUTO_TOUR_SPEED = 1.2; // m/s — slower for guided tour
+const AUTO_TOUR_PAUSE_MS = 2500; // pause in each room
 
 /* ------------------------------------------------------------------ */
 /*  WASD First-Person Movement Controller                              */
@@ -85,6 +87,100 @@ function MovementController({
 }
 
 /* ------------------------------------------------------------------ */
+/*  Auto-Tour Controller — walks camera through each room smoothly     */
+/* ------------------------------------------------------------------ */
+
+function AutoTourController({
+  modules,
+  cameraPositionRef,
+  active,
+  onFinished,
+}: {
+  modules: ModuleConfig[];
+  cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
+  active: boolean;
+  onFinished: () => void;
+}) {
+  const { camera } = useThree();
+  const stateRef = useRef<{
+    waypoints: THREE.Vector3[];
+    currentIdx: number;
+    pauseUntil: number;
+    lookTarget: THREE.Vector3;
+  } | null>(null);
+
+  // Build waypoints when tour starts
+  useEffect(() => {
+    if (!active || modules.length === 0) {
+      stateRef.current = null;
+      return;
+    }
+    const wps = modules.map(
+      (m) =>
+        new THREE.Vector3(
+          m.col * MODULE_SIZE + MODULE_SIZE / 2,
+          EYE_HEIGHT,
+          m.row * MODULE_SIZE + MODULE_SIZE / 2
+        )
+    );
+    stateRef.current = {
+      waypoints: wps,
+      currentIdx: 0,
+      pauseUntil: Date.now() + AUTO_TOUR_PAUSE_MS,
+      lookTarget: wps.length > 1 ? wps[1].clone() : wps[0].clone().add(new THREE.Vector3(0, 0, 1)),
+    };
+    // Teleport to first room
+    camera.position.copy(wps[0]);
+    cameraPositionRef.current.copy(wps[0]);
+  }, [active, modules, camera, cameraPositionRef]);
+
+  useFrame((_, delta) => {
+    const st = stateRef.current;
+    if (!st || !active) return;
+
+    const now = Date.now();
+    // Pausing in current room
+    if (now < st.pauseUntil) {
+      // Slowly rotate camera to look around
+      const angle = ((now % 8000) / 8000) * Math.PI * 2;
+      const lookX = camera.position.x + Math.sin(angle) * 2;
+      const lookZ = camera.position.z + Math.cos(angle) * 2;
+      camera.lookAt(lookX, EYE_HEIGHT, lookZ);
+      return;
+    }
+
+    const nextIdx = st.currentIdx + 1;
+    if (nextIdx >= st.waypoints.length) {
+      onFinished();
+      return;
+    }
+
+    const target = st.waypoints[nextIdx];
+    const dir = target.clone().sub(camera.position);
+    const dist = dir.length();
+
+    if (dist < 0.3) {
+      // Arrived at next room
+      camera.position.copy(target);
+      cameraPositionRef.current.copy(target);
+      st.currentIdx = nextIdx;
+      st.pauseUntil = now + AUTO_TOUR_PAUSE_MS;
+      return;
+    }
+
+    // Move towards target
+    dir.normalize().multiplyScalar(AUTO_TOUR_SPEED * delta);
+    camera.position.add(dir);
+    cameraPositionRef.current.copy(camera.position);
+
+    // Look towards target
+    camera.lookAt(target.x, EYE_HEIGHT, target.z);
+  });
+
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
 /*  Scene contents                                                     */
 /* ------------------------------------------------------------------ */
 
@@ -95,6 +191,8 @@ function SceneContent({
   controlsRef,
   cameraPositionRef,
   enhanced,
+  autoTour,
+  onAutoTourFinished,
 }: {
   modules: ModuleConfig[];
   teleportTarget: { row: number; col: number } | null;
@@ -102,6 +200,8 @@ function SceneContent({
   controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
   enhanced: boolean;
+  autoTour: boolean;
+  onAutoTourFinished: () => void;
 }) {
   const { camera } = useThree();
 
@@ -190,7 +290,13 @@ function SceneContent({
       })}
 
       <PointerLockControls ref={controlsRef} />
-      <MovementController controlsRef={controlsRef} cameraPositionRef={cameraPositionRef} />
+      {!autoTour && <MovementController controlsRef={controlsRef} cameraPositionRef={cameraPositionRef} />}
+      <AutoTourController
+        modules={modules}
+        cameraPositionRef={cameraPositionRef}
+        active={autoTour}
+        onFinished={onAutoTourFinished}
+      />
     </>
   );
 }
@@ -205,10 +311,13 @@ interface WalkthroughSceneProps {
   controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
   enhanced?: boolean;
+  autoTour?: boolean;
+  onAutoTourFinished?: () => void;
 }
 
 export default function WalkthroughScene({
   teleportTarget, onTeleportDone, controlsRef, cameraPositionRef, enhanced = false,
+  autoTour = false, onAutoTourFinished,
 }: WalkthroughSceneProps) {
   const modules = useDesignStore((s) => s.modules);
 
@@ -238,6 +347,8 @@ export default function WalkthroughScene({
         controlsRef={controlsRef}
         cameraPositionRef={cameraPositionRef}
         enhanced={enhanced}
+        autoTour={autoTour}
+        onAutoTourFinished={onAutoTourFinished || (() => {})}
       />
     </Canvas>
   );
