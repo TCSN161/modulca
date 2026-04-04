@@ -4,6 +4,7 @@ const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
 const nextConfig = {
   ...(isGitHubPages ? { output: "export", basePath: "/modulca", assetPrefix: "/modulca/" } : {}),
   reactStrictMode: true,
+  turbopack: {},
   images: {
     unoptimized: true,
     remotePatterns: [

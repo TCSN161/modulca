@@ -32,8 +32,8 @@ const WALKTHROUGH_ENGINES: Record<WalkthroughQuality, { label: string; descripti
   },
   gaussian: {
     label: "Premium (Gaussian Splatting)",
-    description: "Photorealistic walkthrough from captured scenes",
-    badge: "COMING SOON",
+    description: "Photorealistic walkthrough — available in Architect tier",
+    badge: "PREMIUM",
   },
 };
 
@@ -367,8 +367,8 @@ export default function WalkthroughPage() {
             <p className="mt-1 text-[10px] text-gray-400">{WALKTHROUGH_ENGINES[walkthroughQuality].description}</p>
             {walkthroughQuality === "gaussian" && (
               <p className="mt-1 text-[10px] text-brand-amber-600">
-                Gaussian Splatting will be available in the premium tier.
-                Uses photorealistic 3D captured from real photos.
+                Gaussian Splatting creates photorealistic 3D from captured photos.
+                Available with the Architect / Builder plan.
               </p>
             )}
           </div>
@@ -674,7 +674,7 @@ export default function WalkthroughPage() {
               </button>
               {recordTooltip && (
                 <div className="absolute left-0 right-0 mt-1 rounded-lg bg-brand-teal-800 px-3 py-2 text-center text-xs text-white shadow-lg">
-                  Video recording coming soon — Premium feature
+                  Video recording — Available with Premium plan
                 </div>
               )}
             </div>
