@@ -1,0 +1,9 @@
+export const MODULE_SIZE = 3; // 3m
+export const WALL_HEIGHT = 2.7;
+export const WALL_THICKNESS = 0.08;
+export const HALF_THICK = WALL_THICKNESS / 2;
+export const HALF_HEIGHT = WALL_HEIGHT / 2;
+export const DOOR_WIDTH = 0.9;
+export const DOOR_HEIGHT = 2.1;
+export const WINDOW_BOTTOM = 0.9;
+export const WINDOW_TOP = 2.1;

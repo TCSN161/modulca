@@ -11,105 +11,13 @@ import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import { MODULE_TYPES } from "@/shared/types";
 import StepNav from "../shared/StepNav";
 
+import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, RenderResolution, AiEngine } from "./renderConstants";
+import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
+import { useRenderEngine } from "./useRenderEngine";
+import RenderGallery from "./RenderGallery";
+
 const RenderScene3D = dynamic(() => import("./RenderScene3D"), { ssr: false });
 const CombinedScene3D = dynamic(() => import("../visualize/CombinedScene3D"), { ssr: false });
-
-type LightingMode = "daylight" | "evening" | "night";
-type CameraAngle = "interior" | "corner" | "detail";
-type RenderMode = "template" | "ai";
-type ViewMode = "single" | "all";
-type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | "custom";
-type RenderResolution = "draft" | "standard" | "high";
-type AiEngine = "auto" | "pollinations" | "ai-horde" | "stability" | "together" | "leonardo";
-
-const AI_ENGINES: Record<AiEngine, { label: string; description: string; speed: string }> = {
-  auto: { label: "Auto (Best Available)", description: "Tries engines in order until one succeeds", speed: "" },
-  together: { label: "Together.ai FLUX", description: "Free unlimited 3 months, high quality", speed: "Fast" },
-  pollinations: { label: "Pollinations AI", description: "Free, no account needed", speed: "Fast" },
-  leonardo: { label: "Leonardo.ai", description: "150 free/day, photorealistic", speed: "Medium" },
-  stability: { label: "Stability AI", description: "img2img — uses 3D scene as base", speed: "Medium" },
-  "ai-horde": { label: "AI Horde", description: "Free community GPUs, reliable", speed: "Slow" },
-};
-
-const PROMPT_TEMPLATES: Record<PromptTemplate, { label: string; description: string; suffix: string }> = {
-  magazine: {
-    label: "Magazine Cover Shot",
-    description: "Wide angle, dramatic lighting",
-    suffix: "wide angle lens, dramatic lighting, interior design magazine cover, award-winning architectural photography, ultra high resolution, cinematic composition",
-  },
-  cozy: {
-    label: "Cozy Interior",
-    description: "Warm lighting, detail focused",
-    suffix: "warm ambient lighting, cozy atmosphere, soft textures, hygge style, detail focused macro photography, shallow depth of field, inviting space",
-  },
-  realestate: {
-    label: "Real Estate Listing",
-    description: "Bright, clean, professional",
-    suffix: "bright natural daylight, clean and airy, professional real estate photography, HDR, wide angle, well-staged, inviting and spacious feel",
-  },
-  blueprint: {
-    label: "Blueprint Overlay",
-    description: "Technical + render hybrid",
-    suffix: "architectural blueprint overlay, technical drawing blended with photorealistic render, wireframe accents, engineering precision, hybrid visualization",
-  },
-  custom: {
-    label: "Custom",
-    description: "Edit prompt freely",
-    suffix: "",
-  },
-};
-
-const RENDER_RESOLUTIONS: Record<RenderResolution, { label: string; width: number; height: number; note: string }> = {
-  draft: { label: "Draft", width: 512, height: 288, note: "Fast" },
-  standard: { label: "Standard", width: 1024, height: 576, note: "Default" },
-  high: { label: "High", width: 1536, height: 864, note: "Slower" },
-};
-
-/** Pinterest-style recommendation images per style */
-const STYLE_PINS: Record<string, { label: string; h: number; color: string; cat: string }[]> = {
-  scandinavian: [
-    { label: "Nordic Living Room", h: 220, color: "#E8DFD0", cat: "Living" },
-    { label: "Oak Side Table", h: 160, color: "#D4A76A", cat: "Furniture" },
-    { label: "Linen Curtains", h: 180, color: "#F0EDE5", cat: "Textile" },
-    { label: "Birch Bookshelf", h: 240, color: "#D4B896", cat: "Furniture" },
-    { label: "Ceramic Pendant", h: 150, color: "#C8CDD0", cat: "Lighting" },
-    { label: "Wool Throw Blanket", h: 170, color: "#E0D8C8", cat: "Textile" },
-    { label: "Minimalist Kitchen", h: 200, color: "#F5F3EF", cat: "Kitchen" },
-    { label: "White Stone Vase", h: 140, color: "#EDEBE5", cat: "Decor" },
-    { label: "Light Wood Flooring", h: 190, color: "#C8A878", cat: "Flooring" },
-    { label: "Simple Desk Setup", h: 210, color: "#D0C8B8", cat: "Office" },
-    { label: "Fog Grey Sofa", h: 180, color: "#B8BCC0", cat: "Furniture" },
-    { label: "Clean Bathroom", h: 230, color: "#E8E4DC", cat: "Bathroom" },
-  ],
-  industrial: [
-    { label: "Exposed Brick Loft", h: 230, color: "#B5654A", cat: "Living" },
-    { label: "Steel Shelf Unit", h: 200, color: "#5A5A5A", cat: "Furniture" },
-    { label: "Edison Bulb Cluster", h: 150, color: "#C87941", cat: "Lighting" },
-    { label: "Concrete Countertop", h: 170, color: "#B0AFA8", cat: "Kitchen" },
-    { label: "Leather Club Chair", h: 190, color: "#8B5E3C", cat: "Furniture" },
-    { label: "Iron Pipe Rack", h: 160, color: "#4A4A4A", cat: "Storage" },
-    { label: "Distressed Wood Table", h: 210, color: "#7B5B3A", cat: "Furniture" },
-    { label: "Metal Pendant Lamp", h: 140, color: "#3A3A3A", cat: "Lighting" },
-    { label: "Raw Concrete Floor", h: 180, color: "#9A9890", cat: "Flooring" },
-    { label: "Copper Faucet", h: 150, color: "#C87941", cat: "Fixture" },
-    { label: "Wire Frame Mirror", h: 220, color: "#6A6A6A", cat: "Decor" },
-    { label: "Canvas Art Print", h: 200, color: "#444", cat: "Decor" },
-  ],
-  "warm-contemporary": [
-    { label: "Walnut Dining Room", h: 220, color: "#7B5B3A", cat: "Dining" },
-    { label: "Bouclé Armchair", h: 180, color: "#F2EBD9", cat: "Furniture" },
-    { label: "Sage Velvet Cushions", h: 150, color: "#8FAE8B", cat: "Textile" },
-    { label: "Brass Floor Lamp", h: 210, color: "#C8A96E", cat: "Lighting" },
-    { label: "Terracotta Tiles", h: 170, color: "#C4735C", cat: "Flooring" },
-    { label: "Fluted Glass Panel", h: 190, color: "#D4DDD2", cat: "Fixture" },
-    { label: "Curved Wood Console", h: 160, color: "#8B6B4A", cat: "Furniture" },
-    { label: "Textured Wall Art", h: 230, color: "#A08868", cat: "Decor" },
-    { label: "Warm Bedroom Setup", h: 200, color: "#D4B898", cat: "Bedroom" },
-    { label: "Green Plant Corner", h: 140, color: "#6A8A6A", cat: "Decor" },
-    { label: "Stone Basin Sink", h: 180, color: "#B0A898", cat: "Bathroom" },
-    { label: "Woven Pendant Light", h: 160, color: "#C4A882", cat: "Lighting" },
-  ],
-};
 
 export default function RenderPage() {
   const { gridCells, gridRotation } = useLandStore();
@@ -130,18 +38,27 @@ export default function RenderPage() {
   const [isRendering, setIsRendering] = useState(false);
   const [savedPins, setSavedPins] = useState<Set<string>>(new Set());
   const [aiPrompt, setAiPrompt] = useState("");
-  const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
-  const [aiLoading, setAiLoading] = useState(false);
-  const [aiError, setAiError] = useState<string | null>(null);
   const [promptTemplate, setPromptTemplate] = useState<PromptTemplate>("magazine");
   const [renderResolution, setRenderResolution] = useState<RenderResolution>("standard");
   const [includePeople, setIncludePeople] = useState(false);
   const [includePlants, setIncludePlants] = useState(false);
-  const [aiElapsed, setAiElapsed] = useState(0);
   const [aiEngine, setAiEngine] = useState<AiEngine>("auto");
-  const [aiUsedEngine, setAiUsedEngine] = useState<string | null>(null);
   const [useSceneAsBase, setUseSceneAsBase] = useState(false);
   const captureRef = useRef<(() => string | null) | null>(null);
+
+  const {
+    aiImageUrl,
+    aiLoading,
+    aiError,
+    aiElapsed,
+    aiUsedEngine,
+    handleGenerateAiRender: generateAiRender,
+    resetAiImage,
+  } = useRenderEngine({ aiEngine, renderResolution, useSceneAsBase, captureRef });
+
+  const handleGenerateAiRender = useCallback(() => {
+    generateAiRender(aiPrompt);
+  }, [generateAiRender, aiPrompt]);
 
   const handleSceneReady = useCallback((capture: () => string | null) => {
     captureRef.current = capture;
@@ -244,9 +161,8 @@ export default function RenderPage() {
 
   // Reset AI image when prompt changes
   useEffect(() => {
-    setAiImageUrl(null);
-    setAiError(null);
-  }, [aiPrompt]);
+    resetAiImage();
+  }, [aiPrompt, resetAiImage]);
 
   const handleGenerateRender = () => {
     setIsRendering(true);
@@ -258,131 +174,17 @@ export default function RenderPage() {
     }, 500);
   };
 
-  // Elapsed time ticker for AI loading
-  const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
-
-  /** Build sanitized prompt with architectural context to avoid API false-positive content filters */
-  const sanitizePrompt = useCallback((prompt: string) => {
-    const cleaned = prompt
-      .trim()
-      .replace(/[^\w\s,.\-!?']/g, " ")
-      .replace(/\s+/g, " ")
-      .slice(0, 300);
-    // Prefix with explicit architectural context to reduce content-filter false positives
-    return `architectural interior design visualization, empty furnished room, ${cleaned}`;
-  }, []);
-
-  const handleGenerateAiRender = useCallback(async () => {
-    if (!aiPrompt.trim()) return;
-
-    const sanitized = sanitizePrompt(aiPrompt);
-    const res = RENDER_RESOLUTIONS[renderResolution];
-    const seed = String(Date.now());
-
-    // Capture 3D scene as base image if img2img is enabled
-    let baseImage: string | null = null;
-    if (useSceneAsBase && captureRef.current) {
-      const dataUrl = captureRef.current();
-      if (dataUrl) {
-        // Extract base64 from data URL (remove "data:image/png;base64," prefix)
-        baseImage = dataUrl.replace(/^data:image\/\w+;base64,/, "");
-        console.log("[AI Render] Captured 3D scene for img2img, base64 length:", baseImage.length);
-      }
-    }
-
-    setAiError(null);
-    setAiImageUrl(null);
-    setAiUsedEngine(null);
-    setAiLoading(true);
-    setAiElapsed(0);
-    // Start elapsed timer
-    if (tickerRef.current) clearInterval(tickerRef.current);
-    const start = Date.now();
-    tickerRef.current = setInterval(() => {
-      setAiElapsed(Math.floor((Date.now() - start) / 1000));
-    }, 1000);
-
-    try {
-      let response: Response;
-
-      if (baseImage) {
-        // POST mode: send base image for img2img
-        console.log("[AI Render] Using POST (img2img) mode");
-        response = await fetch("/api/ai-render", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt: sanitized,
-            width: res.width,
-            height: res.height,
-            seed,
-            engine: aiEngine !== "auto" ? aiEngine : null,
-            baseImage,
-          }),
-        });
+  const handleTogglePin = useCallback((label: string) => {
+    setSavedPins((prev) => {
+      const next = new Set(prev);
+      if (next.has(label)) {
+        next.delete(label);
       } else {
-        // GET mode: text-to-image
-        const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
-        const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}`;
-        console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
-        response = await fetch(proxyUrl);
+        next.add(label);
       }
-
-      if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
-
-      // If proxy failed (503, static export, etc.), try direct client-side Pollinations call
-      if (!response.ok) {
-        console.warn("[AI Render] Proxy error:", response.status, "— falling back to direct Pollinations call");
-        const directUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(sanitized)}?width=${res.width}&height=${res.height}&seed=${seed}&nologo=true&safe=true`;
-        try {
-          response = await fetch(directUrl);
-        } catch (directErr) {
-          console.error("[AI Render] Direct Pollinations also failed:", directErr);
-          setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
-          setAiLoading(false);
-          return;
-        }
-        if (!response.ok) {
-          setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
-          setAiLoading(false);
-          return;
-        }
-      }
-
-      const contentType = response.headers.get("content-type") || "";
-      // Direct Pollinations returns image/* or may vary — accept any image type
-      if (!contentType.startsWith("image/") && !contentType.includes("octet-stream") && response.url.includes("pollinations")) {
-        // Pollinations usually returns image even without proper content type — try blob anyway
-        console.warn("[AI Render] Non-image content-type, but Pollinations — trying blob anyway");
-      } else if (!contentType.startsWith("image/")) {
-        console.error("[AI Render] Unexpected content type:", contentType);
-        setAiError("Unexpected response from AI. Try again.");
-        setAiLoading(false);
-        return;
-      }
-
-      const blob = await response.blob();
-      console.log("[AI Render] Success! Size:", blob.size, "type:", blob.type);
-
-      if (blob.size < 500) {
-        setAiError("AI returned an empty image. Try a shorter prompt.");
-        setAiLoading(false);
-        return;
-      }
-
-      const usedEngine = response.headers.get("x-ai-engine") || (response.url.includes("pollinations") ? "pollinations" : aiEngine);
-      const objectUrl = URL.createObjectURL(blob);
-      setAiImageUrl(objectUrl);
-      setAiUsedEngine(usedEngine);
-      setAiLoading(false);
-    } catch (err) {
-      if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
-      console.error("[AI Render] Error:", err);
-      setAiError("Network error. Please try again.");
-      setAiLoading(false);
-    }
-  }, [aiPrompt, renderResolution, sanitizePrompt, aiEngine, useSceneAsBase]);
-
+      return next;
+    });
+  }, []);
 
   if (modules.length === 0) {
     return (
@@ -635,7 +437,7 @@ export default function RenderPage() {
                     download={`modulca-render-${currentMod?.label || "module"}-${Date.now()}.png`}
                     className="block w-full rounded-lg border border-brand-teal-800 px-4 py-2 text-center text-xs font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
                   >
-                    💾 Save Image
+                    {"💾 Save Image"}
                   </a>
                   <button
                     onClick={() => {
@@ -653,7 +455,7 @@ export default function RenderPage() {
                     }}
                     className="block w-full rounded-lg border border-brand-amber-500 px-4 py-2 text-center text-xs font-semibold text-brand-amber-600 hover:bg-brand-amber-50 transition-colors"
                   >
-                    📤 Share with Friends
+                    {"📤 Share with Friends"}
                   </button>
                   <button
                     onClick={async () => {
@@ -682,7 +484,7 @@ export default function RenderPage() {
                     }}
                     className="block w-full rounded-lg bg-brand-teal-800 px-4 py-2 text-center text-xs font-semibold text-white hover:bg-brand-teal-700 transition-colors"
                   >
-                    🎨 Save to Presentation
+                    {"🎨 Save to Presentation"}
                   </button>
                 </div>
               )}
@@ -788,70 +590,15 @@ export default function RenderPage() {
                 </div>
               </div>
 
-              {/* Camera angle thumbnails */}
-              <div className="mx-auto flex gap-3" style={{ maxWidth: 800, width: "100%" }}>
-                {(["interior", "corner", "detail"] as CameraAngle[]).map((angle) => (
-                  <button key={angle} onClick={() => setCamera(angle)}
-                    className={`flex-1 rounded-lg border-2 px-4 py-3 text-center text-xs font-medium capitalize transition-all ${camera === angle ? "border-brand-amber-500 bg-brand-amber-50 text-brand-teal-800" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}>
-                    {angle} View
-                  </button>
-                ))}
-              </div>
-
-              {/* Pinterest-style Design Inspiration Board */}
-              <div className="mt-2">
-                <h3 className="mb-1 text-sm font-bold text-brand-teal-800">
-                  Design Inspiration — {style?.label || "Scandinavian Minimal"}
-                </h3>
-                <p className="mb-4 text-xs text-gray-400">
-                  Curated by professional architects for your {currentMod.moduleType} module
-                </p>
-                <div style={{ columns: 3, columnGap: 12 }}>
-                  {pins.map((pin) => (
-                    <div
-                      key={pin.label}
-                      className="mb-3 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
-                      style={{ breakInside: "avoid" }}
-                    >
-                      <div
-                        className="w-full flex items-end p-3"
-                        style={{ height: pin.h, backgroundColor: pin.color }}
-                      >
-                        <span className="rounded bg-white/80 px-2 py-0.5 text-[9px] font-bold text-gray-600 uppercase backdrop-blur-sm">
-                          {pin.cat}
-                        </span>
-                      </div>
-                      <div className="p-3">
-                        <div className="text-xs font-semibold text-brand-teal-800">{pin.label}</div>
-                        <div className="mt-1 flex items-center justify-between">
-                          <span className="text-[10px] text-gray-400">{style?.label || "Scandinavian"}</span>
-                          <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              setSavedPins((prev) => {
-                                const next = new Set(prev);
-                                if (next.has(pin.label)) {
-                                  next.delete(pin.label);
-                                } else {
-                                  next.add(pin.label);
-                                }
-                                return next;
-                              });
-                            }}
-                            className={`rounded-full px-2 py-0.5 text-[9px] font-bold transition-colors ${
-                              savedPins.has(pin.label)
-                                ? "bg-brand-amber-500 text-white"
-                                : "bg-brand-amber-50 text-brand-amber-600 hover:bg-brand-amber-100"
-                            }`}
-                          >
-                            {savedPins.has(pin.label) ? "Saved" : "Save"}
-                          </button>
-                        </div>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
+              <RenderGallery
+                pins={pins}
+                styleLabel={style?.label || "Scandinavian Minimal"}
+                moduleType={currentMod.moduleType}
+                savedPins={savedPins}
+                onTogglePin={handleTogglePin}
+                camera={camera}
+                onCameraChange={setCamera}
+              />
             </div>
           )}
         </main>
@@ -901,21 +648,21 @@ export default function RenderPage() {
                 <div className="text-[10px] font-bold text-gray-400 uppercase">Cost Summary</div>
                 <div className="flex justify-between text-xs text-gray-600">
                   <span>Module cost ({finishLevel})</span>
-                  <span className="font-medium">€{stats.moduleCost.toLocaleString()}</span>
+                  <span className="font-medium">&euro;{stats.moduleCost.toLocaleString()}</span>
                 </div>
                 {stats.sharedWallDiscount > 0 && (
                   <div className="flex justify-between text-xs text-green-600">
                     <span>Shared wall discount</span>
-                    <span className="font-medium">-€{stats.sharedWallDiscount.toLocaleString()}</span>
+                    <span className="font-medium">-&euro;{stats.sharedWallDiscount.toLocaleString()}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-xs text-gray-600">
                   <span>Design fee (8%)</span>
-                  <span className="font-medium">€{stats.designFee.toLocaleString()}</span>
+                  <span className="font-medium">&euro;{stats.designFee.toLocaleString()}</span>
                 </div>
                 <div className="mt-1 border-t border-gray-200 pt-1 flex justify-between text-sm font-bold text-brand-teal-800">
                   <span>Total</span>
-                  <span>€{stats.totalEstimate.toLocaleString()}</span>
+                  <span>&euro;{stats.totalEstimate.toLocaleString()}</span>
                 </div>
               </div>
 
