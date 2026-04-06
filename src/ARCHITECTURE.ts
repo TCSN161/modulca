@@ -32,18 +32,20 @@ export const STORES = {
   useLandStore:        { file: "features/land/store.ts",        lines: 250, keys: "gridCells, gridRotation, mapCenter, polygon, phase" },
   useDesignStore:      { file: "features/design/store.ts",      lines: 399, keys: "modules, finishLevel, selectedModule, styleDirection, moodboardPins, savedRenders, moduleFixtures, wallConfigs, furnitureOverrides" },
   useMarketplaceStore: { file: "features/marketplace/store.ts", lines: 180, keys: "terrains, filters, favorites, selectedTerrain, landMode" },
-  useAuthStore:        { file: "features/auth/store.ts",        lines: 95,  keys: "isAuthenticated, userName, userEmail, userTier, canAccess()" },
+  useAuthStore:        { file: "features/auth/store.ts",        lines: 210, keys: "isAuthenticated, userId, userName, userEmail, userTier, signUp(), signIn(), signInWithGoogle(), signOut(), canAccess()" },
 } as const;
 
-/* ── Large Files (>500 lines) — Split Candidates ──────────── */
+/* ── Split Files (completed refactors) ─────────────────────── */
+
+export const SPLIT_FILES = {
+  "TechnicalDrawing": { shell: "technical/TechnicalDrawing.tsx (173 lines)", parts: "technical/drawings/{FloorPlan,Section,Elevation,WallDetail,Mep,Foundation}Drawing.tsx + drawingConstants.ts" },
+  "ModuleScene3D":    { shell: "visualize/ModuleScene3D.tsx (310 lines)",    parts: "visualize/scene/{WallBuilder,FurnitureRenderer,SceneHelpers}.tsx + constants.ts" },
+  "RenderPage":       { shell: "render/RenderPage.tsx (860 lines)",          parts: "render/{renderConstants.ts, useRenderEngine.ts, RenderGallery.tsx}" },
+} as const;
+
+/* ── Remaining Large Files (>500 lines) ───────────────────── */
 
 export const LARGE_FILES = {
-  // SPLIT into: FloorPlanDrawing, SectionDrawing, ElevationDrawing, WallDetailDrawing, MepDrawing, FoundationDrawing
-  "TechnicalDrawing.tsx":  { lines: 2194, path: "features/design/components/technical/TechnicalDrawing.tsx" },
-  // SPLIT into: ModuleScene3D (shell), FurnitureRenderer, WallRenderer, LightingSetup
-  "ModuleScene3D.tsx":     { lines: 1217, path: "features/design/components/visualize/ModuleScene3D.tsx" },
-  // SPLIT into: RenderPage (shell), RenderEngine, RenderGallery, PromptBuilder
-  "RenderPage.tsx":        { lines: 1113, path: "features/design/components/render/RenderPage.tsx" },
   "ProductsPage.tsx":      { lines: 879,  path: "features/design/components/products/ProductsPage.tsx" },
   "WalkthroughPage.tsx":   { lines: 751,  path: "features/design/components/walkthrough/WalkthroughPage.tsx" },
   "TechnicalPage.tsx":     { lines: 710,  path: "features/design/components/technical/TechnicalPage.tsx" },
@@ -58,6 +60,12 @@ export const SHARED = {
   module3d:   "features/design/components/shared/module3d.tsx — StaticFurniturePiece, ModuleBox, getPresetOverrides()",
   stepNav:    "features/design/components/shared/StepNav.tsx — step navigation bar",
   authTypes:  "features/auth/types.ts — ACCOUNT_TIERS, FeatureAccess, getTierConfig(), hasFeature()",
+  authForm:   "features/auth/components/AuthForm.tsx — shared login/register form",
+  projectSvc: "features/auth/projectService.ts — CRUD projects (Supabase or localStorage)",
+  supabase:   "shared/lib/supabase.ts — Supabase client singleton, isDemoMode, getSupabase()",
+  featureGate:"shared/components/FeatureGate.tsx — tier-based feature wrapper",
+  authGuard:  "shared/components/AuthGuard.tsx — route protection (soft/hard)",
+  slidePanel: "shared/components/SlideOverPanel.tsx — reusable slide-over panel",
   config:     "shared/config/index.ts — MAPBOX_TOKEN, SUPABASE_URL",
 } as const;
 
@@ -81,6 +89,15 @@ export const SHARED = {
 // React 19 | Zustand 5 | Three.js 0.183 | @react-three/fiber+drei
 // Tailwind 3.4 | Mapbox GL 3.20 | Konva 10.2 | @react-pdf/renderer 4.3
 // TypeScript 5 strict | Prisma 5.22 (not yet active) | NextAuth 5 beta (disabled)
+
+/* ── TODO: FeatureGate wiring (Phase 2E) ──────────────────── */
+// Priority gates to add next session:
+// 1. RenderPage: limit aiRendersPerMonth, renderResolution per tier
+// 2. TechnicalPage: gate permitTracker, drawingPresentation, exportPdf behind tier
+// 3. WalkthroughPage: gate autoTour, gaussian behind tier
+// 4. PresentationPage: gate presentationTemplates count, pdfPresentation, sharableLink
+// 5. MarketplacePage: gate marketplaceList behind tier
+// Pattern: wrap feature UI with <FeatureGate requires="featureKey">...</FeatureGate>
 
 /* ── Naming Conventions ───────────────────────────────────── */
 // Components: PascalCase.tsx | Stores: camelCase store.ts | Types: camelCase types.ts
