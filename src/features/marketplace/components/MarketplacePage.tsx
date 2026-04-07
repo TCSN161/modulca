@@ -4,6 +4,7 @@ import { useState, useMemo, useCallback } from "react";
 import Link from "next/link";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { useMarketplaceStore, filterTerrains } from "../store";
+import FeatureGate from "@/shared/components/FeatureGate";
 import type { Terrain } from "../store";
 
 type LandMode = "choose" | "have-land" | "want-land";
@@ -282,12 +283,14 @@ function LandModeChooser({ onSelect }: { onSelect: (mode: LandMode) => void }) {
             <span className="font-semibold text-brand-teal-800">Own land you&apos;d like to sell?</span>{" "}
             List your terrain on the ModulCA marketplace and reach buyers who are ready to build.
           </p>
-          <button
-            onClick={() => onSelect("have-land")}
-            className="mt-3 rounded-lg border border-brand-teal-800 px-4 py-2 text-sm font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
-          >
-            List My Land
-          </button>
+          <FeatureGate requires="marketplaceList">
+            <button
+              onClick={() => onSelect("have-land")}
+              className="mt-3 rounded-lg border border-brand-teal-800 px-4 py-2 text-sm font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
+            >
+              List My Land
+            </button>
+          </FeatureGate>
         </div>
       </div>
     </div>

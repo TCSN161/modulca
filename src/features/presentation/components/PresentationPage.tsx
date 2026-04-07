@@ -8,6 +8,7 @@ import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getStyleDirection } from "@/features/design/styles";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
 import StepNav from "@/features/design/components/shared/StepNav";
+import FeatureGate from "@/shared/components/FeatureGate";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
@@ -176,9 +177,11 @@ export default function PresentationPage() {
         </Link>
         <StepNav activeStep={11} />
         <div className="flex items-center gap-2">
-          <button onClick={handleShareLink} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50">
-            Share Link
-          </button>
+          <FeatureGate requires="sharableLink" hideIfLocked>
+            <button onClick={handleShareLink} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50">
+              Share Link
+            </button>
+          </FeatureGate>
           <Suspense fallback={<span className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white opacity-50">Loading...</span>}>
             <PdfDownloadButton
               template={template}

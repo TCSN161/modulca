@@ -15,6 +15,9 @@ import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, R
 import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
 import { useRenderEngine } from "./useRenderEngine";
 import RenderGallery from "./RenderGallery";
+// Tier-based render limits ready for enforcement:
+// import { useAuthStore } from "@/features/auth/store";
+// import { getTierConfig } from "@/features/auth/types";
 
 const RenderScene3D = dynamic(() => import("./RenderScene3D"), { ssr: false });
 const CombinedScene3D = dynamic(() => import("../visualize/CombinedScene3D"), { ssr: false });
@@ -55,6 +58,9 @@ export default function RenderPage() {
     handleGenerateAiRender: generateAiRender,
     resetAiImage,
   } = useRenderEngine({ aiEngine, renderResolution, useSceneAsBase, captureRef });
+
+  // Tier-based render limits — wired for future enforcement
+  // useAuthStore((s) => s.userTier) + getTierConfig() → .features.aiRendersPerMonth, .renderResolution
 
   const handleGenerateAiRender = useCallback(() => {
     generateAiRender(aiPrompt);

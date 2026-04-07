@@ -11,6 +11,7 @@ import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import { getStyleDirection } from "../../styles";
 import { Vector3 } from "three";
 import StepNav from "../shared/StepNav";
+import FeatureGate from "@/shared/components/FeatureGate";
 
 const WalkthroughScene = dynamic(() => import("./WalkthroughScene"), {
   ssr: false,
@@ -336,17 +337,19 @@ export default function WalkthroughPage() {
             >
               Start Free Walk
             </button>
-            <button
-              onClick={() => setAutoTour(true)}
-              disabled={autoTour}
-              className={`w-full rounded-lg border-2 px-4 py-2.5 text-sm font-bold transition-colors ${
-                autoTour
-                  ? "border-green-400 bg-green-50 text-green-700"
-                  : "border-brand-teal-800 text-brand-teal-800 hover:bg-brand-teal-50"
-              }`}
-            >
-              {autoTour ? "Touring..." : "Auto-Guided Tour"}
-            </button>
+            <FeatureGate requires="autoTour">
+              <button
+                onClick={() => setAutoTour(true)}
+                disabled={autoTour}
+                className={`w-full rounded-lg border-2 px-4 py-2.5 text-sm font-bold transition-colors ${
+                  autoTour
+                    ? "border-green-400 bg-green-50 text-green-700"
+                    : "border-brand-teal-800 text-brand-teal-800 hover:bg-brand-teal-50"
+                }`}
+              >
+                {autoTour ? "Touring..." : "Auto-Guided Tour"}
+              </button>
+            </FeatureGate>
           </div>
 
           {/* 3D Engine Quality Selector */}

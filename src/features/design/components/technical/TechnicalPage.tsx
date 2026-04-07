@@ -18,6 +18,7 @@ import {
 import KnowledgeBasePanel from "./KnowledgeBasePanel";
 import PermitTracker from "./PermitTracker";
 import DrawingPresentation from "./DrawingPresentation";
+import FeatureGate from "@/shared/components/FeatureGate";
 
 
 const DRAWING_TYPES = [
@@ -288,6 +289,7 @@ export default function TechnicalPage() {
             >
               Export All Sheets
             </button>
+            <FeatureGate requires="drawingPresentation">
             <button
               onClick={() => setPresentationOpen(true)}
               className="w-full rounded-lg border border-brand-teal-800 px-4 py-2.5 text-sm font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
@@ -299,6 +301,7 @@ export default function TechnicalPage() {
                 View All Drawings
               </span>
             </button>
+            </FeatureGate>
           </div>
 
           {/* Knowledge Base / Construction Manual */}
@@ -322,6 +325,7 @@ export default function TechnicalPage() {
               </div>
             </button>
 
+            <FeatureGate requires="permitTracker">
             <button
               onClick={() => setPermitOpen(true)}
               className="w-full rounded-lg border-2 border-dashed border-brand-amber-300 bg-brand-amber-50/50 px-4 py-3 text-left hover:border-brand-amber-500 hover:bg-brand-amber-50 transition-colors group"
@@ -340,6 +344,7 @@ export default function TechnicalPage() {
                 </div>
               </div>
             </button>
+            </FeatureGate>
           </div>
         </aside>
 
