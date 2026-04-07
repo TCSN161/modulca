@@ -6,6 +6,7 @@ import Link from "next/link";
 import Toolbar from "./Toolbar";
 import ModulePalette from "./ModulePalette";
 import AddressSearch from "./AddressSearch";
+import StepNav from "@/features/design/components/shared/StepNav";
 import { useLandStore } from "../store";
 import type { GridCell } from "../store";
 import { MODULE_TYPES } from "@/shared/types";
@@ -119,16 +120,9 @@ const MapView = dynamic(() => import("./MapView"), {
   ),
 });
 
-const STEPS = [
-  { num: 1, label: "Locate Land", href: "#" },
-  { num: 2, label: "Design Modules", href: "/project/demo/design" },
-  { num: 3, label: "Get Plans", href: "/project/demo/output" },
-];
-
 export default function LandDesigner() {
   const { phase, gridCells, setGridCells, setPhase } = useLandStore();
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
-  const currentStep = 1;
   const [showPresets, setShowPresets] = useState(true);
 
   /** Apply a preset layout — sets grid cells and skips to modules phase */
@@ -140,55 +134,23 @@ export default function LandDesigner() {
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      {/* Top Nav */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-xl font-bold text-brand-teal-800">
+      {/* Shared Header */}
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4">
+        <Link href="/" className="flex items-center gap-2 shrink-0">
+          <span className="text-lg font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <nav className="hidden items-center gap-8 text-sm font-medium text-gray-500 sm:flex">
-          <span className="hover:text-brand-teal-800 cursor-pointer">How It Works</span>
-          <span className="hover:text-brand-teal-800 cursor-pointer">Pricing</span>
-          <span className="hover:text-brand-teal-800 cursor-pointer">For Builders</span>
-        </nav>
-        <div className="flex items-center gap-3">
+        <StepNav activeStep={0} />
+        <div className="flex items-center gap-3 shrink-0">
           <Link href="/login" className="text-sm font-medium text-gray-500 hover:text-brand-teal-800">
             Login
           </Link>
-          <Link href="/register" className="rounded-lg bg-brand-teal-800 px-4 py-2 text-sm font-medium text-white hover:bg-brand-teal-700">
-            Get Started
+          <Link href="/dashboard" className="rounded-lg bg-brand-teal-800 px-4 py-2 text-sm font-medium text-white hover:bg-brand-teal-700">
+            Dashboard
           </Link>
         </div>
       </header>
-
-      {/* Step Progress Bar */}
-      <div className="flex items-center justify-center gap-16 border-b border-gray-200 bg-white py-4">
-        {STEPS.map((step) => (
-          <div key={step.num} className="flex flex-col items-center gap-1.5">
-            <div
-              className={`flex h-9 w-9 items-center justify-center rounded-full text-sm font-bold ${
-                step.num === currentStep
-                  ? "bg-brand-teal-800 text-white"
-                  : step.num < currentStep
-                  ? "bg-brand-teal-600 text-white"
-                  : "bg-gray-200 text-gray-500"
-              }`}
-            >
-              {step.num}
-            </div>
-            <span
-              className={`text-xs font-medium ${
-                step.num === currentStep
-                  ? "text-brand-teal-800"
-                  : "text-gray-400"
-              }`}
-            >
-              {step.label}
-            </span>
-          </div>
-        ))}
-      </div>
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
@@ -329,12 +291,22 @@ export default function LandDesigner() {
           {/* Next Step CTA */}
           {placedModules.length > 0 && (
             <Link
-              href="/project/demo/design"
+              href="/project/demo/marketplace"
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-brand-amber-500
                          px-6 py-3.5 text-sm font-semibold text-white transition-colors
                          hover:bg-brand-amber-600"
             >
-              Next: Design Modules →
+              Next: Browse Land →
+            </Link>
+          )}
+          {placedModules.length === 0 && phase === "map" && (
+            <Link
+              href="/project/demo/marketplace"
+              className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white
+                         px-6 py-3 text-sm font-medium text-gray-600 transition-colors
+                         hover:bg-gray-50 hover:border-brand-teal-300"
+            >
+              Or browse the Land Marketplace →
             </Link>
           )}
         </aside>

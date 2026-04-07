@@ -50,7 +50,9 @@ export default function MarketplacePage() {
           </span>
         </Link>
         <StepNav activeStep={1} />
-        <div className="w-24" />
+        <Link href="/project/demo/design" className="shrink-0 rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 transition-colors">
+          Next: Design →
+        </Link>
       </header>
 
       {/* Mode Chooser — shown initially */}
