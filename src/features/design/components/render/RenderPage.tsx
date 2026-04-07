@@ -15,9 +15,8 @@ import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, R
 import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
 import { useRenderEngine } from "./useRenderEngine";
 import RenderGallery from "./RenderGallery";
-// Tier-based render limits ready for enforcement:
-// import { useAuthStore } from "@/features/auth/store";
-// import { getTierConfig } from "@/features/auth/types";
+import { useAuthStore } from "@/features/auth/store";
+import { getTierConfig } from "@/features/auth/types";
 
 const RenderScene3D = dynamic(() => import("./RenderScene3D"), { ssr: false });
 const CombinedScene3D = dynamic(() => import("../visualize/CombinedScene3D"), { ssr: false });
@@ -59,12 +58,43 @@ export default function RenderPage() {
     resetAiImage,
   } = useRenderEngine({ aiEngine, renderResolution, useSceneAsBase, captureRef });
 
-  // Tier-based render limits — wired for future enforcement
-  // useAuthStore((s) => s.userTier) + getTierConfig() → .features.aiRendersPerMonth, .renderResolution
+  // Tier-based render limits
+  const userTier = useAuthStore((s) => s.userTier);
+  const tierConfig = getTierConfig(userTier);
+  const maxRendersPerMonth = tierConfig.features.aiRendersPerMonth;
+  const tierResolution = tierConfig.features.renderResolution;
+  /** Check if a resolution is locked for the current tier */
+  const isResLocked = (res: string) => {
+    if (tierResolution === "4k") return false;
+    if (tierResolution === "hd") return false;
+    // SD tier: only draft + standard allowed
+    if (tierResolution === "sd" && res === "high") return true;
+    return false;
+  };
+
+  // Track monthly render count
+  const [renderCount, setRenderCount] = useState(0);
+  useEffect(() => {
+    try {
+      const key = `modulca-render-count-${new Date().toISOString().slice(0, 7)}`;
+      const count = parseInt(localStorage.getItem(key) || "0", 10);
+      setRenderCount(count);
+    } catch { /* ignore */ }
+  }, []);
+
+  const atRenderLimit = maxRendersPerMonth !== -1 && renderCount >= maxRendersPerMonth;
 
   const handleGenerateAiRender = useCallback(() => {
+    if (atRenderLimit) return;
     generateAiRender(aiPrompt);
-  }, [generateAiRender, aiPrompt]);
+    // Increment render count
+    try {
+      const key = `modulca-render-count-${new Date().toISOString().slice(0, 7)}`;
+      const newCount = renderCount + 1;
+      localStorage.setItem(key, String(newCount));
+      setRenderCount(newCount);
+    } catch { /* ignore */ }
+  }, [generateAiRender, aiPrompt, atRenderLimit, renderCount]);
 
   const handleSceneReady = useCallback((capture: () => string | null) => {
     captureRef.current = capture;
@@ -346,13 +376,16 @@ export default function RenderPage() {
               <div className="mb-3">
                 <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Resolution</label>
                 <div className="flex gap-1">
-                  {(Object.keys(RENDER_RESOLUTIONS) as RenderResolution[]).map((r) => (
-                    <button key={r} onClick={() => setRenderResolution(r)}
-                      className={`flex-1 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors ${renderResolution === r ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                      <div>{RENDER_RESOLUTIONS[r].label}</div>
-                      <div className="text-[8px] opacity-70">{RENDER_RESOLUTIONS[r].width}x{RENDER_RESOLUTIONS[r].height}</div>
-                    </button>
-                  ))}
+                  {(Object.keys(RENDER_RESOLUTIONS) as RenderResolution[]).map((r) => {
+                    const locked = isResLocked(r);
+                    return (
+                      <button key={r} onClick={() => !locked && setRenderResolution(r)} disabled={locked}
+                        className={`flex-1 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors ${locked ? "bg-gray-50 text-gray-300 cursor-not-allowed" : renderResolution === r ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                        <div>{RENDER_RESOLUTIONS[r].label}{locked ? " 🔒" : ""}</div>
+                        <div className="text-[8px] opacity-70">{RENDER_RESOLUTIONS[r].width}x{RENDER_RESOLUTIONS[r].height}</div>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
 
@@ -424,13 +457,23 @@ export default function RenderPage() {
               </div>
               <button
                 onClick={handleGenerateAiRender}
-                disabled={aiLoading || !aiPrompt.trim()}
+                disabled={aiLoading || !aiPrompt.trim() || atRenderLimit}
                 className="w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors disabled:opacity-50 disabled:cursor-wait"
               >
-                {aiLoading
+                {atRenderLimit
+                  ? "Monthly render limit reached"
+                  : aiLoading
                   ? `Generating... ${aiElapsed}s`
                   : `Generate with ${aiEngine === "auto" ? "AI" : AI_ENGINES[aiEngine].label}`}
               </button>
+              {maxRendersPerMonth !== -1 && (
+                <div className="flex items-center justify-between text-[10px] text-gray-400 mt-1">
+                  <span>{renderCount}/{maxRendersPerMonth} renders this month</span>
+                  {atRenderLimit && (
+                    <a href="/pricing" className="text-brand-amber-500 font-semibold hover:underline">Upgrade</a>
+                  )}
+                </div>
+              )}
               {aiImageUrl && (
                 <div className="mt-3 space-y-2">
                   {aiUsedEngine && (
@@ -775,12 +818,15 @@ export default function RenderPage() {
                       <div className="mb-3">
                         <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Resolution</label>
                         <div className="flex gap-1">
-                          {(Object.keys(RENDER_RESOLUTIONS) as RenderResolution[]).map((r) => (
-                            <button key={r} onClick={() => setRenderResolution(r)}
-                              className={`flex-1 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors ${renderResolution === r ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                              {RENDER_RESOLUTIONS[r].label}
-                            </button>
-                          ))}
+                          {(Object.keys(RENDER_RESOLUTIONS) as RenderResolution[]).map((r) => {
+                            const locked = isResLocked(r);
+                            return (
+                              <button key={r} onClick={() => !locked && setRenderResolution(r)} disabled={locked}
+                                className={`flex-1 rounded-md px-1 py-1.5 text-[10px] font-medium transition-colors ${locked ? "bg-gray-50 text-gray-300 cursor-not-allowed" : renderResolution === r ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
+                                {RENDER_RESOLUTIONS[r].label}{locked ? " 🔒" : ""}
+                              </button>
+                            );
+                          })}
                         </div>
                       </div>
                       {/* AI Engine selector (mobile) */}

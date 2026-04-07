@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#0f5e5c;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#0a4a48;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+  <!-- Grid pattern -->
+  <g opacity="0.08" stroke="white" stroke-width="1">
+    <line x1="0" y1="100" x2="1200" y2="100"/>
+    <line x1="0" y1="200" x2="1200" y2="200"/>
+    <line x1="0" y1="300" x2="1200" y2="300"/>
+    <line x1="0" y1="400" x2="1200" y2="400"/>
+    <line x1="0" y1="500" x2="1200" y2="500"/>
+    <line x1="200" y1="0" x2="200" y2="630"/>
+    <line x1="400" y1="0" x2="400" y2="630"/>
+    <line x1="600" y1="0" x2="600" y2="630"/>
+    <line x1="800" y1="0" x2="800" y2="630"/>
+    <line x1="1000" y1="0" x2="1000" y2="630"/>
+  </g>
+  <!-- Module blocks -->
+  <g transform="translate(720, 200)">
+    <rect x="0" y="0" width="80" height="80" rx="8" fill="#e8a849" opacity="0.9"/>
+    <rect x="90" y="0" width="80" height="80" rx="8" fill="#e8a849" opacity="0.7"/>
+    <rect x="180" y="0" width="80" height="80" rx="8" fill="#e8a849" opacity="0.5"/>
+    <rect x="0" y="90" width="80" height="80" rx="8" fill="#e8a849" opacity="0.7"/>
+    <rect x="90" y="90" width="80" height="80" rx="8" fill="#e8a849" opacity="0.5"/>
+    <rect x="0" y="180" width="80" height="80" rx="8" fill="#e8a849" opacity="0.5"/>
+  </g>
+  <!-- Logo -->
+  <text x="100" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="white">Modul</text>
+  <text x="380" y="260" font-family="system-ui, -apple-system, sans-serif" font-size="72" font-weight="bold" fill="#e8a849">CA</text>
+  <!-- Tagline -->
+  <text x="100" y="320" font-family="system-ui, -apple-system, sans-serif" font-size="28" fill="#9bc4c3">Design Your Modular Home in Minutes</text>
+  <!-- Features -->
+  <text x="100" y="400" font-family="system-ui, -apple-system, sans-serif" font-size="18" fill="#6ba3a1">AI Renders  ·  3D Walkthrough  ·  Technical Drawings  ·  Cost Estimates</text>
+  <!-- URL -->
+  <text x="100" y="560" font-family="system-ui, -apple-system, sans-serif" font-size="20" fill="#5a9391">modulca.com</text>
+</svg>

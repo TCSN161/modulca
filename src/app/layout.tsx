@@ -42,7 +42,7 @@ export const metadata: Metadata = {
       "AI-powered modular construction platform. Design, visualize, and build your modular home with professional tools.",
     images: [
       {
-        url: "/og-image.png",
+        url: "/og-image.svg",
         width: 1200,
         height: 630,
         alt: "ModulCA — Modular Construction Platform",
@@ -54,7 +54,7 @@ export const metadata: Metadata = {
     title: "ModulCA — Design Your Modular Home in Minutes",
     description:
       "AI-powered modular construction platform. Design, visualize, and build your modular home.",
-    images: ["/og-image.png"],
+    images: ["/og-image.svg"],
   },
   robots: {
     index: true,
