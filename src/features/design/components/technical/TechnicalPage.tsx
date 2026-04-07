@@ -138,7 +138,7 @@ export default function TechnicalPage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={7} />
+        <StepNav activeStep={8} />
         <div className="flex items-center gap-3">
           <button onClick={handleSave} className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${saved ? "bg-green-600" : "bg-brand-teal-800 hover:bg-brand-teal-700"}`}>
             {saved ? "Saved!" : "Save"}
@@ -325,7 +325,6 @@ export default function TechnicalPage() {
               </div>
             </button>
 
-            <FeatureGate requires="permitTracker">
             <button
               onClick={() => setPermitOpen(true)}
               className="w-full rounded-lg border-2 border-dashed border-brand-amber-300 bg-brand-amber-50/50 px-4 py-3 text-left hover:border-brand-amber-500 hover:bg-brand-amber-50 transition-colors group"
@@ -344,7 +343,6 @@ export default function TechnicalPage() {
                 </div>
               </div>
             </button>
-            </FeatureGate>
           </div>
         </aside>
 

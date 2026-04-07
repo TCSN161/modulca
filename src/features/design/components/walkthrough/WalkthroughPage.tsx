@@ -249,7 +249,7 @@ export default function WalkthroughPage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={8} />
+        <StepNav activeStep={9} />
         <button onClick={handleSave} className={`rounded-lg px-4 py-2 text-sm font-medium text-white transition-colors ${saved ? "bg-green-600" : "bg-brand-teal-800 hover:bg-brand-teal-700"}`}>
           {saved ? "Saved!" : "Save"}
         </button>

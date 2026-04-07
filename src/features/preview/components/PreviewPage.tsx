@@ -49,7 +49,7 @@ export default function PreviewPage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={2} />
+        <StepNav activeStep={3} />
         <div className="flex items-center gap-3">
           <Link
             href="/project/demo/style"

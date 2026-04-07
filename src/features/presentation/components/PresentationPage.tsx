@@ -175,7 +175,7 @@ export default function PresentationPage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={11} />
+        <StepNav activeStep={12} />
         <div className="flex items-center gap-2">
           <FeatureGate requires="sharableLink" hideIfLocked>
             <button onClick={handleShareLink} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50">

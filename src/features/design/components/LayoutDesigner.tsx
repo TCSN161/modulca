@@ -33,7 +33,7 @@ export default function LayoutDesigner() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={1} />
+        <StepNav activeStep={2} />
         <div className="flex items-center gap-2 md:gap-3">
           <Link
             href="/project/demo/land"

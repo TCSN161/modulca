@@ -57,7 +57,7 @@ export default function StylePage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={3} />
+        <StepNav activeStep={4} />
         <div className="flex items-center gap-3">
           <button
             onClick={handleSave}

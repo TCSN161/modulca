@@ -49,7 +49,7 @@ export default function MarketplacePage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={12} />
+        <StepNav activeStep={1} />
         <div className="w-24" />
       </header>
 

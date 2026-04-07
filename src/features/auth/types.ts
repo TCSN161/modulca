@@ -134,7 +134,7 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       allDrawingTypes: false, // floor plan + section only
       drawingPresentation: false,
       knowledgeBase: true,
-      permitTracker: false,
+      permitTracker: true,
       exportPdf: false,
       exportDwg: false,
       // Walkthrough

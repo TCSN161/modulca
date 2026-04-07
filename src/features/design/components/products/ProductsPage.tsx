@@ -586,7 +586,7 @@ export default function ProductsPage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={9} />
+        <StepNav activeStep={10} />
         <div className="w-24" />
       </header>
 

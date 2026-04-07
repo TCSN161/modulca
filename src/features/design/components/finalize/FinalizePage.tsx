@@ -81,7 +81,7 @@ export default function FinalizePage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </Link>
         </div>
-        <StepNav activeStep={10} />
+        <StepNav activeStep={11} />
         <div className="w-24" />
       </header>
 

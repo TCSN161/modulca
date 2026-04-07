@@ -12,18 +12,18 @@
 
 export const STEPS = [
   { n: 1,  id: "land",         route: "/project/[id]/land",         component: "features/land/components/LandDesigner.tsx",                  store: "useLandStore",        lines: 580 },
-  { n: 2,  id: "design",       route: "/project/[id]/design",       component: "features/design/components/LayoutDesigner.tsx",               store: "useDesignStore",      lines: 350 },
-  { n: 3,  id: "output",       route: "/project/[id]/output",       component: "features/preview/components/PreviewPage.tsx",                 store: "useDesignStore",      lines: 280 },
-  { n: 4,  id: "style",        route: "/project/[id]/style",        component: "features/design/components/style/StylePage.tsx",              store: "useDesignStore",      lines: 437 },
-  { n: 5,  id: "configure",    route: "/project/[id]/configure",    component: "features/design/components/configure/ConfigurePage.tsx",      store: "useDesignStore",      lines: 385 },
-  { n: 6,  id: "visualize",    route: "/project/[id]/visualize",    component: "features/design/components/visualize/VisualizePage.tsx",      store: "useDesignStore",      lines: 390 },
-  { n: 7,  id: "render",       route: "/project/[id]/render",       component: "features/design/components/render/RenderPage.tsx",            store: "useDesignStore",      lines: 1113 },
-  { n: 8,  id: "technical",    route: "/project/[id]/technical",    component: "features/design/components/technical/TechnicalPage.tsx",      store: "useDesignStore",      lines: 710 },
-  { n: 9,  id: "walkthrough",  route: "/project/[id]/walkthrough",  component: "features/design/components/walkthrough/WalkthroughPage.tsx",  store: "useDesignStore",      lines: 751 },
-  { n: 10, id: "products",     route: "/project/[id]/products",     component: "features/design/components/products/ProductsPage.tsx",        store: "useDesignStore",      lines: 879 },
-  { n: 11, id: "finalize",     route: "/project/[id]/finalize",     component: "features/design/components/FinalizePage.tsx",                 store: "useDesignStore",      lines: 200 },
-  { n: 12, id: "presentation", route: "/project/[id]/presentation", component: "features/presentation/components/PresentationPage.tsx",       store: "useDesignStore",      lines: 900 },
-  { n: 13, id: "marketplace",  route: "/project/[id]/marketplace",  component: "features/marketplace/components/MarketplacePage.tsx",         store: "useMarketplaceStore", lines: 1055 },
+  { n: 2,  id: "marketplace",  route: "/project/[id]/marketplace",  component: "features/marketplace/components/MarketplacePage.tsx",         store: "useMarketplaceStore", lines: 1055 },
+  { n: 3,  id: "design",       route: "/project/[id]/design",       component: "features/design/components/LayoutDesigner.tsx",               store: "useDesignStore",      lines: 350 },
+  { n: 4,  id: "output",       route: "/project/[id]/output",       component: "features/preview/components/PreviewPage.tsx",                 store: "useDesignStore",      lines: 280 },
+  { n: 5,  id: "style",        route: "/project/[id]/style",        component: "features/design/components/style/StylePage.tsx",              store: "useDesignStore",      lines: 437 },
+  { n: 6,  id: "configure",    route: "/project/[id]/configure",    component: "features/design/components/configure/ConfigurePage.tsx",      store: "useDesignStore",      lines: 385 },
+  { n: 7,  id: "visualize",    route: "/project/[id]/visualize",    component: "features/design/components/visualize/VisualizePage.tsx",      store: "useDesignStore",      lines: 390 },
+  { n: 8,  id: "render",       route: "/project/[id]/render",       component: "features/design/components/render/RenderPage.tsx",            store: "useDesignStore",      lines: 1113 },
+  { n: 9,  id: "technical",    route: "/project/[id]/technical",    component: "features/design/components/technical/TechnicalPage.tsx",      store: "useDesignStore",      lines: 710 },
+  { n: 10, id: "walkthrough",  route: "/project/[id]/walkthrough",  component: "features/design/components/walkthrough/WalkthroughPage.tsx",  store: "useDesignStore",      lines: 751 },
+  { n: 11, id: "products",     route: "/project/[id]/products",     component: "features/design/components/products/ProductsPage.tsx",        store: "useDesignStore",      lines: 879 },
+  { n: 12, id: "finalize",     route: "/project/[id]/finalize",     component: "features/design/components/FinalizePage.tsx",                 store: "useDesignStore",      lines: 200 },
+  { n: 13, id: "presentation", route: "/project/[id]/presentation", component: "features/presentation/components/PresentationPage.tsx",       store: "useDesignStore",      lines: 900 },
 ] as const;
 
 /* ── Stores ────────────────────────────────────────────────── */

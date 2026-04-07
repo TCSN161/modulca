@@ -224,7 +224,7 @@ export default function ConfigurePage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={4} />
+        <StepNav activeStep={5} />
         <div className="flex items-center gap-3">
           <button
             onClick={handleSave}
