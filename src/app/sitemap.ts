@@ -1,6 +1,8 @@
 import type { MetadataRoute } from "next";
 import { getAllSlugs } from "@/features/blog/articles";
 
+export const dynamic = "force-static";
+
 const SITE_URL = "https://modulca.com";
 
 export default function sitemap(): MetadataRoute.Sitemap {
