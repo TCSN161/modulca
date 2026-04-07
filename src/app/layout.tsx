@@ -8,13 +8,65 @@ const inter = Inter({
   display: "swap",
 });
 
+const SITE_URL = "https://modulca.com";
+
 export const metadata: Metadata = {
   title: {
-    default: "ModulCA — Design Your Modular Home",
+    default: "ModulCA — Design Your Modular Home in Minutes",
     template: "%s | ModulCA",
   },
   description:
-    "Design modular buildings in minutes. Choose modules, customize finishes, get instant cost estimates, and connect with certified builders.",
+    "AI-powered modular construction platform. Place 3×3m modules on your land, visualize in 3D, get AI renders, technical drawings, cost estimates, and connect with certified builders.",
+  keywords: [
+    "modular construction",
+    "modular home",
+    "prefabricated house",
+    "AI architecture",
+    "home design",
+    "Romania construction",
+    "modular building",
+    "3D home visualization",
+    "building permits Romania",
+    "ModulCA",
+  ],
+  authors: [{ name: "ModulCA" }],
+  creator: "ModulCA",
+  metadataBase: new URL(SITE_URL),
+  openGraph: {
+    type: "website",
+    locale: "en_US",
+    url: SITE_URL,
+    siteName: "ModulCA",
+    title: "ModulCA — Design Your Modular Home in Minutes",
+    description:
+      "AI-powered modular construction platform. Design, visualize, and build your modular home with professional tools.",
+    images: [
+      {
+        url: "/og-image.png",
+        width: 1200,
+        height: 630,
+        alt: "ModulCA — Modular Construction Platform",
+      },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "ModulCA — Design Your Modular Home in Minutes",
+    description:
+      "AI-powered modular construction platform. Design, visualize, and build your modular home.",
+    images: ["/og-image.png"],
+  },
+  robots: {
+    index: true,
+    follow: true,
+    googleBot: {
+      index: true,
+      follow: true,
+      "max-video-preview": -1,
+      "max-image-preview": "large",
+      "max-snippet": -1,
+    },
+  },
 };
 
 export default function RootLayout({

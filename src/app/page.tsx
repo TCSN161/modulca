@@ -23,6 +23,7 @@ export default function HomePage() {
             <a href="#how-it-works" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">How It Works</a>
             <a href="#pricing" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">Pricing</a>
             <a href="#for-builders" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">For Builders</a>
+            <Link href="/blog" className="text-sm font-medium text-gray-600 hover:text-brand-teal-800">Blog</Link>
           </div>
           <div className="flex items-center gap-3">
             <Link
@@ -321,6 +322,7 @@ export default function HomePage() {
               <a href="#features" className="hover:text-gray-600">Features</a>
               <a href="#pricing" className="hover:text-gray-600">Pricing</a>
               <a href="#for-builders" className="hover:text-gray-600">For Builders</a>
+              <Link href="/blog" className="hover:text-gray-600">Blog</Link>
             </div>
             <p className="text-xs text-gray-400">&copy; {new Date().getFullYear()} ModulCA. Built in Bucharest.</p>
           </div>
