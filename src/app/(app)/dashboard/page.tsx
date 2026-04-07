@@ -122,9 +122,9 @@ export default function DashboardPage() {
                 </div>
               </div>
               <div className="flex gap-3">
-                <button className="px-5 py-2 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors">
+                <Link href="/pricing" className="px-5 py-2 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors">
                   Upgrade Now
-                </button>
+                </Link>
                 <button
                   onClick={() => setShowUpgrade(false)}
                   className="px-5 py-2 rounded-lg border border-white/30 text-sm hover:bg-white/10 transition-colors"

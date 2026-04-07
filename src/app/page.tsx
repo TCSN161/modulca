@@ -254,7 +254,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <Link
-                    href="/project/demo/land"
+                    href={plan.highlight ? "/pricing" : "/project/demo/land"}
                     className={`block w-full rounded-lg px-4 py-2.5 text-sm font-semibold transition-colors ${
                       plan.highlight
                         ? "bg-brand-amber-500 text-white hover:bg-brand-amber-600"
