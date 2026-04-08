@@ -27,20 +27,19 @@ interface StepNavProps {
 export default function StepNav({ activeStep }: StepNavProps) {
   return (
     <nav className="flex-1 overflow-x-auto mx-4 scrollbar-none">
-      <div className="flex items-center gap-1 md:gap-4 min-w-max md:justify-center">
+      <div className="flex items-center gap-0.5 md:gap-1 min-w-max md:justify-center">
         {STEPS.map((step, i) => (
           <Link
             key={step.label}
             href={step.href}
             className={cn(
-              "text-[10px] font-semibold uppercase tracking-wider transition-colors hover:text-brand-amber-500 whitespace-nowrap px-1 py-1",
+              "text-[10px] font-semibold uppercase tracking-[0.05em] transition-colors whitespace-nowrap px-1.5 py-1.5 rounded-md",
               i === activeStep
-                ? "text-brand-amber-600 border-b-2 border-brand-amber-500"
+                ? "text-brand-olive-700 bg-brand-olive-100 border-b-2 border-brand-olive-700"
                 : i < activeStep
-                  ? "text-brand-teal-800"
-                  : "text-gray-400",
-              /* On mobile, hide steps far from active to reduce clutter */
-              Math.abs(i - activeStep) > 2 ? "hidden md:inline" : ""
+                  ? "text-brand-charcoal hover:text-brand-olive-700 hover:bg-brand-olive-50"
+                  : "text-brand-gray/50 hover:text-brand-gray",
+              Math.abs(i - activeStep) > 2 ? "hidden md:inline-flex" : "inline-flex"
             )}
           >
             <span className="md:hidden">{i + 1}</span>
