@@ -60,7 +60,7 @@ When answering:
 const PROVIDERS = {
   together: {
     url: "https://api.together.xyz/v1/chat/completions",
-    model: "meta-llama/Llama-3-70b-chat-hf",
+    model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
     keyEnv: "TOGETHER_API_KEY",
   },
   // Future: add openai, anthropic, etc.

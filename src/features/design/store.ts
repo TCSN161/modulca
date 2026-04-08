@@ -257,11 +257,12 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 
   updateWallConfig: (row, col, side, wallType) =>
     set((state) => ({
-      modules: state.modules.map((m) =>
-        m.row === row && m.col === col
-          ? { ...m, wallConfigs: { ...m.wallConfigs, [side]: wallType } }
-          : m
-      ),
+      modules: state.modules.map((m) => {
+        if (m.row !== row || m.col !== col) return m;
+        // Don't allow changing shared walls — they must remain open between adjacent modules
+        if (m.wallConfigs[side] === "shared") return m;
+        return { ...m, wallConfigs: { ...m.wallConfigs, [side]: wallType } };
+      }),
     })),
 
   updateFurnitureOverride: (row, col, furnitureId, override) =>
@@ -340,9 +341,17 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
             }
           }
         }
+        // Re-enforce shared walls: if an adjacent module exists, wall MUST be "shared" (open)
+        const existingConfigs = m.wallConfigs ?? computeWallConfigs(m.row, m.col, occupiedSet);
+        const enforcedConfigs = { ...existingConfigs };
+        if (occupiedSet.has(`${m.row - 1},${m.col}`)) enforcedConfigs.north = "shared";
+        if (occupiedSet.has(`${m.row + 1},${m.col}`)) enforcedConfigs.south = "shared";
+        if (occupiedSet.has(`${m.row},${m.col - 1}`)) enforcedConfigs.west = "shared";
+        if (occupiedSet.has(`${m.row},${m.col + 1}`)) enforcedConfigs.east = "shared";
+
         return {
           ...m,
-          wallConfigs: m.wallConfigs ?? computeWallConfigs(m.row, m.col, occupiedSet),
+          wallConfigs: enforcedConfigs,
           furnitureOverrides: cleanedOverrides,
         };
       });
