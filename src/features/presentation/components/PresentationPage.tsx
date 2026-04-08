@@ -184,7 +184,27 @@ export default function PresentationPage() {
     );
   }, []);
 
-  // PDF generation handled by PdfDownloadButton component
+  // High-quality PDF export via modular engine (html2canvas + jsPDF)
+  const [exporting, setExporting] = useState(false);
+  const handleHtmlExport = useCallback(async () => {
+    setExporting(true);
+    try {
+      const { getDefaultEngine } = await import("../engines");
+      const engine = getDefaultEngine();
+      const slideEls = Array.from(
+        document.querySelectorAll<HTMLElement>("[data-slide='true']")
+      );
+      if (slideEls.length === 0) return;
+      await engine.exportSlides(slideEls, {
+        format: "pdf",
+        scale: 2,
+        orientation: "landscape",
+        filename: projectName || "ModulCA-Presentation",
+      });
+    } finally {
+      setExporting(false);
+    }
+  }, [projectName]);
 
   const handleShareLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
@@ -220,6 +240,13 @@ export default function PresentationPage() {
               Share Link
             </button>
           </FeatureGate>
+          <button
+            onClick={handleHtmlExport}
+            disabled={exporting}
+            className="rounded-lg border border-brand-olive-700 px-4 py-2 text-xs font-semibold text-brand-olive-700 hover:bg-brand-olive-50 transition-colors disabled:opacity-50"
+          >
+            {exporting ? "Exporting..." : "Export HD PDF"}
+          </button>
           <Suspense fallback={<span className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white opacity-50">Loading...</span>}>
             <PdfDownloadButton
               template={template}
@@ -915,8 +942,9 @@ export default function PresentationPage() {
 function SlideCard({ bg, text, children }: { bg: string; text: string; accent?: string; children: React.ReactNode }) {
   return (
     <div
+      data-slide="true"
       className="rounded-2xl shadow-lg mb-6 p-8 print:shadow-none print:rounded-none print:mb-0 print:break-after-page"
-      style={{ backgroundColor: bg, color: text, minHeight: 500 }}
+      style={{ backgroundColor: bg, color: text, minHeight: 500, aspectRatio: "297/210" }}
     >
       {children}
     </div>
