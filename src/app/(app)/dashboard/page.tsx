@@ -7,11 +7,17 @@ import { useAuthStore } from "@/features/auth/store";
 import { listProjects, deleteProject, type ProjectRecord } from "@/features/auth/projectService";
 import { getTierConfig } from "@/features/auth/types";
 
+/* Sample templates shown when user has no projects */
+const TEMPLATES = [
+  { name: "Eco-Lodge Module", desc: "Solar-ready, 45sqm", gradient: "from-emerald-800 to-emerald-600", modules: 5 },
+  { name: "Urban Studio Loft", desc: "Compact living, 27sqm", gradient: "from-slate-700 to-slate-500", modules: 3 },
+  { name: "Family Courtyard", desc: "U-shape, 108sqm", gradient: "from-amber-800 to-amber-600", modules: 12 },
+];
+
 export default function DashboardPage() {
   const router = useRouter();
   const { isAuthenticated, userId, userName, userEmail, userTier, signOut } = useAuthStore();
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
-  const [showUpgrade, setShowUpgrade] = useState(false);
   const [loaded, setLoaded] = useState(false);
 
   const tierConfig = getTierConfig(userTier);
@@ -28,13 +34,14 @@ export default function DashboardPage() {
     loadProjects();
   }, [loadProjects]);
 
-  const handleDelete = async (id: string) => {
+  // Available for future use (e.g. swipe-to-delete, context menu)
+  const _handleDelete = async (id: string) => {
     await deleteProject(userId ?? "demo", id);
     setProjects((prev) => prev.filter((p) => p.id !== id));
   };
+  void _handleDelete;
 
   const handleLoad = (project: ProjectRecord) => {
-    // Store project data for the design flow to pick up
     try {
       localStorage.setItem("modulca-design", JSON.stringify(project.data));
       localStorage.setItem("modulca-active-project", JSON.stringify({ id: project.id, name: project.name }));
@@ -48,186 +55,208 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="flex flex-col h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-brand-bone-100">
       {/* Header */}
-      <header className="flex items-center justify-between h-14 px-4 md:px-6 bg-white border-b border-gray-200 shrink-0">
-        <Link href="/" className="text-lg font-bold text-brand-teal-800 tracking-tight">
-          Modul<span className="text-brand-amber-500">CA</span>
+      <header className="flex items-center justify-between h-14 px-4 md:px-6 bg-white border-b border-brand-bone-300/60 shrink-0">
+        <Link href="/" className="flex items-center gap-2">
+          <div className="h-8 w-8 rounded-full bg-brand-olive-700 flex items-center justify-center">
+            <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+            </svg>
+          </div>
+          <span className="text-lg font-bold text-brand-charcoal tracking-tight">
+            Modul<span className="text-brand-olive-700">CA</span>
+          </span>
         </Link>
         <div className="flex items-center gap-3">
-          <Link
-            href="/project/demo/land"
-            className="px-4 py-2 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors"
-          >
-            + New Project
-          </Link>
           {isAuthenticated ? (
             <div className="flex items-center gap-2">
               <div className="hidden sm:block text-right">
-                <div className="text-xs font-medium text-gray-700">{userName || userEmail}</div>
-                <div className="text-[10px] text-gray-400" style={{ color: tierConfig.color }}>
+                <div className="text-xs font-medium text-brand-charcoal">{userName || userEmail}</div>
+                <div className="text-[10px] text-brand-gray" style={{ color: tierConfig.color }}>
                   {tierConfig.label}
                 </div>
               </div>
               <button
                 onClick={handleSignOut}
-                className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+                className="text-xs text-brand-gray hover:text-red-500 transition-colors"
               >
                 Sign out
               </button>
             </div>
           ) : (
-            <Link href="/login" className="text-sm text-gray-500 hover:text-brand-teal-800">
+            <Link href="/login" className="text-sm text-brand-gray hover:text-brand-olive-700 transition-colors">
               Log in
             </Link>
           )}
+          <div className="h-8 w-8 rounded-full bg-brand-bone-200 flex items-center justify-center">
+            <svg className="w-4 h-4 text-brand-gray" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+              <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            </svg>
+          </div>
         </div>
       </header>
 
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-4xl mx-auto py-10 px-4 md:px-6">
-          <div className="flex items-center justify-between mb-8">
-            <div>
-              <h1 className="text-2xl font-bold text-brand-teal-800">My Projects</h1>
-              <p className="text-sm text-gray-500 mt-1">
-                {projects.length}{maxProjects !== -1 ? `/${maxProjects}` : ""} project{projects.length !== 1 ? "s" : ""}
-                {userTier === "free" && " (free tier)"}
-              </p>
-            </div>
-            {atLimit && (
-              <button
-                onClick={() => setShowUpgrade(true)}
-                className="px-4 py-2 rounded-lg bg-gradient-to-r from-brand-amber-500 to-brand-amber-600 text-white text-sm font-semibold hover:shadow-md transition-all"
-              >
-                Upgrade Plan
-              </button>
-            )}
+        <div className="max-w-2xl mx-auto py-8 px-4 md:px-6">
+          {/* Welcome Section */}
+          <div className="mb-8">
+            <p className="label-caps mb-1">Alfa 0.1</p>
+            <h1 className="text-2xl md:text-3xl font-bold text-brand-charcoal tracking-heading mb-1">
+              Welcome back,<br />Architect
+            </h1>
           </div>
 
-          {/* Upgrade banner */}
-          {showUpgrade && (
-            <div className="bg-gradient-to-br from-brand-teal-800 to-brand-teal-700 rounded-xl shadow-lg p-6 mb-8 text-white">
-              <h2 className="text-lg font-bold mb-2">Upgrade to {userTier === "free" ? "Premium" : "Architect"}</h2>
-              <p className="text-sm text-brand-teal-200 mb-4">
-                {userTier === "free"
-                  ? "Unlock up to 12 modules, HD AI renders, all drawing types, and building permits."
-                  : "Unlock unlimited projects, 4K renders, DWG export, team collaboration, and white-label."}
-              </p>
-              <div className="flex items-center gap-6 mb-4">
-                <div>
-                  <span className="text-3xl font-bold">
-                    &euro;{userTier === "free" ? "19" : "49"}
-                  </span>
-                  <span className="text-sm text-brand-teal-200">/month</span>
-                </div>
-              </div>
-              <div className="flex gap-3">
-                <Link href="/pricing" className="px-5 py-2 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors">
-                  Upgrade Now
-                </Link>
-                <button
-                  onClick={() => setShowUpgrade(false)}
-                  className="px-5 py-2 rounded-lg border border-white/30 text-sm hover:bg-white/10 transition-colors"
-                >
-                  Dismiss
-                </button>
-              </div>
-            </div>
-          )}
-
-          {/* Projects grid */}
-          {!loaded ? (
-            <div className="flex items-center justify-center py-20">
-              <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-teal-800 border-t-transparent" />
-            </div>
-          ) : projects.length === 0 ? (
-            <div className="text-center py-20">
-              <div className="inline-flex items-center justify-center w-16 h-16 rounded-full bg-gray-100 mb-4">
-                <svg className="w-8 h-8 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+          {/* Stats */}
+          <div className="grid grid-cols-2 gap-3 mb-8">
+            <div className="rounded-[12px] bg-brand-bone-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-brand-olive-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
+                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">Active Projects</span>
               </div>
-              <h3 className="text-lg font-semibold text-gray-700 mb-1">No projects yet</h3>
-              <p className="text-sm text-gray-400 mb-6">Start designing your first modular building</p>
-              <Link
-                href="/project/demo/land"
-                className="inline-flex px-6 py-3 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors"
-              >
-                Create Your First Project
-              </Link>
+              <span className="text-2xl font-bold text-brand-charcoal">
+                {loaded ? String(projects.length).padStart(2, "0") : "--"}
+              </span>
             </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {projects.map((project) => {
-                const data = project.data as Record<string, unknown>;
-                const modules = Array.isArray(data.modules) ? data.modules.length : 0;
-                const style = typeof data.styleDirection === "string" ? data.styleDirection : null;
+            <div className="rounded-[12px] bg-brand-bone-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-brand-olive-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                </svg>
+                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">Saved Templates</span>
+              </div>
+              <span className="text-2xl font-bold text-brand-charcoal">
+                {String(TEMPLATES.length).padStart(2, "0")}
+              </span>
+            </div>
+          </div>
 
-                return (
-                  <div
-                    key={project.id}
-                    className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow"
-                  >
-                    <div className="h-32 bg-gradient-to-br from-brand-teal-100 to-brand-teal-50 flex items-center justify-center">
-                      <div className="flex gap-1">
-                        {Array.from({ length: Math.min(modules, 6) }).map((_, i) => (
-                          <div
-                            key={i}
-                            className="w-6 h-6 rounded bg-brand-teal-300/50 border border-brand-teal-400/30"
-                          />
-                        ))}
-                        {modules === 0 && (
-                          <span className="text-xs text-brand-teal-400">Empty</span>
-                        )}
-                      </div>
-                    </div>
-
-                    <div className="p-4">
-                      <h3 className="font-semibold text-brand-teal-800 text-sm mb-1">{project.name}</h3>
-                      <div className="flex items-center gap-3 text-xs text-gray-400 mb-3">
-                        <span>{modules} modules</span>
-                        <span>{new Date(project.updated_at).toLocaleDateString()}</span>
-                      </div>
-                      {style && (
-                        <span className="inline-block px-2 py-0.5 rounded text-[10px] font-medium bg-gray-100 text-gray-600 capitalize mb-3">
-                          {style}
-                        </span>
-                      )}
-                      <div className="flex gap-2">
-                        <button
-                          onClick={() => handleLoad(project)}
-                          className="flex-1 py-2 rounded-lg bg-brand-teal-800 text-white text-xs font-semibold hover:bg-brand-teal-700 transition-colors"
-                        >
-                          Open
-                        </button>
-                        <button
-                          onClick={() => handleDelete(project.id)}
-                          className="px-3 py-2 rounded-lg border border-gray-200 text-xs text-gray-500 hover:bg-red-50 hover:text-red-600 hover:border-red-200 transition-colors"
-                        >
-                          Delete
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-
-              {/* New project card */}
-              {!atLimit && (
+          {/* Start from Template */}
+          <div className="mb-8">
+            <div className="flex items-center justify-between mb-4">
+              <h2 className="text-base font-bold text-brand-charcoal">Start from Template</h2>
+              <button className="text-xs font-semibold text-brand-olive-600 hover:text-brand-olive-800 transition-colors">
+                View All
+              </button>
+            </div>
+            <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1 -mx-1 px-1">
+              {TEMPLATES.map((t) => (
                 <Link
-                  href="/project/demo/land"
-                  className="flex flex-col items-center justify-center h-64 rounded-xl border-2 border-dashed border-gray-300 hover:border-brand-amber-400 hover:bg-brand-amber-50/30 transition-colors group"
+                  key={t.name}
+                  href="/project/demo/choose"
+                  className="flex-shrink-0 w-64 rounded-[16px] overflow-hidden shadow-card hover:shadow-subtle transition-all group"
                 >
-                  <div className="w-10 h-10 rounded-full bg-gray-100 group-hover:bg-brand-amber-100 flex items-center justify-center mb-2 transition-colors">
-                    <span className="text-xl text-gray-400 group-hover:text-brand-amber-500">+</span>
+                  <div className={`h-36 bg-gradient-to-br ${t.gradient} relative p-4 flex flex-col justify-end`}>
+                    <div className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                      </svg>
+                    </div>
+                    <h3 className="text-sm font-bold text-white">{t.name}</h3>
+                    <p className="text-xs text-white/70">{t.desc}</p>
                   </div>
-                  <span className="text-sm font-medium text-gray-400 group-hover:text-brand-amber-600">
-                    New Project
-                  </span>
                 </Link>
-              )}
+              ))}
             </div>
-          )}
+          </div>
+
+          {/* Recent Projects */}
+          <div>
+            <h2 className="text-base font-bold text-brand-charcoal mb-4">Recent Projects</h2>
+
+            {!loaded ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-olive-700 border-t-transparent" />
+              </div>
+            ) : projects.length === 0 ? (
+              <div className="text-center py-12 rounded-[16px] border border-dashed border-brand-bone-400 bg-white">
+                <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-brand-bone-200 mb-3">
+                  <svg className="w-7 h-7 text-brand-gray" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                  </svg>
+                </div>
+                <h3 className="text-sm font-bold text-brand-charcoal mb-1">No projects yet</h3>
+                <p className="text-xs text-brand-gray mb-5">Start designing your first modular building</p>
+                <Link href="/project/demo/choose" className="btn-primary text-sm">
+                  Create Your First Project
+                </Link>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {projects.map((project) => {
+                  const data = project.data as Record<string, unknown>;
+                  const modules = Array.isArray(data.modules) ? data.modules.length : 0;
+                  const style = typeof data.styleDirection === "string" ? data.styleDirection : null;
+                  const cost = modules * 9 * 1200; // rough estimate
+
+                  return (
+                    <div
+                      key={project.id}
+                      className="flex items-center gap-4 rounded-[12px] bg-white border border-brand-bone-300/60 p-3 shadow-card hover:shadow-subtle transition-all group cursor-pointer"
+                      onClick={() => handleLoad(project)}
+                    >
+                      {/* Thumbnail */}
+                      <div className="h-14 w-14 flex-shrink-0 rounded-[10px] bg-gradient-to-br from-brand-olive-100 to-brand-bone-200 flex items-center justify-center">
+                        <div className="grid grid-cols-2 gap-0.5">
+                          {Array.from({ length: Math.min(modules, 4) }).map((_, i) => (
+                            <div key={i} className="w-2.5 h-2.5 rounded-sm bg-brand-olive-400/50" />
+                          ))}
+                        </div>
+                      </div>
+
+                      {/* Info */}
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-sm font-semibold text-brand-charcoal truncate">{project.name}</h3>
+                        <div className="flex items-center gap-2 text-[11px] text-brand-gray">
+                          <span>{modules} Modules</span>
+                          {cost > 0 && (
+                            <>
+                              <span className="text-brand-bone-400">|</span>
+                              <span>${cost.toLocaleString()}</span>
+                            </>
+                          )}
+                          {style && (
+                            <>
+                              <span className="text-brand-bone-400">|</span>
+                              <span className="capitalize">{style}</span>
+                            </>
+                          )}
+                        </div>
+                      </div>
+
+                      {/* Arrow */}
+                      <svg className="w-5 h-5 text-brand-bone-400 group-hover:text-brand-olive-600 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </div>
+                  );
+                })}
+
+                {/* New project row */}
+                {!atLimit && (
+                  <Link
+                    href="/project/demo/choose"
+                    className="flex items-center justify-center gap-2 rounded-[12px] border border-dashed border-brand-bone-400 bg-white p-4 text-sm font-semibold text-brand-gray hover:text-brand-olive-700 hover:border-brand-olive-400 hover:bg-brand-olive-50/30 transition-all"
+                  >
+                    <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                    </svg>
+                    New Project
+                  </Link>
+                )}
+
+                {/* Delete is available via long-press/right-click — keeping it subtle */}
+                {projects.length > 0 && (
+                  <p className="text-[10px] text-brand-gray/40 text-center pt-2">
+                    {projects.length}{maxProjects !== -1 ? `/${maxProjects}` : ""} project{projects.length !== 1 ? "s" : ""}
+                  </p>
+                )}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </div>

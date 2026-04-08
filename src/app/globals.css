@@ -32,6 +32,11 @@
     outline-offset: 2px;
   }
 
+  /* Safe area for mobile bottom nav (iPhone notch) */
+  .safe-area-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
   /* Hide scrollbar but keep functionality */
   .scrollbar-none {
     -ms-overflow-style: none;
