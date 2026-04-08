@@ -5,7 +5,7 @@ import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import type { ModuleConfig } from "../../store";
 import { useDesignStore } from "../../store";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import type { FurnitureItem } from "../../layouts";
 
 import { MODULE_SIZE } from "./scene/constants";
@@ -259,7 +259,8 @@ interface ModuleScene3DProps {
 }
 
 export default function ModuleScene3D({ module }: ModuleScene3DProps) {
-  const preset = getPreset(module.moduleType, module.layoutPreset);
+  const preset = getPreset(module.moduleType, module.layoutPreset)
+    || getPresetsForType(module.moduleType)[0];
   const furniture = preset?.furniture || [];
   const floorColor = FLOOR_MATERIALS.find((f) => f.id === module.floorFinish)?.color || "#D4A76A";
   const wallColor = WALL_MATERIALS.find((w) => w.id === module.wallColor)?.color || "#F0EDE5";

@@ -1,7 +1,7 @@
 "use client";
 
 import { MODULE_TYPES } from "@/shared/types";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import type { ModuleConfig } from "../../store";
 import { DRAWING_LABELS, DRAWING_SCALES } from "./drawingConstants";
 import FloorPlanDrawing from "./drawings/FloorPlanDrawing";
@@ -22,7 +22,8 @@ export default function TechnicalDrawing({
   drawingType,
   projectName = "ModulCA Project",
 }: Props) {
-  const preset = getPreset(module.moduleType, module.layoutPreset);
+  const preset = getPreset(module.moduleType, module.layoutPreset)
+    || getPresetsForType(module.moduleType)[0];
   const moduleType = MODULE_TYPES.find((mt) => mt.id === module.moduleType);
   const floorMat = FLOOR_MATERIALS.find((f) => f.id === module.floorFinish);
   const wallMat = WALL_MATERIALS.find((w) => w.id === module.wallColor);

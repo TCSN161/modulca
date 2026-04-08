@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useDesignStore } from "@/features/design/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
-import { FLOOR_MATERIALS, WALL_MATERIALS, getPreset } from "@/features/design/layouts";
+import { FLOOR_MATERIALS, WALL_MATERIALS, getPreset, getPresetsForType } from "@/features/design/layouts";
 
 type InspectorTab = "geometry" | "material" | "metadata";
 
@@ -30,7 +30,10 @@ export default function Inspector() {
     ? WALL_MATERIALS.find((w) => w.id === selectedMod.wallColor) ?? WALL_MATERIALS[0]
     : null;
 
-  const preset = selectedMod ? getPreset(selectedMod.moduleType, selectedMod.layoutPreset) : null;
+  const preset = selectedMod
+    ? getPreset(selectedMod.moduleType, selectedMod.layoutPreset)
+      || getPresetsForType(selectedMod.moduleType)[0]
+    : null;
 
   const wc = selectedMod?.wallConfigs;
   const wallCounts = wc

@@ -7,7 +7,7 @@ import { useDesignStore } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES } from "@/shared/types";
-import { getPreset } from "../../layouts";
+import { getPreset, getPresetsForType } from "../../layouts";
 import { FURNITURE_COLORS } from "../../styles";
 import ConfigPanel from "../configure/ConfigPanel";
 import StepNav from "../shared/StepNav";
@@ -47,7 +47,10 @@ export default function VisualizePage() {
     ? modules.find((m) => m.row === selectedModule.row && m.col === selectedModule.col) ?? null
     : modules.length > 0 ? modules[0] : null;
 
-  const preset = currentMod ? getPreset(currentMod.moduleType, currentMod.layoutPreset) : null;
+  const preset = currentMod
+    ? getPreset(currentMod.moduleType, currentMod.layoutPreset)
+      || getPresetsForType(currentMod.moduleType)[0]
+    : null;
   const furnitureList = preset?.furniture || [];
   const selectedItem = furnitureList.find((f) => f.id === selectedFurniture);
 

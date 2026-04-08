@@ -7,7 +7,7 @@ import { useDesignStore } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES } from "@/shared/types";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import { getStyleDirection } from "../../styles";
 import { Vector3 } from "three";
 import StepNav from "../shared/StepNav";
@@ -193,6 +193,7 @@ export default function WalkthroughPage() {
 
   const currentPreset = currentRoom
     ? getPreset(currentRoom.moduleType, currentRoom.layoutPreset)
+      || getPresetsForType(currentRoom.moduleType)[0]
     : null;
 
   const currentFloor = currentRoom

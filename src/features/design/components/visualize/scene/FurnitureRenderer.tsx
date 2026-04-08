@@ -516,10 +516,18 @@ export function FurniturePiece({
   const [hovered, setHovered] = useState(false);
   useCursor(hovered);
 
-  const posX = override?.x ?? item.x;
-  const posZ = override?.z ?? item.z;
+  // Robust override validation: only use override if finite and in module bounds
+  const MODULE_SZ = 3; // match MODULE_SIZE
+  let posX = item.x;
+  let posZ = item.z;
+  if (override) {
+    if (typeof override.x === "number" && Number.isFinite(override.x) && override.x >= -0.5 && override.x <= MODULE_SZ + 0.5) posX = override.x;
+    if (typeof override.z === "number" && Number.isFinite(override.z) && override.z >= -0.5 && override.z <= MODULE_SZ + 0.5) posZ = override.z;
+  }
+  if (!Number.isFinite(posX)) posX = MODULE_SZ / 2 - item.width / 2;
+  if (!Number.isFinite(posZ)) posZ = MODULE_SZ / 2 - item.depth / 2;
   const displayColor = override?.color ?? item.color;
-  const rotationY = override?.rotation ?? 0;
+  const rotationY = (override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0;
   const halfH = item.height / 2;
 
   return (

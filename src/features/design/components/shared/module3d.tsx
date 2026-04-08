@@ -298,13 +298,53 @@ export function ModuleWalls({
 /*  GLB model loader                                                   */
 /* ------------------------------------------------------------------ */
 
+/**
+ * Compute a bounding box from ONLY visible Mesh children of a scene graph.
+ * This avoids inflated bounding boxes caused by invisible helpers, lights,
+ * cameras, or empty groups that some GLB exporters leave in the file.
+ */
+function getMeshOnlyBoundingBox(obj: THREE.Object3D): THREE.Box3 {
+  const box = new THREE.Box3();
+  let hasGeometry = false;
+  obj.traverse((child) => {
+    if (child instanceof THREE.Mesh && child.geometry) {
+      child.updateWorldMatrix(true, false);
+      const geomBox = new THREE.Box3().setFromBufferAttribute(
+        child.geometry.attributes.position as THREE.BufferAttribute,
+      );
+      geomBox.applyMatrix4(child.matrixWorld);
+      if (hasGeometry) {
+        box.union(geomBox);
+      } else {
+        box.copy(geomBox);
+        hasGeometry = true;
+      }
+    }
+  });
+  // Fallback: if no mesh geometry found, use the whole object
+  if (!hasGeometry) {
+    box.setFromObject(obj);
+  }
+  return box;
+}
+
 export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number; h: number; d: number; color?: string }) {
   const { scene } = useGLTF(path);
   const ref = useRef<THREE.Group>(null);
 
   useEffect(() => {
     if (!ref.current) return;
+
+    // Deep-clone the cached scene to avoid cross-instance interference
     const cloned = scene.clone(true);
+
+    // Reset any inherited transforms from the GLTF root
+    cloned.position.set(0, 0, 0);
+    cloned.rotation.set(0, 0, 0);
+    cloned.scale.set(1, 1, 1);
+    cloned.updateMatrixWorld(true);
+
+    // Clear previous children
     while (ref.current.children.length) ref.current.remove(ref.current.children[0]);
     ref.current.add(cloned);
 
@@ -322,17 +362,35 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
       });
     }
 
-    const box = new THREE.Box3().setFromObject(cloned);
+    // Compute bounding box from MESH geometry only (not empty groups/helpers)
+    const box = getMeshOnlyBoundingBox(cloned);
     const size = box.getSize(new THREE.Vector3());
-    const scaleX = size.x > 0 ? w / size.x : 1;
-    const scaleY = size.y > 0 ? h / size.y : 1;
-    const scaleZ = size.z > 0 ? d / size.z : 1;
-    cloned.scale.set(scaleX, scaleY, scaleZ);
 
-    const box2 = new THREE.Box3().setFromObject(cloned);
+    // Guard against degenerate models (zero-size dimensions)
+    const MIN_DIM = 0.001;
+    const scaleX = size.x > MIN_DIM ? w / size.x : 1;
+    const scaleY = size.y > MIN_DIM ? h / size.y : 1;
+    const scaleZ = size.z > MIN_DIM ? d / size.z : 1;
+
+    // Protect against insane scale values (corrupted model or bounding box)
+    const MAX_SCALE = 1000;
+    const safeScaleX = Math.min(Math.abs(scaleX), MAX_SCALE);
+    const safeScaleY = Math.min(Math.abs(scaleY), MAX_SCALE);
+    const safeScaleZ = Math.min(Math.abs(scaleZ), MAX_SCALE);
+    cloned.scale.set(safeScaleX, safeScaleY, safeScaleZ);
+
+    // Recompute after scaling, then center + floor-align
+    cloned.updateMatrixWorld(true);
+    const box2 = getMeshOnlyBoundingBox(cloned);
     const center = box2.getCenter(new THREE.Vector3());
     const minY = box2.min.y;
-    cloned.position.set(-center.x, -minY, -center.z);
+
+    // Center horizontally, place bottom on floor (y = 0 in group-local space)
+    cloned.position.set(
+      -center.x,
+      Number.isFinite(minY) ? -minY : 0,
+      -center.z,
+    );
   }, [scene, w, h, d, color]);
 
   return <group ref={ref} position={[0, -h / 2, 0]} />;
@@ -566,19 +624,38 @@ export function StaticFurniturePiece({
   offsetX?: number;
   offsetZ?: number;
 }) {
-  // Use override position if available, but validate it's within module bounds (0-3m).
-  // If override position is NaN or out of bounds, fall back to item defaults.
-  let posX = override?.x ?? item.x;
-  let posZ = override?.z ?? item.z;
-  if (!Number.isFinite(posX) || posX < -0.5 || posX > MODULE_SIZE + 0.5) posX = item.x;
-  if (!Number.isFinite(posZ) || posZ < -0.5 || posZ > MODULE_SIZE + 0.5) posZ = item.z;
+  // ---- Robust position validation ----
+  // 1. Start with item defaults
+  let posX = item.x;
+  let posZ = item.z;
+
+  // 2. Apply override only if values are finite AND within padded module bounds
+  if (override) {
+    if (typeof override.x === "number" && Number.isFinite(override.x)
+        && override.x >= -0.5 && override.x <= MODULE_SIZE + 0.5) {
+      posX = override.x;
+    }
+    if (typeof override.z === "number" && Number.isFinite(override.z)
+        && override.z >= -0.5 && override.z <= MODULE_SIZE + 0.5) {
+      posZ = override.z;
+    }
+  }
+
+  // 3. Final safety: if item defaults themselves are bad, clamp to module center
+  if (!Number.isFinite(posX) || posX < -0.5 || posX > MODULE_SIZE + 0.5) posX = MODULE_SIZE / 2 - item.width / 2;
+  if (!Number.isFinite(posZ) || posZ < -0.5 || posZ > MODULE_SIZE + 0.5) posZ = MODULE_SIZE / 2 - item.depth / 2;
+
   const displayColor = override?.color ?? item.color;
-  const rotationY = override?.rotation ?? 0;
-  const halfH = item.height / 2;
+  const rotationY = (override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0;
+  const halfH = Number.isFinite(item.height) ? item.height / 2 : 0.5;
   const glbPath = getGlbPath(item.label);
 
+  // 4. Validate offset + position computes to a sane world coordinate
+  const worldX = offsetX + posX + item.width / 2;
+  const worldZ = offsetZ + posZ + item.depth / 2;
+
   return (
-    <group position={[offsetX + posX + item.width / 2, halfH, offsetZ + posZ + item.depth / 2]}>
+    <group position={[worldX, halfH, worldZ]}>
       <group rotation={[0, rotationY, 0]}>
         {glbPath ? (
           <SafeGlbFurniture

@@ -3,7 +3,7 @@
 import { MODULE_TYPES } from "@/shared/types";
 import type { ModuleConfig, WallType, WallSide, WallConfigs } from "../../store";
 import { useDesignStore } from "../../store";
-import { getPreset, FLOOR_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS } from "../../layouts";
 
 const SIZE = 300; // px for 3000mm
 const WALL = 12;
@@ -229,7 +229,8 @@ export default function ModuleFloorPlan({ module }: Props) {
     (m) => m.row === module.row && m.col === module.col
   ) ?? module;
 
-  const preset = getPreset(liveModule.moduleType, liveModule.layoutPreset);
+  const preset = getPreset(liveModule.moduleType, liveModule.layoutPreset)
+    || getPresetsForType(liveModule.moduleType)[0];
   const furniture = preset?.furniture || [];
 
   const floorColor = FLOOR_MATERIALS.find((f) => f.id === liveModule.floorFinish)?.color || "#FFFFFF";

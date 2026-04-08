@@ -7,7 +7,7 @@ import { useDesignStore, type SavedRender } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { getStyleDirection } from "../../styles";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import { MODULE_TYPES } from "@/shared/types";
 import StepNav from "../shared/StepNav";
 
@@ -127,7 +127,10 @@ export default function RenderPage() {
     : null;
 
   const style = styleDirection ? getStyleDirection(styleDirection) : null;
-  const preset = currentMod ? getPreset(currentMod.moduleType, currentMod.layoutPreset) : null;
+  const preset = currentMod
+    ? getPreset(currentMod.moduleType, currentMod.layoutPreset)
+      || getPresetsForType(currentMod.moduleType)[0]
+    : null;
   const moduleType = currentMod ? MODULE_TYPES.find((mt) => mt.id === currentMod.moduleType) : null;
   const floorMat = currentMod ? FLOOR_MATERIALS.find((f) => f.id === currentMod.floorFinish) : null;
   const wallMat = currentMod ? WALL_MATERIALS.find((w) => w.id === currentMod.wallColor) : null;

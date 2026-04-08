@@ -323,10 +323,29 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
       // Migrate modules missing wallConfigs (backward compatibility)
       const loadedModules: ModuleConfig[] = data.modules ?? [];
       const occupiedSet = new Set(loadedModules.map((m: ModuleConfig) => `${m.row},${m.col}`));
-      const migratedModules = loadedModules.map((m: ModuleConfig) => ({
-        ...m,
-        wallConfigs: m.wallConfigs ?? computeWallConfigs(m.row, m.col, occupiedSet),
-      }));
+      const MODULE_SZ = 3;
+      const migratedModules = loadedModules.map((m: ModuleConfig) => {
+        // Sanitize furniture overrides: remove any corrupted position values
+        const cleanedOverrides: Record<string, Record<string, FurnitureOverride>> = {};
+        if (m.furnitureOverrides) {
+          for (const [presetKey, items] of Object.entries(m.furnitureOverrides)) {
+            cleanedOverrides[presetKey] = {};
+            for (const [itemId, ov] of Object.entries(items as Record<string, FurnitureOverride>)) {
+              const clean: FurnitureOverride = {};
+              if (typeof ov.x === "number" && Number.isFinite(ov.x) && ov.x >= -0.5 && ov.x <= MODULE_SZ + 0.5) clean.x = ov.x;
+              if (typeof ov.z === "number" && Number.isFinite(ov.z) && ov.z >= -0.5 && ov.z <= MODULE_SZ + 0.5) clean.z = ov.z;
+              if (typeof ov.rotation === "number" && Number.isFinite(ov.rotation)) clean.rotation = ov.rotation;
+              if (typeof ov.color === "string") clean.color = ov.color;
+              if (Object.keys(clean).length > 0) cleanedOverrides[presetKey][itemId] = clean;
+            }
+          }
+        }
+        return {
+          ...m,
+          wallConfigs: m.wallConfigs ?? computeWallConfigs(m.row, m.col, occupiedSet),
+          furnitureOverrides: cleanedOverrides,
+        };
+      });
       set({
         modules: migratedModules,
         finishLevel: data.finishLevel ?? "standard",
