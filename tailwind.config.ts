@@ -1,13 +1,22 @@
 import type { Config } from "tailwindcss";
 
 /**
- * ModulCA Tailwind Configuration
+ * ModulCA Tailwind Configuration — "Digital Arboretum" Theme (Alfa 0.1)
  *
- * Brand colors:
- *   - Deep teal (#1B3A4B) = primary actions, headers, nav
- *   - Warm amber (#E8913A) = CTAs, accents, highlights
- *   - Module colors are defined in the design system, not here
- *     (they're used programmatically in canvas/grid components)
+ * Design direction: Architectural Biophilia
+ *   - Deep Olive Green (#56642B) = primary CTAs, active states, brand highlights
+ *   - Soft Sage (#8A9A5B) = secondary accent, subtle backgrounds
+ *   - Off-white Bone (#FCF9F4) = main background
+ *   - Light Stone (#F2EEE6) = section backgrounds, card containers
+ *   - Charcoal Black (#1C1C19) = headings and body text
+ *   - Deep Gray (#5A5F62) = labels, metadata, secondary text
+ *
+ * ROLLBACK: To revert to the original teal/amber theme, replace the
+ * `brand` color block with the one in THEME_ROLLBACK.md (or git revert).
+ *
+ * --- OLD THEME (for rollback) ---
+ * brand-teal-800: #1B3A4B, brand-amber-500: #E8913A
+ * See git commit eda9038 for full old config.
  */
 const config: Config = {
   content: [
@@ -17,29 +26,57 @@ const config: Config = {
     extend: {
       colors: {
         brand: {
+          /* ---------- NEW: Digital Arboretum palette ---------- */
+          olive: {
+            50: "#F4F5EF",
+            100: "#E5E8D8",
+            200: "#CDD3B5",
+            300: "#B1BB8D",
+            400: "#9AAA6E",
+            500: "#8A9A5B",  /* Soft Sage — secondary */
+            600: "#6E7E42",
+            700: "#56642B",  /* Deep Olive — primary accent */
+            800: "#434D21",
+            900: "#303818",
+          },
+          bone: {
+            50: "#FEFDFB",
+            100: "#FCF9F4",  /* Surface (Base) — main bg */
+            200: "#F2EEE6",  /* Surface (Alt) — sections, cards */
+            300: "#E8E2D6",
+            400: "#D9D1C2",
+            500: "#C5BAA8",
+          },
+          charcoal: "#1C1C19",
+          gray: "#5A5F62",
+
+          /* ---------- LEGACY: kept for backward compat ---------- */
+          /* Inner pages still reference brand-teal-* and brand-amber-*
+             until they are migrated to the new palette. These aliases
+             map old tokens to new equivalents so nothing breaks. */
           teal: {
-            50: "#E6EEF2",
-            100: "#C0D4DD",
-            200: "#96B8C7",
-            300: "#6C9CB1",
-            400: "#4D87A0",
-            500: "#2E728F",
-            600: "#276580",
-            700: "#1E5469",
-            800: "#1B3A4B",
-            900: "#0F2330",
+            50: "#F4F5EF",
+            100: "#E5E8D8",
+            200: "#CDD3B5",
+            300: "#B1BB8D",
+            400: "#9AAA6E",
+            500: "#8A9A5B",
+            600: "#6E7E42",
+            700: "#56642B",
+            800: "#56642B",
+            900: "#303818",
           },
           amber: {
-            50: "#FDF3E8",
-            100: "#F9DFC0",
-            200: "#F5CA95",
-            300: "#F1B569",
-            400: "#EDA54A",
-            500: "#E8913A",
-            600: "#D47E2E",
-            700: "#B86823",
-            800: "#9C5219",
-            900: "#6E3A11",
+            50: "#F4F5EF",
+            100: "#E5E8D8",
+            200: "#CDD3B5",
+            300: "#B1BB8D",
+            400: "#9AAA6E",
+            500: "#56642B",
+            600: "#434D21",
+            700: "#303818",
+            800: "#303818",
+            900: "#1C1C19",
           },
         },
         module: {
@@ -52,12 +89,26 @@ const config: Config = {
         },
       },
       fontFamily: {
-        sans: ["Inter", "system-ui", "-apple-system", "sans-serif"],
+        sans: ["Manrope", "Inter", "system-ui", "-apple-system", "sans-serif"],
+      },
+      borderRadius: {
+        DEFAULT: "12px",
+        lg: "12px",
+        xl: "12px",
+        "2xl": "16px",
+      },
+      boxShadow: {
+        subtle: "0 4px 24px rgba(0,0,0,0.04)",
+        card: "0 2px 12px rgba(0,0,0,0.04)",
       },
       spacing: {
         "grid-sm": "2rem",
         "grid-md": "3rem",
         "grid-lg": "4rem",
+      },
+      letterSpacing: {
+        "heading": "-0.02em",
+        "label": "0.05em",
       },
       animation: {
         "fade-in": "fadeIn 0.3s ease-in-out",

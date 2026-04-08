@@ -1,6 +1,12 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Manrope, Inter } from "next/font/google";
 import "./globals.css";
+
+const manrope = Manrope({
+  subsets: ["latin"],
+  variable: "--font-manrope",
+  display: "swap",
+});
 
 const inter = Inter({
   subsets: ["latin"],
@@ -75,8 +81,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={inter.variable}>
-      <body className="min-h-screen bg-white font-sans text-gray-900 antialiased">
+    <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
+      <body className="min-h-screen bg-brand-bone-100 font-sans text-brand-charcoal antialiased">
         {children}
       </body>
     </html>
