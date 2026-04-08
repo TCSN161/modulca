@@ -194,28 +194,8 @@ export function buildWall(
 
   if (wallType === "none") return walls;
 
-  if (wallType === "shared") {
-    const wallLen = isHorizontal ? fullSize[0] : fullSize[2];
-    const doorLeft = (wallLen - DOOR_WIDTH) / 2;
-    const doorRight = doorLeft + DOOR_WIDTH;
-    const rightWidth = wallLen - doorRight;
-    const topHeight = WALL_HEIGHT - DOOR_HEIGHT;
-
-    if (isHorizontal) {
-      const baseX = pos[0] - wallLen / 2;
-      const baseZ = pos[2];
-      walls.push(<WallSegment key={`${key}-l`} position={[baseX + doorLeft / 2, HALF_HEIGHT, baseZ]} size={[doorLeft, WALL_HEIGHT, WALL_THICKNESS]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-r`} position={[baseX + doorRight + rightWidth / 2, HALF_HEIGHT, baseZ]} size={[rightWidth, WALL_HEIGHT, WALL_THICKNESS]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-t`} position={[pos[0], DOOR_HEIGHT + topHeight / 2, baseZ]} size={[DOOR_WIDTH, topHeight, WALL_THICKNESS]} color="#d4a56a" />);
-    } else {
-      const baseX = pos[0];
-      const baseZ = pos[2] - wallLen / 2;
-      walls.push(<WallSegment key={`${key}-l`} position={[baseX, HALF_HEIGHT, baseZ + doorLeft / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, doorLeft]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-r`} position={[baseX, HALF_HEIGHT, baseZ + doorRight + rightWidth / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, rightWidth]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-t`} position={[baseX, DOOR_HEIGHT + topHeight / 2, pos[2]]} size={[WALL_THICKNESS, topHeight, DOOR_WIDTH]} color="#d4a56a" />);
-    }
-    return walls;
-  }
+  // Shared wall = open space between adjacent modules — no geometry
+  if (wallType === "shared") return walls;
 
   if (wallType === "solid") {
     walls.push(<WallSegment key={key} position={pos} size={fullSize} color={wallColor} />);
@@ -624,6 +604,11 @@ export function StaticFurniturePiece({
   offsetX?: number;
   offsetZ?: number;
 }) {
+  // ---- Safe dimensions (guard against undefined/NaN) ----
+  const safeW = Number.isFinite(item.width) ? item.width : 0.5;
+  const safeD = Number.isFinite(item.depth) ? item.depth : 0.5;
+  const safeH = Number.isFinite(item.height) ? item.height : 0.5;
+
   // ---- Robust position validation ----
   // 1. Start with item defaults
   let posX = item.x;
@@ -642,17 +627,17 @@ export function StaticFurniturePiece({
   }
 
   // 3. Final safety: if item defaults themselves are bad, clamp to module center
-  if (!Number.isFinite(posX) || posX < -0.5 || posX > MODULE_SIZE + 0.5) posX = MODULE_SIZE / 2 - item.width / 2;
-  if (!Number.isFinite(posZ) || posZ < -0.5 || posZ > MODULE_SIZE + 0.5) posZ = MODULE_SIZE / 2 - item.depth / 2;
+  if (!Number.isFinite(posX) || posX < -0.5 || posX > MODULE_SIZE + 0.5) posX = MODULE_SIZE / 2 - safeW / 2;
+  if (!Number.isFinite(posZ) || posZ < -0.5 || posZ > MODULE_SIZE + 0.5) posZ = MODULE_SIZE / 2 - safeD / 2;
 
   const displayColor = override?.color ?? item.color;
   const rotationY = (override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0;
-  const halfH = Number.isFinite(item.height) ? item.height / 2 : 0.5;
+  const halfH = safeH / 2;
   const glbPath = getGlbPath(item.label);
 
   // 4. Validate offset + position computes to a sane world coordinate
-  const worldX = offsetX + posX + item.width / 2;
-  const worldZ = offsetZ + posZ + item.depth / 2;
+  const worldX = offsetX + posX + safeW / 2;
+  const worldZ = offsetZ + posZ + safeD / 2;
 
   return (
     <group position={[worldX, halfH, worldZ]}>
@@ -660,12 +645,12 @@ export function StaticFurniturePiece({
         {glbPath ? (
           <SafeGlbFurniture
             path={glbPath}
-            w={item.width} h={item.height} d={item.depth}
+            w={safeW} h={safeH} d={safeD}
             color={displayColor} label={item.label}
           />
         ) : (
           <DetailedFurniture
-            w={item.width} h={item.height} d={item.depth}
+            w={safeW} h={safeH} d={safeD}
             color={displayColor} label={item.label}
           />
         )}

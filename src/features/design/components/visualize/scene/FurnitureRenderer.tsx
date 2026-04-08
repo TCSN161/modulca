@@ -545,6 +545,8 @@ export function FurniturePiece({
           onSelect();
         }}
         onPointerDown={(e) => {
+          // Only start furniture drag with Shift+click to avoid hijacking camera orbit
+          if (!e.nativeEvent?.shiftKey) return;
           e.stopPropagation();
           onDragStart(e, item);
         }}

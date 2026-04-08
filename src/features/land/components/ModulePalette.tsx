@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useLandStore } from "../store";
+import type { GridCell } from "../store";
 import { MODULE_TYPES, BUILDING_PRESETS } from "@/shared/types";
 import type { BuildingPreset } from "@/shared/types";
 import { useAuthStore } from "@/features/auth/store";
@@ -25,31 +26,56 @@ export default function ModulePalette() {
 
   const filteredPresets = BUILDING_PRESETS.filter((p) => p.category === presetCategory);
 
+  const { setGridCells: setGridCellsDirect } = useLandStore();
+
   const handlePlacePreset = (preset: BuildingPreset) => {
     // Check module limit
     if (maxModules !== -1 && preset.cells.length > maxModules) {
       alert(`This preset requires ${preset.cells.length} modules, but your plan allows ${maxModules}. Upgrade for more.`);
       return;
     }
-    // Check if preset cells fit within available grid
+
+    // Try to fit preset in existing grid first
     const available = new Set(gridCells.map((c) => `${c.row},${c.col}`));
     const fits = preset.cells.every(([r, c]) => available.has(`${r},${c}`));
-    if (!fits) {
-      // Try to find an offset that works
-      const minRow = Math.min(...gridCells.map((c) => c.row));
-      const minCol = Math.min(...gridCells.map((c) => c.col));
-      const offsetCells: [number, number, string][] = preset.cells.map(([r, c, t]) => [r + minRow, c + minCol, t]);
-      const offsetFits = offsetCells.every(([r, c]) => available.has(`${r},${c}`));
-      if (offsetFits) {
-        clearAllModules();
-        placePreset(offsetCells);
-        return;
-      }
-      alert("Grid is too small for this building layout. Draw a larger area first.");
+
+    if (fits) {
+      clearAllModules();
+      placePreset(preset.cells);
       return;
     }
-    clearAllModules();
-    placePreset(preset.cells);
+
+    // Try offset to align with existing grid origin
+    const minRow = gridCells.length > 0 ? Math.min(...gridCells.map((c) => c.row)) : 0;
+    const minCol = gridCells.length > 0 ? Math.min(...gridCells.map((c) => c.col)) : 0;
+    const offsetCells: [number, number, string][] = preset.cells.map(([r, c, t]) => [r + minRow, c + minCol, t]);
+    const offsetFits = offsetCells.every(([r, c]) => available.has(`${r},${c}`));
+
+    if (offsetFits) {
+      clearAllModules();
+      placePreset(offsetCells);
+      return;
+    }
+
+    // Auto-expand grid to fit the preset — create missing cells
+    const cellsToUse = offsetCells;
+    const merged = new Map<string, GridCell>();
+    // Keep existing grid cells
+    for (const c of gridCells) {
+      merged.set(`${c.row},${c.col}`, { ...c, moduleType: null });
+    }
+    // Add any missing cells the preset needs
+    for (const [r, c, t] of cellsToUse) {
+      const key = `${r},${c}`;
+      merged.set(key, { row: r, col: c, moduleType: t });
+    }
+    // For cells that already existed, apply module type from preset
+    for (const [r, c, t] of cellsToUse) {
+      const key = `${r},${c}`;
+      const existing = merged.get(key)!;
+      merged.set(key, { ...existing, moduleType: t });
+    }
+    setGridCellsDirect(Array.from(merged.values()));
   };
 
   return (

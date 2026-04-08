@@ -259,9 +259,9 @@ export default function VisualizePage() {
                 Controls
               </h3>
               <div className="space-y-1 text-[10px] text-gray-400">
-                <div>Click furniture: Select</div>
-                <div>Drag furniture: Move</div>
-                <div>Right-drag: Rotate camera</div>
+                <div>Click: Select furniture</div>
+                <div><kbd className="px-1 rounded bg-gray-200 text-gray-600">Shift</kbd> + drag: Move furniture</div>
+                <div>Left-drag: Rotate camera</div>
                 <div>Scroll: Zoom</div>
               </div>
             </div>

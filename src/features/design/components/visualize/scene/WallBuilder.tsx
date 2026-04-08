@@ -66,29 +66,8 @@ function buildWall(
 
   if (wallType === "none") return walls;
 
-  if (wallType === "shared") {
-    // Shared wall: render as door opening (passthrough between modules)
-    const wallLen = isHorizontal ? fullSize[0] : fullSize[2];
-    const doorLeft = (wallLen - DOOR_WIDTH) / 2;
-    const doorRight = doorLeft + DOOR_WIDTH;
-    const rightWidth = wallLen - doorRight;
-    const topHeight = WALL_HEIGHT - DOOR_HEIGHT;
-
-    if (isHorizontal) {
-      const baseX = pos[0] - wallLen / 2;
-      const baseZ = pos[2];
-      walls.push(<WallSegment key={`${key}-l`} position={[baseX + doorLeft / 2, HALF_HEIGHT, baseZ]} size={[doorLeft, WALL_HEIGHT, WALL_THICKNESS]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-r`} position={[baseX + doorRight + rightWidth / 2, HALF_HEIGHT, baseZ]} size={[rightWidth, WALL_HEIGHT, WALL_THICKNESS]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-t`} position={[pos[0], DOOR_HEIGHT + topHeight / 2, baseZ]} size={[DOOR_WIDTH, topHeight, WALL_THICKNESS]} color="#d4a56a" />);
-    } else {
-      const baseX = pos[0];
-      const baseZ = pos[2] - wallLen / 2;
-      walls.push(<WallSegment key={`${key}-l`} position={[baseX, HALF_HEIGHT, baseZ + doorLeft / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, doorLeft]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-r`} position={[baseX, HALF_HEIGHT, baseZ + doorRight + rightWidth / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, rightWidth]} color="#d4a56a" />);
-      walls.push(<WallSegment key={`${key}-t`} position={[baseX, DOOR_HEIGHT + topHeight / 2, pos[2]]} size={[WALL_THICKNESS, topHeight, DOOR_WIDTH]} color="#d4a56a" />);
-    }
-    return walls;
-  }
+  // Shared wall = open space between adjacent modules — no geometry
+  if (wallType === "shared") return walls;
 
   if (wallType === "solid") {
     walls.push(<WallSegment key={key} position={pos} size={fullSize} color={wallColor} />);
