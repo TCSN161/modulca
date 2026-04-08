@@ -654,53 +654,60 @@ export default function PresentationPage() {
               </SlideCard>
             )}
 
-            {activeSlide === "modules" && slides.find((s) => s.id === "modules")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={5} title="Module Details" />
-                <div className="mt-6 space-y-4">
-                  {modules.map((mod) => {
-                    const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
-                    const preset = getPreset(mod.moduleType, mod.layoutPreset)
-                      || getPresetsForType(mod.moduleType)[0];
-                    const floor = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish);
-                    const wall = WALL_MATERIALS.find((w) => w.id === mod.wallColor);
-                    return (
-                      <div key={`${mod.row}-${mod.col}`} className="rounded-xl p-4" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
-                        <div className="flex items-center gap-3 mb-3">
-                          <div className="h-5 w-5 rounded" style={{ backgroundColor: mt?.color }} />
-                          <h4 className="text-sm font-bold" style={{ color: tmpl.text }}>{mod.label}</h4>
-                          <span className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>{mt?.label} | {preset?.label}</span>
-                        </div>
-                        <div className="grid grid-cols-4 gap-4 text-xs">
-                          <div>
-                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Floor</span>
-                            <div className="flex items-center gap-1 mt-1">
-                              <div className="h-3 w-3 rounded border" style={{ backgroundColor: floor?.color }} />
-                              <span style={{ color: tmpl.text }}>{floor?.label}</span>
+            {activeSlide === "modules" && slides.find((s) => s.id === "modules")?.enabled && (() => {
+              const MODS_PER_SLIDE = 4;
+              const pages: typeof modules[] = [];
+              for (let i = 0; i < modules.length; i += MODS_PER_SLIDE) {
+                pages.push(modules.slice(i, i + MODS_PER_SLIDE));
+              }
+              return pages.map((pageMods, pageIdx) => (
+                <SlideCard key={`modules-${pageIdx}`} bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                  <SlideHeader accent={tmpl.accent} text={tmpl.text} number={5 + pageIdx} title={pages.length > 1 ? `Module Details (${pageIdx + 1}/${pages.length})` : "Module Details"} />
+                  <div className="mt-6 space-y-4">
+                    {pageMods.map((mod) => {
+                      const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+                      const preset = getPreset(mod.moduleType, mod.layoutPreset)
+                        || getPresetsForType(mod.moduleType)[0];
+                      const floor = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish);
+                      const wall = WALL_MATERIALS.find((w) => w.id === mod.wallColor);
+                      return (
+                        <div key={`${mod.row}-${mod.col}`} className="rounded-xl p-4" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="h-5 w-5 rounded" style={{ backgroundColor: mt?.color }} />
+                            <h4 className="text-sm font-bold" style={{ color: tmpl.text }}>{mod.label}</h4>
+                            <span className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>{mt?.label} | {preset?.label}</span>
+                          </div>
+                          <div className="grid grid-cols-4 gap-4 text-xs">
+                            <div>
+                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Floor</span>
+                              <div className="flex items-center gap-1 mt-1">
+                                <div className="h-3 w-3 rounded border" style={{ backgroundColor: floor?.color }} />
+                                <span style={{ color: tmpl.text }}>{floor?.label}</span>
+                              </div>
+                            </div>
+                            <div>
+                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Walls</span>
+                              <div className="flex items-center gap-1 mt-1">
+                                <div className="h-3 w-3 rounded border" style={{ backgroundColor: wall?.color }} />
+                                <span style={{ color: tmpl.text }}>{wall?.label}</span>
+                              </div>
+                            </div>
+                            <div>
+                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Furniture</span>
+                              <span className="block mt-1" style={{ color: tmpl.text }}>{preset?.furniture.length || 0} pieces</span>
+                            </div>
+                            <div>
+                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Area</span>
+                              <span className="block mt-1" style={{ color: tmpl.text }}>9m2 (7m2 usable)</span>
                             </div>
                           </div>
-                          <div>
-                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Walls</span>
-                            <div className="flex items-center gap-1 mt-1">
-                              <div className="h-3 w-3 rounded border" style={{ backgroundColor: wall?.color }} />
-                              <span style={{ color: tmpl.text }}>{wall?.label}</span>
-                            </div>
-                          </div>
-                          <div>
-                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Furniture</span>
-                            <span className="block mt-1" style={{ color: tmpl.text }}>{preset?.furniture.length || 0} pieces</span>
-                          </div>
-                          <div>
-                            <span style={{ color: tmpl.text, opacity: 0.4 }}>Area</span>
-                            <span className="block mt-1" style={{ color: tmpl.text }}>9m2 (7m2 usable)</span>
-                          </div>
                         </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </SlideCard>
-            )}
+                      );
+                    })}
+                  </div>
+                </SlideCard>
+              ));
+            })()}
 
             {activeSlide === "renders" && slides.find((s) => s.id === "renders")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>

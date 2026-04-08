@@ -19,6 +19,7 @@ import {
 } from "./scene/SceneHelpers";
 import { Walls } from "./scene/WallBuilder";
 import { FurniturePiece } from "./scene/FurnitureRenderer";
+import { useWASD } from "./scene/useWASD";
 
 /* ------------------------------------------------------------------ */
 /*  Scene contents (inside Canvas)                                     */
@@ -33,6 +34,7 @@ interface SceneContentProps {
 
 function SceneContent({ module, furniture, floorColor, wallColor }: SceneContentProps) {
   const orbitRef = useRef<any>(null);
+  useWASD(orbitRef);
 
   const selectedFurniture = useDesignStore((s) => s.selectedFurniture);
   const setSelectedFurniture = useDesignStore((s) => s.setSelectedFurniture);
@@ -304,7 +306,7 @@ export default function ModuleScene3D({ module }: ModuleScene3DProps) {
           lineHeight: 1.4,
         }}
       >
-        Click to select &bull; Arrow keys to move &bull; R to rotate
+        WASD: Pan camera &bull; Click: Select &bull; Arrows: Move furniture &bull; R: Rotate
       </div>
     </div>
   );

@@ -259,6 +259,8 @@ export default function VisualizePage() {
                 Controls
               </h3>
               <div className="space-y-1 text-[10px] text-gray-400">
+                <div><kbd className="px-1 rounded bg-gray-200 text-gray-600">W</kbd><kbd className="px-1 rounded bg-gray-200 text-gray-600 ml-0.5">A</kbd><kbd className="px-1 rounded bg-gray-200 text-gray-600 ml-0.5">S</kbd><kbd className="px-1 rounded bg-gray-200 text-gray-600 ml-0.5">D</kbd>: Pan camera</div>
+                <div><kbd className="px-1 rounded bg-gray-200 text-gray-600">Q</kbd> / <kbd className="px-1 rounded bg-gray-200 text-gray-600">E</kbd>: Lower / Raise camera</div>
                 <div>Click: Select furniture</div>
                 <div><kbd className="px-1 rounded bg-gray-200 text-gray-600">Shift</kbd> + drag: Move furniture</div>
                 <div>Left-drag: Rotate camera</div>

@@ -1,8 +1,10 @@
 import { NextRequest, NextResponse } from "next/server";
 
+export const dynamic = "force-dynamic";
+
 /**
  * Neufert AI Architectural Consultant — API route
- * Uses Together API (Llama/Mixtral) with a Neufert-based system prompt.
+ * Fallback chain: Together (Llama 3.3) → Pollinations (free, no key).
  * Modular: swap PROVIDER to switch AI backend without touching the frontend.
  */
 
@@ -56,17 +58,53 @@ When answering:
 6. Use metric units exclusively (meters, square meters)
 7. Keep answers concise but thorough — like a professional consultant`;
 
-// Provider configuration — swap here to change AI backend
-const PROVIDERS = {
-  together: {
+// Provider configuration — fallback chain: Together → Pollinations (free)
+interface Provider {
+  id: string;
+  url: string;
+  model: string;
+  keyEnv?: string; // If set, requires this env var
+  buildHeaders: (apiKey?: string) => Record<string, string>;
+  buildBody: (messages: { role: string; content: string }[]) => object;
+  extractReply: (data: unknown) => string | null;
+}
+
+const PROVIDERS: Provider[] = [
+  {
+    id: "together",
     url: "https://api.together.xyz/v1/chat/completions",
     model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
     keyEnv: "TOGETHER_API_KEY",
+    buildHeaders: (apiKey) => ({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    }),
+    buildBody: (messages) => ({
+      model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
+      messages,
+      max_tokens: 1024,
+      temperature: 0.7,
+    }),
+    extractReply: (data: any) => data?.choices?.[0]?.message?.content || null,
   },
-  // Future: add openai, anthropic, etc.
-};
-
-const PROVIDER = PROVIDERS.together;
+  {
+    id: "pollinations",
+    url: "https://text.pollinations.ai/openai",
+    model: "openai",
+    // No API key needed — free
+    buildHeaders: () => ({ "Content-Type": "application/json" }),
+    buildBody: (messages) => ({
+      messages,
+      model: "openai",
+      max_tokens: 2048,
+    }),
+    extractReply: (data: any) => {
+      const msg = data?.choices?.[0]?.message;
+      // Pollinations may put answer in content or reasoning_content
+      return msg?.content || msg?.reasoning_content || null;
+    },
+  },
+];
 
 export async function POST(req: NextRequest) {
   try {
@@ -76,41 +114,58 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Messages array required" }, { status: 400 });
     }
 
-    const apiKey = process.env[PROVIDER.keyEnv];
-    if (!apiKey) {
-      return NextResponse.json(
-        { error: "AI service not configured. Add API key to .env.local" },
-        { status: 503 },
-      );
+    const fullMessages = [
+      { role: "system", content: SYSTEM_PROMPT },
+      ...messages.slice(-20),
+    ];
+
+    // Try each provider in order
+    for (const provider of PROVIDERS) {
+      // Skip providers that need a missing API key
+      const apiKey = provider.keyEnv ? process.env[provider.keyEnv] : undefined;
+      if (provider.keyEnv && !apiKey) {
+        console.log(`[consultant] ${provider.id}: no API key, skipping`);
+        continue;
+      }
+
+      try {
+        console.log(`[consultant] Trying ${provider.id}...`);
+        const response = await fetch(provider.url, {
+          method: "POST",
+          headers: provider.buildHeaders(apiKey),
+          body: JSON.stringify(provider.buildBody(fullMessages)),
+        });
+
+        if (!response.ok) {
+          const err = await response.text().catch(() => "");
+          console.error(`[consultant] ${provider.id} error ${response.status}:`, err.slice(0, 200));
+          continue;
+        }
+
+        // Pollinations returns plain text; others return JSON
+        let reply: string | null;
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("application/json")) {
+          const data = await response.json();
+          reply = provider.extractReply(data);
+        } else {
+          reply = await response.text();
+        }
+
+        if (reply && reply.trim()) {
+          console.log(`[consultant] ${provider.id} success (${reply.length} chars)`);
+          return NextResponse.json({ reply: reply.trim() });
+        }
+        console.warn(`[consultant] ${provider.id} returned empty reply`);
+      } catch (err) {
+        console.error(`[consultant] ${provider.id} exception:`, err);
+      }
     }
 
-    const response = await fetch(PROVIDER.url, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model: PROVIDER.model,
-        messages: [
-          { role: "system", content: SYSTEM_PROMPT },
-          ...messages.slice(-20), // Keep context window manageable
-        ],
-        max_tokens: 1024,
-        temperature: 0.7,
-      }),
-    });
-
-    if (!response.ok) {
-      const err = await response.text();
-      console.error("AI API error:", err);
-      return NextResponse.json({ error: "AI service temporarily unavailable" }, { status: 502 });
-    }
-
-    const data = await response.json();
-    const reply = data.choices?.[0]?.message?.content || "I couldn't generate a response. Please try again.";
-
-    return NextResponse.json({ reply });
+    return NextResponse.json(
+      { error: "All AI providers are temporarily unavailable. Please try again." },
+      { status: 503 },
+    );
   } catch (error) {
     console.error("Consultant API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

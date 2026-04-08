@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import { useDesignStore } from "../../store";
@@ -11,6 +11,7 @@ import {
   ModuleWalls, ModuleFloor,
   StaticFurniturePiece,
 } from "../shared/module3d";
+import { useWASD } from "./scene/useWASD";
 
 /* ------------------------------------------------------------------ */
 /*  Clickable module highlight overlay                                 */
@@ -70,6 +71,8 @@ function ModuleClickArea({
 /* ------------------------------------------------------------------ */
 
 function SceneContent({ modules }: { modules: ModuleConfig[] }) {
+  const orbitRef = useRef<any>(null);
+  useWASD(orbitRef);
   const selectedModule = useDesignStore((s) => s.selectedModule);
   const setSelectedModule = useDesignStore((s) => s.setSelectedModule);
 
@@ -147,6 +150,7 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
 
       <ContactShadows position={[centerX, -0.005, centerZ]} opacity={0.25} scale={extent + 10} blur={2} />
       <OrbitControls
+        ref={orbitRef}
         target={[centerX, WALL_HEIGHT * 0.3, centerZ]}
         minPolarAngle={0.2} maxPolarAngle={Math.PI / 2.2}
         minDistance={3} maxDistance={cameraDistance * 2} enablePan
