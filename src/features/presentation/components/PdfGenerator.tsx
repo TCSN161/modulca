@@ -18,7 +18,7 @@ import type { StyleDirection } from "@/features/design/styles";
 /* ------------------------------------------------------------------ */
 
 interface PdfGeneratorProps {
-  template: "minimal" | "bold" | "classic";
+  template: "minimal" | "bold" | "classic" | "luxury" | "architect";
   slides: { id: string; label: string; enabled: boolean }[];
   projectName: string;
   clientName: string;
@@ -52,6 +52,8 @@ const TMPL: Record<string, { accent: string; bg: string; text: string }> = {
   minimal: { accent: "#C8956C", bg: "#FFFFFF", text: "#1a1a1a" },
   bold: { accent: "#F59E0B", bg: "#111111", text: "#FFFFFF" },
   classic: { accent: "#1D6B6B", bg: "#F8F6F2", text: "#2A2A2A" },
+  luxury: { accent: "#C5A572", bg: "#0A0A0A", text: "#FFFFFF" },
+  architect: { accent: "#333333", bg: "#FFFFFF", text: "#1a1a1a" },
 };
 
 const MODULE_COLORS: Record<string, string> = {
@@ -240,6 +242,47 @@ function PresentationDocument(props: PdfGeneratorProps) {
           </SlidePage>
         );
         break;
+
+      case "description": {
+        const roomCounts = props.modules.reduce<Record<string, number>>((acc, m) => {
+          acc[m.moduleType] = (acc[m.moduleType] || 0) + 1;
+          return acc;
+        }, {});
+        const roomList = Object.entries(roomCounts).map(([type, count]) => `${count} ${type}${count > 1 ? "s" : ""}`).join(", ");
+        const styleName = props.style?.label || "modern";
+        pages.push(
+          <SlidePage key="description" slideLabel="Project Description" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+            <View style={s.accentBar} />
+            <Text style={s.sectionTitle}>Project Description</Text>
+            <Text style={{ ...s.body, marginTop: 16, lineHeight: 1.8 }}>
+              This {styleName.toLowerCase()} modular residence comprises {props.stats.totalModules} modules totaling {props.stats.totalArea}m2 of built area ({props.stats.usableArea}m2 usable), featuring {roomList}. Designed with a {props.finishLabel.toLowerCase()} finish level, the project prioritizes efficient space utilization through modular construction techniques.
+            </Text>
+            <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 24 }}>
+              <View style={{ ...s.card, width: "46%" }}>
+                <Text style={{ fontSize: 8, color: t.accent, fontWeight: "bold" }}>CONFIGURATION</Text>
+                <Text style={{ fontSize: 18, color: t.text, fontWeight: "bold", marginTop: 4 }}>{props.stats.totalModules} Modules</Text>
+                <Text style={{ fontSize: 8, color: t.text, opacity: 0.5, marginTop: 2 }}>{roomList}</Text>
+              </View>
+              <View style={{ ...s.card, width: "46%" }}>
+                <Text style={{ fontSize: 8, color: t.accent, fontWeight: "bold" }}>TOTAL AREA</Text>
+                <Text style={{ fontSize: 18, color: t.text, fontWeight: "bold", marginTop: 4 }}>{props.stats.totalArea}m2</Text>
+                <Text style={{ fontSize: 8, color: t.text, opacity: 0.5, marginTop: 2 }}>{props.stats.usableArea}m2 usable interior</Text>
+              </View>
+              <View style={{ ...s.card, width: "46%" }}>
+                <Text style={{ fontSize: 8, color: t.accent, fontWeight: "bold" }}>DESIGN STYLE</Text>
+                <Text style={{ fontSize: 18, color: t.text, fontWeight: "bold", marginTop: 4 }}>{props.style?.label || "Modern"}</Text>
+                <Text style={{ fontSize: 8, color: t.text, opacity: 0.5, marginTop: 2 }}>{props.style?.tagline || "Contemporary modular design"}</Text>
+              </View>
+              <View style={{ ...s.card, width: "46%" }}>
+                <Text style={{ fontSize: 8, color: t.accent, fontWeight: "bold" }}>INVESTMENT</Text>
+                <Text style={{ fontSize: 18, color: t.text, fontWeight: "bold", marginTop: 4 }}>EUR {Math.round(props.stats.totalEstimate).toLocaleString()}</Text>
+                <Text style={{ fontSize: 8, color: t.text, opacity: 0.5, marginTop: 2 }}>{props.finishLabel} finish</Text>
+              </View>
+            </View>
+          </SlidePage>
+        );
+        break;
+      }
 
       case "site":
         pages.push(

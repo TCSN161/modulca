@@ -4,7 +4,7 @@ import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react"
 import Link from "next/link";
 import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
-import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
+import { MODULE_TYPES, FINISH_LEVELS, MODULE_EXTERIOR_SIZE, MODULE_EXTERIOR_AREA, MODULE_INTERIOR_AREA } from "@/shared/types";
 import { getStyleDirection } from "@/features/design/styles";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
 import StepNav from "@/features/design/components/shared/StepNav";
@@ -13,9 +13,10 @@ import { useAuthStore } from "@/features/auth/store";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
-type PresentationTemplate = "minimal" | "bold" | "classic";
+type PresentationTemplate = "minimal" | "bold" | "classic" | "luxury" | "architect";
 type SlideId =
   | "cover"
+  | "description"
   | "site"
   | "floorplan"
   | "vision"
@@ -55,10 +56,25 @@ const TEMPLATES: Record<PresentationTemplate, { label: string; description: stri
     bg: "#F8F6F2",
     text: "#2A2A2A",
   },
+  luxury: {
+    label: "Real Estate Luxury",
+    description: "Premium, exclusive — inspired by high-end real estate marketing",
+    accent: "#C5A572",
+    bg: "#0A0A0A",
+    text: "#FFFFFF",
+  },
+  architect: {
+    label: "Architecture Portfolio",
+    description: "Clean, technical — inspired by architectural submission documents",
+    accent: "#333333",
+    bg: "#FFFFFF",
+    text: "#1a1a1a",
+  },
 };
 
 const DEFAULT_SLIDES: SlideConfig[] = [
   { id: "cover", label: "Cover Page", description: "Project name, hero render, date", enabled: true },
+  { id: "description", label: "Project Description", description: "Auto-generated overview of your design", enabled: true },
   { id: "site", label: "Site Plan", description: "Location map, terrain area, coordinates", enabled: true },
   { id: "floorplan", label: "Floor Plan", description: "Technical drawing, module layout", enabled: true },
   { id: "vision", label: "Design Vision", description: "Style direction, moodboard, palette", enabled: true },
@@ -69,6 +85,14 @@ const DEFAULT_SLIDES: SlideConfig[] = [
   { id: "cost", label: "Cost Summary", description: "Full pricing breakdown", enabled: true },
   { id: "next", label: "Next Steps", description: "Contact, timeline, builder info", enabled: true },
 ];
+
+/** Texture background URLs for common materials (Unsplash) */
+const MATERIAL_TEXTURES: Record<string, string> = {
+  oak: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop&q=60",
+  walnut: "https://images.unsplash.com/photo-1588854337115-1c67d9247e4d?w=200&h=200&fit=crop&q=60",
+  concrete: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?w=200&h=200&fit=crop&q=60",
+  marble: "https://images.unsplash.com/photo-1618220179428-22790b461013?w=200&h=200&fit=crop&q=60",
+};
 
 /** Product catalog for matching localStorage IDs — must match IDs from ProductsPage */
 const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
@@ -115,6 +139,13 @@ export default function PresentationPage() {
   const [projectName, setProjectName] = useState("My Modular Home");
   const [clientName, setClientName] = useState("");
   const [activeSlide, setActiveSlide] = useState<SlideId>("cover");
+  const [coverRenderIndex, setCoverRenderIndex] = useState(0);
+  const [nextSteps, setNextSteps] = useState([
+    { title: "Request a Builder Quote", desc: "Share this presentation with certified modular builders for detailed quotes." },
+    { title: "Book a Consultation", desc: "Schedule a session with our architects to refine your design." },
+    { title: "Secure Financing", desc: "Use this presentation for bank mortgage applications and investor meetings." },
+    { title: "Begin Construction", desc: "Once approved, your modular home can be manufactured and assembled in weeks." },
+  ]);
   const previewRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -326,27 +357,110 @@ export default function PresentationPage() {
             {/* Each slide is a card styled per template */}
             {(activeSlide === "cover" || typeof window !== "undefined" && window.matchMedia("print").matches) && slides.find((s) => s.id === "cover")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <div className="flex flex-col items-center justify-center min-h-[500px] text-center">
-                  <div className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: tmpl.accent }}>
-                    ModulCA Project Presentation
-                  </div>
-                  <h1 className="text-4xl font-bold mb-4" style={{ color: tmpl.text }}>{projectName}</h1>
-                  {clientName && (
-                    <p className="text-lg mb-2" style={{ color: tmpl.text, opacity: 0.6 }}>Prepared for {clientName}</p>
+                <div className="relative flex flex-col items-center justify-center min-h-[500px] text-center">
+                  {/* Hero render background */}
+                  {savedRenders.length > 0 && (
+                    <div className="absolute inset-0 rounded-xl overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={savedRenders[coverRenderIndex]?.imageUrl || savedRenders[0].imageUrl}
+                        alt="Hero render"
+                        className="h-full w-full object-cover"
+                      />
+                      <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${tmpl.bg}CC 0%, ${tmpl.bg}99 40%, ${tmpl.bg}DD 100%)` }} />
+                    </div>
                   )}
-                  <p className="text-sm mb-8" style={{ color: tmpl.text, opacity: 0.4 }}>
-                    {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                  </p>
-                  <div className="flex items-center gap-6 text-xs" style={{ color: tmpl.text, opacity: 0.5 }}>
-                    <span>{modules.length} Modules</span>
-                    <span>{stats.totalArea}m2 Total Area</span>
-                    <span>{style?.label || "Modern"} Style</span>
-                    <span>{finishInfo?.label || "Standard"} Finish</span>
+                  <div className="relative z-10">
+                    <div className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: tmpl.accent }}>
+                      ModulCA Project Presentation
+                    </div>
+                    <h1 className="text-4xl font-bold mb-4" style={{ color: tmpl.text }}>{projectName}</h1>
+                    {clientName && (
+                      <p className="text-lg mb-2" style={{ color: tmpl.text, opacity: 0.6 }}>Prepared for {clientName}</p>
+                    )}
+                    <p className="text-sm mb-8" style={{ color: tmpl.text, opacity: 0.4 }}>
+                      {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
+                    </p>
+                    <div className="flex items-center gap-6 text-xs" style={{ color: tmpl.text, opacity: 0.5 }}>
+                      <span>{modules.length} Modules</span>
+                      <span>{stats.totalArea}m{"\u00B2"} Total Area</span>
+                      <span>{style?.label || "Modern"} Style</span>
+                      <span>{finishInfo?.label || "Standard"} Finish</span>
+                    </div>
+                    <div className="mt-12 h-1 w-24 rounded mx-auto" style={{ backgroundColor: tmpl.accent }} />
                   </div>
-                  <div className="mt-12 h-1 w-24 rounded" style={{ backgroundColor: tmpl.accent }} />
+                  {/* Render thumbnail picker */}
+                  {savedRenders.length > 1 && (
+                    <div className="relative z-10 mt-6 flex items-center gap-2">
+                      <span className="text-[9px] uppercase tracking-wider mr-2" style={{ color: tmpl.text, opacity: 0.4 }}>Cover image:</span>
+                      {savedRenders.map((render, i) => (
+                        <button
+                          key={render.id}
+                          onClick={() => setCoverRenderIndex(i)}
+                          className={`h-10 w-14 rounded-md overflow-hidden border-2 transition-all ${
+                            i === coverRenderIndex ? "border-current opacity-100 scale-105" : "border-transparent opacity-50 hover:opacity-80"
+                          }`}
+                          style={{ borderColor: i === coverRenderIndex ? tmpl.accent : "transparent" }}
+                        >
+                          {/* eslint-disable-next-line @next/next/no-img-element */}
+                          <img src={render.imageUrl} alt={render.label} className="h-full w-full object-cover" />
+                        </button>
+                      ))}
+                    </div>
+                  )}
                 </div>
               </SlideCard>
             )}
+
+            {activeSlide === "description" && slides.find((s) => s.id === "description")?.enabled && (() => {
+              // Auto-generate project description from data
+              const roomBreakdown = Array.from(new Set(modules.map((m) => m.moduleType))).map((type) => {
+                const mt = MODULE_TYPES.find((m) => m.id === type);
+                const count = modules.filter((m) => m.moduleType === type).length;
+                return `${count} ${mt?.label || type}${count > 1 ? "s" : ""}`;
+              });
+              const styleName = style?.label || "modern";
+              const totalArea = stats.totalArea;
+              const usableArea = stats.usableArea;
+              const finishName = finishInfo?.label || "Standard";
+
+              return (
+                <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                  <SlideHeader accent={tmpl.accent} text={tmpl.text} number={2} title="Project Description" />
+                  <div className="mt-8 max-w-2xl mx-auto">
+                    <p className="text-base leading-relaxed mb-6" style={{ color: tmpl.text, opacity: 0.8 }}>
+                      This {styleName.toLowerCase()} modular residence comprises {modules.length} modules
+                      totaling {totalArea}m{"\u00B2"} of built area ({usableArea}m{"\u00B2"} usable),
+                      featuring {roomBreakdown.join(", ")}. Designed with a {finishName.toLowerCase()} finish
+                      level, the project prioritizes efficient space utilization through modular construction
+                      techniques.
+                    </p>
+                    <div className="grid grid-cols-2 gap-4 mt-8">
+                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Configuration</p>
+                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>{modules.length} Modules</p>
+                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{roomBreakdown.join(" + ")}</p>
+                      </div>
+                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Total Area</p>
+                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>{totalArea}m{"\u00B2"}</p>
+                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{usableArea}m{"\u00B2"} usable interior space</p>
+                      </div>
+                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Design Style</p>
+                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>{style?.label || "Modern"}</p>
+                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{style?.tagline || "Contemporary modular design"}</p>
+                      </div>
+                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
+                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Investment</p>
+                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>EUR {Math.round(stats.totalEstimate).toLocaleString()}</p>
+                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{finishName} finish | EUR {Math.round(stats.totalEstimate / totalArea)}/m{"\u00B2"}</p>
+                      </div>
+                    </div>
+                  </div>
+                </SlideCard>
+              );
+            })()}
 
             {activeSlide === "site" && slides.find((s) => s.id === "site")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
@@ -373,48 +487,96 @@ export default function PresentationPage() {
               </SlideCard>
             )}
 
-            {activeSlide === "floorplan" && slides.find((s) => s.id === "floorplan")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={3} title="Floor Plan" />
-                <div className="mt-6 flex justify-center">
-                  <div className="grid gap-1" style={{
-                    gridTemplateColumns: `repeat(${Math.max(...modules.map((m) => m.col)) - Math.min(...modules.map((m) => m.col)) + 1}, 80px)`,
-                  }}>
-                    {modules.map((mod) => {
-                      const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
+            {activeSlide === "floorplan" && slides.find((s) => s.id === "floorplan")?.enabled && (() => {
+              // Build grid from gridCells (includes empty cells for context) + modules for placed data
+              const activeCells = gridCells.filter((c) => c.moduleType !== null);
+              const cellsToRender = activeCells.length > 0 ? activeCells : modules.map((m) => ({ row: m.row, col: m.col, moduleType: m.moduleType }));
+              const allRows = cellsToRender.map((c) => c.row);
+              const allCols = cellsToRender.map((c) => c.col);
+              const minRow = Math.min(...allRows);
+              const maxRow = Math.max(...allRows);
+              const minCol = Math.min(...allCols);
+              const maxCol = Math.max(...allCols);
+              const numCols = maxCol - minCol + 1;
+              const numRows = maxRow - minRow + 1;
+              const cellLookup = new Map(cellsToRender.map((c) => [`${c.row},${c.col}`, c.moduleType]));
+              // Also create a module label lookup
+              const labelLookup = new Map(modules.map((m) => [`${m.row},${m.col}`, m.label]));
+
+              // Build grid positions including empty cells for the bounding box
+              const gridPositions: { row: number; col: number; moduleType: string | null }[] = [];
+              for (let r = minRow; r <= maxRow; r++) {
+                for (let c = minCol; c <= maxCol; c++) {
+                  const key = `${r},${c}`;
+                  gridPositions.push({ row: r, col: c, moduleType: cellLookup.get(key) ?? null });
+                }
+              }
+
+              return (
+                <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
+                  <SlideHeader accent={tmpl.accent} text={tmpl.text} number={3} title="Floor Plan" />
+                  <div className="mt-4 text-center">
+                    <p className="text-xs mb-1" style={{ color: tmpl.text, opacity: 0.4 }}>
+                      {numCols * MODULE_EXTERIOR_SIZE}m x {numRows * MODULE_EXTERIOR_SIZE}m footprint | {modules.length * MODULE_EXTERIOR_AREA}m{"\u00B2"} total | {modules.length * MODULE_INTERIOR_AREA}m{"\u00B2"} usable
+                    </p>
+                  </div>
+                  <div className="mt-4 flex justify-center">
+                    <div className="grid gap-1" style={{
+                      gridTemplateColumns: `repeat(${numCols}, 80px)`,
+                    }}>
+                      {gridPositions.map(({ row, col, moduleType }) => {
+                        const mt = moduleType ? MODULE_TYPES.find((m) => m.id === moduleType) : null;
+                        const label = labelLookup.get(`${row},${col}`);
+                        if (!moduleType) {
+                          // Empty grid cell — show as faint placeholder
+                          return (
+                            <div
+                              key={`${row}-${col}`}
+                              className="rounded-lg border border-dashed p-2 text-center"
+                              style={{
+                                gridColumn: col - minCol + 1,
+                                gridRow: row - minRow + 1,
+                                borderColor: tmpl.text + "15",
+                              }}
+                            >
+                              <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.15 }}>empty</div>
+                            </div>
+                          );
+                        }
+                        return (
+                          <div
+                            key={`${row}-${col}`}
+                            className="rounded-lg border p-2 text-center"
+                            style={{
+                              gridColumn: col - minCol + 1,
+                              gridRow: row - minRow + 1,
+                              backgroundColor: mt?.color + "30",
+                              borderColor: mt?.color || "#ccc",
+                            }}
+                          >
+                            <div className="text-[9px] font-bold" style={{ color: tmpl.text }}>{label || moduleType}</div>
+                            <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.5 }}>{mt?.label}</div>
+                            <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.4 }}>{MODULE_EXTERIOR_SIZE}m x {MODULE_EXTERIOR_SIZE}m</div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                  <div className="mt-6 flex justify-center gap-4">
+                    {Array.from(new Set(modules.map((m) => m.moduleType))).map((type) => {
+                      const mt = MODULE_TYPES.find((m) => m.id === type);
+                      const count = modules.filter((m) => m.moduleType === type).length;
                       return (
-                        <div
-                          key={`${mod.row}-${mod.col}`}
-                          className="rounded-lg border p-2 text-center"
-                          style={{
-                            gridColumn: mod.col - Math.min(...modules.map((m) => m.col)) + 1,
-                            gridRow: mod.row - Math.min(...modules.map((m) => m.row)) + 1,
-                            backgroundColor: mt?.color + "30",
-                            borderColor: mt?.color || "#ccc",
-                          }}
-                        >
-                          <div className="text-[9px] font-bold" style={{ color: tmpl.text }}>{mod.label}</div>
-                          <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.5 }}>{mt?.label}</div>
-                          <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.4 }}>3m x 3m</div>
+                        <div key={type} className="flex items-center gap-2 text-xs" style={{ color: tmpl.text }}>
+                          <div className="h-3 w-3 rounded" style={{ backgroundColor: mt?.color }} />
+                          <span>{mt?.label} x{count} ({count * MODULE_EXTERIOR_AREA}m{"\u00B2"})</span>
                         </div>
                       );
                     })}
                   </div>
-                </div>
-                <div className="mt-6 flex justify-center gap-4">
-                  {Array.from(new Set(modules.map((m) => m.moduleType))).map((type) => {
-                    const mt = MODULE_TYPES.find((m) => m.id === type);
-                    const count = modules.filter((m) => m.moduleType === type).length;
-                    return (
-                      <div key={type} className="flex items-center gap-2 text-xs" style={{ color: tmpl.text }}>
-                        <div className="h-3 w-3 rounded" style={{ backgroundColor: mt?.color }} />
-                        <span>{mt?.label} x{count}</span>
-                      </div>
-                    );
-                  })}
-                </div>
-              </SlideCard>
-            )}
+                </SlideCard>
+              );
+            })()}
 
             {activeSlide === "vision" && slides.find((s) => s.id === "vision")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
@@ -557,9 +719,15 @@ export default function PresentationPage() {
                       {Array.from(new Set(modules.map((m) => m.floorFinish))).map((floorId) => {
                         const floor = FLOOR_MATERIALS.find((f) => f.id === floorId);
                         const count = modules.filter((m) => m.floorFinish === floorId).length;
+                        const textureUrl = MATERIAL_TEXTURES[floorId];
                         return (
                           <div key={floorId} className="flex items-center gap-3 rounded-lg p-2" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
-                            <div className="h-10 w-10 rounded-lg border" style={{ backgroundColor: floor?.color }} />
+                            <div className="h-10 w-10 rounded-lg border overflow-hidden flex-shrink-0" style={{ backgroundColor: floor?.color }}>
+                              {textureUrl && (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={textureUrl} alt={floor?.label || floorId} className="h-full w-full object-cover" />
+                              )}
+                            </div>
                             <div>
                               <span className="text-xs font-medium" style={{ color: tmpl.text }}>{floor?.label}</span>
                               <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Used in {count} module{count > 1 ? "s" : ""}</span>
@@ -575,9 +743,15 @@ export default function PresentationPage() {
                       {Array.from(new Set(modules.map((m) => m.wallColor))).map((wallId) => {
                         const wall = WALL_MATERIALS.find((w) => w.id === wallId);
                         const count = modules.filter((m) => m.wallColor === wallId).length;
+                        const textureUrl = MATERIAL_TEXTURES[wallId];
                         return (
                           <div key={wallId} className="flex items-center gap-3 rounded-lg p-2" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
-                            <div className="h-10 w-10 rounded-lg border" style={{ backgroundColor: wall?.color }} />
+                            <div className="h-10 w-10 rounded-lg border overflow-hidden flex-shrink-0" style={{ backgroundColor: wall?.color }}>
+                              {textureUrl && (
+                                // eslint-disable-next-line @next/next/no-img-element
+                                <img src={textureUrl} alt={wall?.label || wallId} className="h-full w-full object-cover" />
+                              )}
+                            </div>
                             <div>
                               <span className="text-xs font-medium" style={{ color: tmpl.text }}>{wall?.label}</span>
                               <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Used in {count} module{count > 1 ? "s" : ""}</span>
@@ -652,21 +826,34 @@ export default function PresentationPage() {
 
             {activeSlide === "next" && slides.find((s) => s.id === "next")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={10} title="Next Steps" />
+                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={enabledSlides.findIndex((s) => s.id === "next") + 1} title="Next Steps" />
                 <div className="mt-8 max-w-lg mx-auto space-y-6">
-                  {[
-                    { step: "1", title: "Request a Builder Quote", desc: "Share this presentation with certified modular builders for detailed quotes." },
-                    { step: "2", title: "Book a Consultation", desc: "Schedule a session with our architects to refine your design." },
-                    { step: "3", title: "Secure Financing", desc: "Use this presentation for bank mortgage applications and investor meetings." },
-                    { step: "4", title: "Begin Construction", desc: "Once approved, your modular home can be manufactured and assembled in weeks." },
-                  ].map((item) => (
-                    <div key={item.step} className="flex gap-4">
+                  {nextSteps.map((item, i) => (
+                    <div key={i} className="flex gap-4">
                       <div className="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: tmpl.accent }}>
-                        {item.step}
+                        {i + 1}
                       </div>
-                      <div>
-                        <h4 className="text-sm font-bold" style={{ color: tmpl.text }}>{item.title}</h4>
-                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{item.desc}</p>
+                      <div className="flex-1">
+                        <input
+                          type="text"
+                          value={item.title}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setNextSteps((prev) => prev.map((s, j) => j === i ? { ...s, title: val } : s));
+                          }}
+                          className="w-full bg-transparent text-sm font-bold border-b border-transparent hover:border-current focus:border-current focus:outline-none transition-colors"
+                          style={{ color: tmpl.text }}
+                        />
+                        <input
+                          type="text"
+                          value={item.desc}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            setNextSteps((prev) => prev.map((s, j) => j === i ? { ...s, desc: val } : s));
+                          }}
+                          className="w-full bg-transparent text-xs mt-1 border-b border-transparent hover:border-current focus:border-current focus:outline-none transition-colors"
+                          style={{ color: tmpl.text, opacity: 0.5 }}
+                        />
                       </div>
                     </div>
                   ))}
