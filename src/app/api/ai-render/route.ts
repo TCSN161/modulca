@@ -79,10 +79,10 @@ const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo }> = {
 };
 
 /** Default engine order for text-to-image fallback chain.
- *  Together (best quality, no content filter issues) → AI Horde → Leonardo → Pollinations (most aggressive filter, last resort) */
-const FALLBACK_ORDER = ["together", "ai-horde", "leonardo", "pollinations"];
+ *  Pollinations first (free, no key) → AI Horde (free community) → paid engines as last resort */
+const FALLBACK_ORDER = ["pollinations", "ai-horde", "together", "stability", "leonardo"];
 /** Engines that support img2img (prefer these when baseImage is provided) */
-const IMG2IMG_FALLBACK = ["stability", "together", "ai-horde", "pollinations"];
+const IMG2IMG_FALLBACK = ["stability", "pollinations", "ai-horde", "together"];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */

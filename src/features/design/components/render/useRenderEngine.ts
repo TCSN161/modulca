@@ -13,6 +13,7 @@ interface UseRenderEngineReturn {
   aiImageUrl: string | null;
   aiLoading: boolean;
   aiError: string | null;
+  aiStatusMessage: string | null;
   aiElapsed: number;
   aiUsedEngine: string | null;
   handleGenerateAiRender: (prompt: string) => Promise<void>;
@@ -30,6 +31,20 @@ function sanitizePrompt(prompt: string): string {
   return `architectural interior design visualization, empty furnished room, ${cleaned}`;
 }
 
+/** Client-side direct engine URLs (used when proxy is unavailable, e.g. GitHub Pages static export) */
+const CLIENT_FALLBACK_ENGINES: Array<{
+  id: string;
+  label: string;
+  buildUrl: (prompt: string, width: number, height: number, seed: string) => string;
+}> = [
+  {
+    id: "pollinations",
+    label: "Pollinations AI",
+    buildUrl: (prompt, width, height, seed) =>
+      `https://image.pollinations.ai/prompt/${encodeURIComponent(prompt)}?width=${width}&height=${height}&seed=${seed}&nologo=true&nofeed=true&safe=true`,
+  },
+];
+
 export function useRenderEngine({
   aiEngine,
   renderResolution,
@@ -39,15 +54,21 @@ export function useRenderEngine({
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [aiStatusMessage, setAiStatusMessage] = useState<string | null>(null);
   const [aiElapsed, setAiElapsed] = useState(0);
   const [aiUsedEngine, setAiUsedEngine] = useState<string | null>(null);
 
   // Elapsed time ticker for AI loading
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  const stopTicker = () => {
+    if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
+  };
+
   const resetAiImage = useCallback(() => {
     setAiImageUrl(null);
     setAiError(null);
+    setAiStatusMessage(null);
   }, []);
 
   const handleGenerateAiRender = useCallback(async (prompt: string) => {
@@ -71,70 +92,135 @@ export function useRenderEngine({
     setAiError(null);
     setAiImageUrl(null);
     setAiUsedEngine(null);
+    setAiStatusMessage(null);
     setAiLoading(true);
     setAiElapsed(0);
+
     // Start elapsed timer
-    if (tickerRef.current) clearInterval(tickerRef.current);
+    stopTicker();
     const start = Date.now();
     tickerRef.current = setInterval(() => {
       setAiElapsed(Math.floor((Date.now() - start) / 1000));
     }, 1000);
 
     try {
-      let response: Response;
+      // ── Step 1: Try the proxy (handles server-side fallback automatically) ──
+      const engineLabel = aiEngine === "auto" ? "best available engine" : aiEngine.replace("ai-horde", "AI Horde").replace("pollinations", "Pollinations AI").replace("leonardo", "Leonardo.ai").replace("stability", "Stability AI").replace("together", "Together.ai");
+      setAiStatusMessage(`Generating with ${engineLabel}…`);
 
-      if (baseImage) {
-        // POST mode: send base image for img2img
-        console.log("[AI Render] Using POST (img2img) mode");
-        response = await fetch("/api/ai-render", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            prompt: sanitized,
-            width: res.width,
-            height: res.height,
-            seed,
-            engine: aiEngine !== "auto" ? aiEngine : null,
-            baseImage,
-          }),
-        });
-      } else {
-        // GET mode: text-to-image
-        const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
-        const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}`;
-        console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
-        response = await fetch(proxyUrl);
+      let response: Response | null = null;
+
+      try {
+        if (baseImage) {
+          // POST mode: send base image for img2img
+          console.log("[AI Render] Using POST (img2img) mode");
+          response = await fetch("/api/ai-render", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              prompt: sanitized,
+              width: res.width,
+              height: res.height,
+              seed,
+              engine: aiEngine !== "auto" ? aiEngine : null,
+              baseImage,
+            }),
+          });
+        } else {
+          // GET mode: text-to-image
+          const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
+          const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}`;
+          console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
+          response = await fetch(proxyUrl);
+        }
+      } catch (fetchErr) {
+        console.warn("[AI Render] Proxy fetch error:", fetchErr);
+        response = null;
       }
 
-      if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
+      // ── Step 2: Handle proxy unavailable (static export: 404/405) ──
+      // Fall back to client-side direct engine calls
+      if (!response || response.status === 404 || response.status === 405) {
+        console.warn("[AI Render] Proxy unavailable — switching to client-side direct calls");
+        return await tryClientFallback(sanitized, res.width, res.height, seed);
+      }
 
-      // If proxy failed (503, static export, etc.), try direct client-side Pollinations call
+      // ── Step 3: Handle proxy errors (503 = all engines failed, 429 = rate limit) ──
       if (!response.ok) {
-        console.warn("[AI Render] Proxy error:", response.status, "— falling back to direct Pollinations call");
-        const directUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(sanitized)}?width=${res.width}&height=${res.height}&seed=${seed}&nologo=true&safe=true`;
-        try {
-          response = await fetch(directUrl);
-        } catch (directErr) {
-          console.error("[AI Render] Direct Pollinations also failed:", directErr);
-          setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
-          setAiLoading(false);
-          return;
+        const status = response.status;
+        console.warn(`[AI Render] Proxy error ${status} — falling back to direct Pollinations`);
+
+        if (status === 429) {
+          setAiStatusMessage("Rate limit reached — retrying with Pollinations AI…");
+        } else if (status === 503) {
+          setAiStatusMessage("All engines busy — trying Pollinations AI directly…");
+        } else {
+          setAiStatusMessage("Server error — trying Pollinations AI directly…");
         }
-        if (!response.ok) {
-          setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
-          setAiLoading(false);
-          return;
+
+        return await tryClientFallback(sanitized, res.width, res.height, seed);
+      }
+
+      // ── Step 4: Parse successful response ──
+      return await parseImageResponse(response, aiEngine);
+
+    } catch (err) {
+      stopTicker();
+      console.error("[AI Render] Unexpected error:", err);
+      setAiError("Network error. Please try again.");
+      setAiStatusMessage(null);
+      setAiLoading(false);
+    }
+
+    // ── Helpers ──
+
+    async function tryClientFallback(prompt: string, width: number, height: number, seed: string) {
+      for (const engine of CLIENT_FALLBACK_ENGINES) {
+        setAiStatusMessage(`Trying ${engine.label}…`);
+        console.log(`[AI Render] Client fallback: ${engine.id}`);
+
+        try {
+          const url = engine.buildUrl(prompt, width, height, seed);
+          const directResponse = await fetch(url);
+
+          if (directResponse.ok) {
+            const blob = await directResponse.blob();
+            if (blob.size >= 500) {
+              console.log(`[AI Render] ${engine.id} direct success: ${blob.size} bytes`);
+              const objectUrl = URL.createObjectURL(blob);
+              setAiImageUrl(objectUrl);
+              setAiUsedEngine(engine.id);
+              setAiStatusMessage(null);
+              stopTicker();
+              setAiLoading(false);
+              return;
+            }
+            console.warn(`[AI Render] ${engine.id} returned suspiciously small image (${blob.size} bytes)`);
+          } else if (directResponse.status === 429) {
+            console.warn(`[AI Render] ${engine.id} rate limited (429)`);
+            setAiStatusMessage(`${engine.label} is rate limited. Please wait a moment and try again.`);
+          }
+        } catch (err) {
+          console.error(`[AI Render] ${engine.id} client fallback error:`, err);
         }
       }
 
+      stopTicker();
+      setAiError("AI generation failed. Please try again in a moment.");
+      setAiStatusMessage(null);
+      setAiLoading(false);
+    }
+
+    async function parseImageResponse(response: Response, engine: AiEngine) {
       const contentType = response.headers.get("content-type") || "";
-      // Direct Pollinations returns image/* or may vary — accept any image type
-      if (!contentType.startsWith("image/") && !contentType.includes("octet-stream") && response.url.includes("pollinations")) {
-        // Pollinations usually returns image even without proper content type — try blob anyway
-        console.warn("[AI Render] Non-image content-type, but Pollinations — trying blob anyway");
-      } else if (!contentType.startsWith("image/")) {
+
+      // Pollinations sometimes returns without proper content-type
+      const isPollinationsDirect = response.url.includes("pollinations");
+      if (!contentType.startsWith("image/") && !contentType.includes("octet-stream") && !isPollinationsDirect) {
         console.error("[AI Render] Unexpected content type:", contentType);
         setAiError("Unexpected response from AI. Try again.");
+        setAiStatusMessage(null);
+        stopTicker();
         setAiLoading(false);
         return;
       }
@@ -144,19 +230,18 @@ export function useRenderEngine({
 
       if (blob.size < 500) {
         setAiError("AI returned an empty image. Try a shorter prompt.");
+        setAiStatusMessage(null);
+        stopTicker();
         setAiLoading(false);
         return;
       }
 
-      const usedEngine = response.headers.get("x-ai-engine") || (response.url.includes("pollinations") ? "pollinations" : aiEngine);
+      const usedEngine = response.headers.get("x-ai-engine") || (isPollinationsDirect ? "pollinations" : engine);
       const objectUrl = URL.createObjectURL(blob);
       setAiImageUrl(objectUrl);
       setAiUsedEngine(usedEngine);
-      setAiLoading(false);
-    } catch (err) {
-      if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
-      console.error("[AI Render] Error:", err);
-      setAiError("Network error. Please try again.");
+      setAiStatusMessage(null);
+      stopTicker();
       setAiLoading(false);
     }
   }, [renderResolution, aiEngine, useSceneAsBase, captureRef]);
@@ -165,6 +250,7 @@ export function useRenderEngine({
     aiImageUrl,
     aiLoading,
     aiError,
+    aiStatusMessage,
     aiElapsed,
     aiUsedEngine,
     handleGenerateAiRender,

@@ -84,7 +84,7 @@ export default function HomePage() {
               Log in
             </Link>
             <Link
-              href="/project/demo/land"
+              href="/project/demo/marketplace"
               className="rounded-[12px] bg-brand-olive-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-olive-800"
             >
               Try Free Demo
@@ -126,7 +126,7 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
-                  href="/project/demo/land"
+                  href="/project/demo/marketplace"
                   className="btn-primary px-7 py-3.5 text-base shadow-subtle"
                 >
                   Start Designing — Free
@@ -252,7 +252,7 @@ export default function HomePage() {
               ))}
             </div>
             <div className="mt-12">
-              <Link href="/project/demo/land" className="btn-primary px-8 py-3 text-sm">
+              <Link href="/project/demo/marketplace" className="btn-primary px-8 py-3 text-sm">
                 Try the Full 13-Step Flow
               </Link>
             </div>
@@ -347,7 +347,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <Link
-                    href={plan.highlight ? "/pricing" : "/project/demo/land"}
+                    href={plan.highlight ? "/pricing" : "/project/demo/marketplace"}
                     className={`block w-full rounded-[12px] px-4 py-2.5 text-sm font-semibold transition-colors ${
                       plan.highlight
                         ? "bg-brand-olive-700 text-white hover:bg-brand-olive-800"
@@ -379,7 +379,7 @@ export default function HomePage() {
               </h2>
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
-                  href="/project/demo/land"
+                  href="/project/demo/marketplace"
                   className="rounded-[12px] bg-white px-8 py-3.5 text-sm font-bold text-brand-charcoal transition-colors hover:bg-brand-bone-200 shadow-subtle"
                 >
                   Launch Designer
@@ -421,7 +421,7 @@ export default function HomePage() {
               ))}
             </div>
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
-              <Link href="/project/demo/land" className="btn-primary px-8 py-3 text-sm">
+              <Link href="/project/demo/marketplace" className="btn-primary px-8 py-3 text-sm">
                 See a Demo Project
               </Link>
               <Link href="/register" className="btn-secondary px-8 py-3 text-sm">

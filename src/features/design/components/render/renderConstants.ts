@@ -6,13 +6,13 @@ export type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | 
 export type RenderResolution = "draft" | "standard" | "high";
 export type AiEngine = "auto" | "pollinations" | "ai-horde" | "stability" | "together" | "leonardo";
 
-export const AI_ENGINES: Record<AiEngine, { label: string; description: string; speed: string }> = {
-  auto: { label: "Auto (Best Available)", description: "Tries engines in order until one succeeds", speed: "" },
-  together: { label: "Together.ai FLUX", description: "Free unlimited 3 months, high quality", speed: "Fast" },
-  pollinations: { label: "Pollinations AI", description: "Free, no account needed", speed: "Fast" },
-  leonardo: { label: "Leonardo.ai", description: "150 free/day, photorealistic", speed: "Medium" },
-  stability: { label: "Stability AI", description: "img2img — uses 3D scene as base", speed: "Medium" },
-  "ai-horde": { label: "AI Horde", description: "Free community GPUs, reliable", speed: "Slow" },
+export const AI_ENGINES: Record<AiEngine, { label: string; description: string; speed: string; free?: boolean }> = {
+  auto: { label: "Auto (Best Available)", description: "Tries Pollinations → AI Horde → paid engines", speed: "", free: true },
+  pollinations: { label: "Pollinations AI", description: "Free, no account needed — recommended", speed: "Fast", free: true },
+  "ai-horde": { label: "AI Horde", description: "Free community GPUs, reliable", speed: "Slow", free: true },
+  together: { label: "Together.ai FLUX", description: "Free 3 months, high quality — API key required", speed: "Fast" },
+  stability: { label: "Stability AI", description: "img2img — uses 3D scene as base — API key required", speed: "Medium" },
+  leonardo: { label: "Leonardo.ai", description: "150 free/day, photorealistic — API key required", speed: "Medium" },
 };
 
 export const PROMPT_TEMPLATES: Record<PromptTemplate, { label: string; description: string; suffix: string }> = {

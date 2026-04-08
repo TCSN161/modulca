@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useLandStore } from "../store";
 
 interface SearchResult {
@@ -9,11 +9,21 @@ interface SearchResult {
   lon: string;
 }
 
+interface AddressSearchProps {
+  /** Pre-fill the search input (e.g. passed from marketplace terrain selection) */
+  initialQuery?: string;
+}
+
 /**
  * Address search using Nominatim (OpenStreetMap geocoding, free, no API key).
  */
-export default function AddressSearch() {
-  const [query, setQuery] = useState("");
+export default function AddressSearch({ initialQuery = "" }: AddressSearchProps) {
+  const [query, setQuery] = useState(initialQuery);
+
+  // Sync if parent provides a new initialQuery after mount (e.g. URL params resolved)
+  useEffect(() => {
+    if (initialQuery) setQuery(initialQuery);
+  }, [initialQuery]);
   const [results, setResults] = useState<SearchResult[]>([]);
   const [loading, setLoading] = useState(false);
   const { setMapCenter, setMapZoom } = useLandStore();

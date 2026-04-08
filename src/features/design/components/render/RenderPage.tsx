@@ -44,7 +44,7 @@ export default function RenderPage() {
   const [renderResolution, setRenderResolution] = useState<RenderResolution>("standard");
   const [includePeople, setIncludePeople] = useState(false);
   const [includePlants, setIncludePlants] = useState(false);
-  const [aiEngine, setAiEngine] = useState<AiEngine>("auto");
+  const [aiEngine, setAiEngine] = useState<AiEngine>("pollinations");
   const [useSceneAsBase, setUseSceneAsBase] = useState(false);
   const captureRef = useRef<(() => string | null) | null>(null);
 
@@ -52,6 +52,7 @@ export default function RenderPage() {
     aiImageUrl,
     aiLoading,
     aiError,
+    aiStatusMessage,
     aiElapsed,
     aiUsedEngine,
     handleGenerateAiRender: generateAiRender,
@@ -598,7 +599,7 @@ export default function RenderPage() {
                         <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl">
                           <div className="h-8 w-8 animate-spin rounded-full border-4 border-brand-amber-500 border-t-transparent" />
                           <p className="text-sm font-medium text-brand-teal-800">
-                            Generating with {aiEngine === "auto" ? "AI" : AI_ENGINES[aiEngine].label}...
+                            {aiStatusMessage || `Generating with ${aiEngine === "auto" ? "AI" : AI_ENGINES[aiEngine].label}…`}
                           </p>
                           <p className="text-xs text-gray-400">{aiElapsed}s elapsed — typically takes 30-90 seconds</p>
                           <p className="text-[10px] text-gray-300">Please wait — the AI is creating your image</p>
