@@ -360,38 +360,55 @@ function PresentationDocument(props: PdfGeneratorProps) {
         );
         break;
 
-      case "renders":
-        pages.push(
-          <SlidePage key="renders" slideLabel="AI Renders" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
-            <View style={s.accentBar} />
-            <Text style={s.sectionTitle}>AI Renders</Text>
-            {props.savedRenders.length > 0 ? (
-              <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 8 }}>
-                {props.savedRenders.slice(0, 4).map((render, i) => (
-                  <View key={i} style={{ width: "48%", marginBottom: 8 }}>
-                    <Image
-                      src={render.imageUrl}
-                      style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 4 }}
-                    />
-                    <Text style={{ fontSize: 8, color: t.text, marginTop: 4 }}>
-                      {render.label} — {render.engine}
-                    </Text>
-                  </View>
-                ))}
-              </View>
-            ) : (
+      case "renders": {
+        // Show ALL saved renders — 4 per page, adding extra pages as needed
+        const renders = props.savedRenders;
+        if (renders.length === 0) {
+          pages.push(
+            <SlidePage key="renders" slideLabel="AI Renders" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+              <View style={s.accentBar} />
+              <Text style={s.sectionTitle}>AI Renders</Text>
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
                 <Text style={{ ...s.body, opacity: 0.4, fontSize: 14 }}>
                   No AI renders saved yet.
                 </Text>
                 <Text style={{ ...s.body, opacity: 0.3, marginTop: 8 }}>
-                  Generate renders in Step 7 and click &quot;Save to Presentation&quot;.
+                  Generate renders in Step 8 and click &quot;Save to Presentation&quot;.
                 </Text>
               </View>
-            )}
-          </SlidePage>
-        );
+            </SlidePage>
+          );
+        } else {
+          const RENDERS_PER_PAGE = 4;
+          const renderPages = Math.ceil(renders.length / RENDERS_PER_PAGE);
+          for (let rp = 0; rp < renderPages; rp++) {
+            const chunk = renders.slice(rp * RENDERS_PER_PAGE, (rp + 1) * RENDERS_PER_PAGE);
+            const label = renderPages > 1 ? `AI Renders (${rp + 1}/${renderPages})` : "AI Renders";
+            pages.push(
+              <SlidePage key={`renders-${rp}`} slideLabel={label} pageNum={pn + rp} total={total + renderPages - 1} s={s} isFreeUser={isFree}>
+                <View style={s.accentBar} />
+                <Text style={s.sectionTitle}>{label}</Text>
+                <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 8 }}>
+                  {chunk.map((render, i) => (
+                    <View key={i} style={{ width: "48%", marginBottom: 8 }}>
+                      <Image
+                        src={render.imageUrl}
+                        style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 4 }}
+                      />
+                      <Text style={{ fontSize: 8, color: t.text, marginTop: 4 }}>
+                        {render.label} — {render.engine}
+                      </Text>
+                    </View>
+                  ))}
+                </View>
+              </SlidePage>
+            );
+          }
+          // Adjust pageNum for extra render pages
+          if (renderPages > 1) pageNum += renderPages - 1;
+        }
         break;
+      }
 
       case "materials":
         pages.push(
@@ -526,29 +543,34 @@ function PresentationDocument(props: PdfGeneratorProps) {
 /* ------------------------------------------------------------------ */
 
 const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
-  "flooring-oak": { name: "Oak Flooring", price: 45 },
-  "flooring-concrete": { name: "Polished Concrete", price: 35 },
-  "wall-panels": { name: "Decorative Wall Panels", price: 28 },
-  "insulation-premium": { name: "Premium Insulation", price: 22 },
-  "windows-double": { name: "Double-Glazed Windows", price: 320 },
-  "door-interior": { name: "Interior Doors", price: 180 },
-  "paint-interior": { name: "Interior Paint", price: 35 },
-  "tiles-bathroom": { name: "Bathroom Tiles", price: 42 },
-  "sofa-modular": { name: "Modular Sofa", price: 890 },
-  "rug-area": { name: "Area Rug", price: 220 },
-  "curtains-blackout": { name: "Blackout Curtains", price: 85 },
-  "shelving-unit": { name: "Shelving Unit", price: 340 },
-  "pendant-light": { name: "Pendant Lights", price: 120 },
-  "mirror-wall": { name: "Wall Mirror", price: 95 },
-  "bathtub-freestanding": { name: "Freestanding Bathtub", price: 1200 },
-  "faucet-set": { name: "Faucet Set", price: 180 },
-  "sink-kitchen": { name: "Kitchen Sink", price: 280 },
-  "toilet-modern": { name: "Modern Toilet", price: 450 },
-  "shower-system": { name: "Rain Shower System", price: 380 },
-  "outlet-smart": { name: "Smart Outlets", price: 25 },
-  "switch-dimmer": { name: "Dimmer Switches", price: 35 },
-  "light-recessed": { name: "Recessed Lighting", price: 45 },
-  "heater-water": { name: "Tankless Water Heater", price: 680 },
+  // Finishing Materials
+  "fin-01": { name: "Engineered Oak Flooring", price: 42 },
+  "fin-02": { name: "Gypsum Wall Panels", price: 18 },
+  "fin-03": { name: "XPS Underfloor Insulation", price: 12 },
+  "fin-04": { name: "Triple-Glazed Window Unit", price: 385 },
+  "fin-05": { name: "Interior Flush Door", price: 145 },
+  "fin-06": { name: "Mineral Wool Insulation Roll", price: 8 },
+  "fin-07": { name: "Interior Wall Paint", price: 35 },
+  "fin-08": { name: "Porcelain Floor Tiles", price: 28 },
+  // Furniture & Decor
+  "fur-01": { name: "Modular Sofa 3-Seat", price: 1290 },
+  "fur-02": { name: "Wool Area Rug 200\u00D7300", price: 420 },
+  "fur-03": { name: "Blackout Curtain Pair", price: 95 },
+  "fur-04": { name: "Ceramic Vase Collection", price: 65 },
+  "fur-05": { name: "Wall-Mounted Shelving Unit", price: 280 },
+  "fur-06": { name: "Pendant Light Fixture", price: 175 },
+  "fur-07": { name: "Round Wall Mirror", price: 210 },
+  "fur-08": { name: "Upholstered Dining Chair", price: 195 },
+  // Plumbing & Electrical
+  "plm-01": { name: "Freestanding Bathtub", price: 890 },
+  "plm-02": { name: "Single-Lever Basin Faucet", price: 125 },
+  "plm-03": { name: "Ceramic Countertop Sink", price: 185 },
+  "plm-04": { name: "Wall-Hung Toilet", price: 320 },
+  "plm-05": { name: "Thermostatic Shower Set", price: 295 },
+  "plm-06": { name: "Flush-Mount Outlet Pack", price: 48 },
+  "plm-07": { name: "Modular Light Switch Set", price: 36 },
+  "plm-08": { name: "LED Ceiling Downlight Pack", price: 85 },
+  "plm-09": { name: "Electric Water Heater 80 L", price: 340 },
 };
 
 function loadProducts(): { name: string; quantity: number; price: number }[] {

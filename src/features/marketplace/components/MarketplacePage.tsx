@@ -512,10 +512,13 @@ function TerrainCard({
 
   return (
     <div className="rounded-xl border border-gray-200 bg-white overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-      {/* Color header */}
+      {/* Photo or gradient header */}
       <div
-        className="h-32 relative"
-        style={{ background: `linear-gradient(135deg, ${zc.from}, ${zc.to})` }}
+        className="h-36 relative bg-cover bg-center"
+        style={t.photos.length > 0
+          ? { backgroundImage: `url(${t.photos[0]})` }
+          : { background: `linear-gradient(135deg, ${zc.from}, ${zc.to})` }
+        }
       >
         {/* Status badge */}
         <span className={`absolute top-3 left-3 px-2 py-0.5 rounded-full text-[10px] font-bold uppercase ${STATUS_STYLES[t.status]}`}>

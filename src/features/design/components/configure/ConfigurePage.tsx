@@ -10,7 +10,7 @@ import type { WallSide, WallType, WallConfigs, ModuleConfig } from "../../store"
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import StepNav from "../shared/StepNav";
 
 type ViewMode = "single" | "all";
@@ -63,7 +63,8 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
   const finishLevel = useDesignStore((s) => s.finishLevel);
 
   const mt = MODULE_TYPES.find((t) => t.id === mod.moduleType);
-  const preset = getPreset(mod.moduleType, mod.layoutPreset);
+  const preset = getPreset(mod.moduleType, mod.layoutPreset)
+    || getPresetsForType(mod.moduleType)[0];
   const floorMat = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish);
   const wallMat = WALL_MATERIALS.find((w) => w.id === mod.wallColor);
   const furnitureCount = preset?.furniture.length ?? 0;

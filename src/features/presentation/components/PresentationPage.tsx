@@ -6,7 +6,7 @@ import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getStyleDirection } from "@/features/design/styles";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
 import StepNav from "@/features/design/components/shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
 import { useAuthStore } from "@/features/auth/store";
@@ -70,31 +70,36 @@ const DEFAULT_SLIDES: SlideConfig[] = [
   { id: "next", label: "Next Steps", description: "Contact, timeline, builder info", enabled: true },
 ];
 
-/** Product catalog for matching localStorage IDs */
+/** Product catalog for matching localStorage IDs — must match IDs from ProductsPage */
 const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
-  "flooring-oak": { name: "Oak Flooring", price: 45 },
-  "flooring-concrete": { name: "Polished Concrete", price: 35 },
-  "wall-panels": { name: "Decorative Wall Panels", price: 28 },
-  "insulation-premium": { name: "Premium Insulation", price: 22 },
-  "windows-double": { name: "Double-Glazed Windows", price: 320 },
-  "door-interior": { name: "Interior Doors", price: 180 },
-  "paint-interior": { name: "Interior Paint", price: 35 },
-  "tiles-bathroom": { name: "Bathroom Tiles", price: 42 },
-  "sofa-modular": { name: "Modular Sofa", price: 890 },
-  "rug-area": { name: "Area Rug", price: 220 },
-  "curtains-blackout": { name: "Blackout Curtains", price: 85 },
-  "shelving-unit": { name: "Shelving Unit", price: 340 },
-  "pendant-light": { name: "Pendant Lights", price: 120 },
-  "mirror-wall": { name: "Wall Mirror", price: 95 },
-  "bathtub-freestanding": { name: "Freestanding Bathtub", price: 1200 },
-  "faucet-set": { name: "Faucet Set", price: 180 },
-  "sink-kitchen": { name: "Kitchen Sink", price: 280 },
-  "toilet-modern": { name: "Modern Toilet", price: 450 },
-  "shower-system": { name: "Rain Shower System", price: 380 },
-  "outlet-smart": { name: "Smart Outlets", price: 25 },
-  "switch-dimmer": { name: "Dimmer Switches", price: 35 },
-  "light-recessed": { name: "Recessed Lighting", price: 45 },
-  "heater-water": { name: "Tankless Water Heater", price: 680 },
+  // Finishing Materials
+  "fin-01": { name: "Engineered Oak Flooring", price: 42 },
+  "fin-02": { name: "Gypsum Wall Panels", price: 18 },
+  "fin-03": { name: "XPS Underfloor Insulation", price: 12 },
+  "fin-04": { name: "Triple-Glazed Window Unit", price: 385 },
+  "fin-05": { name: "Interior Flush Door", price: 145 },
+  "fin-06": { name: "Mineral Wool Insulation Roll", price: 8 },
+  "fin-07": { name: "Interior Wall Paint", price: 35 },
+  "fin-08": { name: "Porcelain Floor Tiles", price: 28 },
+  // Furniture & Decor
+  "fur-01": { name: "Modular Sofa 3-Seat", price: 1290 },
+  "fur-02": { name: "Wool Area Rug 200\u00D7300", price: 420 },
+  "fur-03": { name: "Blackout Curtain Pair", price: 95 },
+  "fur-04": { name: "Ceramic Vase Collection", price: 65 },
+  "fur-05": { name: "Wall-Mounted Shelving Unit", price: 280 },
+  "fur-06": { name: "Pendant Light Fixture", price: 175 },
+  "fur-07": { name: "Round Wall Mirror", price: 210 },
+  "fur-08": { name: "Upholstered Dining Chair", price: 195 },
+  // Plumbing & Electrical
+  "plm-01": { name: "Freestanding Bathtub", price: 890 },
+  "plm-02": { name: "Single-Lever Basin Faucet", price: 125 },
+  "plm-03": { name: "Ceramic Countertop Sink", price: 185 },
+  "plm-04": { name: "Wall-Hung Toilet", price: 320 },
+  "plm-05": { name: "Thermostatic Shower Set", price: 295 },
+  "plm-06": { name: "Flush-Mount Outlet Pack", price: 48 },
+  "plm-07": { name: "Modular Light Switch Set", price: 36 },
+  "plm-08": { name: "LED Ceiling Downlight Pack", price: 85 },
+  "plm-09": { name: "Electric Water Heater 80 L", price: 340 },
 };
 
 export default function PresentationPage() {
@@ -466,7 +471,8 @@ export default function PresentationPage() {
                 <div className="mt-6 space-y-4">
                   {modules.map((mod) => {
                     const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
-                    const preset = getPreset(mod.moduleType, mod.layoutPreset);
+                    const preset = getPreset(mod.moduleType, mod.layoutPreset)
+                      || getPresetsForType(mod.moduleType)[0];
                     const floor = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish);
                     const wall = WALL_MATERIALS.find((w) => w.id === mod.wallColor);
                     return (
@@ -512,7 +518,7 @@ export default function PresentationPage() {
                 <SlideHeader accent={tmpl.accent} text={tmpl.text} number={6} title="AI Renders" />
                 {savedRenders.length > 0 ? (
                   <div className="mt-6 grid grid-cols-2 gap-4">
-                    {savedRenders.slice(0, 5).map((render) => (
+                    {savedRenders.map((render) => (
                       <div key={render.id} className="rounded-xl overflow-hidden border" style={{ borderColor: tmpl.text + "20" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={render.imageUrl} alt={render.label} className="w-full aspect-video object-cover" />
@@ -533,9 +539,9 @@ export default function PresentationPage() {
                     </p>
                   </div>
                 )}
-                {savedRenders.length > 5 && (
+                {savedRenders.length > 6 && (
                   <p className="text-[10px] mt-2 text-center" style={{ color: tmpl.text, opacity: 0.3 }}>
-                    Showing 5 of {savedRenders.length} renders (upgrade to Premium for unlimited)
+                    {savedRenders.length} renders saved
                   </p>
                 )}
               </SlideCard>
@@ -616,7 +622,7 @@ export default function PresentationPage() {
                   </div>
                 ) : (
                   <div className="mt-6 text-center py-12">
-                    <p className="text-sm" style={{ color: tmpl.text, opacity: 0.4 }}>No products selected yet. Add products in Step 10.</p>
+                    <p className="text-sm" style={{ color: tmpl.text, opacity: 0.4 }}>No products selected yet. Add products in Step 11 (Products).</p>
                   </div>
                 )}
               </SlideCard>

@@ -3,7 +3,7 @@
 import React from "react";
 import { MODULE_TYPES } from "@/shared/types";
 import type { ModuleConfig, WallType } from "../../store";
-import { getPreset, FLOOR_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS } from "../../layouts";
 
 const CELL = 300; // px per 3m module
 const WALL = 12;
@@ -139,7 +139,8 @@ export default function CombinedFloorPlan({ modules, selectedModule, onSelectMod
         {modules.map((mod) => {
           const mt = MODULE_TYPES.find((t) => t.id === mod.moduleType);
           const color = mt?.color || "#888";
-          const preset = getPreset(mod.moduleType, mod.layoutPreset);
+          const preset = getPreset(mod.moduleType, mod.layoutPreset)
+            || getPresetsForType(mod.moduleType)[0];
           const furniture = preset?.furniture || [];
           const floorColor =
             FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish)?.color || "#FFFFFF";

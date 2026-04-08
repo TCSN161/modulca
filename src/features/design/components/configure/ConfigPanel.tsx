@@ -253,7 +253,7 @@ export default function ConfigPanel({ moduleRow, moduleCol }: ConfigPanelProps) 
               <div className="flex justify-between">
                 <span className="text-gray-500">Layout</span>
                 <span className="font-medium text-brand-teal-800">
-                  {getPreset(mod.moduleType, mod.layoutPreset)?.label || "Default"}
+                  {(getPreset(mod.moduleType, mod.layoutPreset) || getPresetsForType(mod.moduleType)[0])?.label || "Default"}
                 </span>
               </div>
               <div className="flex justify-between">

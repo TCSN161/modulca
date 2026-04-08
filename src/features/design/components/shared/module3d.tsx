@@ -566,8 +566,12 @@ export function StaticFurniturePiece({
   offsetX?: number;
   offsetZ?: number;
 }) {
-  const posX = override?.x ?? item.x;
-  const posZ = override?.z ?? item.z;
+  // Use override position if available, but validate it's within module bounds (0-3m).
+  // If override position is NaN or out of bounds, fall back to item defaults.
+  let posX = override?.x ?? item.x;
+  let posZ = override?.z ?? item.z;
+  if (!Number.isFinite(posX) || posX < -0.5 || posX > MODULE_SIZE + 0.5) posX = item.x;
+  if (!Number.isFinite(posZ) || posZ < -0.5 || posZ > MODULE_SIZE + 0.5) posZ = item.z;
   const displayColor = override?.color ?? item.color;
   const rotationY = override?.rotation ?? 0;
   const halfH = item.height / 2;

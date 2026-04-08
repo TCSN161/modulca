@@ -103,54 +103,56 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
     priceYearly: null,
     color: "#6B7280", // gray
     features: {
+      // NOTE: Free tier is fully unlocked for demo/MVP phase.
+      // Re-enable limits when real billing (Stripe) is connected.
       // Land
-      maxTerrainSize: 500,
-      customTerrainShape: false,
+      maxTerrainSize: 2000,
+      customTerrainShape: true,
       importCadastralData: false,
       // Layout
-      maxModules: 4,
-      allModuleTypes: false, // living, bedroom, kitchen, bathroom only
+      maxModules: 12,
+      allModuleTypes: true,
       customModuleDimensions: false,
       // Preview
-      highQualityPreview: false,
+      highQualityPreview: true,
       moduleSwap: true,
       // Vision
-      styleDirections: 2,
-      moodboardPins: 3,
-      customStyleUpload: false,
+      styleDirections: 3,
+      moodboardPins: 12,
+      customStyleUpload: true,
       // Materials
-      allMaterials: false,
+      allMaterials: true,
       customMaterials: false,
-      furnitureOverrides: false,
+      furnitureOverrides: true,
       // Products
       productCatalog: true,
-      partnerPricing: false,
+      partnerPricing: true,
       directPurchase: false,
       // Render
-      aiRendersPerMonth: 5,
-      renderResolution: "sd",
-      savedRenders: 3,
+      aiRendersPerMonth: -1, // unlimited for demo
+      renderResolution: "hd",
+      savedRenders: 20,
       // Technical
-      allDrawingTypes: false, // floor plan + section only
-      drawingPresentation: false,
+      allDrawingTypes: true,
+      drawingPresentation: true,
       knowledgeBase: true,
       permitTracker: true,
-      exportPdf: false,
+      exportPdf: true,
       exportDwg: false,
       // Walkthrough
       walkthrough: true,
-      autoTour: false,
+      autoTour: true,
       vrMode: false,
       // Presentation
-      presentationTemplates: 1,
-      pdfPresentation: false,
-      sharableLink: false,
+      presentationTemplates: 3,
+      pdfPresentation: true,
+      sharableLink: true,
       // Marketplace
       marketplaceBrowse: true,
-      marketplaceList: false,
-      builderDirectory: false,
+      marketplaceList: true,
+      builderDirectory: true,
       // Projects
-      maxProjects: 1,
+      maxProjects: 5,
       projectCollaboration: false,
       clientDashboard: false,
       analytics: false,

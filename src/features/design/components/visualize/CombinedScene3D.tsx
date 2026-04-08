@@ -5,7 +5,7 @@ import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import { useDesignStore } from "../../store";
 import type { ModuleConfig } from "../../store";
-import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
+import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import {
   MODULE_SIZE, WALL_HEIGHT,
   ModuleWalls, ModuleFloor,
@@ -110,7 +110,8 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
         const oz = mod.row * MODULE_SIZE;
         const floorColor = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish)?.color || "#D4A76A";
         const wallColor = WALL_MATERIALS.find((w) => w.id === mod.wallColor)?.color || "#F0EDE5";
-        const preset = getPreset(mod.moduleType, mod.layoutPreset);
+        const preset = getPreset(mod.moduleType, mod.layoutPreset)
+          || getPresetsForType(mod.moduleType)[0];
         const furniture = preset?.furniture || [];
         const overrides = mod.furnitureOverrides[mod.layoutPreset] ?? {};
         const isSelected = selectedModule?.row === mod.row && selectedModule?.col === mod.col;
