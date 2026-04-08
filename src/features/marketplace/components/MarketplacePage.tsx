@@ -355,9 +355,11 @@ function HaveLandFlow({ onBack }: { onBack: () => void }) {
     const params = new URLSearchParams();
     if (address) params.set("address", address);
     if (city) params.set("city", city);
+    if (county) params.set("county", county);
     if (area) params.set("area", area);
+    if (zoning) params.set("zoning", zoning);
     return params.toString();
-  }, [address, city, area]);
+  }, [address, city, county, area, zoning]);
 
   return (
     <div className="flex-1 overflow-y-auto">

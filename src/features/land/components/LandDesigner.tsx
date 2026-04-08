@@ -135,19 +135,39 @@ export default function LandDesigner() {
   const terrainLat = searchParams.get("lat");
   const terrainLng = searchParams.get("lng");
   const terrainAddr = searchParams.get("address");
-  const fromChoose = terrainLat && terrainLng;
+  const terrainCity = searchParams.get("city");
 
   const setMapCenter = useLandStore((s) => s.setMapCenter);
   const setMapZoom = useLandStore((s) => s.setMapZoom);
 
   useEffect(() => {
-    if (fromChoose && terrainLat && terrainLng) {
+    if (terrainLat && terrainLng) {
+      // Direct coordinates (from marketplace terrain selection)
       const lat = parseFloat(terrainLat);
       const lng = parseFloat(terrainLng);
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
         setMapCenter({ lat, lng });
         setMapZoom(18);
       }
+    } else if (terrainAddr) {
+      // Address only (from "I have land" form) — geocode it
+      const query = [terrainAddr, terrainCity, "Romania"].filter(Boolean).join(", ");
+      fetch(
+        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
+        { headers: { "Accept-Language": "en" } }
+      )
+        .then((res) => res.json())
+        .then((data: { lat: string; lon: string }[]) => {
+          if (data.length > 0) {
+            const lat = parseFloat(data[0].lat);
+            const lng = parseFloat(data[0].lon);
+            if (Number.isFinite(lat) && Number.isFinite(lng)) {
+              setMapCenter({ lat, lng });
+              setMapZoom(18);
+            }
+          }
+        })
+        .catch(() => { /* geocoding failed, user can search manually */ });
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
@@ -186,8 +206,8 @@ export default function LandDesigner() {
             Step 2: Locate Your Land
           </h2>
           <p className="mb-5 text-sm text-gray-500">
-            {fromChoose && terrainAddr
-              ? `Selected terrain: ${terrainAddr}`
+            {terrainAddr
+              ? `Selected terrain: ${terrainAddr}${terrainCity ? `, ${terrainCity}` : ""}`
               : "Search for your location, then click and drag on the map to draw your building area."}
           </p>
 
