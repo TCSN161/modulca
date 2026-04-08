@@ -66,7 +66,7 @@ export const SHARED = {
   featureGate:"shared/components/FeatureGate.tsx — tier-based feature wrapper",
   authGuard:  "shared/components/AuthGuard.tsx — route protection (soft/hard)",
   slidePanel: "shared/components/SlideOverPanel.tsx — reusable slide-over panel",
-  config:     "shared/config/index.ts — MAPBOX_TOKEN, SUPABASE_URL",
+  config:     "shared/config/index.ts — SUPABASE_URL (maps use Leaflet, no Mapbox)",
 } as const;
 
 /* ── Hydration Pattern (all step pages use this) ──────────── */
@@ -87,7 +87,7 @@ export const SHARED = {
 /* ── Tech Stack ────────────────────────────────────────────── */
 // Next.js 16.2.1 (App Router, output: "export" for GitHub Pages)
 // React 19 | Zustand 5 | Three.js 0.183 | @react-three/fiber+drei
-// Tailwind 3.4 | Mapbox GL 3.20 | Konva 10.2 | @react-pdf/renderer 4.3
+// Tailwind 3.4 | Leaflet 1.9 + react-leaflet 5 | Konva 10.2 | @react-pdf/renderer 4.3
 // TypeScript 5 strict | Prisma 5.22 (not yet active) | NextAuth 5 beta (disabled)
 
 /* ── TODO: FeatureGate wiring (Phase 2E) ──────────────────── */

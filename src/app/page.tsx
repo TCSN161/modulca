@@ -96,7 +96,7 @@ export default function HomePage() {
             </p>
             <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
               {[
-                { icon: "🗺️", title: "Interactive Land Designer", desc: "Draw your building area on a real map with Mapbox. Auto-generated 3x3m grid overlay." },
+                { icon: "🗺️", title: "Interactive Land Designer", desc: "Draw your building area on a real satellite map. Auto-generated 3x3m grid overlay." },
                 { icon: "🧱", title: "Modular Layout System", desc: "8 room types, 9 building presets, drag-and-place modules with shared wall detection." },
                 { icon: "🎨", title: "3D Preview & Visualization", desc: "Real-time Three.js preview with furniture, materials, lighting, and module inspection." },
                 { icon: "🤖", title: "AI-Powered Renders", desc: "5 AI engines generate photorealistic interior renders. Multiple styles and templates." },

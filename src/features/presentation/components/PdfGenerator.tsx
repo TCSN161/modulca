@@ -41,6 +41,7 @@ interface PdfGeneratorProps {
   mapCenter: { lat: number; lng: number };
   products: { name: string; quantity: number; price: number }[];
   savedRenders: SavedRender[];
+  isFreeUser?: boolean;
 }
 
 /* ------------------------------------------------------------------ */
@@ -154,12 +155,14 @@ function SlidePage({
   pageNum,
   total,
   s,
+  isFreeUser,
 }: {
   children: React.ReactNode;
   slideLabel: string;
   pageNum: number;
   total: number;
   s: ReturnType<typeof makeStyles>;
+  isFreeUser?: boolean;
 }) {
   return (
     <Page size="A4" orientation="landscape" style={s.page}>
@@ -170,6 +173,19 @@ function SlidePage({
           {pageNum} / {total}
         </Text>
       </View>
+      {isFreeUser && (
+        <Text style={{
+          position: "absolute",
+          top: "45%",
+          left: "20%",
+          fontSize: 48,
+          color: "#000000",
+          opacity: 0.04,
+          transform: "rotate(-30deg)",
+        }}>
+          ModulCA Free — modulca.com
+        </Text>
+      )}
     </Page>
   );
 }
@@ -183,6 +199,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
   const s = makeStyles(t);
   const enabled = props.slides.filter((sl) => sl.enabled);
   const total = enabled.length;
+  const isFree = props.isFreeUser;
   let pageNum = 0;
 
   const pages: React.ReactNode[] = [];
@@ -194,7 +211,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
     switch (slide.id) {
       case "cover":
         pages.push(
-          <SlidePage key="cover" slideLabel="Cover" pageNum={pn} total={total} s={s}>
+          <SlidePage key="cover" slideLabel="Cover" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={{ flex: 1, justifyContent: "center" }}>
               <View style={s.accentBar} />
               <Text style={{ ...s.title, fontSize: 36 }}>{props.projectName}</Text>
@@ -202,7 +219,21 @@ function PresentationDocument(props: PdfGeneratorProps) {
                 <Text style={{ ...s.subtitle, fontSize: 16 }}>Prepared for {props.clientName}</Text>
               ) : null}
               <Text style={s.body}>{new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}</Text>
-              <Text style={{ ...s.body, marginTop: 40, opacity: 0.4 }}>
+              <View style={{ flexDirection: "row", gap: 24, marginTop: 32 }}>
+                <View>
+                  <Text style={{ fontSize: 24, fontWeight: "bold", color: t.accent }}>{props.stats.totalModules}</Text>
+                  <Text style={{ fontSize: 8, color: t.text, opacity: 0.5 }}>MODULES</Text>
+                </View>
+                <View>
+                  <Text style={{ fontSize: 24, fontWeight: "bold", color: t.accent }}>{props.stats.totalArea}m2</Text>
+                  <Text style={{ fontSize: 8, color: t.text, opacity: 0.5 }}>TOTAL AREA</Text>
+                </View>
+                <View>
+                  <Text style={{ fontSize: 24, fontWeight: "bold", color: t.accent }}>EUR {Math.round(props.stats.totalEstimate).toLocaleString()}</Text>
+                  <Text style={{ fontSize: 8, color: t.text, opacity: 0.5 }}>ESTIMATE</Text>
+                </View>
+              </View>
+              <Text style={{ ...s.body, marginTop: 32, opacity: 0.4 }}>
                 Designed with ModulCA — Modular Construction Platform
               </Text>
             </View>
@@ -212,7 +243,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "site":
         pages.push(
-          <SlidePage key="site" slideLabel="Site Plan" pageNum={pn} total={total} s={s}>
+          <SlidePage key="site" slideLabel="Site Plan" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Site Plan</Text>
             <View style={s.row}>
@@ -241,7 +272,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "floorplan":
         pages.push(
-          <SlidePage key="floorplan" slideLabel="Floor Plan" pageNum={pn} total={total} s={s}>
+          <SlidePage key="floorplan" slideLabel="Floor Plan" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Floor Plan — Module Layout</Text>
             <View style={{ ...s.row, borderBottomWidth: 1, marginBottom: 4 }}>
@@ -270,7 +301,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "vision":
         pages.push(
-          <SlidePage key="vision" slideLabel="Design Vision" pageNum={pn} total={total} s={s}>
+          <SlidePage key="vision" slideLabel="Design Vision" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Design Vision</Text>
             {props.style ? (
@@ -306,7 +337,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "modules":
         pages.push(
-          <SlidePage key="modules" slideLabel="Module Details" pageNum={pn} total={total} s={s}>
+          <SlidePage key="modules" slideLabel="Module Details" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Module Details</Text>
             <View style={s.grid}>
@@ -331,7 +362,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "renders":
         pages.push(
-          <SlidePage key="renders" slideLabel="AI Renders" pageNum={pn} total={total} s={s}>
+          <SlidePage key="renders" slideLabel="AI Renders" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>AI Renders</Text>
             {props.savedRenders.length > 0 ? (
@@ -364,7 +395,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "materials":
         pages.push(
-          <SlidePage key="materials" slideLabel="Materials & Finishes" pageNum={pn} total={total} s={s}>
+          <SlidePage key="materials" slideLabel="Materials & Finishes" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Materials & Finishes</Text>
             <View style={s.row}>
@@ -385,7 +416,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "products":
         pages.push(
-          <SlidePage key="products" slideLabel="Products" pageNum={pn} total={total} s={s}>
+          <SlidePage key="products" slideLabel="Products" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Selected Products</Text>
             {props.products.length > 0 ? (
@@ -420,7 +451,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "cost":
         pages.push(
-          <SlidePage key="cost" slideLabel="Cost Summary" pageNum={pn} total={total} s={s}>
+          <SlidePage key="cost" slideLabel="Cost Summary" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Cost Summary</Text>
             <View style={{ marginTop: 12 }}>
@@ -455,7 +486,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "next":
         pages.push(
-          <SlidePage key="next" slideLabel="Next Steps" pageNum={pn} total={total} s={s}>
+          <SlidePage key="next" slideLabel="Next Steps" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Next Steps</Text>
             <View style={{ marginTop: 12, gap: 16 }}>
@@ -552,6 +583,7 @@ export default function PdfDownloadButton({
   polygon,
   mapCenter,
   savedRenders,
+  isFreeUser,
 }: Omit<PdfGeneratorProps, "products">) {
   const [loading, setLoading] = useState(false);
 
@@ -573,6 +605,7 @@ export default function PdfDownloadButton({
           mapCenter={mapCenter}
           products={products}
           savedRenders={savedRenders}
+          isFreeUser={isFreeUser}
         />
       );
       const blob = await pdf(doc).toBlob();
@@ -597,9 +630,24 @@ export default function PdfDownloadButton({
     <button
       onClick={handleDownload}
       disabled={loading}
-      className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 disabled:opacity-50"
+      className="inline-flex items-center gap-2 rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 disabled:opacity-50 transition-colors"
     >
-      {loading ? "Generating PDF..." : "Download PDF"}
+      {loading ? (
+        <>
+          <svg className="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+            <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+            <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+          </svg>
+          Generating...
+        </>
+      ) : (
+        <>
+          <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          Download PDF
+        </>
+      )}
     </button>
   );
 }

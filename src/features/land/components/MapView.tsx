@@ -15,6 +15,8 @@ import "leaflet/dist/leaflet.css";
 import { useLandStore, type MapLayer } from "../store";
 import { createCellCornersFn, getPolygonCenter } from "../utils/grid";
 import { MODULE_TYPES } from "@/shared/types";
+import { useAuthStore } from "@/features/auth/store";
+import { getTierConfig } from "@/features/auth/types";
 
 const TILE_LAYERS: Record<
   MapLayer,
@@ -75,6 +77,11 @@ function GridOverlay() {
     removeModule,
   } = useLandStore();
 
+  const userTier = useAuthStore((s) => s.userTier);
+  const maxModules = getTierConfig(userTier).features.maxModules;
+  const placedCount = gridCells.filter((c) => c.moduleType !== null).length;
+  const atLimit = maxModules !== -1 && placedCount >= maxModules;
+
   // Precompute the corner function (avoids recalculating bbox per cell)
   const getCorners = useMemo(() => {
     if (polygon.length < 3 || gridCells.length === 0) return null;
@@ -109,6 +116,10 @@ function GridOverlay() {
                 if (cell.moduleType) {
                   removeModule(cell.row, cell.col);
                 } else if (selectedModuleType) {
+                  if (atLimit) {
+                    alert(`Module limit reached (${maxModules}). Upgrade your plan for more modules.`);
+                    return;
+                  }
                   placeModule(cell.row, cell.col);
                 }
               },

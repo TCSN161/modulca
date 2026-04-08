@@ -10,6 +10,8 @@ import StepNav from "@/features/design/components/shared/StepNav";
 import { useLandStore } from "../store";
 import type { GridCell } from "../store";
 import { MODULE_TYPES } from "@/shared/types";
+import { useAuthStore } from "@/features/auth/store";
+import { getTierConfig } from "@/features/auth/types";
 
 /* ------------------------------------------------------------------ */
 /*  Predefined building layouts                                        */
@@ -122,6 +124,8 @@ const MapView = dynamic(() => import("./MapView"), {
 
 export default function LandDesigner() {
   const { phase, gridCells, setGridCells, setPhase } = useLandStore();
+  const userTier = useAuthStore((s) => s.userTier);
+  const maxModules = getTierConfig(userTier).features.maxModules;
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
   const [showPresets, setShowPresets] = useState(true);
 
@@ -173,27 +177,35 @@ export default function LandDesigner() {
                 Choose a preset layout to get started quickly, or draw your own area on the map.
               </p>
               <div className="space-y-2">
-                {PRESET_LAYOUTS.map((preset) => (
-                  <button
-                    key={preset.id}
-                    onClick={() => applyPreset(preset)}
-                    className="w-full flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-2.5
-                               hover:border-brand-amber-400 hover:bg-brand-amber-25 transition-colors text-left group"
-                  >
-                    <span className="text-xl flex-shrink-0">{preset.icon}</span>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center justify-between">
-                        <span className="text-sm font-semibold text-brand-teal-800 group-hover:text-brand-teal-600">
-                          {preset.label}
-                        </span>
-                        <span className="text-[10px] font-bold text-gray-400">
-                          {preset.modules} mod · {preset.area}
-                        </span>
+                {PRESET_LAYOUTS.map((preset) => {
+                  const exceedsLimit = maxModules !== -1 && preset.modules > maxModules;
+                  return (
+                    <button
+                      key={preset.id}
+                      onClick={() => !exceedsLimit && applyPreset(preset)}
+                      disabled={exceedsLimit}
+                      className={`w-full flex items-center gap-3 rounded-lg border p-2.5 transition-colors text-left group ${
+                        exceedsLimit
+                          ? "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
+                          : "border-gray-200 bg-white hover:border-brand-amber-400 hover:bg-brand-amber-25"
+                      }`}
+                    >
+                      <span className="text-xl flex-shrink-0">{preset.icon}</span>
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm font-semibold text-brand-teal-800 group-hover:text-brand-teal-600">
+                            {preset.label}
+                          </span>
+                          <span className="text-[10px] font-bold text-gray-400">
+                            {preset.modules} mod · {preset.area}
+                            {exceedsLimit && " · ⬆ Upgrade"}
+                          </span>
+                        </div>
+                        <span className="text-[10px] text-gray-500">{preset.description}</span>
                       </div>
-                      <span className="text-[10px] text-gray-500">{preset.description}</span>
-                    </div>
-                  </button>
-                ))}
+                    </button>
+                  );
+                })}
               </div>
               <button
                 onClick={() => setShowPresets(false)}
@@ -251,7 +263,7 @@ export default function LandDesigner() {
                 </span>
               </div>
               <div className="text-lg font-bold text-brand-teal-800">
-                {placedModules.length} Module{placedModules.length !== 1 ? "s" : ""}
+                {placedModules.length}{maxModules !== -1 ? `/${maxModules}` : ""} Module{placedModules.length !== 1 ? "s" : ""}
               </div>
               <div className="mt-1 text-sm text-brand-teal-600">
                 {placedModules.length * 9}m&sup2; total / {placedModules.length * 7}m&sup2; usable

@@ -4,6 +4,8 @@ import { useState } from "react";
 import { useLandStore } from "../store";
 import { MODULE_TYPES, BUILDING_PRESETS } from "@/shared/types";
 import type { BuildingPreset } from "@/shared/types";
+import { useAuthStore } from "@/features/auth/store";
+import { getTierConfig } from "@/features/auth/types";
 
 type Tab = "modules" | "presets";
 
@@ -12,7 +14,10 @@ export default function ModulePalette() {
   const [tab, setTab] = useState<Tab>("modules");
   const [presetCategory, setPresetCategory] = useState<string>("house");
 
+  const userTier = useAuthStore((s) => s.userTier);
+  const maxModules = getTierConfig(userTier).features.maxModules;
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
+  const atLimit = maxModules !== -1 && placedModules.length >= maxModules;
   const moduleCounts = MODULE_TYPES.map((mt) => ({
     ...mt,
     count: placedModules.filter((c) => c.moduleType === mt.id).length,
@@ -21,6 +26,11 @@ export default function ModulePalette() {
   const filteredPresets = BUILDING_PRESETS.filter((p) => p.category === presetCategory);
 
   const handlePlacePreset = (preset: BuildingPreset) => {
+    // Check module limit
+    if (maxModules !== -1 && preset.cells.length > maxModules) {
+      alert(`This preset requires ${preset.cells.length} modules, but your plan allows ${maxModules}. Upgrade for more.`);
+      return;
+    }
     // Check if preset cells fit within available grid
     const available = new Set(gridCells.map((c) => `${c.row},${c.col}`));
     const fits = preset.cells.every(([r, c]) => available.has(`${r},${c}`));
@@ -72,6 +82,19 @@ export default function ModulePalette() {
           <p className="text-xs text-gray-500">
             Select a module type, then click grid cells to place it. Click a placed module to remove it.
           </p>
+          {maxModules !== -1 && (
+            <div className={`text-xs font-medium rounded-lg px-3 py-1.5 ${
+              atLimit ? "bg-red-50 text-red-600 border border-red-200" : "bg-gray-50 text-gray-500"
+            }`}>
+              {placedModules.length}/{maxModules} modules
+              {atLimit && " — limit reached"}
+              {atLimit && (
+                <a href="/pricing" className="ml-1 underline text-brand-amber-600 hover:text-brand-amber-700">
+                  Upgrade
+                </a>
+              )}
+            </div>
+          )}
           <div className="grid grid-cols-2 gap-2">
             {MODULE_TYPES.map((mod) => {
               const isSelected = selectedModuleType === mod.id;

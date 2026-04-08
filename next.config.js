@@ -9,7 +9,7 @@ const nextConfig = {
     unoptimized: true,
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
-      { protocol: "https", hostname: "api.mapbox.com" },
+      { protocol: "https", hostname: "tile.openstreetmap.org" },
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "image.pollinations.ai" },
       { protocol: "https", hostname: "gen.pollinations.ai" },

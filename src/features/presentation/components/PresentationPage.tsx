@@ -9,6 +9,7 @@ import { getStyleDirection } from "@/features/design/styles";
 import { getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
 import StepNav from "@/features/design/components/shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
+import { useAuthStore } from "@/features/auth/store";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
@@ -103,6 +104,7 @@ export default function PresentationPage() {
     moodboardPins, savedRenders, loadFromLocalStorage,
   } = useDesignStore();
 
+  const userTier = useAuthStore((s) => s.userTier);
   const [template, setTemplate] = useState<PresentationTemplate>("minimal");
   const [slides, setSlides] = useState<SlideConfig[]>(DEFAULT_SLIDES);
   const [projectName, setProjectName] = useState("My Modular Home");
@@ -195,6 +197,7 @@ export default function PresentationPage() {
               polygon={polygon}
               mapCenter={mapCenter}
               savedRenders={savedRenders}
+              isFreeUser={userTier === "free"}
             />
           </Suspense>
         </div>
