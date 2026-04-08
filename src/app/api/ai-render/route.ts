@@ -6,8 +6,11 @@ import { togetherEngine } from "./engines/together";
 import { leonardoEngine } from "./engines/leonardo";
 import type { AiRenderEngine, AiRenderRequest, EngineInfo } from "./engines/types";
 
-/** API route must run on server — not compatible with static export */
-export const dynamic = "force-dynamic";
+/**
+ * On localhost (server mode) these handlers run normally.
+ * On static export (GitHub Pages) they become no-op stubs.
+ */
+export const dynamic = "force-static";
 
 /**
  * Modular AI Render Proxy
