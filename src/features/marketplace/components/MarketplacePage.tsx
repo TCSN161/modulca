@@ -49,9 +49,9 @@ export default function MarketplacePage() {
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={1} />
-        <Link href="/project/demo/design" className="shrink-0 rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 transition-colors">
-          Next: Design →
+        <StepNav activeStep={0} />
+        <Link href="/project/demo/land" className="shrink-0 rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 transition-colors">
+          Next: Land →
         </Link>
       </header>
 
@@ -578,7 +578,7 @@ function TerrainCard({
           </button>
           {t.status === "available" && (
             <Link
-              href={`/project/demo/land?lat=${t.location.lat}&lng=${t.location.lng}`}
+              href={`/project/demo/land?lat=${t.location.lat}&lng=${t.location.lng}&address=${encodeURIComponent(t.location.address + ", " + t.location.city)}`}
               className="flex-1 rounded-lg bg-brand-amber-500 py-2 text-xs font-semibold text-white text-center hover:bg-brand-amber-600 transition-colors"
             >
               Use Terrain
@@ -698,7 +698,7 @@ function TerrainDetailModal({
           <div className="flex gap-3">
             {t.status === "available" && (
               <Link
-                href={`/project/demo/land?lat=${t.location.lat}&lng=${t.location.lng}`}
+                href={`/project/demo/land?lat=${t.location.lat}&lng=${t.location.lng}&address=${encodeURIComponent(t.location.address + ", " + t.location.city)}`}
                 className="flex-1 rounded-lg bg-brand-amber-500 py-3 text-sm font-semibold text-white text-center hover:bg-brand-amber-600 transition-colors"
               >
                 Use This Terrain

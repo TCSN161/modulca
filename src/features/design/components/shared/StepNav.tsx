@@ -4,8 +4,8 @@ import Link from "next/link";
 import { cn } from "@/shared/utils/cn";
 
 const STEPS = [
-  { label: "Land", href: "/project/demo/land" },
   { label: "Marketplace", href: "/project/demo/marketplace" },
+  { label: "Land", href: "/project/demo/land" },
   { label: "Design", href: "/project/demo/design" },
   { label: "Preview", href: "/project/demo/output" },
   { label: "Style", href: "/project/demo/style" },
