@@ -344,6 +344,26 @@ export default function TechnicalPage() {
               </div>
             </button>
           </div>
+
+          {/* AI Architect Consultant */}
+          <div className="mt-4 pt-4 border-t border-gray-100">
+            <Link
+              href="/project/demo/consultant"
+              className="flex items-center gap-3 rounded-xl border-2 border-dashed border-brand-olive-300 bg-brand-olive-50 p-3 group hover:border-brand-olive-500 transition-colors"
+            >
+              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-olive-100 text-lg group-hover:bg-brand-olive-200 transition-colors">
+                📐
+              </div>
+              <div>
+                <div className="text-xs font-bold text-brand-olive-700 group-hover:text-brand-olive-800">
+                  AI Architect Consultant
+                </div>
+                <div className="text-[10px] text-brand-olive-600 mt-0.5">
+                  Neufert-based planning advice
+                </div>
+              </div>
+            </Link>
+          </div>
         </aside>
 
         {/* ── Center — Drawing Display ── */}
