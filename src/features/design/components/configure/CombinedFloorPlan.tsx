@@ -89,28 +89,23 @@ function renderWall(
     return elements;
   }
 
-  // "shared" — dashed interior wall with opening
-  if (isHorizontal) {
-    elements.push(
-      <line key={`${key}-l`} x1={x1} y1={y1} x2={midX - OPENING_WIDTH / 2} y2={y1} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
-      <line key={`${key}-r`} x1={midX + OPENING_WIDTH / 2} y1={y1} x2={x2} y2={y2} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
-      <path
-        key={`${key}-arc`}
-        d={`M ${midX - OPENING_WIDTH / 2} ${y1} A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 1 ${midX + OPENING_WIDTH / 2} ${y1}`}
-        fill="none" stroke="#9ca3af" strokeWidth={1} strokeDasharray="3 2"
-      />,
-    );
-  } else {
-    elements.push(
-      <line key={`${key}-l`} x1={x1} y1={y1} x2={x1} y2={midY - OPENING_WIDTH / 2} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
-      <line key={`${key}-r`} x1={x1} y1={midY + OPENING_WIDTH / 2} x2={x2} y2={y2} stroke="#d4a56a" strokeWidth={WALL / 2} strokeDasharray="4 3" />,
-      <path
-        key={`${key}-arc`}
-        d={`M ${x1} ${midY - OPENING_WIDTH / 2} A ${OPENING_WIDTH / 2} ${OPENING_WIDTH / 2} 0 0 0 ${x1} ${midY + OPENING_WIDTH / 2}`}
-        fill="none" stroke="#9ca3af" strokeWidth={1} strokeDasharray="3 2"
-      />,
-    );
-  }
+  // "shared" — open zone, no wall. Just a light dashed boundary to indicate the connection
+  elements.push(
+    <line
+      key={key}
+      x1={x1} y1={y1} x2={x2} y2={y2}
+      stroke="#c8e6c9" strokeWidth={1} strokeDasharray="6 4"
+      opacity={0.6}
+    />,
+    <text
+      key={`${key}-label`}
+      x={midX} y={isHorizontal ? y1 - 6 : midY}
+      textAnchor="middle"
+      fontSize={7} fill="#66bb6a" fontWeight="bold"
+    >
+      OPEN
+    </text>,
+  );
 
   return elements;
 }

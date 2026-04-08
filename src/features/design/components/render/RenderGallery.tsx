@@ -1,11 +1,4 @@
-import type { CameraAngle } from "./renderConstants";
-
-interface StylePin {
-  label: string;
-  h: number;
-  color: string;
-  cat: string;
-}
+import type { CameraAngle, StylePin } from "./renderConstants";
 
 interface RenderGalleryProps {
   pins: StylePin[];
@@ -54,8 +47,12 @@ export default function RenderGallery({
               style={{ breakInside: "avoid" }}
             >
               <div
-                className="w-full flex items-end p-3"
-                style={{ height: pin.h, backgroundColor: pin.color }}
+                className="w-full flex items-end p-3 bg-cover bg-center"
+                style={{
+                  height: pin.h,
+                  backgroundColor: pin.color,
+                  backgroundImage: pin.img ? `url(${pin.img})` : undefined,
+                }}
               >
                 <span className="rounded bg-white/80 px-2 py-0.5 text-[9px] font-bold text-gray-600 uppercase backdrop-blur-sm">
                   {pin.cat}

@@ -583,6 +583,7 @@ export default function RenderPage() {
                       lighting={lighting}
                       camera={camera}
                       showPlants={atmosphere.plants}
+                      showPeople={atmosphere.people || includePeople}
                       onReady={handleSceneReady}
                     />
                   )}

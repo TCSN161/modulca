@@ -41,10 +41,11 @@ function CanvasCapture({ onReady }: { onReady: (capture: () => string | null) =>
   return null;
 }
 
-function SceneContent({ module, lighting, showPlants }: {
+function SceneContent({ module, lighting, showPlants, showPeople }: {
   module: ModuleConfig;
   lighting: LightingMode;
   showPlants: boolean;
+  showPeople: boolean;
 }) {
   const lc = LIGHTING_CONFIGS[lighting];
   const preset = getPreset(module.moduleType, module.layoutPreset)
@@ -100,6 +101,53 @@ function SceneContent({ module, lighting, showPlants }: {
             </mesh>
           </group>
         )}
+
+        {/* Human silhouette figures for scale — semi-transparent shadow people */}
+        {showPeople && (
+          <>
+            {/* Person 1 — standing near center */}
+            <group position={[1.5, 0, 1.2]}>
+              {/* Legs */}
+              <mesh position={[-0.06, 0.4, 0]} castShadow>
+                <cylinderGeometry args={[0.04, 0.05, 0.8, 6]} />
+                <meshStandardMaterial color="#3a3a3a" transparent opacity={0.6} roughness={0.9} />
+              </mesh>
+              <mesh position={[0.06, 0.4, 0]} castShadow>
+                <cylinderGeometry args={[0.04, 0.05, 0.8, 6]} />
+                <meshStandardMaterial color="#3a3a3a" transparent opacity={0.6} roughness={0.9} />
+              </mesh>
+              {/* Torso */}
+              <mesh position={[0, 1.05, 0]} castShadow>
+                <cylinderGeometry args={[0.14, 0.12, 0.6, 8]} />
+                <meshStandardMaterial color="#4a4a4a" transparent opacity={0.6} roughness={0.9} />
+              </mesh>
+              {/* Head */}
+              <mesh position={[0, 1.55, 0]} castShadow>
+                <sphereGeometry args={[0.12, 8, 8]} />
+                <meshStandardMaterial color="#5a5a5a" transparent opacity={0.6} roughness={0.9} />
+              </mesh>
+            </group>
+
+            {/* Person 2 — seated/leaning, smaller, different spot */}
+            <group position={[0.8, 0, 2.0]} rotation={[0, 0.5, 0]}>
+              {/* Legs (seated) */}
+              <mesh position={[0, 0.3, 0.08]} castShadow rotation={[0.3, 0, 0]}>
+                <cylinderGeometry args={[0.04, 0.05, 0.7, 6]} />
+                <meshStandardMaterial color="#3a3a3a" transparent opacity={0.5} roughness={0.9} />
+              </mesh>
+              {/* Torso */}
+              <mesh position={[0, 0.85, 0]} castShadow>
+                <cylinderGeometry args={[0.13, 0.11, 0.55, 8]} />
+                <meshStandardMaterial color="#4a4a4a" transparent opacity={0.5} roughness={0.9} />
+              </mesh>
+              {/* Head */}
+              <mesh position={[0, 1.3, 0]} castShadow>
+                <sphereGeometry args={[0.11, 8, 8]} />
+                <meshStandardMaterial color="#5a5a5a" transparent opacity={0.5} roughness={0.9} />
+              </mesh>
+            </group>
+          </>
+        )}
       </group>
 
       <ContactShadows position={[0, -0.01, 0]} opacity={0.4} scale={12} blur={2.5} />
@@ -120,10 +168,11 @@ export interface RenderScene3DProps {
   lighting: LightingMode;
   camera: CameraAngle;
   showPlants: boolean;
+  showPeople?: boolean;
   onReady?: (capture: () => string | null) => void;
 }
 
-export default function RenderScene3D({ module, lighting, camera, showPlants, onReady }: RenderScene3DProps) {
+export default function RenderScene3D({ module, lighting, camera, showPlants, showPeople = false, onReady }: RenderScene3DProps) {
   const camPos = CAMERA_POSITIONS[camera];
   return (
     <Canvas
@@ -133,7 +182,7 @@ export default function RenderScene3D({ module, lighting, camera, showPlants, on
       style={{ width: "100%", height: "100%" }}
     >
       {onReady && <CanvasCapture onReady={onReady} />}
-      <SceneContent module={module} lighting={lighting} showPlants={showPlants} />
+      <SceneContent module={module} lighting={lighting} showPlants={showPlants} showPeople={showPeople} />
     </Canvas>
   );
 }
