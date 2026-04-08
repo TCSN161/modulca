@@ -1,13 +1,14 @@
 "use client";
 
-import { useState, useMemo, useCallback } from "react";
+import { useState, useMemo, useCallback, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { useMarketplaceStore, filterTerrains } from "../store";
 import FeatureGate from "@/shared/components/FeatureGate";
 import type { Terrain } from "../store";
 
-type LandMode = "choose" | "have-land" | "want-land";
+type LandMode = "choose" | "have-land" | "want-land" | "play";
 
 /* ------------------------------------------------------------------ */
 /*  Zoning color map                                                   */
@@ -33,8 +34,16 @@ export default function MarketplacePage() {
   const { terrains, filters, favorites, setFilter, clearFilters, toggleFavorite } =
     useMarketplaceStore();
 
+  const router = useRouter();
   const [mode, setMode] = useState<LandMode>("choose");
   const [detailId, setDetailId] = useState<string | null>(null);
+
+  // "Let me play" mode — redirect to Land page with no params
+  useEffect(() => {
+    if (mode === "play") {
+      router.push("/project/demo/land?mode=play");
+    }
+  }, [mode, router]);
 
   const filtered = useMemo(() => filterTerrains(terrains, filters), [terrains, filters]);
   const cities = useMemo(() => [...new Set(terrains.map((t) => t.location.city))].sort(), [terrains]);
@@ -50,8 +59,8 @@ export default function MarketplacePage() {
           </span>
         </Link>
         <StepNav activeStep={0} />
-        <Link href="/project/demo/land" className="shrink-0 rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 transition-colors">
-          Next: Land →
+        <Link href="/project/demo/land" className="shrink-0 rounded-lg bg-brand-olive-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-olive-800 transition-colors">
+          Next: Draw Land →
         </Link>
       </header>
 
@@ -60,7 +69,7 @@ export default function MarketplacePage() {
         <LandModeChooser onSelect={setMode} />
       ) : mode === "have-land" ? (
         <HaveLandFlow onBack={() => setMode("choose")} />
-      ) : (
+      ) : mode === "want-land" ? (
         /* want-land = existing marketplace browse */
         <>
           <div className="flex flex-1 overflow-hidden">
@@ -209,7 +218,7 @@ export default function MarketplacePage() {
             />
           )}
         </>
-      )}
+      ) : null}
     </div>
   );
 }
@@ -220,58 +229,82 @@ export default function MarketplacePage() {
 
 function LandModeChooser({ onSelect }: { onSelect: (mode: LandMode) => void }) {
   return (
-    <div className="flex-1 flex items-center justify-center p-8">
-      <div className="max-w-3xl w-full">
+    <div className="flex-1 flex items-center justify-center p-8 bg-brand-bone-100">
+      <div className="max-w-4xl w-full">
         <div className="text-center mb-10">
-          <h1 className="text-3xl font-bold text-brand-teal-800 mb-2">
-            Let&apos;s find your perfect spot
+          <p className="label-caps mb-3">Step 1</p>
+          <h1 className="text-3xl font-bold tracking-heading text-brand-charcoal mb-2">
+            Where is your land?
           </h1>
-          <p className="text-gray-500">
-            Do you already own land, or are you looking for the right terrain?
+          <p className="text-brand-gray">
+            Choose how you want to start designing your modular home.
           </p>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {/* I Have Land */}
           <button
             onClick={() => onSelect("have-land")}
-            className="group rounded-2xl border-2 border-gray-200 bg-white p-8 text-left hover:border-brand-teal-500 hover:shadow-lg transition-all"
+            className="group rounded-[12px] border border-brand-bone-300 bg-white p-6 text-left shadow-card transition-all hover:shadow-subtle hover:border-brand-olive-400"
           >
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-emerald-100 text-3xl group-hover:bg-emerald-200 transition-colors">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[12px] bg-brand-bone-200 text-2xl group-hover:bg-brand-olive-100 transition-colors">
               🏡
             </div>
-            <h2 className="text-lg font-bold text-brand-teal-800 mb-2">
+            <h2 className="text-base font-bold text-brand-charcoal mb-2">
               I have land
             </h2>
-            <p className="text-sm text-gray-500 leading-relaxed mb-4">
-              I already own a terrain and want to design my modular home on it.
-              Enter your land details and jump straight into planning.
+            <p className="text-xs text-brand-gray leading-relaxed mb-4">
+              I already own a terrain. Enter your address and land details,
+              then draw your building area on the map.
             </p>
-            <div className="flex items-center gap-1 text-sm font-semibold text-brand-teal-800 group-hover:text-brand-amber-500 transition-colors">
-              Start designing
+            <div className="flex items-center gap-1 text-sm font-semibold text-brand-olive-700 group-hover:text-brand-olive-500 transition-colors">
+              Enter land info
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
             </div>
           </button>
 
-          {/* I Want Land */}
+          {/* Browse Marketplace */}
           <button
             onClick={() => onSelect("want-land")}
-            className="group rounded-2xl border-2 border-gray-200 bg-white p-8 text-left hover:border-brand-amber-500 hover:shadow-lg transition-all"
+            className="group rounded-[12px] border border-brand-bone-300 bg-white p-6 text-left shadow-card transition-all hover:shadow-subtle hover:border-brand-olive-400"
           >
-            <div className="mb-4 flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-100 text-3xl group-hover:bg-amber-200 transition-colors">
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[12px] bg-brand-bone-200 text-2xl group-hover:bg-brand-olive-100 transition-colors">
               🔍
             </div>
-            <h2 className="text-lg font-bold text-brand-teal-800 mb-2">
-              I want land
-            </h2>
-            <p className="text-sm text-gray-500 leading-relaxed mb-4">
-              I&apos;m looking for the perfect terrain to buy. Browse available
-              plots across Romania with suitability scores for modular building.
-            </p>
-            <div className="flex items-center gap-1 text-sm font-semibold text-brand-teal-800 group-hover:text-brand-amber-500 transition-colors">
+            <h2 className="text-base font-bold text-brand-charcoal mb-2">
               Browse marketplace
+            </h2>
+            <p className="text-xs text-brand-gray leading-relaxed mb-4">
+              Looking for the right plot? Browse available terrains across
+              Romania with suitability scores and pricing.
+            </p>
+            <div className="flex items-center gap-1 text-sm font-semibold text-brand-olive-700 group-hover:text-brand-olive-500 transition-colors">
+              See terrains
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+              </svg>
+            </div>
+          </button>
+
+          {/* Let Me Play */}
+          <button
+            onClick={() => onSelect("play")}
+            className="group rounded-[12px] border border-brand-bone-300 bg-white p-6 text-left shadow-card transition-all hover:shadow-subtle hover:border-brand-olive-400"
+          >
+            <div className="mb-4 flex h-14 w-14 items-center justify-center rounded-[12px] bg-brand-bone-200 text-2xl group-hover:bg-brand-olive-100 transition-colors">
+              🎮
+            </div>
+            <h2 className="text-base font-bold text-brand-charcoal mb-2">
+              Let me play
+            </h2>
+            <p className="text-xs text-brand-gray leading-relaxed mb-4">
+              Just explore the platform. Jump straight into the design
+              flow with a free canvas and presets.
+            </p>
+            <div className="flex items-center gap-1 text-sm font-semibold text-brand-olive-700 group-hover:text-brand-olive-500 transition-colors">
+              Start exploring
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
               </svg>
@@ -280,15 +313,15 @@ function LandModeChooser({ onSelect }: { onSelect: (mode: LandMode) => void }) {
         </div>
 
         {/* Sell your land CTA */}
-        <div className="mt-8 rounded-xl border border-dashed border-gray-300 bg-gray-50 p-6 text-center">
-          <p className="text-sm text-gray-500">
-            <span className="font-semibold text-brand-teal-800">Own land you&apos;d like to sell?</span>{" "}
+        <div className="mt-8 rounded-[12px] border border-dashed border-brand-bone-400 bg-brand-bone-200 p-6 text-center">
+          <p className="text-sm text-brand-gray">
+            <span className="font-semibold text-brand-charcoal">Own land you&apos;d like to sell?</span>{" "}
             List your terrain on the ModulCA marketplace and reach buyers who are ready to build.
           </p>
           <FeatureGate requires="marketplaceList">
             <button
               onClick={() => onSelect("have-land")}
-              className="mt-3 rounded-lg border border-brand-teal-800 px-4 py-2 text-sm font-semibold text-brand-teal-800 hover:bg-brand-teal-50 transition-colors"
+              className="mt-3 rounded-[12px] border border-brand-olive-700 px-4 py-2 text-sm font-semibold text-brand-olive-700 hover:bg-brand-olive-100 transition-colors"
             >
               List My Land
             </button>

@@ -130,21 +130,18 @@ export default function LandDesigner() {
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
   const [showPresets, setShowPresets] = useState(true);
 
-  /* ---- 3-mode land chooser ---- */
-  type LandMode = "chooser" | "own-land" | "marketplace" | "play";
+  /* ---- Read URL params from Choose page (Step 1) ---- */
   const searchParams = useSearchParams();
   const terrainLat = searchParams.get("lat");
   const terrainLng = searchParams.get("lng");
   const terrainAddr = searchParams.get("address");
-  const fromMarketplace = terrainLat && terrainLng;
+  const fromChoose = terrainLat && terrainLng;
 
-  // If coming from marketplace with URL params, skip the chooser and fly to terrain
-  const [landMode, setLandMode] = useState<LandMode>(fromMarketplace ? "marketplace" : "chooser");
   const setMapCenter = useLandStore((s) => s.setMapCenter);
   const setMapZoom = useLandStore((s) => s.setMapZoom);
 
   useEffect(() => {
-    if (fromMarketplace && terrainLat && terrainLng) {
+    if (fromChoose && terrainLat && terrainLng) {
       const lat = parseFloat(terrainLat);
       const lng = parseFloat(terrainLng);
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
@@ -181,65 +178,7 @@ export default function LandDesigner() {
         </div>
       </header>
 
-      {/* ---- 3-Mode Chooser Overlay ---- */}
-      {landMode === "chooser" && (
-        <div className="flex flex-1 items-center justify-center bg-brand-bone-100 px-4 py-12">
-          <div className="w-full max-w-3xl text-center">
-            <h2 className="mb-2 text-3xl font-bold tracking-tight text-brand-charcoal">
-              Where is your land?
-            </h2>
-            <p className="mb-10 text-brand-gray">
-              Choose how you want to start designing your modular home.
-            </p>
-            <div className="grid gap-5 sm:grid-cols-3">
-              {/* I Have Land */}
-              <button
-                onClick={() => setLandMode("own-land")}
-                className="group rounded-[12px] border border-brand-bone-300 bg-white p-6 text-left shadow-card transition-all hover:shadow-subtle hover:border-brand-olive-400"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-[12px] bg-brand-bone-200 text-2xl group-hover:bg-brand-olive-100">
-                  🏠
-                </div>
-                <h3 className="mb-1 text-base font-bold text-brand-charcoal">I have land</h3>
-                <p className="text-xs text-brand-gray leading-relaxed">
-                  I already own a terrain and want to design my modular home on it. Search for your address on the map.
-                </p>
-              </button>
-
-              {/* Browse Marketplace */}
-              <Link
-                href="/project/demo/marketplace"
-                className="group rounded-[12px] border border-brand-bone-300 bg-white p-6 text-left shadow-card transition-all hover:shadow-subtle hover:border-brand-olive-400"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-[12px] bg-brand-bone-200 text-2xl group-hover:bg-brand-olive-100">
-                  🔍
-                </div>
-                <h3 className="mb-1 text-base font-bold text-brand-charcoal">Browse marketplace</h3>
-                <p className="text-xs text-brand-gray leading-relaxed">
-                  I&apos;m looking for the right plot. Browse available terrains with suitability scores and prices.
-                </p>
-              </Link>
-
-              {/* Let Me Play */}
-              <button
-                onClick={() => { setLandMode("play"); setShowPresets(true); }}
-                className="group rounded-[12px] border border-brand-bone-300 bg-white p-6 text-left shadow-card transition-all hover:shadow-subtle hover:border-brand-olive-400"
-              >
-                <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-[12px] bg-brand-bone-200 text-2xl group-hover:bg-brand-olive-100">
-                  🎮
-                </div>
-                <h3 className="mb-1 text-base font-bold text-brand-charcoal">Let me play</h3>
-                <p className="text-xs text-brand-gray leading-relaxed">
-                  I just want to explore the platform. Jump straight into the design flow with a free canvas.
-                </p>
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* Main Content — shown when mode is selected */}
-      {landMode !== "chooser" && (
+      {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
         <aside className="w-80 flex-shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-5">
@@ -247,8 +186,8 @@ export default function LandDesigner() {
             Step 2: Locate Your Land
           </h2>
           <p className="mb-5 text-sm text-gray-500">
-            {landMode === "marketplace" && terrainAddr
-              ? `Terrain from marketplace: ${terrainAddr}`
+            {fromChoose && terrainAddr
+              ? `Selected terrain: ${terrainAddr}`
               : "Search for your location, then click and drag on the map to draw your building area."}
           </p>
 
@@ -396,24 +335,13 @@ export default function LandDesigner() {
               Next: Design →
             </Link>
           )}
-          {placedModules.length === 0 && phase === "map" && (
-            <Link
-              href="/project/demo/marketplace"
-              className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg border border-gray-200 bg-white
-                         px-6 py-3 text-sm font-medium text-gray-600 transition-colors
-                         hover:bg-gray-50 hover:border-brand-teal-300"
-            >
-              Or browse the Land Marketplace →
-            </Link>
-          )}
-
-          {/* Back to mode chooser */}
-          <button
-            onClick={() => setLandMode("chooser")}
-            className="mt-3 w-full text-center text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
+          {/* Back to Choose page */}
+          <Link
+            href="/project/demo/choose"
+            className="mt-3 w-full block text-center text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
           >
-            ← Change land mode
-          </button>
+            ← Back to Choose
+          </Link>
         </aside>
 
         {/* Map Area */}
@@ -421,7 +349,6 @@ export default function LandDesigner() {
           <MapView />
         </div>
       </div>
-      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ export default function ProjectPage() {
 
   useEffect(() => {
     // For now, redirect to the first step
-    router.replace("/project/demo/land");
+    router.replace("/project/demo/choose");
   }, [router]);
 
   return (
