@@ -259,8 +259,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
     set((state) => ({
       modules: state.modules.map((m) => {
         if (m.row !== row || m.col !== col) return m;
-        // Don't allow changing shared walls — they must remain open between adjacent modules
-        if (m.wallConfigs[side] === "shared") return m;
+        // Allow changing any wall type — user can set interior doors/windows between modules
         return { ...m, wallConfigs: { ...m.wallConfigs, [side]: wallType } };
       }),
     })),
@@ -341,13 +340,17 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
             }
           }
         }
-        // Re-enforce shared walls: if an adjacent module exists, wall MUST be "shared" (open)
+        // Default adjacent walls to "shared" (open) only if no wallConfigs exist yet.
+        // If user has customized a wall (e.g. to "door" or "window"), respect that choice.
         const existingConfigs = m.wallConfigs ?? computeWallConfigs(m.row, m.col, occupiedSet);
         const enforcedConfigs = { ...existingConfigs };
-        if (occupiedSet.has(`${m.row - 1},${m.col}`)) enforcedConfigs.north = "shared";
-        if (occupiedSet.has(`${m.row + 1},${m.col}`)) enforcedConfigs.south = "shared";
-        if (occupiedSet.has(`${m.row},${m.col - 1}`)) enforcedConfigs.west = "shared";
-        if (occupiedSet.has(`${m.row},${m.col + 1}`)) enforcedConfigs.east = "shared";
+        // Only set to "shared" if the wall hasn't been loaded yet (was computed fresh)
+        if (!m.wallConfigs) {
+          if (occupiedSet.has(`${m.row - 1},${m.col}`)) enforcedConfigs.north = "shared";
+          if (occupiedSet.has(`${m.row + 1},${m.col}`)) enforcedConfigs.south = "shared";
+          if (occupiedSet.has(`${m.row},${m.col - 1}`)) enforcedConfigs.west = "shared";
+          if (occupiedSet.has(`${m.row},${m.col + 1}`)) enforcedConfigs.east = "shared";
+        }
 
         return {
           ...m,

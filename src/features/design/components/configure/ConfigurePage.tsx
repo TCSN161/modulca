@@ -26,7 +26,7 @@ const WALL_PRICES: Record<WallType, number> = {
 
 const WALL_SIDES: WallSide[] = ["north", "south", "east", "west"];
 const EXTERIOR_WALL_OPTIONS: WallType[] = ["solid", "window", "door", "none"];
-const INTERIOR_WALL_OPTIONS: WallType[] = ["shared", "door", "none"];
+const INTERIOR_WALL_OPTIONS: WallType[] = ["shared", "solid", "window", "door", "none"];
 
 function wallLabel(type: WallType): string {
   switch (type) {
