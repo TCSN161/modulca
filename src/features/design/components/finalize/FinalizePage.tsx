@@ -147,32 +147,70 @@ export default function FinalizePage() {
               })}
             </div>
 
-            {/* Cost breakdown */}
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">Cost Estimate</h3>
-            <div className="space-y-2 text-sm">
-              <div className="flex justify-between">
-                <span className="text-gray-500">{stats.totalModules} modules ({finish.label})</span>
-                <span className="font-medium">&euro;{stats.moduleCost.toLocaleString()}</span>
+            {/* Investment Breakdown */}
+            <div className="flex items-center justify-between mb-3">
+              <h3 className="text-sm font-semibold text-brand-charcoal">Investment Breakdown</h3>
+              <div className="h-8 w-8 rounded-[8px] bg-brand-bone-200 flex items-center justify-center">
+                <svg className="w-4 h-4 text-brand-olive-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 18.75a60.07 60.07 0 0115.797 2.101c.727.198 1.453-.342 1.453-1.096V18.75M3.75 4.5v.75A.75.75 0 013 6h-.75m0 0v-.375c0-.621.504-1.125 1.125-1.125H20.25M2.25 6v9m18-10.5v.75c0 .414.336.75.75.75h.75m-1.5-1.5h.375c.621 0 1.125.504 1.125 1.125v9.75c0 .621-.504 1.125-1.125 1.125h-.375m1.5-1.5H21a.75.75 0 00-.75.75v.75m0 0H3.75m0 0h-.375a1.125 1.125 0 01-1.125-1.125V15m1.5 1.5v-.75A.75.75 0 003 15h-.75M15 10.5a3 3 0 11-6 0 3 3 0 016 0zm3 0h.008v.008H18V10.5zm-12 0h.008v.008H6V10.5z" />
+                </svg>
               </div>
-              {stats.sharedWallDiscount > 0 && (
-                <div className="flex justify-between text-emerald-600">
-                  <span>Shared wall discount ({stats.sharedWalls} walls)</span>
-                  <span className="font-medium">-&euro;{stats.sharedWallDiscount.toLocaleString()}</span>
-                </div>
-              )}
-              {stats.wallUpgradeCost !== 0 && (
-                <div className="flex justify-between">
-                  <span className="text-gray-500">Wall upgrades</span>
-                  <span className="font-medium">{stats.wallUpgradeCost > 0 ? "+" : ""}&euro;{stats.wallUpgradeCost.toLocaleString()}</span>
-                </div>
-              )}
-              <div className="flex justify-between">
-                <span className="text-gray-500">Design fee (8%)</span>
-                <span className="font-medium">&euro;{Math.round(stats.designFee).toLocaleString()}</span>
+            </div>
+
+            {/* Category breakdown cards */}
+            <div className="space-y-3 mb-4">
+              {(() => {
+                const structuralCost = Math.round(stats.moduleCost * 0.64);
+                const interiorCost = Math.round(stats.moduleCost * 0.22 + stats.wallUpgradeCost);
+                const systemCost = Math.round(stats.moduleCost * 0.14);
+                return (
+                  <>
+                    <div className="flex items-center justify-between rounded-[12px] bg-brand-bone-100 p-4">
+                      <div>
+                        <div className="text-sm font-semibold text-brand-charcoal">Structural Shell</div>
+                        <div className="text-[11px] text-brand-gray">CLT Panels &amp; Insulation</div>
+                      </div>
+                      <span className="text-sm font-bold text-brand-charcoal">&euro;{structuralCost.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-[12px] bg-brand-bone-100 p-4">
+                      <div>
+                        <div className="text-sm font-semibold text-brand-charcoal">Interior Finishes</div>
+                        <div className="text-[11px] text-brand-gray">{finish.label} &amp; Wall Details</div>
+                      </div>
+                      <span className="text-sm font-bold text-brand-charcoal">&euro;{interiorCost.toLocaleString()}</span>
+                    </div>
+                    <div className="flex items-center justify-between rounded-[12px] bg-brand-bone-100 p-4">
+                      <div>
+                        <div className="text-sm font-semibold text-brand-charcoal">System Integration</div>
+                        <div className="text-[11px] text-brand-gray">HVAC, Electrical &amp; Plumbing</div>
+                      </div>
+                      <span className="text-sm font-bold text-brand-charcoal">&euro;{systemCost.toLocaleString()}</span>
+                    </div>
+                  </>
+                );
+              })()}
+            </div>
+
+            {/* Discounts */}
+            {stats.sharedWallDiscount > 0 && (
+              <div className="flex justify-between text-sm text-emerald-600 mb-2 px-1">
+                <span>Shared wall savings ({stats.sharedWalls} walls)</span>
+                <span className="font-medium">-&euro;{stats.sharedWallDiscount.toLocaleString()}</span>
               </div>
-              <div className="flex justify-between pt-2 border-t border-gray-200">
-                <span className="font-semibold text-brand-teal-800">Total Estimate</span>
-                <span className="text-lg font-bold text-brand-amber-600">&euro;{Math.round(stats.totalEstimate).toLocaleString()}</span>
+            )}
+            <div className="flex justify-between text-sm text-brand-gray mb-3 px-1">
+              <span>Design fee (8%)</span>
+              <span className="font-medium">&euro;{Math.round(stats.designFee).toLocaleString()}</span>
+            </div>
+
+            {/* Total */}
+            <div className="border-t border-brand-bone-300/60 pt-3">
+              <div className="flex items-baseline justify-between">
+                <div>
+                  <div className="text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">Estimated Total</div>
+                  <span className="text-2xl font-bold text-brand-charcoal">&euro;{Math.round(stats.totalEstimate).toLocaleString()}</span>
+                </div>
+                <span className="text-[10px] text-brand-gray">*Excluding land &amp; permits</span>
               </div>
             </div>
           </div>

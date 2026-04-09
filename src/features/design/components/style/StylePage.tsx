@@ -266,17 +266,17 @@ export default function StylePage() {
 
               {/* Color Palette */}
               <section className="mb-8">
-                <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
+                <h3 className="mb-4 text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">
                   Color Palette
                 </h3>
                 <div className="flex items-center gap-5">
                   {selectedStyle.palette.map((swatch) => (
-                    <div key={swatch.label} className="flex flex-col items-center gap-1.5">
+                    <div key={swatch.label} className="flex flex-col items-center gap-2">
                       <div
-                        className="h-14 w-14 rounded-full border border-gray-200 shadow-sm"
+                        className="h-14 w-14 rounded-full border-2 border-brand-bone-300 shadow-card hover:scale-105 transition-transform"
                         style={{ backgroundColor: swatch.color }}
                       />
-                      <span className="text-[10px] font-medium text-gray-500">
+                      <span className="text-[10px] font-medium text-brand-gray">
                         {swatch.label}
                       </span>
                     </div>
@@ -284,23 +284,36 @@ export default function StylePage() {
                 </div>
               </section>
 
-              {/* Materials */}
+              {/* Primary Materials — circular swatches */}
               <section className="mb-8">
-                <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
-                  Materials
+                <h3 className="mb-4 text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">
+                  Primary Materials
                 </h3>
-                <div className="flex items-center gap-4">
-                  {selectedStyle.materials.map((mat) => (
-                    <div key={mat.label} className="flex flex-col items-center gap-1.5">
-                      <div
-                        className="h-20 w-20 rounded-lg border border-gray-200 shadow-sm"
-                        style={{ backgroundColor: mat.color }}
-                      />
-                      <span className="text-[10px] font-medium text-gray-500">
-                        {mat.label}
-                      </span>
-                    </div>
-                  ))}
+                <div className="flex items-center gap-5">
+                  {selectedStyle.materials.map((mat, i) => {
+                    const abbrevs = ["OAK", "CONC", "METAL", "GLASS", "LINEN", "LACQ", "WALNT", "SLATE"];
+                    const abbrev = abbrevs[i] || mat.label.slice(0, 4).toUpperCase();
+                    return (
+                      <div key={mat.label} className="flex flex-col items-center gap-2">
+                        <div className="relative group">
+                          <div
+                            className="h-16 w-16 rounded-full border-2 border-brand-bone-300 shadow-card transition-all group-hover:border-brand-olive-400 group-hover:shadow-subtle group-hover:scale-105"
+                            style={{ backgroundColor: mat.color }}
+                          />
+                          {i === 0 && (
+                            <div className="absolute -top-1 -right-1 h-4 w-4 rounded-full bg-brand-olive-600 border-2 border-white flex items-center justify-center">
+                              <svg className="w-2 h-2 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                              </svg>
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-[10px] font-bold text-brand-gray uppercase tracking-wider">
+                          {abbrev}
+                        </span>
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
 
