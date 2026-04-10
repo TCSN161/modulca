@@ -100,6 +100,7 @@ interface DesignStore {
   updateModuleConfig: (row: number, col: number, config: Partial<ModuleConfig>) => void;
   updateWallConfig: (row: number, col: number, side: WallSide, wallType: WallType) => void;
   updateFurnitureOverride: (row: number, col: number, furnitureId: string, override: FurnitureOverride) => void;
+  resetAllFurnitureOverrides: () => void;
   selectedModule: { row: number; col: number } | null;
   selectedFurniture: string | null;
   setSelectedModule: (m: { row: number; col: number } | null) => void;
@@ -287,6 +288,14 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
           },
         };
       }),
+    })),
+
+  resetAllFurnitureOverrides: () =>
+    set((state) => ({
+      modules: state.modules.map((m) => ({
+        ...m,
+        furnitureOverrides: {},
+      })),
     })),
 
   setSelectedModule: (m) => set({ selectedModule: m, selectedFurniture: null }),

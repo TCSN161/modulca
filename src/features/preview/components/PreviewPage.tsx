@@ -63,15 +63,17 @@ export default function PreviewPage() {
 
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* Left — tools sidebar */}
-        <ToolsSidebar />
+        {/* Left — tools sidebar (desktop only) */}
+        <div className="hidden md:block">
+          <ToolsSidebar />
+        </div>
 
         {/* Center — 3D scene */}
         <main className="flex-1 relative">
           <Scene3D />
 
-          {/* Keyboard shortcuts hint */}
-          <div className="absolute bottom-4 left-4 flex items-center gap-3 rounded-lg bg-white/90 px-4 py-2 shadow-sm backdrop-blur-sm">
+          {/* Keyboard shortcuts hint (desktop only) */}
+          <div className="hidden md:flex absolute bottom-4 left-4 items-center gap-3 rounded-lg bg-white/90 px-4 py-2 shadow-sm backdrop-blur-sm">
             {[
               { key: "G", label: "Move" },
               { key: "S", label: "Scale" },
@@ -113,8 +115,8 @@ export default function PreviewPage() {
           </div>
         </main>
 
-        {/* Right — inspector */}
-        <aside className="w-80 flex-shrink-0 border-l border-gray-200 bg-gray-50">
+        {/* Right — inspector (desktop only) */}
+        <aside className="hidden md:block w-80 flex-shrink-0 border-l border-gray-200 bg-gray-50">
           <Inspector />
         </aside>
       </div>

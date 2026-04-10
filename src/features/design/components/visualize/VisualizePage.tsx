@@ -23,7 +23,7 @@ export default function VisualizePage() {
   const {
     setModulesFromGrid, modules, selectedModule, setSelectedModule,
     selectedFurniture, setSelectedFurniture, updateFurnitureOverride,
-    styleDirection, loadFromLocalStorage,
+    resetAllFurnitureOverrides, styleDirection, loadFromLocalStorage,
   } = useDesignStore();
   const [viewMode, setViewMode] = useState<ViewMode>("single");
   const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
@@ -254,6 +254,22 @@ export default function VisualizePage() {
               </div>
             )}
 
+            {/* Reset furniture positions */}
+            <div className="border-t border-gray-200 p-4">
+              <button
+                onClick={() => {
+                  resetAllFurnitureOverrides();
+                  useDesignStore.getState().saveToLocalStorage();
+                }}
+                className="w-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors"
+              >
+                ↺ Reset All Furniture Positions
+              </button>
+              <p className="mt-1.5 text-[9px] text-gray-400">
+                Resets furniture to default positions if they appear misplaced.
+              </p>
+            </div>
+
             {/* Controls info */}
             <div className="border-t border-gray-200 p-4">
               <h3 className="mb-2 text-xs font-bold text-gray-500 uppercase tracking-wider">
@@ -298,9 +314,9 @@ export default function VisualizePage() {
           </aside>
         )}
 
-        {/* Mobile FAB to toggle sidebars */}
+        {/* Mobile FAB to toggle sidebars — above MobileStepFooter + MobileBottomNav */}
         {viewMode === "single" && (
-          <div className="md:hidden fixed bottom-4 right-4 flex flex-col gap-2 z-50">
+          <div className="md:hidden fixed bottom-36 right-3 flex flex-col gap-2 z-50">
             <button
               onClick={() => setMobileSidebar(mobileSidebar === "left" ? null : "left")}
               className="h-12 w-12 rounded-full bg-brand-teal-800 text-white shadow-lg flex items-center justify-center text-lg"
@@ -384,8 +400,25 @@ export default function VisualizePage() {
                     </div>
                   )}
                 </div>
-              ) : (
+              ) : mobileSidebar === "right" ? (
                 selectedModule && <ConfigPanel moduleRow={selectedModule.row} moduleCol={selectedModule.col} />
+              ) : null}
+              {/* Reset button in mobile panel */}
+              {mobileSidebar === "left" && (
+                <div className="border-t border-gray-200 p-4">
+                  <button
+                    onClick={() => {
+                      resetAllFurnitureOverrides();
+                      useDesignStore.getState().saveToLocalStorage();
+                    }}
+                    className="w-full rounded-lg border border-red-200 bg-red-50 px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-100 transition-colors"
+                  >
+                    ↺ Reset All Furniture Positions
+                  </button>
+                  <p className="mt-1.5 text-[9px] text-gray-400">
+                    Resets furniture to default positions if they appear misplaced.
+                  </p>
+                </div>
               )}
             </aside>
           </div>

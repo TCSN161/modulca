@@ -710,7 +710,7 @@ export default function ProductsPage() {
         </main>
 
         {/* ── RIGHT SIDEBAR: Selected Products ── */}
-        <aside className="w-80 bg-white border-l border-gray-200 overflow-y-auto shrink-0 p-5 flex flex-col">
+        <aside className="hidden md:flex w-80 bg-white border-l border-gray-200 overflow-y-auto shrink-0 p-5 flex-col">
           <div className="flex items-center gap-2 mb-4">
             <ShoppingCart size={16} className="text-[#1B3A4B]" />
             <h3 className="text-sm font-bold text-[#1B3A4B]">

@@ -19,41 +19,46 @@ interface MobileStepFooterProps {
 export default function MobileStepFooter({ activeStep, info }: MobileStepFooterProps) {
   const prevStep = activeStep > 0 ? STEPS[activeStep - 1] : null;
   const nextStep = activeStep < STEPS.length - 1 ? STEPS[activeStep + 1] : null;
-  const currentStep = STEPS[activeStep];
 
   return (
-    <div className="md:hidden flex items-center justify-between border-t border-gray-200 bg-white px-3 py-2 mb-16 shrink-0">
+    <div className="md:hidden flex items-center justify-between border-t border-gray-200 bg-white px-2 py-2.5 mb-16 shrink-0">
       {prevStep ? (
         <Link
           href={prevStep.href}
-          className="text-[10px] font-semibold text-gray-400 active:text-gray-600"
+          className="flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-2 text-xs font-semibold text-gray-500 active:bg-gray-50"
         >
-          &larr; {prevStep.label}
+          <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          </svg>
+          {prevStep.label}
         </Link>
       ) : (
-        <span />
+        <span className="w-16" />
       )}
 
-      <div className="text-center min-w-0 px-2">
-        <span className="text-[10px] font-bold text-brand-charcoal">
-          {activeStep + 1}. {currentStep?.label}
-        </span>
+      <div className="text-center min-w-0 px-1">
+        <div className="text-[11px] font-bold text-brand-charcoal">
+          {activeStep + 1}/{STEPS.length}
+        </div>
         {info && (
-          <span className="text-[9px] text-gray-400 ml-1 truncate">
+          <div className="text-[9px] text-gray-400 truncate">
             {info}
-          </span>
+          </div>
         )}
       </div>
 
       {nextStep ? (
         <Link
           href={nextStep.href}
-          className="rounded-lg bg-brand-amber-500 px-3 py-1.5 text-[11px] font-bold text-white active:scale-95 transition-transform whitespace-nowrap"
+          className="flex items-center gap-1 rounded-lg bg-brand-amber-500 px-3 py-2 text-xs font-bold text-white active:scale-95 transition-transform whitespace-nowrap shadow-sm"
         >
-          {nextStep.label} &rarr;
+          {nextStep.label}
+          <svg className="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
         </Link>
       ) : (
-        <span className="text-[10px] font-semibold text-green-600">Done!</span>
+        <span className="text-xs font-bold text-green-600 px-2">Done!</span>
       )}
     </div>
   );

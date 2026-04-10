@@ -905,7 +905,7 @@ export default function PresentationPage() {
         </main>
 
         {/* Right Sidebar — Slide Navigator */}
-        <aside className="w-56 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4 print:hidden">
+        <aside className="hidden md:block w-56 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4 print:hidden">
           <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Slides</h3>
           <div className="space-y-1">
             {enabledSlides.map((slide, i) => (
