@@ -22,6 +22,11 @@ interface AuthStore {
   loading: boolean;
   error: string | null;
 
+  // Usage tracking
+  projectCount: number;
+  storageUsedMb: number;
+  aiCallsToday: number;
+
   // Auth actions
   signUp: (email: string, password: string, name: string) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<boolean>;
@@ -32,6 +37,9 @@ interface AuthStore {
 
   // Helpers
   canAccess: (feature: string) => boolean;
+  canCreateProject: () => { allowed: boolean; reason?: string };
+  canUseAiCall: () => { allowed: boolean; reason?: string };
+  incrementAiCalls: () => Promise<void>;
   getTierLabel: () => string;
 
   // Hydration
@@ -62,6 +70,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   userAvatar: null,
   loading: false,
   error: null,
+  projectCount: 0,
+  storageUsedMb: 0,
+  aiCallsToday: 0,
 
   /* ── Sign Up ── */
   signUp: async (email, password, name) => {
@@ -179,6 +190,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       userTier: "free",
       userAvatar: null,
       error: null,
+      projectCount: 0,
+      storageUsedMb: 0,
+      aiCallsToday: 0,
     });
   },
 
@@ -207,6 +221,43 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     return true;
   },
 
+  canCreateProject: () => {
+    const { userTier, projectCount } = get();
+    const config = getTierConfig(userTier);
+    const max = config.features.maxProjects;
+    if (max === -1) return { allowed: true };
+    if (projectCount >= max) {
+      return { allowed: false, reason: `You've reached the limit of ${max} projects on the ${config.label} plan. Upgrade for more.` };
+    }
+    return { allowed: true };
+  },
+
+  canUseAiCall: () => {
+    const { userTier, aiCallsToday } = get();
+    const config = getTierConfig(userTier);
+    const max = config.features.aiRendersPerMonth;
+    if (max === -1) return { allowed: true };
+    // Daily limit = monthly / 30, minimum 1
+    const dailyLimit = Math.max(1, Math.ceil(max / 30));
+    if (aiCallsToday >= dailyLimit) {
+      return { allowed: false, reason: `Daily AI limit reached (${dailyLimit}/day on ${config.label} plan). Resets at midnight.` };
+    }
+    return { allowed: true };
+  },
+
+  incrementAiCalls: async () => {
+    const { userId, aiCallsToday } = get();
+    const newCount = aiCallsToday + 1;
+    set({ aiCallsToday: newCount });
+    const sb = getSupabase();
+    if (sb && userId) {
+      await sb.from("profiles").update({
+        ai_calls_today: newCount,
+        ai_calls_reset_at: new Date().toISOString().split("T")[0],
+      }).eq("id", userId);
+    }
+  },
+
   getTierLabel: () => getTierConfig(get().userTier).label,
 
   /* ── Load Session (on page load) ── */
@@ -233,9 +284,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!session?.user) return;
 
     const { data: profile } = await sb.from("profiles")
-      .select("display_name, tier, avatar_url")
+      .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at")
       .eq("id", session.user.id)
       .single();
+
+    // Reset AI calls if it's a new day
+    const today = new Date().toISOString().split("T")[0];
+    const aiCalls = profile?.ai_calls_reset_at === today ? (profile?.ai_calls_today ?? 0) : 0;
 
     set({
       isAuthenticated: true,
@@ -244,6 +299,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       userEmail: session.user.email ?? null,
       userTier: (profile?.tier as AccountTier) ?? "free",
       userAvatar: profile?.avatar_url ?? null,
+      projectCount: profile?.project_count ?? 0,
+      storageUsedMb: profile?.storage_used_mb ?? 0,
+      aiCallsToday: aiCalls,
     });
   },
 }));
