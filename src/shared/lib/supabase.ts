@@ -19,7 +19,13 @@ export const isDemoMode = !url || !key;
 
 export const supabase = isDemoMode
   ? (null as unknown as ReturnType<typeof createClient>)
-  : createClient(url, key);
+  : createClient(url, key, {
+      auth: {
+        persistSession: true,
+        autoRefreshToken: true,
+        detectSessionInUrl: true,
+      },
+    });
 
 /**
  * Helper: safely call supabase. Returns null in demo mode.

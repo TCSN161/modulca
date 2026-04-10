@@ -283,6 +283,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     const { data: { session } } = await sb.auth.getSession();
     if (!session?.user) return;
 
+    // Ensure profile exists (Google OAuth may not trigger signUp flow)
+    await sb.from("profiles").upsert({
+      id: session.user.id,
+      email: session.user.email,
+      display_name: session.user.user_metadata?.full_name ?? session.user.user_metadata?.display_name ?? session.user.email?.split("@")[0],
+      avatar_url: session.user.user_metadata?.avatar_url ?? null,
+    }, { onConflict: "id", ignoreDuplicates: true });
+
     const { data: profile } = await sb.from("profiles")
       .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at")
       .eq("id", session.user.id)
@@ -306,9 +314,21 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 }));
 
-// Auto-hydrate on client
+// Auto-hydrate on client + listen for auth changes (OAuth callbacks, token refresh)
 if (typeof window !== "undefined") {
   queueMicrotask(() => {
     useAuthStore.getState().loadSession();
   });
+
+  const sb = getSupabase();
+  if (sb) {
+    sb.auth.onAuthStateChange((event) => {
+      if (event === "SIGNED_IN" || event === "TOKEN_REFRESHED") {
+        useAuthStore.getState().loadSession();
+      }
+      if (event === "SIGNED_OUT") {
+        useAuthStore.getState().signOut();
+      }
+    });
+  }
 }

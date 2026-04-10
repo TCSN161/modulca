@@ -87,7 +87,7 @@ export default function AdminPage() {
         .select("email, tier, project_count, storage_used_mb, created_at")
         .order("created_at", { ascending: false });
 
-      if (profileErr) throw profileErr;
+      if (profileErr) throw new Error(`Profiles query: ${profileErr.message} (${profileErr.code})`);
 
       const users = profiles ?? [];
       const totalUsers = users.length;
