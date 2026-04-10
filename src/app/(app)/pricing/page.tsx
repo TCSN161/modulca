@@ -4,10 +4,11 @@ import { useState } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store";
 import { ACCOUNT_TIERS } from "@/features/auth/types";
+import { AuthNav } from "@/features/auth/components/AuthNav";
 import { STRIPE_PRICES, redirectToCheckout, isStripeConfigured } from "@/shared/lib/stripe";
 
 export default function PricingPage() {
-  const { userTier, userEmail, setTier, isAuthenticated } = useAuthStore();
+  const { userTier, userEmail, setTier } = useAuthStore();
   const [yearly, setYearly] = useState(false);
   const [upgrading, setUpgrading] = useState<string | null>(null);
 
@@ -37,17 +38,7 @@ export default function PricingPage() {
           <Link href="/" className="text-lg font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
           </Link>
-          <div className="flex items-center gap-3">
-            {isAuthenticated ? (
-              <Link href="/dashboard" className="text-sm text-gray-500 hover:text-brand-teal-800">
-                Dashboard
-              </Link>
-            ) : (
-              <Link href="/login" className="text-sm text-gray-500 hover:text-brand-teal-800">
-                Log in
-              </Link>
-            )}
-          </div>
+          <AuthNav />
         </div>
       </header>
 

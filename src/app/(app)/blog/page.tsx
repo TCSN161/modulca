@@ -1,6 +1,7 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { BLOG_ARTICLES } from "@/features/blog/articles";
+import { AuthNav } from "@/features/auth/components/AuthNav";
 
 export const metadata: Metadata = {
   title: "Blog",
@@ -16,14 +17,7 @@ export default function BlogPage() {
           <Link href="/" className="text-lg font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
           </Link>
-          <div className="flex items-center gap-4">
-            <Link href="/dashboard" className="text-sm text-gray-500 hover:text-brand-teal-800">
-              Dashboard
-            </Link>
-            <Link href="/project/demo/land" className="text-sm font-semibold text-brand-amber-500 hover:text-brand-amber-600">
-              Try Demo
-            </Link>
-          </div>
+          <AuthNav />
         </div>
       </header>
 

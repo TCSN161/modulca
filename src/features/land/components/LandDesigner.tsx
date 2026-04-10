@@ -13,6 +13,7 @@ import type { GridCell } from "../store";
 import { MODULE_TYPES } from "@/shared/types";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
+import { AuthNav } from "@/features/auth/components/AuthNav";
 
 /* ------------------------------------------------------------------ */
 /*  Predefined building layouts                                        */
@@ -189,12 +190,7 @@ export default function LandDesigner() {
         </Link>
         <StepNav activeStep={1} />
         <div className="flex items-center gap-3 shrink-0">
-          <Link href="/login" className="text-sm font-medium text-gray-500 hover:text-brand-teal-800">
-            Login
-          </Link>
-          <Link href="/dashboard" className="rounded-lg bg-brand-teal-800 px-4 py-2 text-sm font-medium text-white hover:bg-brand-teal-700">
-            Dashboard
-          </Link>
+          <AuthNav />
         </div>
       </header>
 
