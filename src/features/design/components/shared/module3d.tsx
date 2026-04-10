@@ -639,6 +639,18 @@ export function StaticFurniturePiece({
   const worldX = offsetX + posX + safeW / 2;
   const worldZ = offsetZ + posZ + safeD / 2;
 
+  // DEBUG: trace furniture positioning (remove after fixing)
+  if (typeof window !== "undefined" && !(window as any).__furnDbgDone) {
+    (window as any).__furnDbgCount = ((window as any).__furnDbgCount || 0) + 1;
+    if ((window as any).__furnDbgCount <= 20) {
+      console.log(`[FURN] ${item.label} | item(${item.x.toFixed(2)},${item.z.toFixed(2)}) | override(${override?.x?.toFixed(2) ?? "-"},${override?.z?.toFixed(2) ?? "-"}) | offset(${offsetX},${offsetZ}) | pos(${posX.toFixed(2)},${posZ.toFixed(2)}) | world(${worldX.toFixed(2)},${worldZ.toFixed(2)}) | size(${safeW.toFixed(2)}x${safeD.toFixed(2)})`);
+    }
+    if ((window as any).__furnDbgCount === 20) {
+      console.log("[FURN] ... (logging capped at 20)");
+      (window as any).__furnDbgDone = true;
+    }
+  }
+
   return (
     <group position={[worldX, halfH, worldZ]}>
       <group rotation={[0, rotationY, 0]}>
