@@ -130,7 +130,8 @@ export default function LandDesigner() {
   const maxModules = getTierConfig(userTier).features.maxModules;
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
   const [showPresets, setShowPresets] = useState(true);
-  const [mobilePanel, setMobilePanel] = useState<"presets" | "tools" | null>("presets");
+  const [mobilePanel, setMobilePanel] = useState<"presets" | "tools" | null>(null);
+  const [mobileTopOpen, setMobileTopOpen] = useState(true);
 
   /* ---- Read URL params from Choose page (Step 1) ---- */
   const searchParams = useSearchParams();
@@ -225,37 +226,71 @@ export default function LandDesigner() {
       </header>
 
       {/* ============================================================ */}
-      {/*  MOBILE LAYOUT (< md): stacked vertical                     */}
+      {/*  MOBILE LAYOUT (< md): map-first with top/bottom bars        */}
       {/* ============================================================ */}
       <div className="flex flex-col flex-1 overflow-hidden md:hidden">
-        {/* Title + Address */}
-        <div className="bg-white px-4 pt-4 pb-3 border-b border-brand-bone-300/60">
-          <h2 className="text-xl font-bold text-brand-charcoal tracking-heading">
-            Step 2: Locate Your Land
-          </h2>
-          <p className="text-xs text-brand-gray mt-0.5 mb-3">
-            {terrainAddr
-              ? `${terrainAddr}${terrainCity ? `, ${terrainCity}` : ""}`
-              : "Pinpoint your site to begin the architectural projection."}
-          </p>
-          <AddressSearch />
-        </div>
-
-        {/* Quick Start Presets — horizontal scroll */}
-        {showPresetsSection && mobilePanel === "presets" && (
-          <div className="bg-white border-b border-brand-bone-300/60 px-4 py-3">
-            <div className="flex items-center justify-between mb-2">
-              <h4 className="text-[10px] font-bold text-brand-charcoal uppercase tracking-wider">
-                Quick Start Presets
-              </h4>
+        {/* ---- TOP BAR: collapsible controls ---- */}
+        <div className="bg-white border-b border-brand-bone-300/60">
+          {/* Collapsed: single row with toggle */}
+          <div className="flex items-center justify-between px-3 py-2">
+            <div className="flex items-center gap-2 min-w-0">
+              <span className="text-xs font-bold text-brand-charcoal truncate">
+                {terrainAddr
+                  ? `📍 ${terrainAddr}${terrainCity ? `, ${terrainCity}` : ""}`
+                  : "📍 Search your land"}
+              </span>
+            </div>
+            <div className="flex items-center gap-1.5">
+              {/* Presets toggle */}
+              {showPresetsSection && (
+                <button
+                  onClick={() => setMobilePanel(mobilePanel === "presets" ? null : "presets")}
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${
+                    mobilePanel === "presets"
+                      ? "bg-brand-olive-700 text-white"
+                      : "bg-brand-bone-200 text-brand-gray"
+                  }`}
+                >
+                  Presets
+                </button>
+              )}
+              {/* Tools toggle */}
+              {(phase === "grid" || phase === "modules") && (
+                <button
+                  onClick={() => setMobilePanel(mobilePanel === "tools" ? null : "tools")}
+                  className={`px-2.5 py-1 rounded-full text-[10px] font-bold transition-colors ${
+                    mobilePanel === "tools"
+                      ? "bg-brand-olive-700 text-white"
+                      : "bg-brand-bone-200 text-brand-gray"
+                  }`}
+                >
+                  Tools
+                </button>
+              )}
+              {/* Expand/collapse search */}
               <button
-                onClick={() => { setShowPresets(false); setMobilePanel(null); }}
-                className="text-[10px] text-brand-olive-700 font-semibold"
+                onClick={() => setMobileTopOpen(!mobileTopOpen)}
+                className="w-7 h-7 flex items-center justify-center rounded-full bg-brand-bone-200 text-brand-gray"
               >
-                Skip
+                <svg className={`w-3.5 h-3.5 transition-transform ${mobileTopOpen ? "rotate-180" : ""}`} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M19 9l-7 7-7-7" />
+                </svg>
               </button>
             </div>
-            <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+          </div>
+
+          {/* Expanded: address search + map layer */}
+          {mobileTopOpen && (
+            <div className="px-3 pb-2.5 space-y-2">
+              <AddressSearch />
+            </div>
+          )}
+        </div>
+
+        {/* ---- DROPDOWN PANEL: Presets ---- */}
+        {mobilePanel === "presets" && showPresetsSection && (
+          <div className="bg-white border-b border-brand-bone-300/60 px-3 py-2.5">
+            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none">
               {PRESET_LAYOUTS.map((preset) => {
                 const exceedsLimit = maxModules !== -1 && preset.modules > maxModules;
                 return (
@@ -263,18 +298,18 @@ export default function LandDesigner() {
                     key={preset.id}
                     onClick={() => !exceedsLimit && applyPreset(preset)}
                     disabled={exceedsLimit}
-                    className={`flex-shrink-0 w-28 rounded-[12px] border p-3 text-center transition-colors ${
+                    className={`flex-shrink-0 w-20 rounded-lg border p-2 text-center transition-colors ${
                       exceedsLimit
                         ? "border-gray-100 bg-gray-50 opacity-40"
                         : "border-brand-bone-300/60 bg-brand-bone-100 active:bg-brand-olive-100"
                     }`}
                   >
-                    <span className="text-2xl block mb-1">{preset.icon}</span>
-                    <span className="text-[11px] font-bold text-brand-charcoal block leading-tight">
+                    <span className="text-lg block">{preset.icon}</span>
+                    <span className="text-[9px] font-bold text-brand-charcoal block leading-tight">
                       {preset.label}
                     </span>
-                    <span className="text-[9px] text-brand-gray block mt-0.5">
-                      {preset.modules} Modules
+                    <span className="text-[8px] text-brand-gray block">
+                      {preset.modules}mod
                     </span>
                   </button>
                 );
@@ -283,67 +318,63 @@ export default function LandDesigner() {
           </div>
         )}
 
-        {/* Map — takes remaining space */}
-        <div className="relative flex-1 min-h-0">
-          <MapView />
-
-          {/* Floating module count badge */}
-          {placedModules.length > 0 && (
-            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-[14px] bg-white/95 backdrop-blur-md shadow-lg border border-brand-bone-300/60 px-4 py-3">
-              <div>
-                <div className="text-[10px] font-bold text-brand-gray uppercase tracking-wider">Site Area</div>
-                <div className="text-lg font-bold text-brand-charcoal">
-                  {placedModules.length * 9} m²
-                </div>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className="text-xs text-brand-gray font-medium">
-                  {placedModules.length} module{placedModules.length !== 1 ? "s" : ""}
-                </span>
-                <Link
-                  href="/project/demo/design"
-                  className="rounded-[10px] bg-brand-olive-700 px-4 py-2.5 text-xs font-bold text-white active:scale-[0.97]"
-                >
-                  Next →
-                </Link>
-              </div>
-            </div>
-          )}
-
-          {/* Floating tools toggle */}
-          {(phase === "grid" || phase === "modules") && (
-            <button
-              onClick={() => setMobilePanel(mobilePanel === "tools" ? null : "tools")}
-              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white shadow-lg border border-brand-bone-300/60 flex items-center justify-center active:scale-[0.95]"
-            >
-              <svg className="w-5 h-5 text-brand-charcoal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </button>
-          )}
-        </div>
-
-        {/* Mobile tools drawer */}
+        {/* ---- DROPDOWN PANEL: Tools ---- */}
         {mobilePanel === "tools" && (
-          <div className="bg-white border-t border-brand-bone-300/60 px-4 py-3 max-h-[40vh] overflow-y-auto">
+          <div className="bg-white border-b border-brand-bone-300/60 px-3 py-2.5 max-h-[35vh] overflow-y-auto">
             <Toolbar />
             {phase === "modules" && (
-              <div className="mt-3">
+              <div className="mt-2">
                 <ModulePalette />
               </div>
             )}
           </div>
         )}
 
-        {/* Back link */}
-        <div className="bg-white border-t border-brand-bone-300/60 px-4 py-2 pb-safe-area-bottom">
-          <Link
-            href="/project/demo/choose"
-            className="block text-center text-[11px] text-brand-gray hover:text-brand-charcoal transition-colors"
-          >
-            ← Back to Choose
-          </Link>
+        {/* ---- MAP: takes all remaining space ---- */}
+        <div className="relative flex-1 min-h-0">
+          <MapView />
+
+          {/* Phase indicator floating pill */}
+          <div className="absolute top-2 left-2 rounded-full bg-black/60 backdrop-blur-sm px-2.5 py-1 text-[9px] font-bold text-white uppercase tracking-wider">
+            {phase === "map" ? "1. Draw Area" : phase === "grid" ? "2. Grid" : "3. Modules"}
+          </div>
+
+          {/* Module count chip — when modules placed but bottom bar shows Next */}
+          {placedModules.length > 0 && (
+            <div className="absolute top-2 right-2 rounded-full bg-white/90 backdrop-blur-sm shadow px-2.5 py-1 text-[10px] font-bold text-brand-charcoal">
+              {placedModules.length}{maxModules !== -1 ? `/${maxModules}` : ""} modules · {placedModules.length * 9}m²
+            </div>
+          )}
+        </div>
+
+        {/* ---- BOTTOM BAR: fixed at bottom ---- */}
+        <div className="bg-white border-t border-brand-bone-300/60 px-3 py-2.5 pb-[max(0.625rem,env(safe-area-inset-bottom))]">
+          {placedModules.length > 0 ? (
+            <div className="flex items-center gap-2">
+              <Link
+                href="/project/demo/choose"
+                className="px-3 py-2 rounded-lg border border-brand-bone-300 text-[10px] font-semibold text-brand-gray"
+              >
+                ← Back
+              </Link>
+              <Link
+                href="/project/demo/design"
+                className="flex-1 rounded-lg bg-brand-olive-700 py-3 text-center text-sm font-bold text-white active:scale-[0.98] transition-transform"
+              >
+                Next Step: Design →
+              </Link>
+            </div>
+          ) : (
+            <div className="flex items-center justify-between">
+              <Link
+                href="/project/demo/choose"
+                className="text-[10px] text-brand-gray font-medium"
+              >
+                ← Back to Choose
+              </Link>
+              <span className="text-[10px] text-brand-gray">Draw area on map to continue</span>
+            </div>
+          )}
         </div>
       </div>
 
