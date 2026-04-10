@@ -130,6 +130,7 @@ export default function LandDesigner() {
   const maxModules = getTierConfig(userTier).features.maxModules;
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
   const [showPresets, setShowPresets] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   /* ---- Read URL params from Choose page (Step 1) ---- */
   const searchParams = useSearchParams();
@@ -181,23 +182,80 @@ export default function LandDesigner() {
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      {/* Shared Header */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4">
+      {/* Header */}
+      <header className="flex h-12 md:h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-4 shrink-0">
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-lg font-bold text-brand-teal-800">
+          <span className="text-base md:text-lg font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        <StepNav activeStep={1} />
-        <div className="flex items-center gap-3 shrink-0">
+        {/* Desktop: full step nav */}
+        <div className="hidden md:block">
+          <StepNav activeStep={1} />
+        </div>
+        {/* Mobile: compact step dots */}
+        <div className="flex md:hidden items-center gap-1">
+          {[1, 2, 3, 4].map((s) => (
+            <span
+              key={s}
+              className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
+                s === 2 ? "bg-brand-olive-700 text-white" : "bg-gray-100 text-gray-400"
+              }`}
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
           <AuthNav />
         </div>
       </header>
 
       {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
-        {/* Left Sidebar */}
-        <aside className="w-80 flex-shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-5">
+      <div className="relative flex flex-1 overflow-hidden">
+        {/* Mobile: floating toggle button */}
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="md:hidden absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200 px-3 py-2 text-[10px] font-bold text-brand-charcoal active:scale-95 transition-transform"
+        >
+          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+          </svg>
+          {sidebarOpen ? "Close" : "Tools"}
+        </button>
+
+        {/* Mobile: floating Next button */}
+        {placedModules.length > 0 && (
+          <div className="md:hidden absolute bottom-3 left-3 right-3 z-20 flex items-center gap-2">
+            <div className="flex-1 rounded-xl bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200 px-3 py-2">
+              <span className="text-[10px] text-gray-500 font-medium">
+                {placedModules.length} modules &middot; {placedModules.length * 9}m&sup2;
+              </span>
+            </div>
+            <Link
+              href="/project/demo/design"
+              className="rounded-xl bg-brand-amber-500 px-5 py-3 text-xs font-bold text-white shadow-lg active:scale-95 transition-transform"
+            >
+              Next &rarr;
+            </Link>
+          </div>
+        )}
+
+        {/* Sidebar — hidden on mobile, slides in as overlay */}
+        {sidebarOpen && (
+          <div
+            className="md:hidden fixed inset-0 z-30 bg-black/30"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
+        <aside className={`
+          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+          md:translate-x-0
+          fixed md:static inset-y-0 left-0 z-40 md:z-auto
+          w-72 md:w-80 flex-shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-4 md:p-5
+          transition-transform duration-200 ease-out
+          pt-16 md:pt-5
+        `}>
           <h2 className="mb-1 text-xl font-bold text-brand-teal-800">
             Step 2: Locate Your Land
           </h2>
