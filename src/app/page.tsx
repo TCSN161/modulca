@@ -74,6 +74,7 @@ export default function HomePage() {
             <a href="#how-it-works" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">How It Works</a>
             <a href="#pricing" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Pricing</a>
             <a href="#for-builders" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">For Builders</a>
+            <Link href="/portfolio" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Portfolio</Link>
             <Link href="/blog" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Blog</Link>
           </div>
           <div className="flex items-center gap-3">
