@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { AuthNav } from "@/features/auth/components/AuthNav";
 
 interface CaseStudy {
   id: string;
@@ -119,9 +120,7 @@ export default function PortfolioPage() {
           <Link href="/portfolio" className="font-semibold text-brand-olive-700">Portfolio</Link>
           <Link href="/pricing" className="hover:text-brand-olive-700 transition-colors">Pricing</Link>
         </nav>
-        <Link href="/project/demo/choose" className="btn-primary text-sm px-4 py-2">
-          Try Free Demo
-        </Link>
+        <AuthNav />
       </header>
 
       {/* Hero */}

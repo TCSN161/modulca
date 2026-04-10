@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AuthNav } from "@/features/auth/components/AuthNav";
 
 /**
  * ModulCA Landing Page — "Digital Arboretum" Theme
@@ -77,20 +78,7 @@ export default function HomePage() {
             <Link href="/portfolio" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Portfolio</Link>
             <Link href="/blog" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Blog</Link>
           </div>
-          <div className="flex items-center gap-3">
-            <Link
-              href="/login"
-              className="text-sm font-medium text-brand-gray transition-colors hover:text-brand-charcoal"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/project/demo/choose"
-              className="rounded-[12px] bg-brand-olive-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-olive-800"
-            >
-              Try Free Demo
-            </Link>
-          </div>
+          <AuthNav />
         </div>
       </nav>
 

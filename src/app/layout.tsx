@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { Manrope, Inter } from "next/font/google";
+import { AuthHydrator } from "@/features/auth/components/AuthHydrator";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -83,6 +84,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
       <body className="min-h-screen bg-brand-bone-100 font-sans text-brand-charcoal antialiased">
+        <AuthHydrator />
         {children}
       </body>
     </html>
