@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useDesignStore } from "../../store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import StepNav from "../shared/StepNav";
+import MobileStepFooter from "../shared/MobileStepFooter";
 
 const MAX_FREE_PROJECTS = 3;
 type ContactMode = null | "quote" | "consultation";
@@ -423,6 +424,7 @@ export default function FinalizePage() {
           </div>
         </div>
       </div>
+      <MobileStepFooter activeStep={11} />
     </div>
   );
 }

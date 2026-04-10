@@ -12,6 +12,7 @@ import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import StepNav from "../shared/StepNav";
+import MobileStepFooter from "../shared/MobileStepFooter";
 
 type ViewMode = "single" | "all";
 
@@ -381,6 +382,7 @@ export default function ConfigurePage() {
           </div>
         )}
       </div>
+      <MobileStepFooter activeStep={5} />
     </div>
   );
 }

@@ -7,7 +7,8 @@ import { useSearchParams } from "next/navigation";
 import Toolbar from "./Toolbar";
 import ModulePalette from "./ModulePalette";
 import AddressSearch from "./AddressSearch";
-import StepNav, { STEPS } from "@/features/design/components/shared/StepNav";
+import StepNav from "@/features/design/components/shared/StepNav";
+import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
 import { useLandStore } from "../store";
 import type { GridCell } from "../store";
 import { MODULE_TYPES } from "@/shared/types";
@@ -182,44 +183,17 @@ export default function LandDesigner() {
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      {/* Desktop Header */}
-      <header className="hidden md:flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 shrink-0">
+      {/* Header */}
+      <header className="flex h-12 md:h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-4 shrink-0">
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-lg font-bold text-brand-teal-800">
+          <span className="text-sm md:text-lg font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
         <StepNav activeStep={1} />
-        <div className="flex items-center gap-3 shrink-0">
+        <div className="flex items-center gap-2 md:gap-3 shrink-0">
           <AuthNav />
         </div>
-      </header>
-
-      {/* Mobile Header: scrollable step pills */}
-      <header className="md:hidden flex items-center gap-1 border-b border-gray-200 bg-white px-2 py-1.5 shrink-0 overflow-x-auto scrollbar-none">
-        <Link href="/" className="shrink-0 mr-1">
-          <span className="text-sm font-bold text-brand-teal-800">
-            M<span className="text-brand-amber-500">CA</span>
-          </span>
-        </Link>
-        {STEPS.map((step, i) => (
-          <Link
-            key={step.label}
-            href={step.href}
-            className={`shrink-0 flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold transition-colors ${
-              i === 1
-                ? "bg-brand-olive-700 text-white"
-                : i < 1
-                  ? "bg-gray-100 text-brand-charcoal"
-                  : "bg-gray-50 text-gray-400"
-            }`}
-          >
-            <span>{i + 1}</span>
-            {(i === 1 || Math.abs(i - 1) <= 1) && (
-              <span className="text-[9px]">{step.label}</span>
-            )}
-          </Link>
-        ))}
       </header>
 
       {/* Main Content */}
@@ -428,31 +402,10 @@ export default function LandDesigner() {
         </div>
       </div>
 
-      {/* Mobile Bottom Bar — always visible, above MobileBottomNav (h-16=64px) */}
-      <div className="md:hidden flex items-center justify-between border-t border-gray-200 bg-white px-3 py-2 mb-16 shrink-0">
-        <Link
-          href={STEPS[0].href}
-          className="text-[10px] font-semibold text-gray-400"
-        >
-          &larr; {STEPS[0].label}
-        </Link>
-        <div className="text-center">
-          <span className="text-[10px] font-bold text-brand-charcoal">
-            Step 2: Land
-          </span>
-          {placedModules.length > 0 && (
-            <span className="text-[9px] text-gray-400 ml-1">
-              {placedModules.length} mod &middot; {placedModules.length * 9}m&sup2;
-            </span>
-          )}
-        </div>
-        <Link
-          href={STEPS[2].href}
-          className="rounded-lg bg-brand-amber-500 px-4 py-2 text-[11px] font-bold text-white active:scale-95 transition-transform"
-        >
-          Next: {STEPS[2].label} &rarr;
-        </Link>
-      </div>
+      <MobileStepFooter
+        activeStep={1}
+        info={placedModules.length > 0 ? `${placedModules.length} mod · ${placedModules.length * 9}m²` : undefined}
+      />
     </div>
   );
 }

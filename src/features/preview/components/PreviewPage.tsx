@@ -8,6 +8,7 @@ import Inspector from "./Inspector";
 import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
 import StepNav from "@/features/design/components/shared/StepNav";
+import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
 
 const Scene3D = dynamic(() => import("./Scene3D"), {
   ssr: false,
@@ -117,6 +118,8 @@ export default function PreviewPage() {
           <Inspector />
         </aside>
       </div>
+
+      <MobileStepFooter activeStep={3} />
     </div>
   );
 }

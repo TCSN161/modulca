@@ -8,6 +8,7 @@ import ProjectLayers, { DEFAULT_LAYERS, type LayerVisibility } from "./ProjectLa
 import { useDesignStore } from "../store";
 import { useLandStore } from "@/features/land/store";
 import StepNav from "./shared/StepNav";
+import MobileStepFooter from "./shared/MobileStepFooter";
 
 export default function LayoutDesigner() {
   const { gridCells, gridRotation } = useLandStore();
@@ -108,6 +109,7 @@ export default function LayoutDesigner() {
           </div>
         </div>
       )}
+      <MobileStepFooter activeStep={2} />
     </div>
   );
 }

@@ -12,6 +12,7 @@ import { getStyleDirection } from "../../styles";
 import { Vector3 } from "three";
 import StepNav from "../shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
+import MobileStepFooter from "../shared/MobileStepFooter";
 
 const WalkthroughScene = dynamic(() => import("./WalkthroughScene"), {
   ssr: false,
@@ -750,6 +751,7 @@ export default function WalkthroughPage() {
           </div>
         </div>
       )}
+      <MobileStepFooter activeStep={9} />
     </div>
   );
 }

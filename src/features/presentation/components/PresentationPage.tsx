@@ -10,6 +10,7 @@ import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "@
 import StepNav from "@/features/design/components/shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
 import { useAuthStore } from "@/features/auth/store";
+import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
@@ -938,6 +939,7 @@ export default function PresentationPage() {
           </div>
         </aside>
       </div>
+      <MobileStepFooter activeStep={12} />
     </div>
   );
 }

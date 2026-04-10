@@ -8,6 +8,7 @@ import { STYLE_DIRECTIONS, getStyleDirection } from "../../styles";
 import { cn } from "@/shared/utils/cn";
 import Moodboard from "./Moodboard";
 import StepNav from "../shared/StepNav";
+import MobileStepFooter from "../shared/MobileStepFooter";
 
 export default function StylePage() {
   const styleDirection = useDesignStore((s) => s.styleDirection);
@@ -19,6 +20,7 @@ export default function StylePage() {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const { saved, handleSave } = useSaveDesign();
   const [activeTab, setActiveTab] = useState<"style" | "moodboard">("style");
+  const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
 
   const selectedStyle = styleDirection
     ? getStyleDirection(styleDirection)
@@ -69,21 +71,21 @@ export default function StylePage() {
       </header>
 
       {/* Navigation bar */}
-      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-6 py-3">
+      <div className="flex items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6 py-2 md:py-3 gap-2">
         <Link
           href="/project/demo/design"
-          className="text-sm text-gray-500 hover:text-brand-teal-800"
+          className="hidden md:inline text-sm text-gray-500 hover:text-brand-teal-800"
         >
           &larr; Back to Preview
         </Link>
         {/* Tab switcher */}
-        <div className="flex items-center rounded-lg bg-gray-100 p-1">
+        <div className="flex items-center rounded-lg bg-gray-100 p-0.5 md:p-1">
           {(["style", "moodboard"] as const).map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
               className={cn(
-                "rounded-md px-4 py-1.5 text-xs font-semibold transition-all",
+                "rounded-md px-3 md:px-4 py-1 md:py-1.5 text-[10px] md:text-xs font-semibold transition-all",
                 activeTab === tab
                   ? "bg-white text-brand-teal-800 shadow-sm"
                   : "text-gray-500 hover:text-gray-700"
@@ -93,18 +95,95 @@ export default function StylePage() {
             </button>
           ))}
         </div>
+        {/* Mobile sidebar toggles */}
+        <div className="flex md:hidden items-center gap-1.5">
+          <button
+            onClick={() => setMobileSidebar(mobileSidebar === "left" ? null : "left")}
+            className={cn(
+              "px-2 py-1 rounded-full text-[10px] font-bold transition-colors",
+              mobileSidebar === "left" ? "bg-brand-olive-700 text-white" : "bg-gray-100 text-gray-500"
+            )}
+          >
+            Vision
+          </button>
+          <button
+            onClick={() => setMobileSidebar(mobileSidebar === "right" ? null : "right")}
+            className={cn(
+              "px-2 py-1 rounded-full text-[10px] font-bold transition-colors",
+              mobileSidebar === "right" ? "bg-brand-olive-700 text-white" : "bg-gray-100 text-gray-500"
+            )}
+          >
+            Summary
+          </button>
+        </div>
         <Link
           href="/project/demo/configure"
-          className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
+          className="hidden md:inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
         >
           Configure Modules &rarr;
         </Link>
       </div>
 
+      {/* Mobile sidebar overlay */}
+      {mobileSidebar && (
+        <div className="md:hidden fixed inset-0 z-30 bg-black/30" onClick={() => setMobileSidebar(null)} />
+      )}
+
+      {/* Mobile left panel slide-over */}
+      <div
+        className={cn(
+          "md:hidden fixed inset-y-0 left-0 z-40 w-72 bg-white border-r border-gray-200 overflow-y-auto p-5 pt-16 transition-transform duration-200",
+          mobileSidebar === "left" ? "translate-x-0" : "-translate-x-full"
+        )}
+      >
+        <button onClick={() => setMobileSidebar(null)} className="absolute top-3 right-3 text-gray-400 text-xs font-bold">✕</button>
+        <h3 className="mb-3 text-sm font-bold text-brand-teal-800 uppercase tracking-wider">Your Style Vision</h3>
+        <textarea
+          value={styleDescription}
+          onChange={(e) => setStyleDescription(e.target.value)}
+          placeholder="Describe your dream space..."
+          className="w-full rounded-lg border border-gray-200 bg-gray-50 p-3 text-sm text-gray-700 placeholder-gray-400 focus:border-brand-amber-500 focus:outline-none resize-none"
+          rows={4}
+        />
+        {selectedStyle && (
+          <div className="mt-4">
+            <h4 className="mb-2 text-xs font-bold text-gray-500 uppercase">Style Keywords</h4>
+            <div className="flex flex-wrap gap-1.5">
+              {selectedStyle.keywords.map((kw) => (
+                <span key={kw} className="rounded-full bg-brand-teal-800/10 px-2.5 py-0.5 text-[10px] font-medium text-brand-teal-800">{kw}</span>
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+
+      {/* Mobile right panel slide-over */}
+      <div
+        className={cn(
+          "md:hidden fixed inset-y-0 right-0 z-40 w-72 bg-white border-l border-gray-200 overflow-y-auto p-5 pt-16 transition-transform duration-200",
+          mobileSidebar === "right" ? "translate-x-0" : "translate-x-full"
+        )}
+      >
+        <button onClick={() => setMobileSidebar(null)} className="absolute top-3 left-3 text-gray-400 text-xs font-bold">✕</button>
+        <h3 className="mb-4 text-sm font-bold text-brand-teal-800 uppercase tracking-wider">Design Summary</h3>
+        {selectedStyle ? (
+          <div className="space-y-4">
+            <div className="text-sm font-bold text-brand-teal-800">{selectedStyle.label}</div>
+            <p className="text-xs text-gray-500">{selectedStyle.description}</p>
+            <div className="rounded-lg bg-gray-50 p-3 text-xs space-y-1">
+              <div className="flex justify-between"><span className="text-gray-500">Floor</span><span className="font-medium">{selectedStyle.floorDefault}</span></div>
+              <div className="flex justify-between"><span className="text-gray-500">Wall</span><span className="font-medium">{selectedStyle.wallDefault}</span></div>
+            </div>
+          </div>
+        ) : (
+          <p className="text-xs text-gray-400">Select a style to see summary.</p>
+        )}
+      </div>
+
       {/* Main Content */}
       <div className="flex flex-1 overflow-hidden">
-        {/* LEFT SIDEBAR */}
-        <aside className="w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-5">
+        {/* LEFT SIDEBAR — desktop only */}
+        <aside className="hidden md:block w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-5">
           <h3 className="mb-3 text-sm font-bold text-brand-teal-800 uppercase tracking-wider">
             Your Style Vision
           </h3>
@@ -379,8 +458,8 @@ export default function StylePage() {
           )}
         </main>
 
-        {/* RIGHT SIDEBAR */}
-        <aside className="w-72 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-5">
+        {/* RIGHT SIDEBAR — desktop only */}
+        <aside className="hidden md:block w-72 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-5">
           <h3 className="mb-4 text-sm font-bold text-brand-teal-800 uppercase tracking-wider">
             Design Summary
           </h3>
@@ -445,6 +524,8 @@ export default function StylePage() {
           </div>
         </aside>
       </div>
+
+      <MobileStepFooter activeStep={4} />
     </div>
   );
 }

@@ -11,6 +11,7 @@ import { getPreset, getPresetsForType } from "../../layouts";
 import { FURNITURE_COLORS } from "../../styles";
 import ConfigPanel from "../configure/ConfigPanel";
 import StepNav from "../shared/StepNav";
+import MobileStepFooter from "../shared/MobileStepFooter";
 
 type ViewMode = "single" | "all";
 
@@ -390,6 +391,7 @@ export default function VisualizePage() {
           </div>
         )}
       </div>
+      <MobileStepFooter activeStep={6} />
     </div>
   );
 }

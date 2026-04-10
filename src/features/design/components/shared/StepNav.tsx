@@ -26,23 +26,31 @@ interface StepNavProps {
 
 export default function StepNav({ activeStep }: StepNavProps) {
   return (
-    <nav className="flex-1 overflow-x-auto mx-4 scrollbar-none">
+    <nav className="flex-1 overflow-x-auto mx-2 md:mx-4 scrollbar-none">
       <div className="flex items-center gap-0.5 md:gap-1 min-w-max md:justify-center">
         {STEPS.map((step, i) => (
           <Link
             key={step.label}
             href={step.href}
             className={cn(
-              "text-[10px] font-semibold uppercase tracking-[0.05em] transition-colors whitespace-nowrap px-1.5 py-1.5 rounded-md",
+              "text-[10px] font-semibold uppercase tracking-[0.05em] transition-colors whitespace-nowrap rounded-md inline-flex",
+              // Mobile: compact pills always visible, scrollable
+              "px-1.5 py-1 md:px-1.5 md:py-1.5",
               i === activeStep
                 ? "text-brand-olive-700 bg-brand-olive-100 border-b-2 border-brand-olive-700"
                 : i < activeStep
                   ? "text-brand-charcoal hover:text-brand-olive-700 hover:bg-brand-olive-50"
                   : "text-brand-gray/50 hover:text-brand-gray",
-              Math.abs(i - activeStep) > 2 ? "hidden md:inline-flex" : "inline-flex"
             )}
           >
-            <span className="md:hidden">{i + 1}</span>
+            {/* Mobile: show number, and label for active±1 */}
+            <span className="md:hidden flex items-center gap-0.5">
+              <span>{i + 1}</span>
+              {Math.abs(i - activeStep) <= 1 && (
+                <span className="text-[8px]">{step.label}</span>
+              )}
+            </span>
+            {/* Desktop: full label */}
             <span className="hidden md:inline">{i + 1}. {step.label}</span>
           </Link>
         ))}

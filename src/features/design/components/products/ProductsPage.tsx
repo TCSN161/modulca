@@ -8,6 +8,7 @@ import Image from "next/image";
 import { useDesignStore } from "../../store";
 import { useLandStore } from "@/features/land/store";
 import StepNav from "../shared/StepNav";
+import MobileStepFooter from "../shared/MobileStepFooter";
 import {
   Layers,
   Sofa,
@@ -863,6 +864,8 @@ export default function ProductsPage() {
           </div>
         </aside>
       </div>
+
+      <MobileStepFooter activeStep={10} />
 
       {/* ── Product Detail Modal ── */}
       {detailProduct && (

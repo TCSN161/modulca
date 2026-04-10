@@ -10,6 +10,7 @@ import { getStyleDirection } from "../../styles";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import { MODULE_TYPES } from "@/shared/types";
 import StepNav from "../shared/StepNav";
+import MobileStepFooter from "../shared/MobileStepFooter";
 
 import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, RenderResolution, AiEngine } from "./renderConstants";
 import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
@@ -911,6 +912,7 @@ export default function RenderPage() {
           </div>
         )}
       </div>
+      <MobileStepFooter activeStep={7} />
     </div>
   );
 }

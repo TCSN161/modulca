@@ -19,6 +19,7 @@ import KnowledgeBasePanel from "./KnowledgeBasePanel";
 import PermitTracker from "./PermitTracker";
 import DrawingPresentation from "./DrawingPresentation";
 import FeatureGate from "@/shared/components/FeatureGate";
+import MobileStepFooter from "../shared/MobileStepFooter";
 
 
 const DRAWING_TYPES = [
@@ -728,6 +729,7 @@ export default function TechnicalPage() {
 
       {/* Full-screen drawing presentation */}
       <DrawingPresentation open={presentationOpen} onClose={() => setPresentationOpen(false)} />
+      <MobileStepFooter activeStep={8} />
     </div>
   );
 }

@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { useMarketplaceStore, filterTerrains } from "../store";
 import FeatureGate from "@/shared/components/FeatureGate";
+import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
 import type { Terrain } from "../store";
 
 type LandMode = "choose" | "have-land" | "want-land" | "play";
@@ -219,6 +220,7 @@ export default function MarketplacePage() {
           )}
         </>
       ) : null}
+      <MobileStepFooter activeStep={0} />
     </div>
   );
 }
