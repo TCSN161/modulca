@@ -130,6 +130,7 @@ export default function LandDesigner() {
   const maxModules = getTierConfig(userTier).features.maxModules;
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
   const [showPresets, setShowPresets] = useState(true);
+  const [mobilePanel, setMobilePanel] = useState<"presets" | "tools" | null>("presets");
 
   /* ---- Read URL params from Choose page (Step 1) ---- */
   const searchParams = useSearchParams();
@@ -143,7 +144,6 @@ export default function LandDesigner() {
 
   useEffect(() => {
     if (terrainLat && terrainLng) {
-      // Direct coordinates (from marketplace terrain selection)
       const lat = parseFloat(terrainLat);
       const lng = parseFloat(terrainLng);
       if (Number.isFinite(lat) && Number.isFinite(lng)) {
@@ -151,7 +151,6 @@ export default function LandDesigner() {
         setMapZoom(18);
       }
     } else if (terrainAddr) {
-      // Address only (from "I have land" form) — geocode it
       const query = [terrainAddr, terrainCity, "Romania"].filter(Boolean).join(", ");
       fetch(
         `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(query)}&limit=1`,
@@ -168,21 +167,52 @@ export default function LandDesigner() {
             }
           }
         })
-        .catch(() => { /* geocoding failed, user can search manually */ });
+        .catch(() => {});
     }
   }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /** Apply a preset layout — sets grid cells and skips to modules phase */
   const applyPreset = (preset: PresetLayout) => {
     setGridCells(preset.cells);
     setPhase("modules");
     setShowPresets(false);
+    setMobilePanel(null);
   };
+
+  const showPresetsSection = showPresets && phase === "map" && gridCells.length === 0;
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      {/* Shared Header */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4">
+      {/* ============================================================ */}
+      {/*  MOBILE HEADER (< md)                                        */}
+      {/* ============================================================ */}
+      <header className="flex md:hidden h-14 items-center justify-between border-b border-brand-bone-300/60 bg-white px-4">
+        <Link href="/" className="flex items-center gap-2">
+          <span className="text-lg font-bold text-brand-charcoal tracking-tight">
+            Modul<span className="text-brand-olive-700">CA</span>
+          </span>
+        </Link>
+        {/* Step dots */}
+        <div className="flex items-center gap-1.5">
+          {[1, 2, 3].map((s) => (
+            <span
+              key={s}
+              className={`flex items-center justify-center w-7 h-7 rounded-full text-xs font-bold ${
+                s === 2
+                  ? "bg-brand-olive-700 text-white"
+                  : "bg-brand-bone-200 text-brand-gray"
+              }`}
+            >
+              {s}
+            </span>
+          ))}
+        </div>
+        <AuthNav />
+      </header>
+
+      {/* ============================================================ */}
+      {/*  DESKTOP HEADER (md+)                                        */}
+      {/* ============================================================ */}
+      <header className="hidden md:flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4">
         <Link href="/" className="flex items-center gap-2 shrink-0">
           <span className="text-lg font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -194,8 +224,133 @@ export default function LandDesigner() {
         </div>
       </header>
 
-      {/* Main Content */}
-      <div className="flex flex-1 overflow-hidden">
+      {/* ============================================================ */}
+      {/*  MOBILE LAYOUT (< md): stacked vertical                     */}
+      {/* ============================================================ */}
+      <div className="flex flex-col flex-1 overflow-hidden md:hidden">
+        {/* Title + Address */}
+        <div className="bg-white px-4 pt-4 pb-3 border-b border-brand-bone-300/60">
+          <h2 className="text-xl font-bold text-brand-charcoal tracking-heading">
+            Step 2: Locate Your Land
+          </h2>
+          <p className="text-xs text-brand-gray mt-0.5 mb-3">
+            {terrainAddr
+              ? `${terrainAddr}${terrainCity ? `, ${terrainCity}` : ""}`
+              : "Pinpoint your site to begin the architectural projection."}
+          </p>
+          <AddressSearch />
+        </div>
+
+        {/* Quick Start Presets — horizontal scroll */}
+        {showPresetsSection && mobilePanel === "presets" && (
+          <div className="bg-white border-b border-brand-bone-300/60 px-4 py-3">
+            <div className="flex items-center justify-between mb-2">
+              <h4 className="text-[10px] font-bold text-brand-charcoal uppercase tracking-wider">
+                Quick Start Presets
+              </h4>
+              <button
+                onClick={() => { setShowPresets(false); setMobilePanel(null); }}
+                className="text-[10px] text-brand-olive-700 font-semibold"
+              >
+                Skip
+              </button>
+            </div>
+            <div className="flex gap-2.5 overflow-x-auto pb-1 scrollbar-none -mx-1 px-1">
+              {PRESET_LAYOUTS.map((preset) => {
+                const exceedsLimit = maxModules !== -1 && preset.modules > maxModules;
+                return (
+                  <button
+                    key={preset.id}
+                    onClick={() => !exceedsLimit && applyPreset(preset)}
+                    disabled={exceedsLimit}
+                    className={`flex-shrink-0 w-28 rounded-[12px] border p-3 text-center transition-colors ${
+                      exceedsLimit
+                        ? "border-gray-100 bg-gray-50 opacity-40"
+                        : "border-brand-bone-300/60 bg-brand-bone-100 active:bg-brand-olive-100"
+                    }`}
+                  >
+                    <span className="text-2xl block mb-1">{preset.icon}</span>
+                    <span className="text-[11px] font-bold text-brand-charcoal block leading-tight">
+                      {preset.label}
+                    </span>
+                    <span className="text-[9px] text-brand-gray block mt-0.5">
+                      {preset.modules} Modules
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {/* Map — takes remaining space */}
+        <div className="relative flex-1 min-h-0">
+          <MapView />
+
+          {/* Floating module count badge */}
+          {placedModules.length > 0 && (
+            <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between rounded-[14px] bg-white/95 backdrop-blur-md shadow-lg border border-brand-bone-300/60 px-4 py-3">
+              <div>
+                <div className="text-[10px] font-bold text-brand-gray uppercase tracking-wider">Site Area</div>
+                <div className="text-lg font-bold text-brand-charcoal">
+                  {placedModules.length * 9} m²
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-xs text-brand-gray font-medium">
+                  {placedModules.length} module{placedModules.length !== 1 ? "s" : ""}
+                </span>
+                <Link
+                  href="/project/demo/design"
+                  className="rounded-[10px] bg-brand-olive-700 px-4 py-2.5 text-xs font-bold text-white active:scale-[0.97]"
+                >
+                  Next →
+                </Link>
+              </div>
+            </div>
+          )}
+
+          {/* Floating tools toggle */}
+          {(phase === "grid" || phase === "modules") && (
+            <button
+              onClick={() => setMobilePanel(mobilePanel === "tools" ? null : "tools")}
+              className="absolute top-3 right-3 w-10 h-10 rounded-full bg-white shadow-lg border border-brand-bone-300/60 flex items-center justify-center active:scale-[0.95]"
+            >
+              <svg className="w-5 h-5 text-brand-charcoal" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
+                <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+            </button>
+          )}
+        </div>
+
+        {/* Mobile tools drawer */}
+        {mobilePanel === "tools" && (
+          <div className="bg-white border-t border-brand-bone-300/60 px-4 py-3 max-h-[40vh] overflow-y-auto">
+            <Toolbar />
+            {phase === "modules" && (
+              <div className="mt-3">
+                <ModulePalette />
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Back link */}
+        <div className="bg-white border-t border-brand-bone-300/60 px-4 py-2 pb-safe-area-bottom">
+          <Link
+            href="/project/demo/choose"
+            className="block text-center text-[11px] text-brand-gray hover:text-brand-charcoal transition-colors"
+          >
+            ← Back to Choose
+          </Link>
+        </div>
+      </div>
+
+      {/* ============================================================ */}
+      {/*  DESKTOP LAYOUT (md+): sidebar + map                         */}
+      {/* ============================================================ */}
+      <div className="hidden md:flex flex-1 overflow-hidden">
         {/* Left Sidebar */}
         <aside className="w-80 flex-shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-5">
           <h2 className="mb-1 text-xl font-bold text-brand-teal-800">
@@ -208,7 +363,7 @@ export default function LandDesigner() {
           </p>
 
           {/* Quick Start Presets */}
-          {showPresets && phase === "map" && gridCells.length === 0 && (
+          {showPresetsSection && (
             <div className="mb-5 rounded-lg border border-brand-amber-200 bg-brand-amber-50 p-4">
               <h4 className="mb-1 text-xs font-bold text-brand-amber-700 uppercase tracking-wider flex items-center gap-1.5">
                 ⚡ Quick Start
@@ -271,7 +426,7 @@ export default function LandDesigner() {
             </div>
           )}
 
-          {/* Module Types Legend (always visible) */}
+          {/* Module Types Legend */}
           {(phase === "grid" || phase === "modules") && (
             <div className="mt-5 rounded-lg border border-gray-100 bg-gray-50 p-4">
               <h4 className="mb-2 text-xs font-semibold text-gray-500 uppercase tracking-wider">
@@ -308,7 +463,6 @@ export default function LandDesigner() {
               <div className="mt-1 text-sm text-brand-teal-600">
                 {placedModules.length * 9}m&sup2; total / {placedModules.length * 7}m&sup2; usable
               </div>
-              {/* Mini breakdown */}
               <div className="mt-2 flex flex-wrap gap-1.5">
                 {MODULE_TYPES.filter((mt) =>
                   placedModules.some((c) => c.moduleType === mt.id)
@@ -351,7 +505,6 @@ export default function LandDesigner() {
               Next: Design →
             </Link>
           )}
-          {/* Back to Choose page */}
           <Link
             href="/project/demo/choose"
             className="mt-3 w-full block text-center text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
