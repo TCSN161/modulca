@@ -296,6 +296,18 @@ export default function VisualizePage() {
             style={{ visibility: viewMode === "all" ? "visible" : "hidden" }}
           >
             <CombinedScene3D />
+            {/* Reset button for all-modules view */}
+            <div className="absolute top-3 left-3 z-10">
+              <button
+                onClick={() => {
+                  resetAllFurnitureOverrides();
+                  useDesignStore.getState().saveToLocalStorage();
+                }}
+                className="rounded-lg border border-red-200 bg-white/90 backdrop-blur-sm px-3 py-2 text-xs font-semibold text-red-600 hover:bg-red-50 shadow-sm transition-colors"
+              >
+                ↺ Reset All Furniture Positions
+              </button>
+            </div>
           </div>
           <div
             className="absolute inset-0"

@@ -639,6 +639,14 @@ export function StaticFurniturePiece({
   const worldX = offsetX + posX + safeW / 2;
   const worldZ = offsetZ + posZ + safeD / 2;
 
+  // DEBUG: trace combined view positions (remove after fixing)
+  if (typeof window !== "undefined" && offsetX !== 0 || offsetZ !== 0) {
+    if (!((window as any).__sfpCount)) (window as any).__sfpCount = 0;
+    if ((window as any).__sfpCount < 30) {
+      console.log(`[SFP] ${item.label} | default(${item.x},${item.z}) | override(${override?.x ?? "-"},${override?.z ?? "-"}) | pos(${posX.toFixed(2)},${posZ.toFixed(2)}) | offset(${offsetX},${offsetZ}) | world(${worldX.toFixed(2)},${worldZ.toFixed(2)})`);
+      (window as any).__sfpCount++;
+    }
+  }
 
   return (
     <group position={[worldX, halfH, worldZ]}>
