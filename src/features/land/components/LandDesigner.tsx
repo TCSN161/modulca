@@ -7,7 +7,7 @@ import { useSearchParams } from "next/navigation";
 import Toolbar from "./Toolbar";
 import ModulePalette from "./ModulePalette";
 import AddressSearch from "./AddressSearch";
-import StepNav from "@/features/design/components/shared/StepNav";
+import StepNav, { STEPS } from "@/features/design/components/shared/StepNav";
 import { useLandStore } from "../store";
 import type { GridCell } from "../store";
 import { MODULE_TYPES } from "@/shared/types";
@@ -182,64 +182,59 @@ export default function LandDesigner() {
 
   return (
     <div className="flex h-screen flex-col bg-gray-50">
-      {/* Header */}
-      <header className="flex h-12 md:h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-4 shrink-0">
+      {/* Desktop Header */}
+      <header className="hidden md:flex h-14 items-center justify-between border-b border-gray-200 bg-white px-4 shrink-0">
         <Link href="/" className="flex items-center gap-2 shrink-0">
-          <span className="text-base md:text-lg font-bold text-brand-teal-800">
+          <span className="text-lg font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
           </span>
         </Link>
-        {/* Desktop: full step nav */}
-        <div className="hidden md:block">
-          <StepNav activeStep={1} />
-        </div>
-        {/* Mobile: compact step dots */}
-        <div className="flex md:hidden items-center gap-1">
-          {[1, 2, 3, 4].map((s) => (
-            <span
-              key={s}
-              className={`w-6 h-6 rounded-full flex items-center justify-center text-[10px] font-bold ${
-                s === 2 ? "bg-brand-olive-700 text-white" : "bg-gray-100 text-gray-400"
-              }`}
-            >
-              {s}
-            </span>
-          ))}
-        </div>
-        <div className="flex items-center gap-2 md:gap-3 shrink-0">
+        <StepNav activeStep={1} />
+        <div className="flex items-center gap-3 shrink-0">
           <AuthNav />
         </div>
       </header>
 
+      {/* Mobile Header: scrollable step pills */}
+      <header className="md:hidden flex items-center gap-1 border-b border-gray-200 bg-white px-2 py-1.5 shrink-0 overflow-x-auto scrollbar-none">
+        <Link href="/" className="shrink-0 mr-1">
+          <span className="text-sm font-bold text-brand-teal-800">
+            M<span className="text-brand-amber-500">CA</span>
+          </span>
+        </Link>
+        {STEPS.map((step, i) => (
+          <Link
+            key={step.label}
+            href={step.href}
+            className={`shrink-0 flex items-center gap-1 rounded-full px-2 py-1 text-[10px] font-bold transition-colors ${
+              i === 1
+                ? "bg-brand-olive-700 text-white"
+                : i < 1
+                  ? "bg-gray-100 text-brand-charcoal"
+                  : "bg-gray-50 text-gray-400"
+            }`}
+          >
+            <span>{i + 1}</span>
+            {(i === 1 || Math.abs(i - 1) <= 1) && (
+              <span className="text-[9px]">{step.label}</span>
+            )}
+          </Link>
+        ))}
+      </header>
+
       {/* Main Content */}
       <div className="relative flex flex-1 overflow-hidden">
-        {/* Mobile: floating toggle button */}
+        {/* Mobile: floating Tools button */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-full bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200 px-3 py-2 text-[10px] font-bold text-brand-charcoal active:scale-95 transition-transform"
+          className="md:hidden absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-lg bg-white shadow-lg border border-gray-200 px-3 py-2.5 text-xs font-bold text-brand-charcoal active:scale-95 transition-transform"
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M4 6h16M4 12h16M4 18h16"} />
+            <path strokeLinecap="round" strokeLinejoin="round" d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"} />
+            {!sidebarOpen && <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />}
           </svg>
           {sidebarOpen ? "Close" : "Tools"}
         </button>
-
-        {/* Mobile: floating Next button */}
-        {placedModules.length > 0 && (
-          <div className="md:hidden absolute bottom-3 left-3 right-3 z-20 flex items-center gap-2">
-            <div className="flex-1 rounded-xl bg-white/95 backdrop-blur-sm shadow-lg border border-gray-200 px-3 py-2">
-              <span className="text-[10px] text-gray-500 font-medium">
-                {placedModules.length} modules &middot; {placedModules.length * 9}m&sup2;
-              </span>
-            </div>
-            <Link
-              href="/project/demo/design"
-              className="rounded-xl bg-brand-amber-500 px-5 py-3 text-xs font-bold text-white shadow-lg active:scale-95 transition-transform"
-            >
-              Next &rarr;
-            </Link>
-          </div>
-        )}
 
         {/* Sidebar — hidden on mobile, slides in as overlay */}
         {sidebarOpen && (
@@ -422,6 +417,32 @@ export default function LandDesigner() {
         <div className="relative flex-1">
           <MapView />
         </div>
+      </div>
+
+      {/* Mobile Bottom Bar — always visible */}
+      <div className="md:hidden flex items-center justify-between border-t border-gray-200 bg-white px-3 py-2 shrink-0">
+        <Link
+          href={STEPS[0].href}
+          className="text-[10px] font-semibold text-gray-400"
+        >
+          &larr; {STEPS[0].label}
+        </Link>
+        <div className="text-center">
+          <span className="text-[10px] font-bold text-brand-charcoal">
+            Step 2: Land
+          </span>
+          {placedModules.length > 0 && (
+            <span className="text-[9px] text-gray-400 ml-1">
+              {placedModules.length} mod &middot; {placedModules.length * 9}m&sup2;
+            </span>
+          )}
+        </div>
+        <Link
+          href={STEPS[2].href}
+          className="rounded-lg bg-brand-amber-500 px-4 py-2 text-[11px] font-bold text-white active:scale-95 transition-transform"
+        >
+          Next: {STEPS[2].label} &rarr;
+        </Link>
       </div>
     </div>
   );
