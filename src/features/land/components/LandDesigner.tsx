@@ -224,14 +224,19 @@ export default function LandDesigner() {
 
       {/* Main Content */}
       <div className="relative flex flex-1 overflow-hidden">
-        {/* Mobile: floating Tools button */}
+        {/* Mobile: floating Tools button — top-right to avoid Leaflet zoom controls */}
         <button
           onClick={() => setSidebarOpen(!sidebarOpen)}
-          className="md:hidden absolute top-3 left-3 z-20 flex items-center gap-1.5 rounded-lg bg-white shadow-lg border border-gray-200 px-3 py-2.5 text-xs font-bold text-brand-charcoal active:scale-95 transition-transform"
+          className="md:hidden absolute top-3 right-3 flex items-center gap-1.5 rounded-lg bg-white shadow-lg border border-gray-200 px-3 py-2.5 text-xs font-bold text-brand-charcoal active:scale-95 transition-transform"
+          style={{ zIndex: 1100 }}
         >
           <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-            <path strokeLinecap="round" strokeLinejoin="round" d={sidebarOpen ? "M6 18L18 6M6 6l12 12" : "M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.066 2.573c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.573 1.066c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.066-2.573c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"} />
-            {!sidebarOpen && <path strokeLinecap="round" strokeLinejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />}
+            {sidebarOpen
+              ? <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+              : <>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
+                </>
+            }
           </svg>
           {sidebarOpen ? "Close" : "Tools"}
         </button>
@@ -239,18 +244,22 @@ export default function LandDesigner() {
         {/* Sidebar — hidden on mobile, slides in as overlay */}
         {sidebarOpen && (
           <div
-            className="md:hidden fixed inset-0 z-30 bg-black/30"
+            className="md:hidden fixed inset-0 bg-black/30"
+            style={{ zIndex: 1200 }}
             onClick={() => setSidebarOpen(false)}
           />
         )}
-        <aside className={`
-          ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
-          md:translate-x-0
-          fixed md:static inset-y-0 left-0 z-40 md:z-auto
-          w-72 md:w-80 flex-shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-4 md:p-5
-          transition-transform duration-200 ease-out
-          pt-16 md:pt-5
-        `}>
+        <aside
+          className={`
+            ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+            md:translate-x-0
+            fixed md:static inset-y-0 left-0 md:z-auto
+            w-72 md:w-80 flex-shrink-0 overflow-y-auto border-r border-gray-200 bg-white p-4 md:p-5
+            transition-transform duration-200 ease-out
+            pt-16 md:pt-5
+          `}
+          style={{ zIndex: 1300 }}
+        >
           <h2 className="mb-1 text-xl font-bold text-brand-teal-800">
             Step 2: Locate Your Land
           </h2>
@@ -419,8 +428,8 @@ export default function LandDesigner() {
         </div>
       </div>
 
-      {/* Mobile Bottom Bar — always visible */}
-      <div className="md:hidden flex items-center justify-between border-t border-gray-200 bg-white px-3 py-2 shrink-0">
+      {/* Mobile Bottom Bar — always visible, above MobileBottomNav (h-16=64px) */}
+      <div className="md:hidden flex items-center justify-between border-t border-gray-200 bg-white px-3 py-2 mb-16 shrink-0">
         <Link
           href={STEPS[0].href}
           className="text-[10px] font-semibold text-gray-400"
