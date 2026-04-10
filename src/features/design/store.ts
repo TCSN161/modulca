@@ -5,6 +5,12 @@ import { MODULE_TYPES, FINISH_LEVELS, SHARED_WALL_DISCOUNT, DESIGN_FEE_PERCENTAG
 import type { GridCell } from "@/features/land/store";
 import { getPresetsForType } from "./layouts";
 
+/**
+ * Bump this when the localStorage schema changes.
+ * Old data with a different version will be discarded on load.
+ */
+const STORE_VERSION = 2;
+
 export type FinishLevelId = "basic" | "standard" | "premium";
 export type StyleDirectionId = "scandinavian" | "industrial" | "warm-contemporary" | null;
 export type WallType = "solid" | "window" | "door" | "none" | "shared";
@@ -307,7 +313,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 
   saveToLocalStorage: () => {
     const { modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins, savedRenders, moduleFixtures } = get();
-    const data = { modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins, savedRenders, moduleFixtures };
+    const data = { _v: STORE_VERSION, modules, finishLevel, gridRotation, styleDirection, styleDescription, stylePhoto, moodboardPins, savedRenders, moduleFixtures };
     try {
       localStorage.setItem("modulca-design", JSON.stringify(data));
     } catch {
@@ -320,6 +326,11 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
       const raw = localStorage.getItem("modulca-design");
       if (!raw) return;
       const data = JSON.parse(raw);
+      // Version check — discard stale data from incompatible versions
+      if (data._v !== STORE_VERSION) {
+        localStorage.removeItem("modulca-design");
+        return;
+      }
       // Migrate modules missing wallConfigs (backward compatibility)
       const loadedModules: ModuleConfig[] = data.modules ?? [];
       const occupiedSet = new Set(loadedModules.map((m: ModuleConfig) => `${m.row},${m.col}`));
