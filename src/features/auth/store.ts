@@ -48,9 +48,13 @@ interface AuthStore {
 
 const STORAGE_KEY = "modulca-auth";
 
-/** Save to localStorage (demo fallback) */
+/** Save to localStorage (demo fallback) + set cookie for middleware */
 function saveLocal(data: { id?: string; name: string; email: string; tier: AccountTier }) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(data)); } catch { /* */ }
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    // Set a cookie so middleware knows the user is "authenticated" in demo mode
+    document.cookie = "modulca-auth-active=1; path=/; max-age=2592000; SameSite=Lax";
+  } catch { /* */ }
 }
 
 /** Load from localStorage */
@@ -66,7 +70,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   userId: null,
   userName: null,
   userEmail: null,
-  userTier: "free",
+  userTier: "guest_free", // Anonymous visitors start as guest — upgrade to "free" on signup
   userAvatar: null,
   loading: false,
   error: null,
@@ -181,13 +185,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   signOut: async () => {
     const sb = getSupabase();
     if (sb) await sb.auth.signOut();
-    try { localStorage.removeItem(STORAGE_KEY); } catch { /* */ }
+    try {
+      localStorage.removeItem(STORAGE_KEY);
+      document.cookie = "modulca-auth-active=; path=/; max-age=0";
+    } catch { /* */ }
     set({
       isAuthenticated: false,
       userId: null,
       userName: null,
       userEmail: null,
-      userTier: "free",
+      userTier: "guest_free",
       userAvatar: null,
       error: null,
       projectCount: 0,

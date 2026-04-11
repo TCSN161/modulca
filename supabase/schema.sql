@@ -9,6 +9,10 @@ create table if not exists public.profiles (
   display_name text,
   tier text not null default 'free' check (tier in ('free', 'premium', 'architect')),
   avatar_url text,
+  project_count integer not null default 0,
+  storage_used_mb real not null default 0,
+  ai_calls_today integer not null default 0,
+  ai_calls_reset_at date,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -52,6 +56,8 @@ alter table public.projects enable row level security;
 -- Profiles: users can read/update their own
 create policy "Users can view own profile"
   on public.profiles for select using (auth.uid() = id);
+create policy "Users can insert own profile"
+  on public.profiles for insert with check (auth.uid() = id);
 create policy "Users can update own profile"
   on public.profiles for update using (auth.uid() = id);
 

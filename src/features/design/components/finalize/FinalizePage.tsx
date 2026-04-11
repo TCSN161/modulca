@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { useDesignStore } from "../../store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
-import StepNav from "../shared/StepNav";
+import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
 
 const MAX_FREE_PROJECTS = 3;
@@ -80,15 +80,7 @@ export default function FinalizePage() {
   return (
     <div className="flex flex-col h-screen bg-gray-50">
       {/* Header */}
-      <header className="flex items-center justify-between h-14 px-6 bg-white border-b border-gray-200 shrink-0">
-        <div className="flex items-center gap-3">
-          <Link href="/" className="text-lg font-bold text-brand-teal-800 tracking-tight">
-            Modul<span className="text-brand-amber-500">CA</span>
-          </Link>
-        </div>
-        <StepNav activeStep={11} />
-        <div className="w-24" />
-      </header>
+      <DesignHeader activeStep={11} />
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto">
