@@ -7,10 +7,10 @@ import { leonardoEngine } from "./engines/leonardo";
 import type { AiRenderEngine, AiRenderRequest, EngineInfo } from "./engines/types";
 
 /**
- * On localhost (server mode) these handlers run normally.
- * On static export (GitHub Pages) they become no-op stubs.
+ * Must be force-dynamic so Vercel runs this as a serverless function
+ * that can make real-time API calls to AI engines.
  */
-export const dynamic = "force-static";
+export const dynamic = "force-dynamic";
 
 /**
  * Modular AI Render Proxy

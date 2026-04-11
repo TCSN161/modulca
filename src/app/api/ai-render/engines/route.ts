@@ -1,8 +1,8 @@
 import { NextResponse } from "next/server";
 import type { EngineInfo } from "./types";
 
-/** Static export compatibility for GitHub Pages. */
-export const dynamic = "force-static";
+/** Dynamic so engine list can reflect available keys at runtime. */
+export const dynamic = "force-dynamic";
 
 /**
  * GET /api/ai-render/engines
