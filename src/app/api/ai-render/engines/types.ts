@@ -7,6 +7,16 @@
  * 3. Register it in the ENGINES map in ../route.ts
  */
 
+/** Policy flags for EU compliance and provider routing */
+export interface PolicyFlags {
+  /** Allow China-based providers (Qwen, Hunyuan, Seedream). Default: false */
+  allowChinaProviders?: boolean;
+  /** Require EU data gateway / EU-region processing. Default: false */
+  requireEUGateway?: boolean;
+  /** Safe mode — extra content moderation. Default: true */
+  safeMode?: boolean;
+}
+
 export interface AiRenderRequest {
   prompt: string;
   width: number;
@@ -14,6 +24,10 @@ export interface AiRenderRequest {
   seed: string;
   /** Optional base64-encoded PNG from 3D scene capture (for img2img engines) */
   baseImage?: string;
+  /** User tier — used for cost ceiling enforcement */
+  tier?: string;
+  /** Policy flags for region/compliance control */
+  policyFlags?: PolicyFlags;
 }
 
 export interface AiRenderResult {
@@ -23,6 +37,10 @@ export interface AiRenderResult {
   contentType: string;
   /** Which engine produced this result */
   engine: string;
+  /** Estimated cost in USD for this generation */
+  costUsd?: number;
+  /** Generation latency in milliseconds */
+  latencyMs?: number;
 }
 
 /**

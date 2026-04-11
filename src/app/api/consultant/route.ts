@@ -137,6 +137,26 @@ async function loadArticleContent(filePath: string): Promise<string> {
   }
 }
 
+/* ------------------------------------------------------------------ */
+/*  Tier-based context depth                                           */
+/* ------------------------------------------------------------------ */
+
+interface TierConfig {
+  maxArticles: number;
+  maxChars: number;
+  answerNote: string;
+}
+
+const TIER_CONFIGS: Record<string, TierConfig> = {
+  free:      { maxArticles: 2, maxChars: 2000, answerNote: "Upgrade to Premium for deeper, regulation-specific answers." },
+  premium:   { maxArticles: 4, maxChars: 6000, answerNote: "" },
+  architect: { maxArticles: 6, maxChars: 12000, answerNote: "" },
+};
+
+function getTierConfig(tier: string): TierConfig {
+  return TIER_CONFIGS[tier] ?? TIER_CONFIGS.free;
+}
+
 async function buildRAGContext(question: string, maxArticles = 4, maxChars = 6000): Promise<string> {
   const detectedRegion = detectRegion(question);
 
@@ -277,19 +297,25 @@ async function getLocalAnswer(question: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = await req.json();
+    const { messages, tier } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Messages array required" }, { status: 400 });
     }
 
+    // Tier-aware context depth
+    const tierCfg = getTierConfig(tier || "free");
+
     // Extract the latest user question for RAG context retrieval
     const lastUserMsg = messages.filter((m: { role: string }) => m.role === "user").pop();
     const question = lastUserMsg?.content || "";
 
-    // Build dynamic system prompt with relevant KB articles
-    const ragContext = await buildRAGContext(question);
-    const systemPrompt = BASE_SYSTEM_PROMPT + ragContext;
+    // Build dynamic system prompt with relevant KB articles (depth varies by tier)
+    const ragContext = await buildRAGContext(question, tierCfg.maxArticles, tierCfg.maxChars);
+    const tierNote = tierCfg.answerNote
+      ? `\n\nNote to assistant: The user is on the free tier. Keep answers helpful but concise. End with: "${tierCfg.answerNote}"`
+      : "";
+    const systemPrompt = BASE_SYSTEM_PROMPT + ragContext + tierNote;
 
     const fullMessages = [
       { role: "system", content: systemPrompt },
@@ -339,7 +365,7 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // All cloud providers failed — use local knowledge base (76 articles)
+    // All cloud providers failed — use local knowledge base (133 articles)
     const localReply = await getLocalAnswer(question);
     console.log("[consultant] All cloud providers failed, using local KB");
     return NextResponse.json({ reply: localReply });

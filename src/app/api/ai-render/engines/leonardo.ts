@@ -21,8 +21,14 @@ export const leonardoEngine: AiRenderEngine = async (
     return null;
   }
 
+  const startMs = Date.now();
   try {
-    return await generateImage(req);
+    const result = await generateImage(req);
+    if (result) {
+      result.costUsd = 0.03; // ~3 tokens with alchemy
+      result.latencyMs = Date.now() - startMs;
+    }
+    return result;
   } catch (err) {
     console.error("[leonardo] Error:", err);
     return null;

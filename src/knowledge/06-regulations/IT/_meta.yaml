@@ -1,0 +1,13 @@
+name: "Italy"
+code: "IT"
+flag: "\U0001F1EE\U0001F1F9"
+language: "it"
+status: "in-progress"
+market: "future"
+currency: "EUR"
+standards_body: "UNI (Ente Italiano di Normazione)"
+key_legislation:
+  - "Testo Unico dell'Edilizia (DPR 380/2001)"
+  - "Decreto Requisiti Minimi (2015) — Energy"
+  - "NTC 2018 — Norme Tecniche per le Costruzioni (Seismic)"
+  - "Eurocodes + UNI National Annexes"

@@ -7,12 +7,17 @@ create table if not exists public.profiles (
   id uuid references auth.users(id) on delete cascade primary key,
   email text not null,
   display_name text,
-  tier text not null default 'free' check (tier in ('free', 'premium', 'architect')),
+  tier text not null default 'free' check (tier in ('guest_free', 'free', 'premium', 'architect')),
   avatar_url text,
   project_count integer not null default 0,
   storage_used_mb real not null default 0,
   ai_calls_today integer not null default 0,
   ai_calls_reset_at date,
+  -- Monthly render quota (server-side enforcement)
+  ai_renders_this_month integer not null default 0,
+  ai_renders_month text, -- 'YYYY-MM' format, resets when month changes
+  -- Cost tracking
+  total_cost_usd real not null default 0,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );

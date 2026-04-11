@@ -7,7 +7,7 @@
  *   3. Architect  — professional tools + multi-project management
  */
 
-export type AccountTier = "free" | "premium" | "architect";
+export type AccountTier = "guest_free" | "free" | "premium" | "architect";
 
 export interface AccountTierConfig {
   id: AccountTier;
@@ -52,6 +52,7 @@ export interface FeatureAccess {
 
   // Step 7 — AI Render
   aiRendersPerMonth: number;        // monthly AI render quota
+  maxCostUsdPerImage: number;       // max cost per single render (USD) — controls which engines are allowed
   renderResolution: "sd" | "hd" | "4k";
   savedRenders: number;             // max saved renders
 
@@ -95,6 +96,72 @@ export interface FeatureAccess {
 
 export const ACCOUNT_TIERS: AccountTierConfig[] = [
   {
+    id: "guest_free",
+    label: "Guest",
+    labelRo: "Vizitator",
+    description: "Try ModulCA without signing up. Limited features.",
+    priceMonthly: null,
+    priceYearly: null,
+    color: "#9CA3AF", // light gray
+    features: {
+      // Land
+      maxTerrainSize: 500,
+      customTerrainShape: false,
+      importCadastralData: false,
+      // Layout
+      maxModules: 4,
+      allModuleTypes: false,
+      customModuleDimensions: false,
+      // Preview
+      highQualityPreview: false,
+      moduleSwap: false,
+      // Vision
+      styleDirections: 1,
+      moodboardPins: 3,
+      customStyleUpload: false,
+      // Materials
+      allMaterials: false,
+      customMaterials: false,
+      furnitureOverrides: false,
+      // Products
+      productCatalog: true,
+      partnerPricing: false,
+      directPurchase: false,
+      // Render
+      aiRendersPerMonth: 3, // ~3/day via daily limit logic
+      maxCostUsdPerImage: 0.005, // only free engines (Pollinations, AI Horde)
+      renderResolution: "sd",
+      savedRenders: 3,
+      // Technical
+      allDrawingTypes: false,
+      drawingPresentation: false,
+      knowledgeBase: false,
+      permitTracker: false,
+      exportPdf: false,
+      exportDwg: false,
+      // Walkthrough
+      walkthrough: true,
+      autoTour: false,
+      vrMode: false,
+      // Presentation
+      presentationTemplates: 0,
+      pdfPresentation: false,
+      sharableLink: false,
+      // Marketplace
+      marketplaceBrowse: true,
+      marketplaceList: false,
+      builderDirectory: false,
+      // Projects
+      maxProjects: 1,
+      projectCollaboration: false,
+      clientDashboard: false,
+      analytics: false,
+      whiteLabel: false,
+      // Support
+      supportLevel: "community",
+    },
+  },
+  {
     id: "free",
     label: "Explorer",
     labelRo: "Explorator",
@@ -130,6 +197,7 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       directPurchase: false,
       // Render
       aiRendersPerMonth: -1, // unlimited for demo
+      maxCostUsdPerImage: 0.01, // free tier: only free/near-free engines
       renderResolution: "hd",
       savedRenders: 20,
       // Technical
@@ -195,6 +263,7 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       directPurchase: true,
       // Render
       aiRendersPerMonth: 30,
+      maxCostUsdPerImage: 0.05, // premium: mid-tier engines (Stability, Together Kontext)
       renderResolution: "hd",
       savedRenders: 20,
       // Technical
@@ -260,6 +329,7 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       directPurchase: true,
       // Render
       aiRendersPerMonth: 100,
+      maxCostUsdPerImage: 0.10, // architect: all engines including premium
       renderResolution: "4k",
       savedRenders: 100,
       // Technical

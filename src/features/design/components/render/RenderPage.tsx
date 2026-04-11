@@ -73,29 +73,17 @@ export default function RenderPage() {
     return false;
   };
 
-  // Track monthly render count
-  const [renderCount, setRenderCount] = useState(0);
-  useEffect(() => {
-    try {
-      const key = `modulca-render-count-${new Date().toISOString().slice(0, 7)}`;
-      const count = parseInt(localStorage.getItem(key) || "0", 10);
-      setRenderCount(count);
-    } catch { /* ignore */ }
-  }, []);
-
-  const atRenderLimit = maxRendersPerMonth !== -1 && renderCount >= maxRendersPerMonth;
+  // Monthly render quota — server-side via auth store (Supabase + localStorage fallback)
+  const monthlyRenderCount = useAuthStore((s) => s.monthlyRenderCount);
+  const { allowed: canRender } = useAuthStore.getState().canUseMonthlyRender();
+  const atRenderLimit = !canRender;
+  const incrementMonthlyRenders = useAuthStore((s) => s.incrementMonthlyRenders);
 
   const handleGenerateAiRender = useCallback(() => {
     if (atRenderLimit) return;
     generateAiRender(aiPrompt);
-    // Increment render count
-    try {
-      const key = `modulca-render-count-${new Date().toISOString().slice(0, 7)}`;
-      const newCount = renderCount + 1;
-      localStorage.setItem(key, String(newCount));
-      setRenderCount(newCount);
-    } catch { /* ignore */ }
-  }, [generateAiRender, aiPrompt, atRenderLimit, renderCount]);
+    incrementMonthlyRenders();
+  }, [generateAiRender, aiPrompt, atRenderLimit, incrementMonthlyRenders]);
 
   const handleSceneReady = useCallback((capture: () => string | null) => {
     captureRef.current = capture;
@@ -472,7 +460,7 @@ export default function RenderPage() {
               </button>
               {maxRendersPerMonth !== -1 && (
                 <div className="flex items-center justify-between text-[10px] text-gray-400 mt-1">
-                  <span>{renderCount}/{maxRendersPerMonth} renders this month</span>
+                  <span>{monthlyRenderCount}/{maxRendersPerMonth === -1 ? "∞" : maxRendersPerMonth} renders this month</span>
                   {atRenderLimit && (
                     <a href="/pricing" className="text-brand-amber-500 font-semibold hover:underline">Upgrade</a>
                   )}

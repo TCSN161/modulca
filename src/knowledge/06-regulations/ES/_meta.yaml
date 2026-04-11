@@ -1,0 +1,13 @@
+name: "Spain"
+code: "ES"
+flag: "\U0001F1EA\U0001F1F8"
+language: "es"
+status: "in-progress"
+market: "future"
+currency: "EUR"
+standards_body: "AENOR (Asociación Española de Normalización)"
+key_legislation:
+  - "Código Técnico de la Edificación (CTE)"
+  - "Ley de Ordenación de la Edificación (LOE)"
+  - "Eurocodes + UNE National Annexes"
+  - "Plan General de Ordenación Urbana (PGOU)"

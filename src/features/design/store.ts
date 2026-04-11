@@ -4,6 +4,7 @@ import { create } from "zustand";
 import { MODULE_TYPES, FINISH_LEVELS, SHARED_WALL_DISCOUNT, DESIGN_FEE_PERCENTAGE } from "@/shared/types";
 import type { GridCell } from "@/features/land/store";
 import { getPresetsForType } from "./layouts";
+import { useQuizStore } from "@/features/quiz/store";
 
 /**
  * Bump this when the localStorage schema changes.
@@ -229,6 +230,14 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
   },
 
   setModulesFromGrid: (cells, rotation) => {
+    // Check for quiz profile to auto-apply style defaults
+    const quizStore = useQuizStore.getState();
+    const quizStyle = quizStore.getDesignStyleDirection();
+    const quizFinish = quizStore.getDesignFinishLevel();
+    const styleDefaults = quizStyle ? STYLE_DEFAULTS[quizStyle] : null;
+    const defaultFloor = styleDefaults?.floor ?? "oak";
+    const defaultWall = styleDefaults?.wall ?? "alabaster";
+
     const typeCounts: Record<string, number> = {};
     const activeCells = cells.filter((c) => c.moduleType !== null);
     const occupiedSet = new Set(activeCells.map((c) => `${c.row},${c.col}`));
@@ -244,13 +253,18 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
         moduleType: type,
         label,
         layoutPreset: presets[0]?.id || "default",
-        floorFinish: "oak",
-        wallColor: "alabaster",
+        floorFinish: defaultFloor,
+        wallColor: defaultWall,
         furnitureOverrides: {},
         wallConfigs: computeWallConfigs(c.row, c.col, occupiedSet),
       };
     });
-    set({ modules, gridRotation: rotation });
+    set({
+      modules,
+      gridRotation: rotation,
+      ...(quizStyle ? { styleDirection: quizStyle } : {}),
+      ...(quizFinish ? { finishLevel: quizFinish } : {}),
+    });
   },
 
   setFinishLevel: (level) => set({ finishLevel: level }),

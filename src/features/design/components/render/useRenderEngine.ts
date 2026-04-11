@@ -1,6 +1,8 @@
 import { useState, useRef, useCallback } from "react";
 import type { AiEngine, RenderResolution } from "./renderConstants";
 import { RENDER_RESOLUTIONS } from "./renderConstants";
+import { useAuthStore } from "@/features/auth/store";
+import { getTierConfig } from "@/features/auth/types";
 
 interface UseRenderEngineParams {
   aiEngine: AiEngine;
@@ -56,6 +58,8 @@ export function useRenderEngine({
     const sanitized = sanitizePrompt(prompt);
     const res = RENDER_RESOLUTIONS[renderResolution];
     const seed = String(Date.now());
+    const tier = useAuthStore.getState().userTier;
+    const maxCostUsd = getTierConfig(tier).features.maxCostUsdPerImage;
 
     // Capture 3D scene as base image if img2img is enabled
     let baseImage: string | null = null;
@@ -96,12 +100,14 @@ export function useRenderEngine({
             seed,
             engine: aiEngine !== "auto" ? aiEngine : null,
             baseImage,
+            tier,
+            maxCostUsd,
           }),
         });
       } else {
         // GET mode: text-to-image
         const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
-        const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}`;
+        const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}&tier=${tier}&maxCostUsd=${maxCostUsd}`;
         console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
         response = await fetch(proxyUrl);
       }

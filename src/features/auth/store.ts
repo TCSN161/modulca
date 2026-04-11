@@ -26,6 +26,8 @@ interface AuthStore {
   projectCount: number;
   storageUsedMb: number;
   aiCallsToday: number;
+  monthlyRenderCount: number;
+  totalCostUsd: number;
 
   // Auth actions
   signUp: (email: string, password: string, name: string) => Promise<boolean>;
@@ -39,7 +41,9 @@ interface AuthStore {
   canAccess: (feature: string) => boolean;
   canCreateProject: () => { allowed: boolean; reason?: string };
   canUseAiCall: () => { allowed: boolean; reason?: string };
+  canUseMonthlyRender: () => { allowed: boolean; reason?: string };
   incrementAiCalls: () => Promise<void>;
+  incrementMonthlyRenders: (costUsd?: number) => Promise<void>;
   getTierLabel: () => string;
 
   // Hydration
@@ -77,6 +81,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   projectCount: 0,
   storageUsedMb: 0,
   aiCallsToday: 0,
+  monthlyRenderCount: 0,
+  totalCostUsd: 0,
 
   /* ── Sign Up ── */
   signUp: async (email, password, name) => {
@@ -200,6 +206,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       projectCount: 0,
       storageUsedMb: 0,
       aiCallsToday: 0,
+      monthlyRenderCount: 0,
+      totalCostUsd: 0,
     });
   },
 
@@ -265,6 +273,40 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
+  canUseMonthlyRender: () => {
+    const { userTier, monthlyRenderCount } = get();
+    const config = getTierConfig(userTier);
+    const max = config.features.aiRendersPerMonth;
+    if (max === -1) return { allowed: true };
+    if (monthlyRenderCount >= max) {
+      return { allowed: false, reason: `Monthly render limit reached (${max} on ${config.label} plan). Upgrade for more.` };
+    }
+    return { allowed: true };
+  },
+
+  incrementMonthlyRenders: async (costUsd = 0) => {
+    const { userId, monthlyRenderCount, totalCostUsd } = get();
+    const newCount = monthlyRenderCount + 1;
+    const newTotalCost = totalCostUsd + costUsd;
+    const currentMonth = new Date().toISOString().slice(0, 7); // YYYY-MM
+    set({ monthlyRenderCount: newCount, totalCostUsd: newTotalCost });
+
+    // Persist to localStorage (demo fallback)
+    try {
+      localStorage.setItem(`modulca-render-count-${currentMonth}`, String(newCount));
+    } catch { /* */ }
+
+    // Persist to Supabase
+    const sb = getSupabase();
+    if (sb && userId) {
+      await sb.from("profiles").update({
+        ai_renders_this_month: newCount,
+        ai_renders_month: currentMonth,
+        total_cost_usd: newTotalCost,
+      }).eq("id", userId);
+    }
+  },
+
   getTierLabel: () => getTierConfig(get().userTier).label,
 
   /* ── Load Session (on page load) ── */
@@ -275,12 +317,19 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       // Demo mode — load from localStorage
       const local = loadLocal();
       if (local) {
+        // Hydrate monthly render count from localStorage
+        const currentMonth = new Date().toISOString().slice(0, 7);
+        let monthlyRenders = 0;
+        try {
+          monthlyRenders = parseInt(localStorage.getItem(`modulca-render-count-${currentMonth}`) || "0", 10);
+        } catch { /* */ }
         set({
           isAuthenticated: true,
           userId: local.id ?? "demo",
           userName: local.name,
           userEmail: local.email,
           userTier: local.tier ?? "free",
+          monthlyRenderCount: monthlyRenders,
         });
       }
       return;
@@ -299,13 +348,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }, { onConflict: "id", ignoreDuplicates: true });
 
     const { data: profile } = await sb.from("profiles")
-      .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at")
+      .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at, ai_renders_this_month, ai_renders_month, total_cost_usd")
       .eq("id", session.user.id)
       .single();
 
     // Reset AI calls if it's a new day
     const today = new Date().toISOString().split("T")[0];
     const aiCalls = profile?.ai_calls_reset_at === today ? (profile?.ai_calls_today ?? 0) : 0;
+
+    // Reset monthly renders if it's a new month
+    const currentMonth = new Date().toISOString().slice(0, 7);
+    const monthlyRenders = profile?.ai_renders_month === currentMonth ? (profile?.ai_renders_this_month ?? 0) : 0;
 
     set({
       isAuthenticated: true,
@@ -317,6 +370,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       projectCount: profile?.project_count ?? 0,
       storageUsedMb: profile?.storage_used_mb ?? 0,
       aiCallsToday: aiCalls,
+      monthlyRenderCount: monthlyRenders,
+      totalCostUsd: profile?.total_cost_usd ?? 0,
     });
   },
 }));

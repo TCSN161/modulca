@@ -4,7 +4,9 @@
   "private": true,
   "scripts": {
     "dev": "node --max-old-space-size=4096 node_modules/next/dist/bin/next dev --webpack",
+    "prebuild": "node scripts/build-knowledge.mjs",
     "build": "node --max-old-space-size=4096 node_modules/next/dist/bin/next build --webpack",
+    "build:kb": "node scripts/build-knowledge.mjs",
     "start": "next start",
     "lint": "eslint"
   },

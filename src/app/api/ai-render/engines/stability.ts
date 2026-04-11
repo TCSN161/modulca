@@ -26,13 +26,19 @@ export const stabilityEngine: AiRenderEngine = async (
     return null;
   }
 
+  const startMs = Date.now();
   try {
+    let result: AiRenderResult | null;
     if (req.baseImage) {
-      // img2img mode: use Control/Structure to preserve 3D scene layout
-      return await tryStructure(req);
+      result = await tryStructure(req);
+    } else {
+      result = await tryText2Img(req);
     }
-    // text-to-image fallback
-    return await tryText2Img(req);
+    if (result) {
+      result.costUsd = req.baseImage ? 0.065 : 0.04; // ~6.5 credits structure, ~4 credits sd3
+      result.latencyMs = Date.now() - startMs;
+    }
+    return result;
   } catch (err) {
     console.error("[stability] Error:", err);
     return null;

@@ -1,177 +1,121 @@
 /**
- * Client-side Neufert Knowledge Base
- * Used as fallback when API routes are unavailable (e.g., GitHub Pages static export).
- * Mirrors the server-side KB in api/consultant/route.ts.
+ * Client-side Knowledge Base — powered by the auto-generated article index.
+ * Used as fallback when API routes are unavailable (e.g., static export, offline).
+ * Scores the user's question against 76+ article metadata entries.
  */
 
-const NEUFERT_KB: { keywords: string[]; answer: string }[] = [
-  {
-    keywords: ["bedroom", "sleeping", "bed room"],
-    answer:
-      "**Bedroom (Neufert Standards)**\n\n" +
-      "- **Single bedroom**: min 10m² (2.80×3.60m)\n" +
-      "- **Double bedroom**: min 14m² (3.60×3.90m)\n" +
-      "- **Bed clearances**: 0.60m sides, 0.80m foot\n" +
-      "- **Ceiling height**: min 2.50m\n" +
-      "- **Door width**: min 0.80m\n" +
-      "- **Window**: min 1/8 of floor area for natural light\n\n" +
-      "**In our 3×3m module system**: One module (9m² gross, ~7m² usable) fits a single bedroom with bed, nightstand, and wardrobe. For a double bedroom, consider 2 adjacent modules with shared wall removed.",
-  },
-  {
-    keywords: ["kitchen", "cooking", "counter", "work triangle"],
-    answer:
-      "**Kitchen (Neufert Standards)**\n\n" +
-      "- **Minimum area**: 6m² (small) to 12m² (family)\n" +
-      "- **Work triangle** (sink–stove–fridge): each leg 1.2–2.7m, total ≤6.6m\n" +
-      "- **Counter height**: 85–90cm standard, 100–110cm bar height\n" +
-      "- **Counter depth**: 60cm standard\n" +
-      "- **Clearance between facing counters**: min 1.20m\n" +
-      "- **Ventilation**: min 60 l/s extraction rate\n\n" +
-      "**In our 3×3m module**: One module fits an L-shape kitchen. Two modules create a spacious kitchen-dining area with island.",
-  },
-  {
-    keywords: ["bathroom", "toilet", "shower", "bath", "wc"],
-    answer:
-      "**Bathroom (Neufert Standards)**\n\n" +
-      "- **Minimum area**: 4m² (WC+shower+basin)\n" +
-      "- **Full bath**: 6–8m² (add bathtub)\n" +
-      "- **Toilet clearance**: 0.20m sides, 0.60m front\n" +
-      "- **Shower**: min 0.80×0.80m, recommended 0.90×0.90m\n" +
-      "- **Basin height**: 0.80–0.85m\n" +
-      "- **Ventilation**: min 40 l/s or window 1/10 of floor area\n\n" +
-      "**In our 3×3m module**: One module comfortably fits a full bathroom with shower, vanity, and toilet.",
-  },
-  {
-    keywords: ["living", "lounge", "sitting", "room"],
-    answer:
-      "**Living Room (Neufert Standards)**\n\n" +
-      "- **Minimum area**: 16m² (small), 20–30m² (family)\n" +
-      "- **Sofa-to-TV distance**: 2.5m for 55\" screen\n" +
-      "- **Coffee table clearance**: 0.45m from sofa\n" +
-      "- **Circulation space**: min 0.90m passage width\n" +
-      "- **Ceiling height**: 2.60–2.80m recommended for spacious feel\n\n" +
-      "**In our 3×3m module**: Two modules with shared wall create a 14m² usable living space. Three modules in an L-shape give 21m² — ideal for open-plan living.",
-  },
-  {
-    keywords: ["stair", "steps", "ramp"],
-    answer:
-      "**Stairs (Neufert Standards)**\n\n" +
-      "- **Rise (riser)**: 170–190mm\n" +
-      "- **Going (tread)**: 260–290mm\n" +
-      "- **Formula**: 2×rise + going = 590–650mm\n" +
-      "- **Min width**: 0.90m (residential), 1.20m (accessible)\n" +
-      "- **Headroom**: min 2.10m\n" +
-      "- **Handrail height**: 0.90–1.00m\n" +
-      "- **Landing**: required every 18 steps max\n\n" +
-      "**In modular construction**: Stairs typically occupy one full 3×3m module for a single-story access.",
-  },
-  {
-    keywords: ["door", "entrance", "opening"],
-    answer:
-      "**Doors (Neufert Standards)**\n\n" +
-      "- **Interior door**: 0.80m wide × 2.01m high\n" +
-      "- **Main entrance**: 1.00m wide minimum\n" +
-      "- **Accessible**: 0.90m clear opening\n" +
-      "- **Door swing clearance**: 0.80m radius\n" +
-      "- **Corridor doors**: same width as corridor min\n\n" +
-      "**Romanian regulation**: Main entrance min 0.90m, fire doors REI 30.",
-  },
-  {
-    keywords: ["corridor", "hallway", "passage"],
-    answer:
-      "**Corridors (Neufert Standards)**\n\n" +
-      "- **Minimum width**: 0.90m\n" +
-      "- **Recommended**: 1.10m\n" +
-      "- **Accessible**: 1.20m (wheelchair turning: 1.50m×1.50m)\n" +
-      "- **Max dead-end length**: 7.50m (fire regulation)\n\n" +
-      "**In modular construction**: Corridors can be integrated into module layouts or created between module rows.",
-  },
-  {
-    keywords: ["landscape", "garden", "outdoor", "terrace", "patio", "yard", "planting"],
-    answer:
-      "**Landscaping & Gardens (Neufert Standards)**\n\n" +
-      "- **Terrace/patio**: min 12m² (3×4m), south/south-west orientation preferred\n" +
-      "- **Garden paths**: 0.60m (single), 1.20m (double), 1.50m (wheelchair)\n" +
-      "- **Planting distances from boundary**: 0.50m (shrubs), 2.00m (trees <3m), 4.00m (tall trees)\n" +
-      "- **Outdoor steps**: rise 120–150mm, tread 350–400mm\n" +
-      "- **Parking**: 2.50×5.00m per car, 3.50m for accessible\n\n" +
-      "**Romanian regulations**: Min distance from side boundaries: 1.0m. Green space: typically 20–30% of lot required by CU.",
-  },
-  {
-    keywords: ["permit", "regulation", "romanian", "legal", "certificat", "urbanism"],
-    answer:
-      "**Romanian Building Regulations**\n\n" +
-      "- **Certificat de Urbanism (CU)**: required before design, valid 12 months\n" +
-      "- **Building permit (Autorizație de Construire)**: required for structures >50m²\n" +
-      "- **Max building coverage (POT)**: typically 35–45% of lot\n" +
-      "- **Max land use (CUT)**: typically 0.9–1.5\n" +
-      "- **Boundary setbacks**: 1.0m from side, 2.0m from front\n" +
-      "- **Fire resistance**: min REI 30 for residential\n\n" +
-      "**Modular advantage**: Factory-built modules can be pre-certified, reducing on-site inspection time.",
-  },
-  {
-    keywords: ["modular", "module", "3x3", "prefab"],
-    answer:
-      "**Our 3×3m Modular System**\n\n" +
-      "- **Module size**: 3.00 × 3.00m (9m² gross)\n" +
-      "- **Usable area**: ~7m² after walls (0.15m exterior, 0.10m interior)\n" +
-      "- **Wall height**: 2.70m\n" +
-      "- **Shared walls**: Open space between adjacent modules\n" +
-      "- **Max span**: 3.00m without additional support\n" +
-      "- **Structure**: CLT (Cross-Laminated Timber) or steel frame\n" +
-      "- **Foundation**: Screw piles or strip foundation\n\n" +
-      "**Layouts**: Combine modules in line, L-shape, T-shape, U-shape, or courtyard configurations.",
-  },
-  {
-    keywords: ["cost", "price", "budget", "estimate", "investment"],
-    answer:
-      "**Modular Construction Costs (Romania 2024–2025)**\n\n" +
-      "- **Basic module**: €800–1,200/m² (structure + insulation + finishes)\n" +
-      "- **Premium module**: €1,200–1,800/m² (high-end finishes, smart home)\n" +
-      "- **Foundation**: €50–100/m²\n" +
-      "- **Transport**: €500–2,000 per module (distance-dependent)\n" +
-      "- **Assembly**: €100–200/m² (crane + labor)\n" +
-      "- **Total turnkey**: €1,000–2,000/m² depending on specification\n\n" +
-      "**Comparison**: Traditional construction in Romania: €800–1,500/m². Modular is competitive while being 40–60% faster.",
-  },
-  {
-    keywords: ["sustainability", "energy", "passive", "insulation", "solar", "green", "clt"],
-    answer:
-      "**Sustainability & Energy (Neufert + Romanian Standards)**\n\n" +
-      "- **Passive house**: ≤15 kWh/m²·year heating demand\n" +
-      "- **Orientation**: Living areas south/south-east for solar gain\n" +
-      "- **Insulation**: U-value ≤0.20 W/m²K walls, ≤0.15 roof\n" +
-      "- **Windows**: Triple glazing, U ≤1.0 W/m²K\n" +
-      "- **Air tightness**: n50 ≤0.6/h for passive standard\n" +
-      "- **Natural ventilation**: Cross-ventilation with windows on opposite walls\n\n" +
-      "**CLT advantage**: Carbon-negative material, excellent thermal mass, factory precision ensures air tightness.",
-  },
-];
+import { ARTICLES } from "@/knowledge/_index";
+import type { KBDocumentMeta } from "@/knowledge/_types";
 
-export function getLocalAnswer(question: string): string {
+/* ------------------------------------------------------------------ */
+/*  Region detection                                                   */
+/* ------------------------------------------------------------------ */
+
+const REGION_HINTS: Record<string, string[]> = {
+  RO: ["romania", "romanian", "bucuresti", "bucharest", "autorizatie", "certificat", "p100", "c107"],
+  NL: ["netherlands", "dutch", "holland", "bouwbesluit", "bbl", "omgevingswet", "beng", "kadaster", "waterschap"],
+  EU: ["european", "eu ", "eurocode", "epbd", "ce marking"],
+};
+
+function detectRegion(question: string): string | null {
   const q = question.toLowerCase();
-  let bestMatch: (typeof NEUFERT_KB)[0] | null = null;
+  let best: string | null = null;
   let bestScore = 0;
-  for (const entry of NEUFERT_KB) {
+  for (const [region, hints] of Object.entries(REGION_HINTS)) {
     let score = 0;
-    for (const kw of entry.keywords) {
-      if (q.includes(kw)) score += kw.length;
+    for (const hint of hints) {
+      if (q.includes(hint)) score += hint.length;
     }
     if (score > bestScore) {
       bestScore = score;
-      bestMatch = entry;
+      best = region;
     }
   }
-  if (bestMatch && bestScore > 0) {
-    return bestMatch.answer;
+  return bestScore > 0 ? best : null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Article scoring (mirrors server-side logic)                        */
+/* ------------------------------------------------------------------ */
+
+function scoreArticle(article: KBDocumentMeta, question: string, detectedRegion: string | null): number {
+  const q = question.toLowerCase();
+  const words = q.split(/\s+/).filter((w) => w.length > 2);
+  let score = 0;
+
+  for (const tag of article.tags) {
+    if (q.includes(tag)) score += tag.length * 3;
+    for (const w of words) {
+      if (tag.includes(w)) score += w.length;
+    }
   }
+
+  const titleLower = article.title.toLowerCase();
+  for (const w of words) {
+    if (titleLower.includes(w)) score += w.length * 2;
+  }
+
+  if (detectedRegion && article.region === detectedRegion) score += 15;
+  if (detectedRegion && article.region === "EU") score += 5;
+  if (article.category === "modulca") score += 3;
+
+  return score;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Compact summaries for client-side answers                          */
+/* ------------------------------------------------------------------ */
+
+/** Quick summaries for the most common topics — used when we can't read .md files client-side */
+const TOPIC_SUMMARIES: Record<string, string> = {
+  "room-dimensions": "**Room Dimensions (Neufert)**\n\n- Living room: ≥16m² (min width 3.30m)\n- Double bedroom: ≥14m² (min 3.00m wide)\n- Single bedroom: ≥10m² (min 2.40m wide)\n- Kitchen: ≥6m² (work triangle 3.6–6.6m)\n- Bathroom: ≥4m² (shower min 0.90×0.90m)\n- Home office: ≥7.5m² recommended\n\n**ModulCA**: 1 module = ~7m² usable. 2 modules = 14m² open-plan.",
+  "kitchens": "**Kitchen Standards (Neufert)**\n\n- Work triangle (sink–stove–fridge): each leg 1.2–2.7m, total ≤6.6m\n- Counter height: 85–90cm, bar: 100–110cm\n- Counter depth: 60cm, aisle: ≥1.20m\n- Ventilation: 60 l/s extraction\n\n**ModulCA**: 1 module = L-shape kitchen. 2 modules = kitchen + dining with island.",
+  "bathrooms": "**Bathroom Standards (Neufert)**\n\n- Minimum: 4m² (WC+shower+basin)\n- Full bath: 6–8m²\n- Toilet clearance: 0.20m sides, 0.60m front\n- Shower: min 0.90×0.90m recommended\n\n**ModulCA**: 1 module fits a full bathroom comfortably.",
+  "bedrooms": "**Bedroom Standards (Neufert)**\n\n- Single: ≥10m² (2.40m wide min)\n- Double: ≥14m² (3.00m wide min)\n- Bed clearance: 0.60m sides, 0.80m foot\n- Wardrobe: 0.60m depth + 0.80m swing\n\n**ModulCA**: 1 module = single bedroom. 2 modules = spacious master suite.",
+  "stairs-ramps": "**Stairs (Neufert)**\n\n- Rise: 170–190mm, Tread: 260–290mm\n- Formula: 2×rise + going = 590–650mm\n- Min width: 0.90m, accessible: 1.20m\n- Headroom: ≥2.10m\n\n**ModulCA**: Stairs typically occupy 1 full module.",
+  "modulca-platform": "**ModulCA** is a digital platform for designing modular wooden homes.\n\n- 13-step guided design process\n- 3×3m module grid system (9m² gross, ~7m² usable)\n- Structure: CLT / timber frame / SIP panels\n- Foundation: Screw piles (removable)\n- Markets: Romania (active), Netherlands (expansion)\n- Tiers: Explorer (free), Premium (€19/mo), Architect (€49/mo)",
+  "modulca-module-system": "**3×3m Module System**\n\n- Grid: 3.00 × 3.00m per module\n- Gross: 9m², usable: ~7m² (after walls)\n- Wall height: 2.70m clear\n- Exterior wall: 150mm, interior: 100mm\n- Connections: Bolted (demountable)\n- Layouts: line, L, T, U, courtyard",
+  "ro-building-permit": "**Romanian Building Permit**\n\n1. Certificat de Urbanism (CU) — from primărie, 30 days\n2. Technical project (DTAC) — architect-signed\n3. Utility approvals (avize)\n4. Autorizație de Construire — valid 12 months\n5. Construction + supervision (diriginte)\n6. Final inspection + land registry (intabulare)",
+  "nl-building-permit": "**Dutch Building Permit (Omgevingsvergunning)**\n\n- Apply via Omgevingsloket online portal\n- Kwaliteitsborger (quality inspector) required since 2024\n- Regular procedure: 8 weeks\n- Extended: 26 weeks\n- Bouwbesluit/BBL compliance required",
+  "foundations": "**Foundation Systems**\n\n- Screw piles: 76–114mm shaft, 1.5–3m depth (RO), up to 20m (NL Randstad)\n- Strip foundation: 0.80m+ below frost line\n- Bearing capacity: 25–50 kN/pile\n- ModulCA: 4–6 piles per module\n- NL special: soft clay/peat requires deep piling",
+  "cost-estimation": "**Modular Construction Costs (Romania)**\n\n- Basic: €800–1,200/m²\n- Premium: €1,200–1,800/m²\n- Foundation: €50–100/m² (RO), €150–300/m² (NL piling)\n- Transport: €500–2,000/module\n- Total turnkey: €1,000–2,000/m²",
+  "passive-house": "**Passive House Standards**\n\n- Heating demand: ≤15 kWh/m²·year\n- Primary energy: ≤120 kWh/m²·year\n- Airtightness: n50 ≤0.6/h\n- U-values: walls ≤0.15, roof ≤0.10, floor ≤0.15 W/m²K\n- ModulCA SIP walls: 0.18 W/m²K — near passive standard",
+};
+
+/* ------------------------------------------------------------------ */
+/*  Public API                                                         */
+/* ------------------------------------------------------------------ */
+
+export function getLocalAnswer(question: string): string {
+  const detectedRegion = detectRegion(question);
+
+  const scored = ARTICLES.map((a) => ({
+    article: a,
+    score: scoreArticle(a, question, detectedRegion),
+  }))
+    .filter((s) => s.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  // Try to return a pre-written summary for the best match
+  if (scored.length > 0) {
+    const best = scored[0].article;
+    const summary = TOPIC_SUMMARIES[best.id];
+    if (summary) return summary;
+
+    // No pre-written summary — construct one from metadata
+    const regionLabel = best.region ? ` (${best.region})` : "";
+    const tagList = best.tags.slice(0, 5).join(", ");
+    return `**${best.title}${regionLabel}**\n\nThis topic covers: ${tagList}.\n\nSources: ${best.sources.join(", ")}.\n\n*For detailed information, please use the AI consultant when available, or browse the Knowledge Library.*`;
+  }
+
+  // Generic fallback
   return (
-    "I'm your Neufert architectural consultant. I can help with:\n\n" +
+    "I'm your ModulCA architectural consultant. I can help with:\n\n" +
     "- **Room dimensions**: Bedrooms, kitchens, bathrooms, living rooms\n" +
-    "- **Building regulations**: Romanian permits, setbacks, fire codes\n" +
+    "- **Building regulations**: Romanian permits, Dutch Omgevingswet, EU Eurocodes\n" +
     "- **Modular construction**: Our 3×3m system, layouts, costs\n" +
-    "- **Sustainability**: Passive house, insulation, solar orientation\n" +
-    "- **Stairs, doors, corridors**: Neufert standard dimensions\n\n" +
-    "Please ask about a specific topic for detailed Neufert standards."
+    "- **Sustainability**: Passive house, BENG, insulation, solar orientation\n" +
+    "- **MEP systems**: Electrical, plumbing, HVAC sizing\n\n" +
+    "Please ask about a specific topic for detailed standards."
   );
 }

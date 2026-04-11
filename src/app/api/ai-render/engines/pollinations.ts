@@ -36,6 +36,7 @@ function sanitizeForContentFilter(prompt: string): string {
 export const pollinationsEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
+  const startMs = Date.now();
   const safePrompt = sanitizeForContentFilter(req.prompt);
   const encoded = encodeURIComponent(safePrompt);
   const url = `https://image.pollinations.ai/prompt/${encoded}?width=${req.width}&height=${req.height}&nologo=true&nofeed=true&seed=${req.seed}&safe=true`;
@@ -79,6 +80,8 @@ export const pollinationsEngine: AiRenderEngine = async (
         buffer,
         contentType: blob.type || "image/jpeg",
         engine: "pollinations",
+        costUsd: 0, // Free service
+        latencyMs: Date.now() - startMs,
       };
     } catch (err) {
       console.error("[pollinations] Fetch error:", err);

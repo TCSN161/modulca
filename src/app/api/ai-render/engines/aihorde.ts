@@ -26,6 +26,7 @@ const TIMEOUT_MS = 120_000;
 export const aiHordeEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
+  const startMs = Date.now();
   try {
     // 1. Submit async generation job
     console.log("[ai-horde] Submitting job...");
@@ -91,6 +92,8 @@ export const aiHordeEngine: AiRenderEngine = async (
           buffer,
           contentType: blob.type || "image/webp",
           engine: "ai-horde",
+          costUsd: 0, // Free community GPUs
+          latencyMs: Date.now() - startMs,
         };
       }
     }

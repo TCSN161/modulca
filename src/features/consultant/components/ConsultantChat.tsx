@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { getLocalAnswer } from "../neufertKB";
+import { useAuthStore } from "@/features/auth/store";
 
 interface Message {
   role: "user" | "assistant";
@@ -28,6 +29,7 @@ const KB_TOPICS = [
 ];
 
 export default function ConsultantChat() {
+  const userTier = useAuthStore((s) => s.userTier);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -52,7 +54,7 @@ export default function ConsultantChat() {
         const res = await fetch("/api/consultant", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: updated }),
+          body: JSON.stringify({ messages: updated, tier: userTier }),
         });
 
         if (!res.ok) {

@@ -21,12 +21,20 @@ export const togetherEngine: AiRenderEngine = async (
     return null;
   }
 
+  const startMs = Date.now();
   try {
-    // Use Kontext for img2img if base image provided, otherwise schnell
+    let result: AiRenderResult | null;
     if (req.baseImage) {
-      return await tryKontext(req);
+      result = await tryKontext(req);
+    } else {
+      result = await trySchnell(req);
     }
-    return await trySchnell(req);
+    if (result) {
+      // Schnell free tier = $0, Kontext Pro ~$0.04/img
+      result.costUsd = result.engine === "together-kontext" ? 0.04 : 0;
+      result.latencyMs = Date.now() - startMs;
+    }
+    return result;
   } catch (err) {
     console.error("[together] Error:", err);
     return null;

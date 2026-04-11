@@ -124,6 +124,12 @@ export default function HomePage() {
                 >
                   Start Designing — Free
                 </Link>
+                <Link
+                  href="/quiz"
+                  className="inline-flex items-center gap-2 rounded-[12px] border-2 border-brand-teal-800 bg-brand-teal-50 px-6 py-3 text-sm font-semibold text-brand-teal-900 transition-colors hover:bg-brand-teal-100"
+                >
+                  Take the Style Quiz
+                </Link>
                 <a
                   href="#how-it-works"
                   className="inline-flex items-center gap-2 rounded-[12px] border border-brand-bone-400 bg-white px-6 py-3.5 text-sm font-semibold text-brand-charcoal transition-colors hover:bg-brand-bone-200"

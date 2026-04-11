@@ -1,0 +1,18 @@
+# Template: Copy this folder to add a new country
+# 1. Copy _template/ → XX/ (ISO 3166-1 alpha-2 code)
+# 2. Fill in this file with country details
+# 3. Write articles using the .md templates below
+# 4. Run build — auto-indexed, auto-appears in UI
+
+name: "Country Name"
+code: "XX"
+flag: "\U0001F3F3"
+language: "en"
+status: "planned"
+market: "future"
+currency: "EUR"
+standards_body: "National Standards Body Name"
+key_legislation:
+  - "Main Building Code — Description"
+  - "Energy Standards — Description"
+  - "Fire Safety Code — Description"

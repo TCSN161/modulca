@@ -409,7 +409,7 @@ export default function KnowledgeBasePanel({
         {/* Footer */}
         <div className="border-t border-gray-100 px-5 py-3">
           <div className="text-[10px] text-gray-400 text-center">
-            ModulCA Knowledge Library v2.0 — {ARTICLES.length} articles across Neufert, EU, Romanian & Dutch standards
+            ModulCA Knowledge Library v2.0 — {ARTICLES.length} articles across {REGIONS.filter((r) => (r.articleCount ?? 0) > 0).length} country codes + EU standards
           </div>
         </div>
       </div>
