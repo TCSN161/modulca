@@ -181,10 +181,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       saveLocal({ name: "Demo User", email: "demo@modulca.com", tier: "free" });
       return;
     }
-    await sb.auth.signInWithOAuth({
+    const { data, error } = await sb.auth.signInWithOAuth({
       provider: "google",
       options: { redirectTo: `${window.location.origin}/auth/callback` },
     });
+    if (error) {
+      console.error("[ModulCA] Google OAuth error:", error.message);
+      set({ error: error.message });
+    } else {
+      console.log("[ModulCA] Google OAuth redirect URL:", data?.url);
+      // If signInWithOAuth returned a URL but didn't auto-redirect, do it manually
+      if (data?.url) {
+        window.location.href = data.url;
+      }
+    }
   },
 
   /* ── Sign Out ── */
