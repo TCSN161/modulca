@@ -117,10 +117,6 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
           || getPresetsForType(mod.moduleType)[0];
         const furniture = preset?.furniture || [];
         const overrides = mod.furnitureOverrides[mod.layoutPreset] ?? {};
-        // DEBUG: log module + furniture data
-        if (typeof window !== "undefined" && !(window as any).__csd_logged) {
-          console.log(`[COMBINED] ${mod.label} (${mod.row},${mod.col}) type=${mod.moduleType} preset=${mod.layoutPreset} offset=(${ox},${oz}) furniture=${furniture.length} overrides=${Object.keys(overrides).length}`, overrides);
-        }
         const isSelected = selectedModule?.row === mod.row && selectedModule?.col === mod.col;
 
         return (
@@ -148,7 +144,6 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
         );
       })}
 
-      {typeof window !== "undefined" && ((window as any).__csd_logged = true) && null}
       <mesh visible={false} position={[centerX, -0.1, centerZ]} rotation={[-Math.PI / 2, 0, 0]} onClick={() => setSelectedModule(null)}>
         <planeGeometry args={[200, 200]} /><meshBasicMaterial />
       </mesh>

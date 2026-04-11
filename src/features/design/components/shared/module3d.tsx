@@ -278,35 +278,10 @@ export function ModuleWalls({
 /*  GLB model loader                                                   */
 /* ------------------------------------------------------------------ */
 
-/**
- * Compute a bounding box from ONLY visible Mesh children of a scene graph.
- * This avoids inflated bounding boxes caused by invisible helpers, lights,
- * cameras, or empty groups that some GLB exporters leave in the file.
- */
-function getMeshOnlyBoundingBox(obj: THREE.Object3D): THREE.Box3 {
-  const box = new THREE.Box3();
-  let hasGeometry = false;
-  obj.traverse((child) => {
-    if (child instanceof THREE.Mesh && child.geometry) {
-      child.updateWorldMatrix(true, false);
-      const geomBox = new THREE.Box3().setFromBufferAttribute(
-        child.geometry.attributes.position as THREE.BufferAttribute,
-      );
-      geomBox.applyMatrix4(child.matrixWorld);
-      if (hasGeometry) {
-        box.union(geomBox);
-      } else {
-        box.copy(geomBox);
-        hasGeometry = true;
-      }
-    }
-  });
-  // Fallback: if no mesh geometry found, use the whole object
-  if (!hasGeometry) {
-    box.setFromObject(obj);
-  }
-  return box;
-}
+/* getMeshOnlyBoundingBox removed — was computing bounds in world space
+   which included parent offsets, causing furniture to cluster at origin
+   in combined/multi-module views. Replaced with Box3.setFromObject()
+   on detached clones (local space only). */
 
 export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number; h: number; d: number; color?: string }) {
   const { scene } = useGLTF(path);
@@ -324,10 +299,6 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
     cloned.scale.set(1, 1, 1);
     cloned.updateMatrixWorld(true);
 
-    // Clear previous children
-    while (ref.current.children.length) ref.current.remove(ref.current.children[0]);
-    ref.current.add(cloned);
-
     // Apply color override to all meshes if provided
     if (color) {
       const threeColor = new THREE.Color(color);
@@ -342,8 +313,13 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
       });
     }
 
-    // Compute bounding box from MESH geometry only (not empty groups/helpers)
-    const box = getMeshOnlyBoundingBox(cloned);
+    // ⚠️ IMPORTANT: Compute bounding box BEFORE adding to scene graph.
+    // getMeshOnlyBoundingBox uses child.matrixWorld, so if the clone is
+    // already parented to a group at a world offset (e.g. module at col=2),
+    // the bounding box would include that offset, causing centering to
+    // push furniture toward the origin. Computing while detached ensures
+    // the bounding box is in pure local space.
+    const box = new THREE.Box3().setFromObject(cloned);
     const size = box.getSize(new THREE.Vector3());
 
     // Guard against degenerate models (zero-size dimensions)
@@ -359,9 +335,9 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
     const safeScaleZ = Math.min(Math.abs(scaleZ), MAX_SCALE);
     cloned.scale.set(safeScaleX, safeScaleY, safeScaleZ);
 
-    // Recompute after scaling, then center + floor-align
+    // Recompute after scaling, then center + floor-align (still detached)
     cloned.updateMatrixWorld(true);
-    const box2 = getMeshOnlyBoundingBox(cloned);
+    const box2 = new THREE.Box3().setFromObject(cloned);
     const center = box2.getCenter(new THREE.Vector3());
     const minY = box2.min.y;
 
@@ -371,6 +347,10 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
       Number.isFinite(minY) ? -minY : 0,
       -center.z,
     );
+
+    // NOW add to scene graph, after all positioning is computed
+    while (ref.current.children.length) ref.current.remove(ref.current.children[0]);
+    ref.current.add(cloned);
   }, [scene, w, h, d, color]);
 
   return <group ref={ref} position={[0, -h / 2, 0]} />;
@@ -639,14 +619,6 @@ export function StaticFurniturePiece({
   const worldX = offsetX + posX + safeW / 2;
   const worldZ = offsetZ + posZ + safeD / 2;
 
-  // DEBUG: trace combined view positions (remove after fixing)
-  if (typeof window !== "undefined" && offsetX !== 0 || offsetZ !== 0) {
-    if (!((window as any).__sfpCount)) (window as any).__sfpCount = 0;
-    if ((window as any).__sfpCount < 30) {
-      console.log(`[SFP] ${item.label} | default(${item.x},${item.z}) | override(${override?.x ?? "-"},${override?.z ?? "-"}) | pos(${posX.toFixed(2)},${posZ.toFixed(2)}) | offset(${offsetX},${offsetZ}) | world(${worldX.toFixed(2)},${worldZ.toFixed(2)})`);
-      (window as any).__sfpCount++;
-    }
-  }
 
   return (
     <group position={[worldX, halfH, worldZ]}>
