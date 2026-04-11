@@ -4,6 +4,7 @@ import { MODULE_TYPES } from "@/shared/types";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import type { ModuleConfig } from "../../store";
 import { DRAWING_LABELS, DRAWING_SCALES } from "./drawingConstants";
+import CombinedFloorPlanDrawing from "./drawings/CombinedFloorPlanDrawing";
 import FloorPlanDrawing from "./drawings/FloorPlanDrawing";
 import SectionAADrawing from "./drawings/SectionDrawing";
 import FrontElevationDrawing from "./drawings/ElevationDrawing";
@@ -13,12 +14,14 @@ import FoundationDetailDrawing from "./drawings/FoundationDrawing";
 
 interface Props {
   module: ModuleConfig;
+  allModules?: ModuleConfig[];
   drawingType: string;
   projectName?: string;
 }
 
 export default function TechnicalDrawing({
   module,
+  allModules,
   drawingType,
   projectName = "ModulCA Project",
 }: Props) {
@@ -73,6 +76,9 @@ export default function TechnicalDrawing({
       </text>
 
       {/* ─── Render one drawing based on drawingType ─── */}
+      {drawingType === "combined-plan" && allModules && (
+        <CombinedFloorPlanDrawing modules={allModules} />
+      )}
       {drawingType === "floor-plan" && (
         <FloorPlanDrawing
           floorColor={floorColor}
@@ -150,7 +156,9 @@ export default function TechnicalDrawing({
 
         {/* Module label */}
         <text x="578" y="834" fontSize="8" fill="#000">
-          {module.label} — {moduleType?.label || module.moduleType}
+          {drawingType === "combined-plan"
+            ? `All Modules (${allModules?.length || 0})`
+            : `${module.label} — ${moduleType?.label || module.moduleType}`}
         </text>
 
         {/* Drawing type & scale */}

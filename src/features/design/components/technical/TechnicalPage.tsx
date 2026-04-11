@@ -23,6 +23,7 @@ import MobileStepFooter from "../shared/MobileStepFooter";
 
 
 const DRAWING_TYPES = [
+  { id: "combined-plan", label: "Combined Plan" },
   { id: "floor-plan", label: "Floor Plan" },
   { id: "section-aa", label: "Section A-A" },
   { id: "front-elevation", label: "Front Elevation" },
@@ -52,7 +53,7 @@ export default function TechnicalPage() {
   const { gridCells, gridRotation } = useLandStore();
 
   const { saved, handleSave } = useSaveDesign();
-  const [activeDrawing, setActiveDrawing] = useState("floor-plan");
+  const [activeDrawing, setActiveDrawing] = useState("combined-plan");
   const [zoom, setZoom] = useState(100);
   const [kbOpen, setKbOpen] = useState(false);
   const [permitOpen, setPermitOpen] = useState(false);
@@ -392,6 +393,7 @@ export default function TechnicalPage() {
               {currentMod && (
                 <TechnicalDrawing
                   module={currentMod}
+                  allModules={modules}
                   drawingType={activeDrawing}
                   projectName="ModulCA Project"
                 />

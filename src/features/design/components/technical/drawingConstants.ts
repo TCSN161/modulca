@@ -9,6 +9,7 @@ export const TOTAL_H = CEIL_H + FLOOR_SLAB; // 2900mm
 
 /* ─── Drawing type label map ─── */
 export const DRAWING_LABELS: Record<string, string> = {
+  "combined-plan": "COMBINED FLOOR PLAN",
   "floor-plan": "FLOOR PLAN",
   "section-aa": "SECTION A-A",
   "front-elevation": "FRONT ELEVATION",
@@ -18,6 +19,7 @@ export const DRAWING_LABELS: Record<string, string> = {
 };
 
 export const DRAWING_SCALES: Record<string, string> = {
+  "combined-plan": "1:50",
   "floor-plan": "1:25",
   "section-aa": "1:25",
   "front-elevation": "1:25",
