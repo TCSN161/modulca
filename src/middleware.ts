@@ -18,6 +18,8 @@ const PUBLIC_PATHS = [
   "/login",
   "/register",
   "/reset-password",
+  "/update-password",
+  "/auth/callback",
   "/blog",
   "/portfolio",
   "/pricing",

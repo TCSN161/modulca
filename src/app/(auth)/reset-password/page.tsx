@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
     }
 
     const { error: resetError } = await sb.auth.resetPasswordForEmail(email, {
-      redirectTo: `${window.location.origin}/login`,
+      redirectTo: `${window.location.origin}/auth/callback`,
     });
 
     if (resetError) {
