@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { AuthNav } from "@/features/auth/components/AuthNav";
+import MobileNav from "./MobileNav";
 
 /**
  * ModulCA Landing Page — "Digital Arboretum" Theme
@@ -78,7 +79,10 @@ export default function HomePage() {
             <Link href="/portfolio" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Portfolio</Link>
             <Link href="/blog" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Blog</Link>
           </div>
-          <AuthNav />
+          <div className="flex items-center gap-2">
+            <AuthNav />
+            <MobileNav />
+          </div>
         </div>
       </nav>
 
@@ -101,7 +105,7 @@ export default function HomePage() {
                 <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-brand-olive-500 animate-pulse" />
                 Version 1.0 Live
               </div>
-              <h1 className="mb-6 text-4xl font-extrabold tracking-heading text-brand-charcoal sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
+              <h1 className="mb-6 text-3xl font-extrabold tracking-heading text-brand-charcoal sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
                 Design Your
                 <br />
                 <em className="text-brand-olive-700 not-italic font-extrabold" style={{ fontStyle: "italic" }}>Modular Home</em>
@@ -133,7 +137,7 @@ export default function HomePage() {
 
         {/* ---- Stats bar ---- */}
         <section className="border-y border-brand-bone-300/60 bg-brand-bone-100 py-8">
-          <div className="mx-auto flex max-w-5xl flex-wrap items-center justify-center gap-12 px-4 sm:gap-20">
+          <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 sm:grid-cols-4 sm:gap-12">
             {[
               { value: "13", label: "DESIGN STEPS" },
               { value: "8", label: "MODULE TYPES" },
