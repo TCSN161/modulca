@@ -92,8 +92,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (!sb) {
       // Demo mode — just save locally
       const id = `demo-${Date.now()}`;
-      set({ isAuthenticated: true, userId: id, userName: name, userEmail: email, userTier: "free", loading: false });
-      saveLocal({ id, name, email, tier: "free" });
+      set({ isAuthenticated: true, userId: id, userName: name, userEmail: email, userTier: "premium", loading: false }); // TODO: revert to "free" when Stripe is live
+      saveLocal({ id, name, email, tier: "premium" });
       return true;
     }
 
@@ -109,12 +109,12 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
 
     if (data.user) {
-      // Create profile row
+      // Create profile row — default to "premium" during beta testing
       await sb.from("profiles").upsert({
         id: data.user.id,
         email,
         display_name: name,
-        tier: "free",
+        tier: "premium", // TODO: revert to "free" when Stripe is live
       });
 
       set({
@@ -122,7 +122,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         userId: data.user.id,
         userName: name,
         userEmail: email,
-        userTier: "free",
+        userTier: "premium", // TODO: revert to "free" when Stripe is live
         loading: false,
       });
     }
@@ -176,9 +176,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         userId: "demo-google",
         userName: "Demo User",
         userEmail: "demo@modulca.com",
-        userTier: "free",
+        userTier: "premium", // TODO: revert to "free" when Stripe is live
       });
-      saveLocal({ name: "Demo User", email: "demo@modulca.com", tier: "free" });
+      saveLocal({ name: "Demo User", email: "demo@modulca.com", tier: "premium" });
       return;
     }
     const { data, error } = await sb.auth.signInWithOAuth({
