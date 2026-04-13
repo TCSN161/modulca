@@ -125,6 +125,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         userTier: "premium", // TODO: revert to "free" when Stripe is live
         loading: false,
       });
+
+      // Send welcome email (fire-and-forget)
+      fetch("/api/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ type: "welcome", to: email, displayName: name }),
+      }).catch(() => {});
     }
     return true;
   },

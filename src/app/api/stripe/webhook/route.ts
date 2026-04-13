@@ -1,6 +1,11 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import { createClient } from "@supabase/supabase-js";
+import {
+  sendUpgradeEmail,
+  sendPaymentFailedEmail,
+  sendSubscriptionCancelledEmail,
+} from "@/shared/lib/email";
 
 export const dynamic = "force-dynamic";
 
@@ -71,7 +76,10 @@ export async function POST(req: NextRequest) {
       case "invoice.payment_failed": {
         const invoice = event.data.object as Stripe.Invoice;
         console.warn("[Stripe Webhook] Payment failed for customer:", invoice.customer);
-        // TODO: send email notification to user
+        const failedEmail = invoice.customer_email;
+        if (failedEmail) {
+          await sendPaymentFailedEmail(failedEmail);
+        }
         break;
       }
 
@@ -108,6 +116,12 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     stripe_subscription_id: subscriptionId,
     subscription_status: "active",
   }).eq("id", userId);
+
+  // Send upgrade confirmation email
+  const email = session.customer_email || session.customer_details?.email;
+  if (email) {
+    await sendUpgradeEmail(email, tier);
+  }
 }
 
 async function handleSubscriptionUpdate(sub: Stripe.Subscription) {
@@ -132,11 +146,34 @@ async function handleSubscriptionCancel(sub: Stripe.Subscription) {
 
   console.log("[Stripe Webhook] Subscription cancelled:", { userId });
 
+  // Get user email before downgrading
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("display_name")
+    .eq("id", userId)
+    .single();
+
   await supabase.from("profiles").update({
     tier: "free",
     subscription_status: "canceled",
     stripe_subscription_id: null,
   }).eq("id", userId);
+
+  // Get email from Stripe customer
+  try {
+    const customerId = sub.customer as string;
+    if (customerId) {
+      const customer = await getStripe().customers.retrieve(customerId);
+      if (!customer.deleted && customer.email) {
+        await sendSubscriptionCancelledEmail(
+          customer.email,
+          (profile?.display_name as string) || undefined
+        );
+      }
+    }
+  } catch (e) {
+    console.error("[Stripe Webhook] Could not send cancel email:", e);
+  }
 }
 
 function mapPriceToTier(priceId: string | undefined): string {
