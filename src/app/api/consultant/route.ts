@@ -178,7 +178,9 @@ function getTierConfig(tier: string): TierConfig {
   return TIER_CONFIGS[tier] ?? TIER_CONFIGS.free;
 }
 
-async function buildRAGContext(question: string, maxArticles = 4, maxChars = 6000): Promise<string> {
+interface RAGResult { context: string; articlesUsed: string[] }
+
+async function buildRAGContext(question: string, maxArticles = 4, maxChars = 6000): Promise<RAGResult> {
   const detectedRegion = detectRegion(question);
 
   // Score all articles
@@ -213,9 +215,13 @@ async function buildRAGContext(question: string, maxArticles = 4, maxChars = 600
     if (totalChars >= maxChars) break;
   }
 
-  if (sections.length === 0) return "";
+  const articleIds = scored.filter(s => s.article?.filePath).map(s => s.article.id);
+  if (sections.length === 0) return { context: "", articlesUsed: [] };
   const regionNote = detectedRegion ? `\n\nDetected region context: ${detectedRegion}` : "";
-  return `\n\n# Reference Articles (from ModulCA Knowledge Library)${regionNote}\n\n${sections.join("\n\n---\n\n")}`;
+  return {
+    context: `\n\n# Reference Articles (from ModulCA Knowledge Library)${regionNote}\n\n${sections.join("\n\n---\n\n")}`,
+    articlesUsed: articleIds,
+  };
 }
 
 /* ------------------------------------------------------------------ */
@@ -408,7 +414,7 @@ export async function POST(req: NextRequest) {
     const question = lastUserMsg?.content || "";
 
     // Build dynamic system prompt with relevant KB articles (depth varies by tier)
-    const ragContext = await buildRAGContext(question, tierCfg.maxArticles, tierCfg.maxChars);
+    const { context: ragContext, articlesUsed } = await buildRAGContext(question, tierCfg.maxArticles, tierCfg.maxChars);
     const tierNote = tierCfg.answerNote
       ? `\n\nNote to assistant: The user is on the free tier. Keep answers helpful but concise. End with: "${tierCfg.answerNote}"`
       : "";
@@ -458,7 +464,13 @@ export async function POST(req: NextRequest) {
 
         if (reply && reply.trim()) {
           console.log(`[consultant] ${provider.id} success (${reply.length} chars)`);
-          return NextResponse.json({ reply: reply.trim() });
+          return NextResponse.json({
+            reply: reply.trim(),
+            provider: provider.id,
+            model: provider.model,
+            tier: tier || "free",
+            articlesUsed,
+          });
         }
         console.warn(`[consultant] ${provider.id} returned empty reply`);
       } catch (err) {
@@ -469,7 +481,7 @@ export async function POST(req: NextRequest) {
     // All cloud providers failed — use local knowledge base (133 articles)
     const localReply = await getLocalAnswer(question);
     console.log("[consultant] All cloud providers failed, using local KB");
-    return NextResponse.json({ reply: localReply });
+    return NextResponse.json({ reply: localReply, provider: "local-kb", model: "keyword-match", tier: tier || "free", articlesUsed });
   } catch (error) {
     console.error("Consultant API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

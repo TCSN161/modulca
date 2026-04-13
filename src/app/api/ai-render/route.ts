@@ -14,6 +14,7 @@ import { blackforestEngine } from "./engines/blackforest";
 import { deepinfraEngine } from "./engines/deepinfra";
 import { fireworksEngine } from "./engines/fireworks";
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
+import { canUseEngine, recordSuccess, recordFailure } from "./engines/creditManager";
 
 /**
  * Must be force-dynamic so Vercel runs this as a serverless function
@@ -129,11 +130,35 @@ const DEFAULT_POLICY: PolicyFlags = {
 };
 
 /**
- * Fallback chains — ordered by: free first → low-cost → mid → premium.
- * Cost ceiling in tryEngines() will auto-skip engines over budget.
+ * Fallback chains — tier-aware, ordered by quality/cost trade-off.
+ * Credit manager auto-skips depleted engines.
+ * Cost ceiling in tryEngines() auto-skips engines over per-image budget.
  */
 
-/** text2img: fast free → cheap → mid → premium → always-available */
+/** guest_free / free tier: only free engines */
+const FALLBACK_FREE = [
+  "together", "cloudflare", "huggingface",             // free with API key
+  "pollinations", "ai-horde",                          // free, no key needed
+];
+
+/** premium tier: best quality first, then cheaper fallbacks */
+const FALLBACK_PREMIUM = [
+  "blackforest", "fal", "together", "fireworks",       // best EU + fast
+  "cloudflare", "huggingface", "replicate",            // free/cheap
+  "deepinfra", "segmind", "leonardo",                  // mid-tier
+  "openai",                                            // premium
+  "ai-horde", "pollinations",                          // always-available
+];
+
+/** architect tier: premium quality, no cost restriction */
+const FALLBACK_ARCHITECT = [
+  "blackforest", "openai", "stability", "leonardo",    // premium quality
+  "fal", "together", "fireworks", "replicate",         // fast + versatile
+  "deepinfra", "cloudflare", "huggingface", "segmind", // mid-tier
+  "ai-horde", "pollinations",                          // always-available
+];
+
+/** Default text2img: balanced free → cheap → mid → premium */
 const FALLBACK_ORDER = [
   "together", "fal", "cloudflare", "blackforest",     // free / near-free (BFL = EU)
   "huggingface", "fireworks",                          // free/cheap (Fireworks = best GDPR)
@@ -150,6 +175,22 @@ const IMG2IMG_FALLBACK = [
   "openai",                                             // premium fallback
   "ai-horde", "pollinations",                           // last resort
 ];
+
+/** Get the best fallback chain for a tier + mode combination */
+function getFallbackChain(tier: string, hasBaseImage: boolean): string[] {
+  if (hasBaseImage) return IMG2IMG_FALLBACK;
+  switch (tier) {
+    case "guest_free":
+    case "free":
+      return FALLBACK_FREE;
+    case "premium":
+      return FALLBACK_PREMIUM;
+    case "architect":
+      return FALLBACK_ARCHITECT;
+    default:
+      return FALLBACK_ORDER;
+  }
+}
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -188,22 +229,28 @@ async function tryEngines(
     const eng = ENGINES[engineParam];
     if (eng.estimatedCostUsd > maxCostUsd) {
       console.log(`[ai-render] Engine "${engineParam}" exceeds cost ceiling ($${eng.estimatedCostUsd} > $${maxCostUsd}), skipping to fallback`);
+    } else if (!canUseEngine(engineParam)) {
+      console.log(`[ai-render] Engine "${engineParam}" has no credits remaining, skipping to fallback`);
     } else {
       console.log(`[ai-render] Using engine: ${engineParam}`);
       const result = await eng.fn(renderReq);
       if (result) {
         if (isContentFilterImage(result)) {
           console.warn(`[ai-render] Engine "${engineParam}" returned content-filter image (${result.buffer.length} bytes), falling back...`);
+          recordFailure(engineParam, "content-filter-image");
         } else {
           console.log(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
+          recordSuccess(engineParam, result.costUsd ?? 0, result.latencyMs ?? 0);
           return imageResponse(result);
         }
+      } else {
+        recordFailure(engineParam, "no-result");
       }
       console.log(`[ai-render] Engine "${engineParam}" failed, falling back to others...`);
     }
   }
 
-  // Auto mode / fallback: try engines in order, skip those over budget
+  // Auto mode / fallback: try engines in order, skip those over budget or depleted
   for (const engineId of fallbackOrder) {
     if (engineId === engineParam) continue; // already tried
     const engine = ENGINES[engineId];
@@ -212,16 +259,23 @@ async function tryEngines(
       console.log(`[ai-render] Skipping "${engineId}" — over cost ceiling ($${engine.estimatedCostUsd} > $${maxCostUsd})`);
       continue;
     }
+    if (!canUseEngine(engineId)) {
+      console.log(`[ai-render] Skipping "${engineId}" — no credits or disabled`);
+      continue;
+    }
     console.log(`[ai-render] Trying engine: ${engineId}`);
     const result = await engine.fn(renderReq);
     if (result) {
       if (isContentFilterImage(result)) {
         console.warn(`[ai-render] Engine "${engineId}" returned content-filter image (${result.buffer.length} bytes), trying next...`);
+        recordFailure(engineId, "content-filter-image");
         continue;
       }
       console.log(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
+      recordSuccess(engineId, result.costUsd ?? 0, result.latencyMs ?? 0);
       return imageResponse(result);
     }
+    recordFailure(engineId, "no-result");
     console.log(`[ai-render] Engine "${engineId}" failed, trying next...`);
   }
 
@@ -244,17 +298,20 @@ export async function GET(req: NextRequest) {
   const engineParam = searchParams.get("engine");
   const maxCost = Number(searchParams.get("maxCostUsd") || "1.0");
 
+  const tier = searchParams.get("tier") || "free";
+
   const renderReq: AiRenderRequest = {
     prompt, width, height, seed,
-    tier: searchParams.get("tier") || "free",
+    tier,
     policyFlags: DEFAULT_POLICY,
   };
 
   console.log(
-    `[ai-render] GET: "${prompt.slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} maxCost=$${maxCost}`
+    `[ai-render] GET: "${prompt.slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} tier=${tier} maxCost=$${maxCost}`
   );
 
-  return tryEngines(renderReq, engineParam, FALLBACK_ORDER, maxCost);
+  const order = getFallbackChain(tier, false);
+  return tryEngines(renderReq, engineParam, order, maxCost);
 }
 
 /* ------------------------------------------------------------------ */
@@ -288,7 +345,6 @@ export async function POST(req: NextRequest) {
     `[ai-render] POST: "${prompt.slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} img2img=${!!baseImage} maxCost=$${maxCostUsd}`
   );
 
-  // When we have a base image, prefer img2img-capable engines
-  const order = baseImage ? IMG2IMG_FALLBACK : FALLBACK_ORDER;
+  const order = getFallbackChain(tier, !!baseImage);
   return tryEngines(renderReq, engineParam, order, Number(maxCostUsd));
 }
