@@ -42,7 +42,7 @@ export default function EngineComparisonPage() {
   const allEngineIds = [
     "pollinations", "ai-horde", "together", "cloudflare", "huggingface",
     "fal", "fireworks", "segmind", "deepinfra", "replicate",
-    "leonardo", "blackforest", "stability", "openai",
+    "leonardo", "blackforest", "stability", "openai", "prodia",
   ];
 
   const runComparison = useCallback(async () => {

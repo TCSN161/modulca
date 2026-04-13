@@ -13,6 +13,7 @@ import { openaiEngine } from "../engines/openai";
 import { blackforestEngine } from "../engines/blackforest";
 import { deepinfraEngine } from "../engines/deepinfra";
 import { fireworksEngine } from "../engines/fireworks";
+import { prodiaEngine } from "../engines/prodia";
 import type { AiRenderEngine, AiRenderRequest, PolicyFlags } from "../engines/types";
 
 export const dynamic = "force-dynamic";
@@ -44,6 +45,7 @@ const ALL_ENGINES: EngineEntry[] = [
   { id: "blackforest", label: "Black Forest Labs", fn: blackforestEngine, costPerImage: 0.003, capabilities: ["text2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "Credit-based" },
   { id: "stability", label: "Stability AI", fn: stabilityEngine, costPerImage: 0.04, capabilities: ["text2img", "img2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "25 credits" },
   { id: "openai", label: "OpenAI GPT Image", fn: openaiEngine, costPerImage: 0.02, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "Existing key" },
+  { id: "prodia", label: "Prodia", fn: prodiaEngine, costPerImage: 0.002, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "1000 free calls" },
 ];
 
 const DEFAULT_POLICY: PolicyFlags = {

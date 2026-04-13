@@ -13,6 +13,7 @@ import { openaiEngine } from "./engines/openai";
 import { blackforestEngine } from "./engines/blackforest";
 import { deepinfraEngine } from "./engines/deepinfra";
 import { fireworksEngine } from "./engines/fireworks";
+import { prodiaEngine } from "./engines/prodia";
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
 import { canUseEngine, recordSuccess, recordFailure } from "./engines/creditManager";
 
@@ -120,6 +121,13 @@ const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo; estimatedC
     info: { id: "openai", label: "OpenAI GPT Image", description: "Premium quality. GPT Image + DALL-E 3.", speed: "medium" },
     estimatedCostUsd: 0.02,
   },
+
+  /* ── Ultra-cheap engines ── */
+  prodia: {
+    fn: prodiaEngine,
+    info: { id: "prodia", label: "Prodia", description: "Ultra-fast ($0.002/img). 1000 free calls, no card needed.", speed: "fast" },
+    estimatedCostUsd: 0.002,
+  },
 };
 
 /** Default EU policy: no China providers, safe mode on */
@@ -144,7 +152,7 @@ const FALLBACK_FREE = [
 /** premium tier: best quality first, then cheaper fallbacks */
 const FALLBACK_PREMIUM = [
   "blackforest", "fal", "together", "fireworks",       // best EU + fast
-  "cloudflare", "huggingface", "replicate",            // free/cheap
+  "cloudflare", "huggingface", "prodia", "replicate",  // free/cheap
   "deepinfra", "segmind", "leonardo",                  // mid-tier
   "openai",                                            // premium
   "ai-horde", "pollinations",                          // always-available
@@ -154,14 +162,14 @@ const FALLBACK_PREMIUM = [
 const FALLBACK_ARCHITECT = [
   "blackforest", "openai", "stability", "leonardo",    // premium quality
   "fal", "together", "fireworks", "replicate",         // fast + versatile
-  "deepinfra", "cloudflare", "huggingface", "segmind", // mid-tier
+  "prodia", "deepinfra", "cloudflare", "huggingface", "segmind", // mid-tier
   "ai-horde", "pollinations",                          // always-available
 ];
 
 /** Default text2img: balanced free → cheap → mid → premium */
 const FALLBACK_ORDER = [
   "together", "fal", "cloudflare", "blackforest",     // free / near-free (BFL = EU)
-  "huggingface", "fireworks",                          // free/cheap (Fireworks = best GDPR)
+  "huggingface", "fireworks", "prodia",                // free/cheap
   "segmind", "deepinfra", "replicate", "leonardo",     // low-cost / mid
   "openai",                                            // premium
   "ai-horde", "pollinations",                          // always-available fallback

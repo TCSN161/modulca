@@ -11,7 +11,9 @@ export type AiEngine =
   // Low-cost / mid engines
   | "fal" | "fireworks" | "segmind" | "deepinfra" | "replicate" | "leonardo"
   // Premium engines
-  | "blackforest" | "stability" | "openai";
+  | "blackforest" | "stability" | "openai"
+  // Ultra-cheap
+  | "prodia";
 
 export type EngineCapability = "text2img" | "img2img";
 export type EngineTier = "free" | "low-cost" | "mid" | "premium";
@@ -46,6 +48,8 @@ export const AI_ENGINES: Record<AiEngine, EngineMetadata> = {
   blackforest: { label: "Black Forest Labs", description: "FLUX creators, German (EU/GDPR), best FLUX quality", speed: "Medium", capabilities: ["text2img"], costPerImage: 0.003, tier: "premium", freeQuota: "Credit-based", euCompliant: true },
   stability:   { label: "Stability AI",      description: "img2img — uses 3D scene as structural base", speed: "Medium", capabilities: ["text2img", "img2img"], costPerImage: 0.04, tier: "premium", freeQuota: "25 credits", euCompliant: false },
   openai:      { label: "OpenAI GPT Image",  description: "Premium quality, GPT Image + DALL-E 3", speed: "Medium", capabilities: ["text2img"], costPerImage: 0.02, tier: "premium", freeQuota: "Existing key", euCompliant: false },
+  // ── Ultra-cheap ──
+  prodia:      { label: "Prodia",            description: "Ultra-fast $0.002/img, 1000 free calls", speed: "Fast", capabilities: ["text2img"], costPerImage: 0.002, tier: "low-cost", freeQuota: "1000 free calls", euCompliant: false },
   // ── Always available ──
   "ai-horde":  { label: "AI Horde",          description: "Free community GPUs, reliable fallback", speed: "Slow", capabilities: ["text2img"], costPerImage: 0, tier: "free", freeQuota: "Unlimited (community)", euCompliant: false },
 };
