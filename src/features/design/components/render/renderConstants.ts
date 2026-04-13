@@ -4,15 +4,35 @@ export type RenderMode = "template" | "ai";
 export type ViewMode = "single" | "all";
 export type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | "custom";
 export type RenderResolution = "draft" | "standard" | "high";
-export type AiEngine = "auto" | "pollinations" | "ai-horde" | "stability" | "together" | "leonardo";
+export type AiEngine =
+  | "auto"
+  // Free engines
+  | "together" | "cloudflare" | "huggingface" | "pollinations" | "ai-horde"
+  // Low-cost / mid engines
+  | "fal" | "fireworks" | "segmind" | "deepinfra" | "replicate" | "leonardo"
+  // Premium engines
+  | "blackforest" | "stability" | "openai";
 
 export const AI_ENGINES: Record<AiEngine, { label: string; description: string; speed: string }> = {
-  auto: { label: "Auto (Best Available)", description: "Tries engines in order until one succeeds", speed: "" },
-  together: { label: "Together.ai FLUX", description: "Free unlimited 3 months, high quality", speed: "Fast" },
-  pollinations: { label: "Pollinations AI", description: "Free, no account needed", speed: "Fast" },
-  leonardo: { label: "Leonardo.ai", description: "150 free/day, photorealistic", speed: "Medium" },
-  stability: { label: "Stability AI", description: "img2img — uses 3D scene as base", speed: "Medium" },
-  "ai-horde": { label: "AI Horde", description: "Free community GPUs, reliable", speed: "Slow" },
+  auto:        { label: "Auto (Best Available)", description: "Smart routing by tier & task type", speed: "" },
+  // ── Free ──
+  together:    { label: "Together.ai FLUX",  description: "Free 3 months, FLUX Schnell + Kontext img2img", speed: "Fast" },
+  fal:         { label: "fal.ai",            description: "Fastest inference, img2img + text2img + upscale", speed: "Fast" },
+  cloudflare:  { label: "Cloudflare AI",     description: "Free forever (10K/day), EU regions, FLUX", speed: "Fast" },
+  huggingface: { label: "Hugging Face",      description: "Free open-source FLUX & SDXL models", speed: "Medium" },
+  pollinations:{ label: "Pollinations AI",   description: "Free, no account needed", speed: "Fast" },
+  // ── Low-cost / Mid ──
+  fireworks:   { label: "Fireworks AI",      description: "Best GDPR (EU rep, SOC 2). FLUX $0.0014/img", speed: "Fast" },
+  segmind:     { label: "Segmind",           description: "Cheapest upscaling ($0.005), SDXL", speed: "Medium" },
+  deepinfra:   { label: "DeepInfra",         description: "Fast FLUX inference, DeepStart startup program", speed: "Fast" },
+  replicate:   { label: "Replicate",         description: "ControlNet img2img, largest model ecosystem", speed: "Medium" },
+  leonardo:    { label: "Leonardo.ai",       description: "Photorealistic with alchemy, 150 free/day", speed: "Medium" },
+  // ── Premium ──
+  blackforest: { label: "Black Forest Labs", description: "FLUX creators, German (EU/GDPR), best FLUX quality", speed: "Medium" },
+  stability:   { label: "Stability AI",      description: "img2img — uses 3D scene as structural base", speed: "Medium" },
+  openai:      { label: "OpenAI GPT Image",  description: "Premium quality, GPT Image + DALL-E 3", speed: "Medium" },
+  // ── Always available ──
+  "ai-horde":  { label: "AI Horde",          description: "Free community GPUs, reliable fallback", speed: "Slow" },
 };
 
 export const PROMPT_TEMPLATES: Record<PromptTemplate, { label: string; description: string; suffix: string }> = {

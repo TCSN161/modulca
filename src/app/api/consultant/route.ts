@@ -144,13 +144,34 @@ async function loadArticleContent(filePath: string): Promise<string> {
 interface TierConfig {
   maxArticles: number;
   maxChars: number;
+  maxTokens: number;
   answerNote: string;
+  /** Provider IDs to try in order (tier-specific quality routing) */
+  providerChain: string[];
 }
 
 const TIER_CONFIGS: Record<string, TierConfig> = {
-  free:      { maxArticles: 2, maxChars: 2000, answerNote: "Upgrade to Premium for deeper, regulation-specific answers." },
-  premium:   { maxArticles: 4, maxChars: 6000, answerNote: "" },
-  architect: { maxArticles: 6, maxChars: 12000, answerNote: "" },
+  free: {
+    maxArticles: 2,
+    maxChars: 2000,
+    maxTokens: 768,
+    answerNote: "Upgrade to Premium for deeper, regulation-specific answers.",
+    providerChain: ["groq", "together", "pollinations"],
+  },
+  premium: {
+    maxArticles: 4,
+    maxChars: 6000,
+    maxTokens: 1024,
+    answerNote: "",
+    providerChain: ["openai", "groq", "together", "pollinations"],
+  },
+  architect: {
+    maxArticles: 6,
+    maxChars: 12000,
+    maxTokens: 2048,
+    answerNote: "",
+    providerChain: ["anthropic", "openai", "groq", "together", "pollinations"],
+  },
 };
 
 function getTierConfig(tier: string): TierConfig {
@@ -197,19 +218,95 @@ async function buildRAGContext(question: string, maxArticles = 4, maxChars = 600
   return `\n\n# Reference Articles (from ModulCA Knowledge Library)${regionNote}\n\n${sections.join("\n\n---\n\n")}`;
 }
 
-// Provider configuration — fallback chain: Groq → Together → Pollinations → Local KB
+/* ------------------------------------------------------------------ */
+/*  AI Provider Configuration                                          */
+/* ------------------------------------------------------------------ */
+/*
+ * Provider quality tiers:
+ *   Free users    → Groq (Llama 3.3 70B) → Together → Pollinations
+ *   Premium users → OpenAI (GPT-4o-mini) → Groq → Together → Pollinations
+ *   Architect     → Anthropic (Claude) → OpenAI → Groq → Together → Pollinations
+ *
+ * Platform accounts needed (create free accounts first):
+ *   - Groq:         console.groq.com      — Free: 30 req/min, 14.4K tokens/min
+ *   - Together:     api.together.xyz       — Free: $1 credit, then pay-as-you-go
+ *   - OpenAI:       platform.openai.com    — Pay-as-you-go (~$0.15/1M input tokens for gpt-4o-mini)
+ *   - Anthropic:    console.anthropic.com  — Pay-as-you-go (~$3/1M input tokens for claude-sonnet)
+ *   - Pollinations: text.pollinations.ai   — Free, no key needed (fallback)
+ *
+ * Set API keys in .env.local:
+ *   GROQ_API_KEY=gsk_...
+ *   TOGETHER_API_KEY=...
+ *   OPENAI_API_KEY=sk-...
+ *   ANTHROPIC_API_KEY=sk-ant-...
+ */
+
 interface Provider {
   id: string;
   url: string;
   model: string;
   keyEnv?: string;
+  /** Override key resolution (e.g. when system env shadows .env.local) */
+  getKey?: () => string | undefined;
   buildHeaders: (apiKey?: string) => Record<string, string>;
-  buildBody: (messages: { role: string; content: string }[]) => object;
+  buildBody: (messages: { role: string; content: string }[], maxTokens: number) => object;
   extractReply: (data: unknown) => string | null;
 }
 
-const PROVIDERS: Provider[] = [
-  {
+const ALL_PROVIDERS: Record<string, Provider> = {
+  anthropic: {
+    id: "anthropic",
+    url: "https://api.anthropic.com/v1/messages",
+    model: "claude-sonnet-4-20250514",
+    keyEnv: "ANTHROPIC_API_KEY",
+    getKey: () => process.env.MODULCA_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY || undefined,
+    buildHeaders: (apiKey) => ({
+      "Content-Type": "application/json",
+      "x-api-key": apiKey!,
+      "anthropic-version": "2023-06-01",
+    }),
+    buildBody: (messages, maxTokens) => {
+      // Anthropic uses a different format: system is separate, messages are user/assistant only
+      const system = messages.find((m) => m.role === "system")?.content ?? "";
+      const chatMsgs = messages.filter((m) => m.role !== "system").map((m) => ({
+        role: m.role,
+        content: m.content,
+      }));
+      return {
+        model: "claude-sonnet-4-20250514",
+        system,
+        messages: chatMsgs,
+        max_tokens: maxTokens,
+        temperature: 0.7,
+      };
+    },
+    extractReply: (data: any) => {
+      // Anthropic response: { content: [{ type: "text", text: "..." }] }
+      const blocks = data?.content;
+      if (Array.isArray(blocks)) {
+        return blocks.filter((b: any) => b.type === "text").map((b: any) => b.text).join("") || null;
+      }
+      return null;
+    },
+  },
+  openai: {
+    id: "openai",
+    url: "https://api.openai.com/v1/chat/completions",
+    model: "gpt-4o-mini",
+    keyEnv: "OPENAI_API_KEY",
+    buildHeaders: (apiKey) => ({
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    }),
+    buildBody: (messages, maxTokens) => ({
+      model: "gpt-4o-mini",
+      messages,
+      max_tokens: maxTokens,
+      temperature: 0.7,
+    }),
+    extractReply: (data: any) => data?.choices?.[0]?.message?.content || null,
+  },
+  groq: {
     id: "groq",
     url: "https://api.groq.com/openai/v1/chat/completions",
     model: "llama-3.3-70b-versatile",
@@ -218,15 +315,15 @@ const PROVIDERS: Provider[] = [
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     }),
-    buildBody: (messages) => ({
+    buildBody: (messages, maxTokens) => ({
       model: "llama-3.3-70b-versatile",
       messages,
-      max_tokens: 1024,
+      max_tokens: maxTokens,
       temperature: 0.7,
     }),
     extractReply: (data: any) => data?.choices?.[0]?.message?.content || null,
   },
-  {
+  together: {
     id: "together",
     url: "https://api.together.xyz/v1/chat/completions",
     model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
@@ -235,30 +332,30 @@ const PROVIDERS: Provider[] = [
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     }),
-    buildBody: (messages) => ({
+    buildBody: (messages, maxTokens) => ({
       model: "meta-llama/Llama-3.3-70B-Instruct-Turbo",
       messages,
-      max_tokens: 1024,
+      max_tokens: maxTokens,
       temperature: 0.7,
     }),
     extractReply: (data: any) => data?.choices?.[0]?.message?.content || null,
   },
-  {
+  pollinations: {
     id: "pollinations",
     url: "https://text.pollinations.ai/openai",
     model: "openai",
     buildHeaders: () => ({ "Content-Type": "application/json" }),
-    buildBody: (messages) => ({
+    buildBody: (messages, maxTokens) => ({
       messages,
       model: "openai",
-      max_tokens: 2048,
+      max_tokens: maxTokens,
     }),
     extractReply: (data: any) => {
       const msg = data?.choices?.[0]?.message;
       return msg?.content || msg?.reasoning_content || null;
     },
   },
-];
+};
 
 /* ------------------------------------------------------------------ */
 /*  Local KB Fallback — uses full article index when AI is offline     */
@@ -322,21 +419,25 @@ export async function POST(req: NextRequest) {
       ...messages.slice(-20),
     ];
 
-    // Try each provider in order
-    for (const provider of PROVIDERS) {
+    // Try each provider in tier-specific order
+    const providerChain = tierCfg.providerChain
+      .map((id) => ALL_PROVIDERS[id])
+      .filter(Boolean);
+
+    for (const provider of providerChain) {
       // Skip providers that need a missing API key
-      const apiKey = provider.keyEnv ? process.env[provider.keyEnv] : undefined;
-      if (provider.keyEnv && !apiKey) {
+      const apiKey = provider.getKey ? provider.getKey() : provider.keyEnv ? process.env[provider.keyEnv] : undefined;
+      if ((provider.keyEnv || provider.getKey) && !apiKey) {
         console.log(`[consultant] ${provider.id}: no API key, skipping`);
         continue;
       }
 
       try {
-        console.log(`[consultant] Trying ${provider.id}...`);
+        console.log(`[consultant] Trying ${provider.id} (${tier || "free"} tier)...`);
         const response = await fetch(provider.url, {
           method: "POST",
           headers: provider.buildHeaders(apiKey),
-          body: JSON.stringify(provider.buildBody(fullMessages)),
+          body: JSON.stringify(provider.buildBody(fullMessages, tierCfg.maxTokens)),
         });
 
         if (!response.ok) {

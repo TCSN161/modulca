@@ -4,6 +4,15 @@ import { aiHordeEngine } from "./engines/aihorde";
 import { stabilityEngine } from "./engines/stability";
 import { togetherEngine } from "./engines/together";
 import { leonardoEngine } from "./engines/leonardo";
+import { falEngine } from "./engines/fal";
+import { cloudflareEngine } from "./engines/cloudflare";
+import { replicateEngine } from "./engines/replicate";
+import { huggingfaceEngine } from "./engines/huggingface";
+import { segmindEngine } from "./engines/segmind";
+import { openaiEngine } from "./engines/openai";
+import { blackforestEngine } from "./engines/blackforest";
+import { deepinfraEngine } from "./engines/deepinfra";
+import { fireworksEngine } from "./engines/fireworks";
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
 
 /**
@@ -31,55 +40,84 @@ export const dynamic = "force-dynamic";
 /* ------------------------------------------------------------------ */
 
 const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo; estimatedCostUsd: number }> = {
+  /* ── Free engines (guest_free + free tier) ── */
   pollinations: {
     fn: pollinationsEngine,
-    info: {
-      id: "pollinations",
-      label: "Pollinations AI",
-      description: "Free, no auth, fast (~30-90s). Uses Stable Diffusion via pollinations.ai",
-      speed: "fast",
-    },
+    info: { id: "pollinations", label: "Pollinations AI", description: "Free, no auth. Uses Stable Diffusion.", speed: "fast" },
     estimatedCostUsd: 0,
   },
   "ai-horde": {
     fn: aiHordeEngine,
-    info: {
-      id: "ai-horde",
-      label: "AI Horde",
-      description: "Free community GPU cluster (stablehorde.net). Slower but reliable.",
-      speed: "slow",
-    },
+    info: { id: "ai-horde", label: "AI Horde", description: "Free community GPUs. Slower but reliable.", speed: "slow" },
     estimatedCostUsd: 0,
-  },
-  stability: {
-    fn: stabilityEngine,
-    info: {
-      id: "stability",
-      label: "Stability AI",
-      description: "High-quality img2img — uses 3D scene as base. Requires API key.",
-      speed: "medium",
-    },
-    estimatedCostUsd: 0.065,
   },
   together: {
     fn: togetherEngine,
-    info: {
-      id: "together",
-      label: "Together.ai FLUX",
-      description: "Free unlimited for 3 months. Fast, high quality FLUX model.",
-      speed: "fast",
-    },
-    estimatedCostUsd: 0, // schnell is free; kontext ~$0.04
+    info: { id: "together", label: "Together.ai FLUX", description: "Free 3 months. Fast FLUX Schnell.", speed: "fast" },
+    estimatedCostUsd: 0,
   },
+  cloudflare: {
+    fn: cloudflareEngine,
+    info: { id: "cloudflare", label: "Cloudflare AI", description: "10K neurons/day free FOREVER. FLUX Schnell.", speed: "fast" },
+    estimatedCostUsd: 0,
+  },
+  huggingface: {
+    fn: huggingfaceEngine,
+    info: { id: "huggingface", label: "Hugging Face", description: "Free inference. Open-source FLUX & SDXL.", speed: "medium" },
+    estimatedCostUsd: 0.001,
+  },
+
+  /* ── Low-cost engines (free + standard tier) ── */
+  fal: {
+    fn: falEngine,
+    info: { id: "fal", label: "fal.ai", description: "Fastest inference. img2img + text2img + upscale.", speed: "fast" },
+    estimatedCostUsd: 0.003,
+  },
+  segmind: {
+    fn: segmindEngine,
+    info: { id: "segmind", label: "Segmind", description: "Cheapest upscaling ($0.005). SDXL text2img.", speed: "medium" },
+    estimatedCostUsd: 0.005,
+  },
+
+  /* ── Low-mid engines ── */
+  fireworks: {
+    fn: fireworksEngine,
+    info: { id: "fireworks", label: "Fireworks AI", description: "Best GDPR (EU rep, SOC 2). FLUX $0.0014/img.", speed: "fast" },
+    estimatedCostUsd: 0.0014,
+  },
+  deepinfra: {
+    fn: deepinfraEngine,
+    info: { id: "deepinfra", label: "DeepInfra", description: "Fast FLUX inference. DeepStart startup program.", speed: "fast" },
+    estimatedCostUsd: 0.015,
+  },
+
+  /* ── Mid-tier engines (premium tier) ── */
   leonardo: {
     fn: leonardoEngine,
-    info: {
-      id: "leonardo",
-      label: "Leonardo.ai",
-      description: "150 free/day. Photorealistic with alchemy enhancement.",
-      speed: "medium",
-    },
+    info: { id: "leonardo", label: "Leonardo.ai", description: "Photorealistic with alchemy. 150 free/day.", speed: "medium" },
     estimatedCostUsd: 0.03,
+  },
+  replicate: {
+    fn: replicateEngine,
+    info: { id: "replicate", label: "Replicate", description: "ControlNet img2img + largest model ecosystem.", speed: "medium" },
+    estimatedCostUsd: 0.003,
+  },
+
+  /* ── Premium engines (premium + architect tier) ── */
+  blackforest: {
+    fn: blackforestEngine,
+    info: { id: "blackforest", label: "Black Forest Labs", description: "FLUX creators. German company (EU/GDPR). Best FLUX quality.", speed: "medium" },
+    estimatedCostUsd: 0.003, // Schnell; Pro is $0.04 but auto-selected by tier
+  },
+  stability: {
+    fn: stabilityEngine,
+    info: { id: "stability", label: "Stability AI", description: "High-quality img2img — 3D scene as base.", speed: "medium" },
+    estimatedCostUsd: 0.065,
+  },
+  openai: {
+    fn: openaiEngine,
+    info: { id: "openai", label: "OpenAI GPT Image", description: "Premium quality. GPT Image + DALL-E 3.", speed: "medium" },
+    estimatedCostUsd: 0.02,
   },
 };
 
@@ -90,11 +128,28 @@ const DEFAULT_POLICY: PolicyFlags = {
   safeMode: true,
 };
 
-/** Default engine order for text-to-image fallback chain.
- *  Together (best quality, no content filter issues) → AI Horde → Leonardo → Pollinations (most aggressive filter, last resort) */
-const FALLBACK_ORDER = ["together", "ai-horde", "leonardo", "pollinations"];
-/** Engines that support img2img (prefer these when baseImage is provided) */
-const IMG2IMG_FALLBACK = ["stability", "together", "ai-horde", "pollinations"];
+/**
+ * Fallback chains — ordered by: free first → low-cost → mid → premium.
+ * Cost ceiling in tryEngines() will auto-skip engines over budget.
+ */
+
+/** text2img: fast free → cheap → mid → premium → always-available */
+const FALLBACK_ORDER = [
+  "together", "fal", "cloudflare", "blackforest",     // free / near-free (BFL = EU)
+  "huggingface", "fireworks",                          // free/cheap (Fireworks = best GDPR)
+  "segmind", "deepinfra", "replicate", "leonardo",     // low-cost / mid
+  "openai",                                            // premium
+  "ai-horde", "pollinations",                          // always-available fallback
+];
+
+/** img2img: structure-preserving engines first */
+const IMG2IMG_FALLBACK = [
+  "stability", "fal", "together", "replicate",         // img2img capable
+  "blackforest", "cloudflare", "fireworks",             // text2img fallback (EU-friendly)
+  "huggingface", "segmind", "deepinfra", "leonardo",    // mid-tier fallback
+  "openai",                                             // premium fallback
+  "ai-horde", "pollinations",                           // last resort
+];
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
