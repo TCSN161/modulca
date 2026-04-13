@@ -1,11 +1,12 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store";
 import { listProjects, deleteProject, type ProjectRecord } from "@/features/auth/projectService";
 import { getTierConfig } from "@/features/auth/types";
+import { openCustomerPortal } from "@/shared/lib/stripe";
 
 /* Sample templates shown when user has no projects */
 const TEMPLATES = [
@@ -16,17 +17,42 @@ const TEMPLATES = [
 
 export default function DashboardPage() {
   const router = useRouter();
-  const { isAuthenticated, userId, userName, userEmail, userTier, signOut } = useAuthStore();
+  const searchParams = useSearchParams();
+  const {
+    isAuthenticated, userId, userName, userEmail, userTier,
+    monthlyRenderCount, aiCallsToday, stripeCustomerId,
+    signOut, loadSession,
+  } = useAuthStore();
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [loaded, setLoaded] = useState(false);
+  const [upgradeMsg, setUpgradeMsg] = useState<string | null>(null);
+  const [portalLoading, setPortalLoading] = useState(false);
 
   const tierConfig = getTierConfig(userTier);
   const maxProjects = tierConfig.features.maxProjects;
+  const maxRenders = tierConfig.features.aiRendersPerMonth;
   const atLimit = maxProjects !== -1 && projects.length >= maxProjects;
+
+  // Handle Stripe redirect
+  useEffect(() => {
+    const upgrade = searchParams.get("upgrade");
+    if (upgrade === "success") {
+      setUpgradeMsg("Your subscription is now active! Enjoy your new features.");
+      // Reload session to get updated tier from Supabase
+      loadSession();
+      // Clean URL
+      window.history.replaceState({}, "", "/dashboard");
+      const timer = setTimeout(() => setUpgradeMsg(null), 6000);
+      return () => clearTimeout(timer);
+    }
+    if (upgrade === "cancelled") {
+      setUpgradeMsg(null);
+      window.history.replaceState({}, "", "/dashboard");
+    }
+  }, [searchParams, loadSession]);
 
   const loadProjects = useCallback(async () => {
     if (!userId) {
-      // No user yet — use localStorage fallback
       setProjects([]);
       setLoaded(true);
       return;
@@ -106,36 +132,75 @@ export default function DashboardPage() {
 
       <div className="flex-1 overflow-y-auto">
         <div className="max-w-2xl mx-auto py-8 px-4 md:px-6">
+          {/* Upgrade success banner */}
+          {upgradeMsg && (
+            <div className="mb-6 rounded-[12px] bg-green-50 border border-green-200 p-4 flex items-center gap-3">
+              <svg className="w-5 h-5 text-green-600 shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p className="text-sm text-green-800 font-medium">{upgradeMsg}</p>
+            </div>
+          )}
+
           {/* Welcome Section */}
           <div className="mb-8">
-            <p className="label-caps mb-1">Alfa 0.1</p>
+            <p className="label-caps mb-1">Beta</p>
             <h1 className="text-2xl md:text-3xl font-bold text-brand-charcoal tracking-heading mb-1">
-              Welcome back,<br />Architect
+              Welcome back,<br />{userName || "Architect"}
             </h1>
           </div>
 
           {/* Stats */}
-          <div className="grid grid-cols-2 gap-3 mb-8">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-8">
             <div className="rounded-[12px] bg-brand-bone-200 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <svg className="w-5 h-5 text-brand-olive-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
                 </svg>
-                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">Active Projects</span>
+                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">Projects</span>
               </div>
               <span className="text-2xl font-bold text-brand-charcoal">
-                {loaded ? String(projects.length).padStart(2, "0") : "--"}
+                {loaded ? projects.length : "--"}
+              </span>
+              {maxProjects !== -1 && (
+                <span className="text-[10px] text-brand-gray">/{maxProjects}</span>
+              )}
+            </div>
+            <div className="rounded-[12px] bg-brand-bone-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-brand-olive-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.827 6.175A2.31 2.31 0 015.186 7.23c-.38.054-.757.112-1.134.175C2.999 7.58 2.25 8.507 2.25 9.574V18a2.25 2.25 0 002.25 2.25h15A2.25 2.25 0 0021.75 18V9.574c0-1.067-.75-1.994-1.802-2.169a47.865 47.865 0 00-1.134-.175 2.31 2.31 0 01-1.64-1.055l-.822-1.316a2.192 2.192 0 00-1.736-1.039 48.774 48.774 0 00-5.232 0 2.192 2.192 0 00-1.736 1.039l-.821 1.316z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 12.75a4.5 4.5 0 11-9 0 4.5 4.5 0 019 0z" />
+                </svg>
+                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">AI Renders</span>
+              </div>
+              <span className="text-2xl font-bold text-brand-charcoal">
+                {monthlyRenderCount}
+              </span>
+              {maxRenders !== -1 && (
+                <span className="text-[10px] text-brand-gray">/{maxRenders}</span>
+              )}
+            </div>
+            <div className="rounded-[12px] bg-brand-bone-200 p-4">
+              <div className="flex items-center gap-2 mb-2">
+                <svg className="w-5 h-5 text-brand-olive-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+                </svg>
+                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">AI Today</span>
+              </div>
+              <span className="text-2xl font-bold text-brand-charcoal">
+                {aiCallsToday}
               </span>
             </div>
             <div className="rounded-[12px] bg-brand-bone-200 p-4">
               <div className="flex items-center gap-2 mb-2">
                 <svg className="w-5 h-5 text-brand-olive-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
                 </svg>
-                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">Saved Templates</span>
+                <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">Plan</span>
               </div>
-              <span className="text-2xl font-bold text-brand-charcoal">
-                {String(TEMPLATES.length).padStart(2, "0")}
+              <span className="text-sm font-bold" style={{ color: tierConfig.color }}>
+                {tierConfig.label}
               </span>
             </div>
           </div>
@@ -263,6 +328,44 @@ export default function DashboardPage() {
               </div>
             )}
           </div>
+
+          {/* Subscription Management */}
+          {isAuthenticated && (
+            <div className="mt-10 rounded-[12px] bg-white border border-brand-bone-300/60 p-5">
+              <h2 className="text-base font-bold text-brand-charcoal mb-3">Subscription</h2>
+              <div className="flex items-center justify-between">
+                <div>
+                  <span className="text-sm font-medium" style={{ color: tierConfig.color }}>
+                    {tierConfig.label}
+                  </span>
+                  <p className="text-xs text-brand-gray mt-0.5">{tierConfig.description}</p>
+                </div>
+                <div className="flex items-center gap-2">
+                  {stripeCustomerId ? (
+                    <button
+                      onClick={async () => {
+                        setPortalLoading(true);
+                        await openCustomerPortal(stripeCustomerId);
+                        setPortalLoading(false);
+                      }}
+                      disabled={portalLoading}
+                      className="text-xs font-medium text-brand-olive-700 hover:text-brand-olive-900 border border-brand-olive-300 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+                    >
+                      {portalLoading ? "Loading..." : "Manage"}
+                    </button>
+                  ) : null}
+                  {userTier !== "architect" && (
+                    <Link
+                      href="/pricing"
+                      className="text-xs font-bold text-white bg-brand-olive-700 hover:bg-brand-olive-800 rounded-lg px-3 py-1.5 transition-colors"
+                    >
+                      Upgrade
+                    </Link>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

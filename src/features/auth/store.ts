@@ -29,6 +29,9 @@ interface AuthStore {
   monthlyRenderCount: number;
   totalCostUsd: number;
 
+  // Stripe
+  stripeCustomerId: string | null;
+
   // Auth actions
   signUp: (email: string, password: string, name: string) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<boolean>;
@@ -83,6 +86,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   aiCallsToday: 0,
   monthlyRenderCount: 0,
   totalCostUsd: 0,
+  stripeCustomerId: null,
 
   /* ── Sign Up ── */
   signUp: async (email, password, name) => {
@@ -225,6 +229,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       aiCallsToday: 0,
       monthlyRenderCount: 0,
       totalCostUsd: 0,
+      stripeCustomerId: null,
     });
   },
 
@@ -367,7 +372,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     // Query profile — use basic columns first, extended columns may not exist yet
     let profile: Record<string, unknown> | null = null;
     const { data: p, error: profileErr } = await sb.from("profiles")
-      .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at, ai_renders_this_month, ai_renders_month, total_cost_usd")
+      .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at, ai_renders_this_month, ai_renders_month, total_cost_usd, stripe_customer_id")
       .eq("id", session.user.id)
       .single();
 
@@ -403,6 +408,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       aiCallsToday: aiCalls,
       monthlyRenderCount: monthlyRenders,
       totalCostUsd: (profile?.total_cost_usd as number) ?? 0,
+      stripeCustomerId: (profile?.stripe_customer_id as string) ?? null,
     });
   },
 }));
