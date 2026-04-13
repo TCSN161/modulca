@@ -25,7 +25,13 @@ export default function DashboardPage() {
   const atLimit = maxProjects !== -1 && projects.length >= maxProjects;
 
   const loadProjects = useCallback(async () => {
-    const list = await listProjects(userId ?? "demo");
+    if (!userId) {
+      // No user yet — use localStorage fallback
+      setProjects([]);
+      setLoaded(true);
+      return;
+    }
+    const list = await listProjects(userId);
     setProjects(list);
     setLoaded(true);
   }, [userId]);
@@ -36,7 +42,7 @@ export default function DashboardPage() {
 
   // Available for future use (e.g. swipe-to-delete, context menu)
   const _handleDelete = async (id: string) => {
-    await deleteProject(userId ?? "demo", id);
+    await deleteProject(userId ?? "", id);
     setProjects((prev) => prev.filter((p) => p.id !== id));
   };
   void _handleDelete;

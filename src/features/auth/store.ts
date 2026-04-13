@@ -357,10 +357,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       avatar_url: session.user.user_metadata?.avatar_url ?? null,
     }, { onConflict: "id", ignoreDuplicates: true });
 
-    const { data: profile } = await sb.from("profiles")
+    // Query profile — use basic columns first, extended columns may not exist yet
+    let profile: Record<string, unknown> | null = null;
+    const { data: p, error: profileErr } = await sb.from("profiles")
       .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at, ai_renders_this_month, ai_renders_month, total_cost_usd")
       .eq("id", session.user.id)
       .single();
+
+    if (profileErr) {
+      // Fallback: query only base columns if extended columns don't exist
+      console.warn("[ModulCA] Extended profile query failed, using base columns:", profileErr.message);
+      const { data: pBase } = await sb.from("profiles")
+        .select("display_name, tier, avatar_url")
+        .eq("id", session.user.id)
+        .single();
+      profile = pBase as Record<string, unknown> | null;
+    } else {
+      profile = p as Record<string, unknown> | null;
+    }
 
     // Reset AI calls if it's a new day
     const today = new Date().toISOString().split("T")[0];
