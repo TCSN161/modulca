@@ -16,6 +16,8 @@ import { fireworksEngine } from "./engines/fireworks";
 import { prodiaEngine } from "./engines/prodia";
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
 import { canUseEngine, recordSuccess, recordFailure } from "./engines/creditManager";
+import { logRender } from "./engines/renderLogger";
+import { makeCacheKey, getCachedRender, cacheResult } from "./engines/renderCache";
 
 /**
  * Must be force-dynamic so Vercel runs this as a serverless function
@@ -232,6 +234,65 @@ async function tryEngines(
   fallbackOrder: string[],
   maxCostUsd: number = 1.0,
 ) {
+  const mode: "text2img" | "img2img" = renderReq.baseImage ? "img2img" : "text2img";
+  const tier = renderReq.tier || "free";
+
+  // ── Cache check (skip for img2img since base image varies) ──
+  if (!renderReq.baseImage && engineParam) {
+    const cacheKey = makeCacheKey(renderReq.prompt, renderReq.width, renderReq.height, engineParam);
+    const cached = await getCachedRender(cacheKey);
+    if (cached) {
+      console.log(`[ai-render] Cache HIT for "${renderReq.prompt.slice(0, 40)}..." engine=${cached.engineId}`);
+      logRender({
+        prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
+        seed: renderReq.seed, mode, tier, engine_id: cached.engineId,
+        status: "success", cost_usd: 0, image_size_bytes: cached.buffer.length,
+        content_type: cached.contentType, cache_hit: true, cache_key: cacheKey,
+      });
+      return new NextResponse(new Uint8Array(cached.buffer), {
+        status: 200,
+        headers: {
+          "Content-Type": cached.contentType,
+          "Content-Length": String(cached.buffer.length),
+          "X-AI-Engine": cached.engineId,
+          "X-AI-Cost-Usd": "0",
+          "X-AI-Cache": "HIT",
+          "Cache-Control": "public, max-age=86400",
+        },
+      });
+    }
+  }
+
+  /** Helper: handle a successful engine result */
+  async function onSuccess(engineId: string, result: AiRenderResult) {
+    recordSuccess(engineId, result.costUsd ?? 0, result.latencyMs ?? 0);
+
+    // Cache the result (fire and forget, text2img only)
+    if (!renderReq.baseImage) {
+      const cacheKey = makeCacheKey(renderReq.prompt, renderReq.width, renderReq.height, engineId);
+      cacheResult(cacheKey, engineId, result.buffer, result.contentType, renderReq.width, renderReq.height);
+    }
+
+    // Log to analytics (fire and forget)
+    logRender({
+      prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
+      seed: renderReq.seed, mode, tier, engine_id: engineId, engine_label: result.engine,
+      status: "success", cost_usd: result.costUsd ?? 0, latency_ms: result.latencyMs,
+      image_size_bytes: result.buffer.length, content_type: result.contentType,
+      cache_hit: false,
+    });
+  }
+
+  /** Helper: handle a failed engine attempt */
+  function onFailure(engineId: string, error: string) {
+    recordFailure(engineId, error);
+    logRender({
+      prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
+      seed: renderReq.seed, mode, tier, engine_id: engineId,
+      status: "failed", error_message: error, cost_usd: 0, cache_hit: false,
+    });
+  }
+
   // If a specific engine is requested, try it first (if within budget), then fall back
   if (engineParam && ENGINES[engineParam]) {
     const eng = ENGINES[engineParam];
@@ -245,14 +306,14 @@ async function tryEngines(
       if (result) {
         if (isContentFilterImage(result)) {
           console.warn(`[ai-render] Engine "${engineParam}" returned content-filter image (${result.buffer.length} bytes), falling back...`);
-          recordFailure(engineParam, "content-filter-image");
+          onFailure(engineParam, "content-filter-image");
         } else {
           console.log(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
-          recordSuccess(engineParam, result.costUsd ?? 0, result.latencyMs ?? 0);
+          await onSuccess(engineParam, result);
           return imageResponse(result);
         }
       } else {
-        recordFailure(engineParam, "no-result");
+        onFailure(engineParam, "no-result");
       }
       console.log(`[ai-render] Engine "${engineParam}" failed, falling back to others...`);
     }
@@ -276,14 +337,14 @@ async function tryEngines(
     if (result) {
       if (isContentFilterImage(result)) {
         console.warn(`[ai-render] Engine "${engineId}" returned content-filter image (${result.buffer.length} bytes), trying next...`);
-        recordFailure(engineId, "content-filter-image");
+        onFailure(engineId, "content-filter-image");
         continue;
       }
       console.log(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
-      recordSuccess(engineId, result.costUsd ?? 0, result.latencyMs ?? 0);
+      await onSuccess(engineId, result);
       return imageResponse(result);
     }
-    recordFailure(engineId, "no-result");
+    onFailure(engineId, "no-result");
     console.log(`[ai-render] Engine "${engineId}" failed, trying next...`);
   }
 
