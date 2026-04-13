@@ -4,11 +4,10 @@ import { loadStripe } from "@stripe/stripe-js";
 
 /**
  * Stripe client singleton.
- * Uses Stripe Checkout (hosted page) — no server routes needed.
- * Works with static export.
+ * Uses server-side Checkout Sessions via /api/stripe/checkout.
  *
  * Set NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY in .env.local to activate.
- * In demo mode (no key), redirects to a mock success page.
+ * In demo mode (no key), upgrade happens locally without payment.
  */
 
 const STRIPE_KEY = process.env.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY || "";
@@ -25,42 +24,74 @@ export function getStripe() {
 }
 
 /**
- * Stripe Price IDs — set these in env or hardcode after creating products in Stripe Dashboard.
- * Create 2 products: "ModulCA Premium" and "ModulCA Architect"
+ * Stripe Price IDs — set in env after creating products in Stripe Dashboard.
+ * Products: "ModulCA Premium" and "ModulCA Architect"
  * Each with monthly + yearly prices.
  */
 export const STRIPE_PRICES = {
-  premium_monthly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY  || "price_demo_premium_monthly",
-  premium_yearly:   process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY   || "price_demo_premium_yearly",
-  architect_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_MONTHLY || "price_demo_architect_monthly",
-  architect_yearly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_YEARLY  || "price_demo_architect_yearly",
+  premium_monthly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY  || "",
+  premium_yearly:   process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY   || "",
+  architect_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_MONTHLY || "",
+  architect_yearly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_YEARLY  || "",
 } as const;
 
 /**
- * Redirect to Stripe Checkout.
+ * Redirect to Stripe Checkout via server-side session.
+ * Creates a Checkout Session on /api/stripe/checkout, then redirects to Stripe.
  * In demo mode, simulates upgrade locally.
  */
-/**
- * Redirect to Stripe Checkout.
- * Stripe.js v9+ removed `stripe.redirectToCheckout`.
- * For client-only static export we build the Payment Links URL manually.
- * When a real Stripe backend exists, replace with server-created Session URL.
- */
-export async function redirectToCheckout(priceId: string, _userEmail?: string | null): Promise<void> {
-  if (!isStripeConfigured) {
+export async function redirectToCheckout(
+  priceId: string,
+  userId?: string | null,
+  userEmail?: string | null
+): Promise<void> {
+  if (!isStripeConfigured || !priceId) {
     // Demo mode — simulate upgrade
     console.log("[Stripe Demo] Would redirect to checkout for:", priceId);
     return;
   }
 
-  // Build Stripe Payment Link URL (configure in Stripe Dashboard → Payment Links)
-  // For production, create a server endpoint that returns a Checkout Session URL.
-  const paymentLinkBase = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASE;
-  if (paymentLinkBase) {
-    window.location.href = `${paymentLinkBase}?prefilled_promo_code=&client_reference_id=${priceId}`;
-    return;
-  }
+  try {
+    const res = await fetch("/api/stripe/checkout", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ priceId, userId, userEmail }),
+    });
 
-  // Fallback: log warning — server-side session creation needed
-  console.warn("[Stripe] No payment link configured. Set NEXT_PUBLIC_STRIPE_PAYMENT_LINK_BASE or implement server-side Checkout Sessions.");
+    const data = await res.json();
+
+    if (data.error) {
+      console.error("[Stripe]", data.error);
+      alert(`Payment error: ${data.error}`);
+      return;
+    }
+
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  } catch (err) {
+    console.error("[Stripe] Checkout error:", err);
+    alert("Could not connect to payment service. Please try again.");
+  }
+}
+
+/**
+ * Open Stripe Customer Portal for subscription management.
+ */
+export async function openCustomerPortal(customerId: string): Promise<void> {
+  try {
+    const res = await fetch("/api/stripe/portal", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ customerId }),
+    });
+
+    const data = await res.json();
+
+    if (data.url) {
+      window.location.href = data.url;
+    }
+  } catch (err) {
+    console.error("[Stripe] Portal error:", err);
+  }
 }

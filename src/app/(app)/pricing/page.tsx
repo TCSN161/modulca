@@ -8,7 +8,7 @@ import { AuthNav } from "@/features/auth/components/AuthNav";
 import { STRIPE_PRICES, redirectToCheckout, isStripeConfigured } from "@/shared/lib/stripe";
 
 export default function PricingPage() {
-  const { userTier, userEmail, setTier } = useAuthStore();
+  const { userTier, userId, userEmail, setTier } = useAuthStore();
   const [yearly, setYearly] = useState(false);
   const [upgrading, setUpgrading] = useState<string | null>(null);
 
@@ -26,7 +26,7 @@ export default function PricingPage() {
       ? tierId === "premium" ? STRIPE_PRICES.premium_yearly : STRIPE_PRICES.architect_yearly
       : tierId === "premium" ? STRIPE_PRICES.premium_monthly : STRIPE_PRICES.architect_monthly;
 
-    await redirectToCheckout(priceId, userEmail);
+    await redirectToCheckout(priceId, userId, userEmail);
     setUpgrading(null);
   };
 
