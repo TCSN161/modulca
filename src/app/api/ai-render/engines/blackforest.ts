@@ -13,9 +13,11 @@ import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
  */
 
 const API_KEY = process.env.BFL_API_KEY || "";
-const API_URL = "https://api.bfl.ml/v1";
+/** BFL has multiple API domains — api.bfl.ml (.ml TLD) is blocked by some ISPs */
+const API_URL = process.env.BFL_API_URL || "https://api.us1.bfl.ai/v1";
 const POLL_INTERVAL_MS = 2000;
 const TIMEOUT_MS = 120_000;
+const CONNECT_TIMEOUT_MS = 10_000;
 
 export const blackforestEngine: AiRenderEngine = async (
   req: AiRenderRequest
@@ -43,20 +45,29 @@ async function generateImage(
   const model = isPremium ? "flux-pro-1.1" : "flux-schnell";
   console.log(`[blackforest] Using ${model}`);
 
-  // Step 1: Submit generation request
-  const submitRes = await fetch(`${API_URL}/${model}`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "x-key": API_KEY,
-    },
-    body: JSON.stringify({
-      prompt: req.prompt.slice(0, 1000),
-      width: clampDimension(req.width),
-      height: clampDimension(req.height),
-      seed: Number(req.seed) % 4294967295 || undefined,
-    }),
-  });
+  // Step 1: Submit generation request (with connect timeout)
+  const controller = new AbortController();
+  const connectTimer = setTimeout(() => controller.abort(), CONNECT_TIMEOUT_MS);
+
+  let submitRes: Response;
+  try {
+    submitRes = await fetch(`${API_URL}/${model}`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "x-key": API_KEY,
+      },
+      body: JSON.stringify({
+        prompt: req.prompt.slice(0, 1000),
+        width: clampDimension(req.width),
+        height: clampDimension(req.height),
+        seed: Number(req.seed) % 4294967295 || undefined,
+      }),
+      signal: controller.signal,
+    });
+  } finally {
+    clearTimeout(connectTimer);
+  }
 
   if (!submitRes.ok) {
     const errText = await submitRes.text().catch(() => "");

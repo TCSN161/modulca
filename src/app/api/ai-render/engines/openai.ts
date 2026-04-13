@@ -57,7 +57,6 @@ async function generateImage(
       n: 1,
       size: getSize(req.width, req.height),
       quality,
-      response_format: "b64_json",
     }),
   });
 
