@@ -60,7 +60,7 @@ const ENGINE_CONFIGS: Record<string, EngineBudgetConfig> = {
   segmind:       { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.005 },
   deepinfra:     { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.015 },
   replicate:     { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.003 },
-  leonardo:      { totalBudgetUsd: 5.0, dailyLimit: -1, costPerRender: 0.03 },
+  leonardo:      { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.03 },
   blackforest:   { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.003 },
   stability:     { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.04 },
   openai:        { totalBudgetUsd: 5.0, dailyLimit: -1, costPerRender: 0.02 },

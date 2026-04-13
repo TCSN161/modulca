@@ -53,10 +53,11 @@ async function generateImage(
     },
     body: JSON.stringify({
       model,
-      prompt: req.prompt.slice(0, 1000),
+      prompt: `Interior design photograph: ${req.prompt.slice(0, 900)}`,
       n: 1,
       size: getSize(req.width, req.height),
       quality,
+      response_format: "b64_json",
     }),
   });
 

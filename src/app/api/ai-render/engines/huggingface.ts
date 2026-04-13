@@ -38,7 +38,7 @@ async function generateImage(
   const model = "black-forest-labs/FLUX.1-schnell";
   console.log(`[huggingface] Using ${model}`);
 
-  const url = `https://api-inference.huggingface.co/models/${model}`;
+  const url = `https://router.huggingface.co/hf-inference/models/${model}`;
 
   const response = await fetch(url, {
     method: "POST",

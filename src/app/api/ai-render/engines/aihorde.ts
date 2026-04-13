@@ -23,6 +23,12 @@ const ANON_KEY = "0000000000";
 const POLL_INTERVAL_MS = 3000;
 const TIMEOUT_MS = 120_000;
 
+/** AI Horde requires multiples of 64, max 768 */
+function clampHorde(d: number): number {
+  const clamped = Math.min(Math.max(d, 256), 768);
+  return Math.round(clamped / 64) * 64;
+}
+
 export const aiHordeEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
@@ -39,8 +45,8 @@ export const aiHordeEngine: AiRenderEngine = async (
       body: JSON.stringify({
         prompt: `${sanitizeForContentFilter(req.prompt)} ### professional photograph, 8k, photorealistic, architectural interior design, empty room`,
         params: {
-          width: Math.min(req.width, 768),  // Horde max is typically 768
-          height: Math.min(req.height, 768),
+          width: clampHorde(req.width),
+          height: clampHorde(req.height),
           steps: 25,
           cfg_scale: 7,
           sampler_name: "k_euler_a",

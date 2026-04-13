@@ -28,6 +28,7 @@ const PUBLIC_PATHS = [
 const PUBLIC_PREFIXES = [
   "/project/demo/",  // Demo flow is always public
   "/api/",           // API routes handle their own auth
+  "/admin/",         // Admin tools (engine comparison, etc.)
   "/_next/",         // Next.js internals
   "/models/",        // Static 3D models
   "/images/",        // Static images
