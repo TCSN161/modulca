@@ -27,6 +27,30 @@ interface CompareResponse {
   engines: EngineResult[];
 }
 
+interface BudgetEngine {
+  engineId: string;
+  totalBudgetUsd: number;
+  spentUsd: number;
+  renderCount: number;
+  failCount: number;
+  dailyRenderCount: number;
+  dailyLimit: number;
+  disabled: boolean;
+  healthScore: number;
+  avgLatencyMs: number;
+  lastSuccessAt: string | null;
+  lastError: string | null;
+  remainingRenders: number;
+  remainingBudget: number;
+}
+
+interface BudgetSummary {
+  totalSpent: number;
+  totalRenders: number;
+  totalFails: number;
+  engines: BudgetEngine[];
+}
+
 const DEFAULT_PROMPT =
   "modern scandinavian living room, natural light, minimalist birch furniture, white walls, warm atmosphere, interior design photography";
 
@@ -38,6 +62,19 @@ export default function EngineComparisonPage() {
   const [results, setResults] = useState<CompareResponse | null>(null);
   const [selectedEngines, setSelectedEngines] = useState<string[]>([]);
   const [sortBy, setSortBy] = useState<"latency" | "cost" | "size">("latency");
+  const [budget, setBudget] = useState<BudgetSummary | null>(null);
+  const [showBudget, setShowBudget] = useState(false);
+
+  const loadBudget = useCallback(async () => {
+    try {
+      const res = await fetch("/api/ai-render/budget");
+      const data: BudgetSummary = await res.json();
+      setBudget(data);
+      setShowBudget(true);
+    } catch (err) {
+      console.error("Failed to load budget:", err);
+    }
+  }, []);
 
   const allEngineIds = [
     "pollinations", "ai-horde", "together", "cloudflare", "huggingface",
@@ -101,12 +138,63 @@ export default function EngineComparisonPage() {
 
   return (
     <div style={{ padding: "24px", maxWidth: "1600px", margin: "0 auto", fontFamily: "system-ui, sans-serif", background: "#0a0a0a", color: "#e0e0e0", minHeight: "100vh" }}>
-      <h1 style={{ fontSize: "28px", fontWeight: 700, marginBottom: "4px" }}>
-        AI Engine Comparison
-      </h1>
+      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: "4px" }}>
+        <h1 style={{ fontSize: "28px", fontWeight: 700 }}>
+          AI Engine Comparison
+        </h1>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button onClick={loadBudget} style={{ ...chipStyle(showBudget), padding: "8px 16px" }}>
+            {showBudget ? "Hide Budget" : "Show Budget"}
+          </button>
+          <a href="/admin" style={{ padding: "8px 16px", fontSize: "12px", borderRadius: "6px", border: "1px solid #333", background: "#1a1a1a", color: "#888", textDecoration: "none" }}>
+            Admin Home
+          </a>
+        </div>
+      </div>
       <p style={{ color: "#888", marginBottom: "24px" }}>
-        Test all 14 engines with the same prompt. Compare quality, speed, and cost side-by-side.
+        Test all 15 engines with the same prompt. Compare quality, speed, and cost side-by-side.
       </p>
+
+      {/* Budget Panel */}
+      {showBudget && budget && (
+        <div style={{ background: "#141414", borderRadius: "12px", padding: "20px", marginBottom: "24px", border: "1px solid #222" }}>
+          <h2 style={{ fontSize: "16px", fontWeight: 600, marginBottom: "12px" }}>Engine Budget Status</h2>
+          <div style={{ display: "flex", gap: "16px", marginBottom: "16px", flexWrap: "wrap" }}>
+            <StatCard label="Total Renders" value={String(budget.totalRenders)} />
+            <StatCard label="Total Failures" value={String(budget.totalFails)} color={budget.totalFails > 0 ? "#ef4444" : "#22c55e"} />
+            <StatCard label="Total Spent" value={`$${budget.totalSpent.toFixed(4)}`} />
+            <StatCard label="Success Rate" value={budget.totalRenders > 0 ? `${((1 - budget.totalFails / (budget.totalRenders + budget.totalFails)) * 100).toFixed(0)}%` : "—"} />
+          </div>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(200px, 1fr))", gap: "8px" }}>
+            {budget.engines.map((e) => (
+              <div key={e.engineId} style={{
+                padding: "10px 12px", borderRadius: "8px",
+                background: e.disabled ? "#1a1010" : e.healthScore < 30 ? "#1a1a10" : "#101a10",
+                border: `1px solid ${e.disabled ? "#3a1a1a" : e.healthScore < 30 ? "#3a3a1a" : "#1a3a1a"}`,
+              }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "4px" }}>
+                  <span style={{ fontSize: "13px", fontWeight: 600 }}>{e.engineId}</span>
+                  <span style={{ fontSize: "11px", color: e.healthScore >= 70 ? "#22c55e" : e.healthScore >= 30 ? "#fbbf24" : "#ef4444" }}>
+                    HP {e.healthScore}
+                  </span>
+                </div>
+                <div style={{ fontSize: "11px", color: "#888" }}>
+                  {e.renderCount} renders | ${e.spentUsd.toFixed(4)} spent
+                </div>
+                <div style={{ fontSize: "11px", color: "#888" }}>
+                  {e.remainingRenders === -1 ? "Unlimited" : `${e.remainingRenders} left`}
+                  {e.totalBudgetUsd !== -1 && ` | $${e.remainingBudget.toFixed(2)} budget`}
+                </div>
+                {e.lastError && (
+                  <div style={{ fontSize: "10px", color: "#ef4444", marginTop: "2px", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {e.lastError}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* Controls */}
       <div style={{ background: "#141414", borderRadius: "12px", padding: "20px", marginBottom: "24px", border: "1px solid #222" }}>

@@ -145,9 +145,17 @@ export default function AdminPage() {
           Modul<span className="text-brand-olive-700">CA</span>
           <span className="ml-2 text-xs font-normal text-brand-gray">Admin</span>
         </Link>
-        <button onClick={() => loadStats()} className="text-sm text-brand-olive-700 hover:underline">
-          Refresh
-        </button>
+        <div className="flex items-center gap-4">
+          <Link href="/admin/engines" className="text-sm text-brand-olive-700 hover:underline">
+            Engine Test
+          </Link>
+          <Link href="/admin/analytics" className="text-sm text-brand-olive-700 hover:underline">
+            Render Analytics
+          </Link>
+          <button onClick={() => loadStats()} className="text-sm text-brand-olive-700 hover:underline">
+            Refresh
+          </button>
+        </div>
       </header>
 
       <main className="max-w-5xl mx-auto px-4 md:px-8 py-8">
