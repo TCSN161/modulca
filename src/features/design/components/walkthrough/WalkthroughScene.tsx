@@ -7,7 +7,7 @@ import { useDesignStore } from "../../store";
 import type { ModuleConfig } from "../../store";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import {
-  MODULE_SIZE, WALL_HEIGHT,
+  MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS,
   ModuleWalls, ModuleFloor, ModuleCeiling,
   StaticFurniturePiece,
 } from "../shared/module3d";
@@ -18,6 +18,86 @@ const MOVE_SPEED = 3; // m/s
 const EYE_HEIGHT = 1.6;
 const AUTO_TOUR_SPEED = 1.2; // m/s — slower for guided tour
 const AUTO_TOUR_PAUSE_MS = 2500; // pause in each room
+const PLAYER_RADIUS = 0.25; // collision radius around player
+
+/* ------------------------------------------------------------------ */
+/*  Wall collision system                                              */
+/* ------------------------------------------------------------------ */
+
+interface WallBox {
+  minX: number; maxX: number;
+  minZ: number; maxZ: number;
+}
+
+/** Build AABB wall collision boxes from module wall configs.
+ *  Only solid walls and window pillars block movement — doors and "none" are passable. */
+function buildWallBoxes(modules: ModuleConfig[]): WallBox[] {
+  const boxes: WallBox[] = [];
+  const T = WALL_THICKNESS;
+  const HT = T / 2;
+
+  for (const mod of modules) {
+    const ox = mod.col * MODULE_SIZE;
+    const oz = mod.row * MODULE_SIZE;
+    const cfg = mod.wallConfigs;
+
+    // North wall (z = oz)
+    if (cfg.north === "solid" || cfg.north === "window") {
+      boxes.push({ minX: ox - HT, maxX: ox + MODULE_SIZE + HT, minZ: oz - HT, maxZ: oz + HT });
+    }
+    // South wall (z = oz + MODULE_SIZE)
+    if (cfg.south === "solid" || cfg.south === "window") {
+      boxes.push({ minX: ox - HT, maxX: ox + MODULE_SIZE + HT, minZ: oz + MODULE_SIZE - HT, maxZ: oz + MODULE_SIZE + HT });
+    }
+    // West wall (x = ox)
+    if (cfg.west === "solid" || cfg.west === "window") {
+      boxes.push({ minX: ox - HT, maxX: ox + HT, minZ: oz - HT, maxZ: oz + MODULE_SIZE + HT });
+    }
+    // East wall (x = ox + MODULE_SIZE)
+    if (cfg.east === "solid" || cfg.east === "window") {
+      boxes.push({ minX: ox + MODULE_SIZE - HT, maxX: ox + MODULE_SIZE + HT, minZ: oz - HT, maxZ: oz + MODULE_SIZE + HT });
+    }
+  }
+
+  return boxes;
+}
+
+/** Check if position (with player radius) collides with any wall box.
+ *  Returns corrected position that slides along walls instead of stopping. */
+function resolveCollision(
+  pos: THREE.Vector3,
+  _prevPos: THREE.Vector3,
+  boxes: WallBox[],
+  radius: number
+): THREE.Vector3 {
+  const result = pos.clone();
+
+  for (const box of boxes) {
+    const expandedMinX = box.minX - radius;
+    const expandedMaxX = box.maxX + radius;
+    const expandedMinZ = box.minZ - radius;
+    const expandedMaxZ = box.maxZ + radius;
+
+    if (
+      result.x > expandedMinX && result.x < expandedMaxX &&
+      result.z > expandedMinZ && result.z < expandedMaxZ
+    ) {
+      // Player is inside expanded wall — push out along shortest axis
+      const dLeft = result.x - expandedMinX;
+      const dRight = expandedMaxX - result.x;
+      const dTop = result.z - expandedMinZ;
+      const dBottom = expandedMaxZ - result.z;
+      const minDist = Math.min(dLeft, dRight, dTop, dBottom);
+
+      if (minDist === dLeft) result.x = expandedMinX;
+      else if (minDist === dRight) result.x = expandedMaxX;
+      else if (minDist === dTop) result.z = expandedMinZ;
+      else result.z = expandedMaxZ;
+    }
+  }
+
+  return result;
+}
 
 /* ------------------------------------------------------------------ */
 /*  WASD First-Person Movement Controller                              */
@@ -25,14 +105,17 @@ const AUTO_TOUR_PAUSE_MS = 2500; // pause in each room
 
 function MovementController({
   cameraPositionRef,
+  wallBoxes,
 }: {
   controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
+  wallBoxes: WallBox[];
 }) {
   const { camera } = useThree();
   const keysRef = useRef<Set<string>>(new Set());
   const velocityRef = useRef(new THREE.Vector3());
   const directionRef = useRef(new THREE.Vector3());
+  const prevPosRef = useRef(new THREE.Vector3());
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
@@ -74,10 +157,16 @@ function MovementController({
     if (keys.has("ControlLeft") || keys.has("ControlRight")) vel.y -= 1;
 
     if (vel.lengthSq() > 0) {
+      prevPosRef.current.copy(camera.position);
       vel.normalize().multiplyScalar(MOVE_SPEED * delta);
       camera.position.add(vel);
       // Clamp Y
       camera.position.y = Math.max(0.5, Math.min(camera.position.y, WALL_HEIGHT * 2));
+
+      // Wall collision — slide along walls instead of stopping
+      const resolved = resolveCollision(camera.position, prevPosRef.current, wallBoxes, PLAYER_RADIUS);
+      camera.position.x = resolved.x;
+      camera.position.z = resolved.z;
     }
 
     cameraPositionRef.current.copy(camera.position);
@@ -205,6 +294,9 @@ function SceneContent({
 }) {
   const { camera } = useThree();
 
+  // Build collision boxes from wall configs (memoized)
+  const wallBoxes = useMemo(() => buildWallBoxes(modules), [modules]);
+
   // Teleport
   useEffect(() => {
     if (!teleportTarget) return;
@@ -254,11 +346,19 @@ function SceneContent({
         />
       ))}
 
-      {/* Ground plane */}
+      {/* Ground plane — exterior surface around buildings */}
       <mesh rotation={[-Math.PI / 2, 0, 0]} position={[0, -0.01, 0]} receiveShadow>
         <planeGeometry args={[100, 100]} />
-        <meshStandardMaterial color="#e8e5e0" roughness={1} />
+        <meshStandardMaterial color="#c8c4b8" roughness={0.95} metalness={0.0} />
       </mesh>
+
+      {/* Sky dome for better ambient feel */}
+      {enhanced && (
+        <mesh>
+          <sphereGeometry args={[80, 32, 16]} />
+          <meshBasicMaterial color="#d4e6f1" side={THREE.BackSide} />
+        </mesh>
+      )}
 
       {/* Render each module — uses shared renderer */}
       {modules.map((mod) => {
@@ -292,7 +392,7 @@ function SceneContent({
       })}
 
       <PointerLockControls ref={controlsRef} />
-      {!autoTour && <MovementController controlsRef={controlsRef} cameraPositionRef={cameraPositionRef} />}
+      {!autoTour && <MovementController controlsRef={controlsRef} cameraPositionRef={cameraPositionRef} wallBoxes={wallBoxes} />}
       <AutoTourController
         modules={modules}
         cameraPositionRef={cameraPositionRef}

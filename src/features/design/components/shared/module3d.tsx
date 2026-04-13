@@ -271,6 +271,24 @@ export function ModuleWalls({
   walls.push(...buildWall("west", [offsetX + HALF_THICK, HALF_HEIGHT, offsetZ + MODULE_SIZE / 2], [WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE], wc.west, wallColor, false));
   walls.push(...buildWall("east", [offsetX + MODULE_SIZE - HALF_THICK, HALF_HEIGHT, offsetZ + MODULE_SIZE / 2], [WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE], wc.east, wallColor, false));
 
+  // Baseboards (skirting boards) — thin dark strip at bottom of visible walls
+  const baseH = 0.06;
+  const baseD = WALL_THICKNESS + 0.01;
+  const baseColor = darken(wallColor, 30);
+  const baseOffset = 0.005; // slight protrusion from wall
+  if (wc.north !== "none" && wc.north !== "shared") {
+    walls.push(<WallSegment key="base-n" position={[offsetX + MODULE_SIZE / 2, baseH / 2, offsetZ + HALF_THICK + baseOffset]} size={[MODULE_SIZE, baseH, baseD]} color={baseColor} />);
+  }
+  if (wc.south !== "none" && wc.south !== "shared") {
+    walls.push(<WallSegment key="base-s" position={[offsetX + MODULE_SIZE / 2, baseH / 2, offsetZ + MODULE_SIZE - HALF_THICK - baseOffset]} size={[MODULE_SIZE, baseH, baseD]} color={baseColor} />);
+  }
+  if (wc.west !== "none" && wc.west !== "shared") {
+    walls.push(<WallSegment key="base-w" position={[offsetX + HALF_THICK + baseOffset, baseH / 2, offsetZ + MODULE_SIZE / 2]} size={[baseD, baseH, MODULE_SIZE]} color={baseColor} />);
+  }
+  if (wc.east !== "none" && wc.east !== "shared") {
+    walls.push(<WallSegment key="base-e" position={[offsetX + MODULE_SIZE - HALF_THICK - baseOffset, baseH / 2, offsetZ + MODULE_SIZE / 2]} size={[baseD, baseH, MODULE_SIZE]} color={baseColor} />);
+  }
+
   return <group>{walls}</group>;
 }
 
@@ -669,7 +687,7 @@ export function ModuleCeiling({
   return (
     <mesh position={[offsetX + MODULE_SIZE / 2, WALL_HEIGHT, offsetZ + MODULE_SIZE / 2]} rotation={[Math.PI / 2, 0, 0]}>
       <planeGeometry args={[MODULE_SIZE, MODULE_SIZE]} />
-      <meshStandardMaterial color="#f5f5f0" transparent opacity={0.25} side={THREE.DoubleSide} />
+      <meshStandardMaterial color="#f8f7f4" roughness={0.9} side={THREE.DoubleSide} />
     </mesh>
   );
 }
