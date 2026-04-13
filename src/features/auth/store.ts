@@ -378,24 +378,24 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     // Reset AI calls if it's a new day
     const today = new Date().toISOString().split("T")[0];
-    const aiCalls = profile?.ai_calls_reset_at === today ? (profile?.ai_calls_today ?? 0) : 0;
+    const aiCalls: number = profile?.ai_calls_reset_at === today ? Number(profile?.ai_calls_today ?? 0) : 0;
 
     // Reset monthly renders if it's a new month
     const currentMonth = new Date().toISOString().slice(0, 7);
-    const monthlyRenders = profile?.ai_renders_month === currentMonth ? (profile?.ai_renders_this_month ?? 0) : 0;
+    const monthlyRenders: number = profile?.ai_renders_month === currentMonth ? Number(profile?.ai_renders_this_month ?? 0) : 0;
 
     set({
       isAuthenticated: true,
       userId: session.user.id,
-      userName: profile?.display_name ?? session.user.email?.split("@")[0] ?? null,
+      userName: (profile?.display_name as string) ?? session.user.email?.split("@")[0] ?? null,
       userEmail: session.user.email ?? null,
-      userTier: (profile?.tier as AccountTier) ?? "free",
-      userAvatar: profile?.avatar_url ?? null,
-      projectCount: profile?.project_count ?? 0,
-      storageUsedMb: profile?.storage_used_mb ?? 0,
+      userTier: ((profile?.tier as string) ?? "free") as AccountTier,
+      userAvatar: (profile?.avatar_url as string) ?? null,
+      projectCount: (profile?.project_count as number) ?? 0,
+      storageUsedMb: (profile?.storage_used_mb as number) ?? 0,
       aiCallsToday: aiCalls,
       monthlyRenderCount: monthlyRenders,
-      totalCostUsd: profile?.total_cost_usd ?? 0,
+      totalCostUsd: (profile?.total_cost_usd as number) ?? 0,
     });
   },
 }));
