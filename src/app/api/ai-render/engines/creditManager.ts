@@ -64,7 +64,7 @@ const ENGINE_CONFIGS: Record<string, EngineBudgetConfig> = {
   blackforest:   { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.003 },
   stability:     { totalBudgetUsd: 1.0, dailyLimit: -1, costPerRender: 0.04 },
   openai:        { totalBudgetUsd: 5.0, dailyLimit: -1, costPerRender: 0.02 },
-  prodia:        { totalBudgetUsd: 2.0, dailyLimit: -1, costPerRender: 0.002 }, // 1000 free calls
+  prodia:        { totalBudgetUsd: 4.0, dailyLimit: 50, costPerRender: 0.002 }, // $5/mo Pro plan, ~2000 renders/mo budget, 50/day cap
 };
 
 /** In-memory budget store (resets on server restart — will persist to Supabase later) */
