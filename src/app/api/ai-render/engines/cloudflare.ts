@@ -50,7 +50,7 @@ async function generateImage(
     },
     body: JSON.stringify({
       prompt: req.prompt.slice(0, 500),
-      num_steps: 4,
+      num_steps: 8, // 8 steps = good quality for FLUX Schnell (4 was too blurry)
       width: clampToSupported(req.width),
       height: clampToSupported(req.height),
     }),
@@ -62,8 +62,23 @@ async function generateImage(
     return null;
   }
 
-  // Cloudflare returns raw image bytes
-  const buffer = Buffer.from(await response.arrayBuffer());
+  const contentType = response.headers.get("content-type") || "";
+
+  let buffer: Buffer;
+  if (contentType.includes("application/json")) {
+    // Some CF models return JSON with base64 image
+    const json = await response.json() as { result?: { image?: string }; image?: string };
+    const b64 = json.result?.image || json.image;
+    if (!b64) {
+      console.error("[cloudflare] JSON response but no image field");
+      return null;
+    }
+    buffer = Buffer.from(b64, "base64");
+  } else {
+    // Raw image bytes
+    buffer = Buffer.from(await response.arrayBuffer());
+  }
+
   if (buffer.length < 500) {
     console.error("[cloudflare] Returned tiny image, likely error");
     return null;
