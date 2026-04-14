@@ -8,7 +8,7 @@ tags: ["structural", "eurocode", "nen", "wind", "snow", "foundation", "netherlan
 sources: ["NEN-EN 1990 through 1999 + NL National Annexes"]
 difficulty: "advanced"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["eurocodes-overview", "timber-frame", "foundations"]
 ---
 

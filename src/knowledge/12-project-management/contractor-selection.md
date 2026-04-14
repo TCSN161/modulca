@@ -6,7 +6,7 @@ tags: ["contractor", "hiring", "labor", "insurance", "partner-network"]
 sources: ["ModulCA Partner Network Guidelines", "Romanian Chamber of Commerce", "Dutch SBR Guidelines"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["cost-estimation", "timeline-planning", "quality-control"]
 ---
 

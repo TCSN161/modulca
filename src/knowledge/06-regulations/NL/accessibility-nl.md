@@ -8,7 +8,7 @@ tags: ["accessibility", "disability", "bbl", "woning", "netherlands"]
 sources: ["BBL Chapter 4", "NEN 1814"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["eu-accessibility-directive", "accessibility-design", "nl-bouwbesluit"]
 ---
 

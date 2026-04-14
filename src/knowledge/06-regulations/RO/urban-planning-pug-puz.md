@@ -8,7 +8,7 @@ tags: ["urban-planning", "pug", "puz", "pud", "zoning", "pot", "cut", "romania"]
 sources: ["Legea 350/2001", "Legea 50/1991"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["ro-building-permit", "ro-land-registry"]
 ---
 

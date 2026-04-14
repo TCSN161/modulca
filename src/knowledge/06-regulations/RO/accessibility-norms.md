@@ -8,7 +8,7 @@ tags: ["accessibility", "disability", "np051", "romania"]
 sources: ["NP 051/2012"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["eu-accessibility-directive", "accessibility-design"]
 ---
 

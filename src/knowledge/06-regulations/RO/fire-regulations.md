@@ -8,7 +8,7 @@ tags: ["fire", "safety", "p118", "isu", "romania"]
 sources: ["P118/1999", "NP 068-2002", "Legea 307/2006"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["eu-fire-safety-framework", "fire-safety-general"]
 ---
 

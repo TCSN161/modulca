@@ -8,7 +8,7 @@ tags: ["fire", "safety", "france", "resistance", "euroclasse", "habitation"]
 sources: ["Code de la Construction", "Arrêté du 31 janvier 1986"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["fr-building-permit", "eu-fire-safety-framework", "de-timber-construction"]
 ---
 

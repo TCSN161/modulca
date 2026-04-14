@@ -8,7 +8,7 @@ tags: ["environment", "eia", "impact", "apm", "protected-areas", "romania"]
 sources: ["HG 445/2009", "Legea 292/2018"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["ro-building-permit", "eu-environmental-product-declarations"]
 ---
 

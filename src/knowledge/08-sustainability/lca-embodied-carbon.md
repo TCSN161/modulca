@@ -6,7 +6,7 @@ tags: ["lca", "embodied-carbon", "carbon", "lifecycle", "environmental", "co2"]
 sources: ["EN 15978", "EU Level(s) Framework"]
 difficulty: "advanced"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["eu-environmental-product-declarations", "circular-economy", "clt-timber"]
 ---
 

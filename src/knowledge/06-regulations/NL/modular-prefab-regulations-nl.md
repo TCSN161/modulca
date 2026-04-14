@@ -8,7 +8,7 @@ tags: ["modular", "prefab", "flexwonen", "temporary", "permanent", "netherlands"
 sources: ["Omgevingswet 2024", "Crisis- en herstelwet", "BZK Policy"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["nl-building-permit", "nl-bouwbesluit", "modular-principles"]
 ---
 

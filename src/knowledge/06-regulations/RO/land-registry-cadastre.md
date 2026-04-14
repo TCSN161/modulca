@@ -8,7 +8,7 @@ tags: ["land-registry", "cadastre", "intabulare", "ancpi", "property", "romania"
 sources: ["Legea 7/1996", "Cadastre Law"]
 difficulty: "beginner"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["ro-building-permit", "ro-urban-planning"]
 ---
 

@@ -8,7 +8,7 @@ tags: ["kadaster", "land-registry", "property", "registration", "netherlands"]
 sources: ["Kadasterwet", "kadaster.nl"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["nl-building-permit", "ro-land-registry"]
 ---
 

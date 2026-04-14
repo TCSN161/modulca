@@ -8,7 +8,7 @@ tags: ["permit", "permis-de-construire", "france", "plu", "urbanisme"]
 sources: ["Code de l'Urbanisme", "Code de la Construction et de l'Habitation"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["de-building-permit", "nl-building-permit", "ro-building-permit"]
 ---
 

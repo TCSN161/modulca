@@ -8,7 +8,7 @@ tags: ["electrical", "wiring", "np-i7", "circuits", "romania"]
 sources: ["NP I7-2002", "PE 009"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["electrical", "ro-building-permit"]
 ---
 

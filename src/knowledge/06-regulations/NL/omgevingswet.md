@@ -8,7 +8,7 @@ tags: ["omgevingswet", "planning", "environment", "zoning", "netherlands"]
 sources: ["Omgevingswet 2024", "IPLO guidance"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["nl-bouwbesluit", "nl-building-permit"]
 ---
 

@@ -6,7 +6,7 @@ tags: ["circular", "reuse", "recycle", "demountable", "design-for-disassembly", 
 sources: ["EU Circular Economy Action Plan", "Platform CB'23 (NL)"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["lca-embodied-carbon", "modular-principles", "connections"]
 ---
 

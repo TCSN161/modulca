@@ -6,7 +6,7 @@ tags: ["hvac", "heating", "cooling", "ventilation", "heat-pump"]
 sources: ["Neufert Architects Data"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["energy-performance", "u-values", "electrical"]
 ---
 

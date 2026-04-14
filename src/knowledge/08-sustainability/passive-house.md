@@ -6,7 +6,7 @@ tags: ["passive-house", "sustainability", "energy", "solar", "clt", "green"]
 sources: ["Passive House Institute", "Neufert Architects Data"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["energy-performance", "u-values"]
 ---
 

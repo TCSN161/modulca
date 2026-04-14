@@ -8,7 +8,7 @@ tags: ["energy", "re2020", "france", "carbon", "bbio", "cep"]
 sources: ["RE2020 — Réglementation Environnementale 2020"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["fr-building-permit", "de-energy-geg", "nzeb-standards", "lca-embodied-carbon"]
 ---
 

@@ -6,7 +6,7 @@ tags: ["plumbing", "water", "drainage", "pipes", "hot-water"]
 sources: ["EN 12056"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["electrical", "fire-safety-general"]
 ---
 

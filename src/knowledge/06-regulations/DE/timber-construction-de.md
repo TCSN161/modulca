@@ -8,7 +8,7 @@ tags: ["timber", "holzbau", "clt", "fire", "germany", "gebäudeklasse"]
 sources: ["MBO/LBO", "DIN 68800", "Muster-Holzbaurichtlinie"]
 difficulty: "advanced"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["de-building-permit", "clt-timber", "timber-frame"]
 ---
 

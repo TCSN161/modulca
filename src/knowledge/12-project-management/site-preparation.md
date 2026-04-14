@@ -6,7 +6,7 @@ tags: ["site-prep", "foundation", "crane", "delivery", "utilities", "soil-testin
 sources: ["ModulCA Installation Manual", "Eurocode 7 (Geotechnical Design)", "Romanian NP 112/2014"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["cost-estimation", "timeline-planning", "quality-control"]
 ---
 

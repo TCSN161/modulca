@@ -8,7 +8,7 @@ tags: ["water", "waterschap", "drainage", "flood", "groundwater", "netherlands"]
 sources: ["Waterwet", "Waterschap regulations"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["nl-building-permit", "nl-omgevingswet"]
 ---
 

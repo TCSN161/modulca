@@ -6,7 +6,7 @@ tags: ["cost", "price", "budget", "estimate", "investment"]
 sources: ["ModulCA Market Research 2024-2025"]
 difficulty: "beginner"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["ro-building-permit"]
 ---
 

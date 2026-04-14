@@ -8,7 +8,7 @@ tags: ["permit", "belgium", "stedenbouwkundige-vergunning", "flanders", "walloni
 sources: ["Vlaamse Codex Ruimtelijke Ordening", "CoDT (Wallonia)"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["nl-building-permit", "de-building-permit", "fr-building-permit"]
 ---
 

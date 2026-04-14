@@ -8,7 +8,7 @@ tags: ["fire", "safety", "brandveiligheid", "netherlands"]
 sources: ["BBL Chapter 2", "NEN 6068", "NEN 6069"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["eu-fire-safety-framework", "fire-safety-general", "nl-bouwbesluit"]
 ---
 

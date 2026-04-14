@@ -6,7 +6,7 @@ tags: ["electrical", "wiring", "circuits", "outlets", "ev-charger"]
 sources: ["NP I7-2002", "Romanian Electrical Standards"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["plumbing", "fire-safety-general", "hvac-sizing"]
 ---
 

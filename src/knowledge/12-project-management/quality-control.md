@@ -6,7 +6,7 @@ tags: ["quality", "inspection", "QC", "airtightness", "ISO", "CE-marking"]
 sources: ["ISO 9001:2015", "EN 14080 (Glulam)", "Dutch Wet Kwaliteitsborging", "Romanian ISC Regulations"]
 difficulty: "advanced"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["cost-estimation", "contractor-selection", "site-preparation"]
 ---
 

@@ -8,7 +8,7 @@ tags: ["energy", "epb", "peb", "belgium", "e-peil", "s-peil", "flanders"]
 sources: ["Vlaams Energie- en Klimaatagentschap (VEKA)", "Walloon Energy Decree"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["be-building-permit", "nl-beng", "de-energy-geg", "nzeb-standards"]
 ---
 

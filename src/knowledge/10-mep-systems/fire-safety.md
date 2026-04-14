@@ -6,7 +6,7 @@ tags: ["fire", "safety", "detection", "escape", "rating"]
 sources: ["Euroclass Standards"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["electrical", "ro-fire-regulations"]
 ---
 

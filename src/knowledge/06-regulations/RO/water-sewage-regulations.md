@@ -8,7 +8,7 @@ tags: ["water", "sewage", "drainage", "plumbing", "well", "septic", "romania"]
 sources: ["Legea 241/2006", "NTPA 001/002", "SR 1846"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
-proOnly: false
+proOnly: true
 relatedArticles: ["plumbing", "ro-building-permit"]
 ---
 

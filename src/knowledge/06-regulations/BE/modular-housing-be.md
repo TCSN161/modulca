@@ -8,7 +8,7 @@ tags: ["modular", "compact", "belgium", "flanders", "klein-wonen", "tiny-house"]
 sources: ["Vlaamse Wooncode", "Various Belgian housing policy sources"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["be-building-permit", "nl-modular-prefab", "modular-principles"]
 ---
 

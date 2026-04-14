@@ -6,7 +6,7 @@ tags: ["timeline", "schedule", "planning", "gantt", "construction-speed"]
 sources: ["ModulCA Project Data 2024-2026", "European Modular Building Institute", "Romanian Building Authority (ISC)"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["cost-estimation", "site-preparation", "contractor-selection"]
 ---
 

@@ -8,7 +8,7 @@ tags: ["permit", "baugenehmigung", "bauantrag", "germany", "bauordnung"]
 sources: ["Musterbauordnung (MBO)", "Landesbauordnungen"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["nl-building-permit", "ro-building-permit", "eu-construction-products-regulation"]
 ---
 

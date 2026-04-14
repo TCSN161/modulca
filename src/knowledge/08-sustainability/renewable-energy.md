@@ -6,7 +6,7 @@ tags: ["solar", "photovoltaic", "heat-pump", "renewable", "energy", "pv"]
 sources: ["EU EPBD Recast", "Casa Verde Program (Romania)"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
-proOnly: false
+proOnly: true
 relatedArticles: ["energy-performance", "passive-house", "solar-orientation"]
 ---
 
