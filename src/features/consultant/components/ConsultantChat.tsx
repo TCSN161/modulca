@@ -2,13 +2,19 @@
 
 import { useState, useRef, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { useSearchParams } from "next/navigation";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { getLocalAnswer } from "../neufertKB";
 import { useAuthStore } from "@/features/auth/store";
+import { useQuizStore } from "@/features/quiz/store";
 
 interface Message {
   role: "user" | "assistant";
   content: string;
+  /** Populated on assistant replies */
+  provider?: string;
+  model?: string;
+  articlesUsed?: string[];
 }
 
 const QUICK_QUESTIONS = [
@@ -30,7 +36,10 @@ const KB_TOPICS = [
 
 export default function ConsultantChat() {
   const userTier = useAuthStore((s) => s.userTier);
+  const quizProfile = useQuizStore((s) => s.profile);
+  const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);
+  const [autoSent, setAutoSent] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -54,7 +63,20 @@ export default function ConsultantChat() {
         const res = await fetch("/api/consultant", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ messages: updated, tier: userTier }),
+          body: JSON.stringify({
+            messages: updated,
+            tier: userTier,
+            ...(quizProfile ? { quizProfile: {
+              primaryStyle: quizProfile.primaryStyle,
+              totalModules: quizProfile.totalModules,
+              layout: quizProfile.layout,
+              sustainability: quizProfile.sustainability,
+              biophilic: quizProfile.biophilic,
+              householdSize: quizProfile.householdSize,
+              budgetLevel: quizProfile.budgetLevel,
+              grossArea: quizProfile.grossArea,
+            }} : {}),
+          }),
         });
 
         if (!res.ok) {
@@ -64,7 +86,13 @@ export default function ConsultantChat() {
         }
 
         const data = await res.json();
-        setMessages([...updated, { role: "assistant", content: data.reply }]);
+        setMessages([...updated, {
+          role: "assistant",
+          content: data.reply,
+          provider: data.provider,
+          model: data.model,
+          articlesUsed: data.articlesUsed,
+        }]);
       } catch {
         const localReply = getLocalAnswer(text);
         setMessages([...updated, { role: "assistant", content: localReply }]);
@@ -75,6 +103,15 @@ export default function ConsultantChat() {
     },
     [messages, loading],
   );
+
+  // Auto-send from ?q= query param (deep-link from library)
+  useEffect(() => {
+    const q = searchParams.get("q");
+    if (q && !autoSent && messages.length === 0) {
+      setAutoSent(true);
+      sendMessage(q);
+    }
+  }, [searchParams, autoSent, messages.length, sendMessage]);
 
   return (
     <div className="flex h-screen flex-col bg-brand-bone-100">
@@ -219,6 +256,21 @@ export default function ConsultantChat() {
                       </div>
                     )}
                     <div className="whitespace-pre-wrap">{msg.content}</div>
+                    {msg.provider && (
+                      <div className="mt-2 pt-2 border-t border-brand-bone-200/60 flex items-center gap-2 text-[10px] text-brand-gray/60">
+                        <span className="inline-flex items-center gap-1 rounded-full bg-brand-bone-100 px-2 py-0.5">
+                          {msg.provider === "groq" && "Groq"}
+                          {msg.provider === "openai" && "OpenAI"}
+                          {msg.provider === "anthropic" && "Claude"}
+                          {msg.provider === "together" && "Together"}
+                          {msg.provider === "pollinations" && "Pollinations"}
+                          {msg.provider === "local-kb" && "Local KB"}
+                        </span>
+                        {msg.articlesUsed && msg.articlesUsed.length > 0 && (
+                          <span>{msg.articlesUsed.length} articles referenced</span>
+                        )}
+                      </div>
+                    )}
                   </div>
                 </div>
               ))}

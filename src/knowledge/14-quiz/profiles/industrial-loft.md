@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["exposed-structure", "open-plan-living", "adaptive-reuse"]
+relatedArticles: ["industrial-style", "space-planning", "circular-economy"]
 ---
 
 # Industrial Loft Profile

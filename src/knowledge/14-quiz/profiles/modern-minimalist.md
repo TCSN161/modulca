@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["minimalism", "space-planning", "large-glazing"]
+relatedArticles: ["minimalism", "space-planning", "doors-windows"]
 ---
 
 # Modern Minimalist Profile

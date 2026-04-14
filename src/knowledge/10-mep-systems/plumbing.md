@@ -7,7 +7,7 @@ sources: ["EN 12056"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
 proOnly: false
-relatedArticles: ["electrical", "fire-safety"]
+relatedArticles: ["electrical", "fire-safety-general"]
 ---
 
 # Plumbing & Water

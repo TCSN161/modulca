@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { AuthNav } from "@/features/auth/components/AuthNav";
@@ -496,7 +496,7 @@ function QuestionCard({
   );
 }
 
-function ProfileResult({ profile, onStartDesign }: { profile: ReturnType<typeof computeProfile>; onStartDesign: () => void }) {
+function ProfileResult({ profile, onStartDesign, onRetake }: { profile: ReturnType<typeof computeProfile>; onStartDesign: () => void; onRetake: () => void }) {
   const styleLabel = STYLE_LABELS[profile.primaryStyle] ?? profile.primaryStyle;
 
   return (
@@ -583,6 +583,13 @@ function ProfileResult({ profile, onStartDesign }: { profile: ReturnType<typeof 
           Explore {profile.articles.length} Recommended Articles
         </Link>
       </div>
+
+      {/* Retake */}
+      <div className="mt-4 text-center">
+        <button onClick={onRetake} className="text-xs text-gray-400 hover:text-gray-600 hover:underline">
+          Retake quiz
+        </button>
+      </div>
     </div>
   );
 }
@@ -659,6 +666,27 @@ export default function QuizPage() {
     router.push("/project/demo/choose");
   };
 
+  const handleRetake = () => {
+    setAnswers({});
+    setSectionIndex(0);
+    setQuestionIndex(0);
+    setCompleted(false);
+  };
+
+  // Keyboard: left/right arrows to navigate, number keys for quick answer
+  useEffect(() => {
+    if (completed) return;
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "ArrowLeft") handleBack();
+      if (e.key >= "1" && e.key <= "5" && question) {
+        const idx = parseInt(e.key) - 1;
+        if (idx < question.options.length) handleAnswer(question.options[idx].value);
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  });
+
   return (
     <div className="min-h-screen bg-brand-bone-100">
       {/* Header */}
@@ -675,15 +703,36 @@ export default function QuizPage() {
 
       <div className="mx-auto max-w-3xl px-4 py-8">
         {completed && profile ? (
-          <ProfileResult profile={profile} onStartDesign={handleStartDesign} />
+          <ProfileResult profile={profile} onStartDesign={handleStartDesign} onRetake={handleRetake} />
         ) : section && question ? (
           <>
+            {/* Section dots */}
+            <div className="mb-4 flex justify-center gap-2">
+              {SECTIONS.map((s, si) => (
+                <button
+                  key={s.id}
+                  onClick={() => { setSectionIndex(si); setQuestionIndex(0); }}
+                  className={`flex items-center gap-1 rounded-full px-2.5 py-1 text-[11px] transition-all ${
+                    si === sectionIndex
+                      ? "bg-brand-teal-800 text-white font-medium"
+                      : si < sectionIndex
+                      ? "bg-brand-teal-100 text-brand-teal-700"
+                      : "bg-gray-100 text-gray-400"
+                  }`}
+                  title={s.title}
+                >
+                  <span>{s.icon}</span>
+                  <span className="hidden sm:inline">{s.title}</span>
+                </button>
+              ))}
+            </div>
+
             {/* Progress */}
             <div className="mb-2 flex items-center justify-between text-xs text-gray-500">
               <span>
-                {section.icon} {section.title} — Question {questionIndex + 1}/{section.questions.length}
+                Question {questionIndex + 1}/{section.questions.length}
               </span>
-              <span>{answeredCount}/{TOTAL_QUESTIONS}</span>
+              <span>{answeredCount}/{TOTAL_QUESTIONS} answered</span>
             </div>
             <ProgressBar current={answeredCount} total={TOTAL_QUESTIONS} />
 
@@ -723,6 +772,11 @@ export default function QuizPage() {
                 Skip to results
               </button>
             </div>
+
+            {/* Keyboard hint */}
+            <p className="mt-4 text-center text-[10px] text-gray-300">
+              Tip: Press 1-{question.options.length} to answer quickly, or use arrow keys to navigate
+            </p>
           </>
         ) : null}
       </div>

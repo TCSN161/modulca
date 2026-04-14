@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["project-management", "regulations", "modular-construction"]
+relatedArticles: ["modular-principles"]
 ---
 
 # Section 5: Practical Constraints

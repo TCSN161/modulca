@@ -9,6 +9,23 @@ import { AuthNav } from "@/features/auth/components/AuthNav";
 import { useAuthStore } from "@/features/auth/store";
 
 /* ------------------------------------------------------------------ */
+/*  Bookmarks (localStorage)                                           */
+/* ------------------------------------------------------------------ */
+
+const BOOKMARKS_KEY = "modulca-library-bookmarks";
+
+function loadBookmarks(): Set<string> {
+  try {
+    const raw = localStorage.getItem(BOOKMARKS_KEY);
+    return raw ? new Set(JSON.parse(raw)) : new Set();
+  } catch { return new Set(); }
+}
+
+function saveBookmarks(ids: Set<string>) {
+  try { localStorage.setItem(BOOKMARKS_KEY, JSON.stringify([...ids])); } catch { /* */ }
+}
+
+/* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
@@ -96,9 +113,16 @@ function MarkdownContent({ content }: { content: string }) {
     if (line.startsWith("## ")) { elements.push(<h3 key={i} className="mt-5 mb-2 text-base font-bold text-gray-800">{line.slice(3)}</h3>); i++; continue; }
     if (line.startsWith("### ")) { elements.push(<h4 key={i} className="mt-4 mb-2 text-sm font-bold text-gray-700">{line.slice(4)}</h4>); i++; continue; }
 
-    // List items
+    // List items (unordered)
     if (line.startsWith("- ")) {
       elements.push(<div key={i} className="ml-4 text-sm text-gray-700 mb-1" dangerouslySetInnerHTML={{ __html: "&#8226; " + formatInline(line.slice(2)) }} />);
+      i++; continue;
+    }
+
+    // List items (ordered: "1. ", "2. ", etc.)
+    const orderedMatch = line.match(/^(\d+)\.\s+(.*)/);
+    if (orderedMatch) {
+      elements.push(<div key={i} className="ml-4 text-sm text-gray-700 mb-1" dangerouslySetInnerHTML={{ __html: `<span class="font-medium text-gray-500 mr-1">${orderedMatch[1]}.</span> ` + formatInline(orderedMatch[2]) }} />);
       i++; continue;
     }
 
@@ -131,11 +155,15 @@ function ArticleDetail({
   onBack,
   onSelectArticle,
   tier,
+  bookmarked,
+  onToggleBookmark,
 }: {
   article: KBDocumentMeta;
   onBack: () => void;
   onSelectArticle: (a: KBDocumentMeta) => void;
   tier: string;
+  bookmarked?: boolean;
+  onToggleBookmark?: () => void;
 }) {
   const region = article.region
     ? REGIONS.find((r) => r.code === article.region)
@@ -178,7 +206,20 @@ function ArticleDetail({
         Back
       </button>
 
-      <h2 className="mb-3 text-xl font-bold text-gray-900">{article.title}</h2>
+      <div className="mb-3 flex items-center justify-between">
+        <h2 className="text-xl font-bold text-gray-900">{article.title}</h2>
+        {onToggleBookmark && (
+          <button
+            onClick={onToggleBookmark}
+            className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
+            title={bookmarked ? "Remove bookmark" : "Save article"}
+          >
+            <svg className={`h-5 w-5 ${bookmarked ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+            </svg>
+          </button>
+        )}
+      </div>
 
       {/* Metadata badges */}
       <div className="mb-4 flex flex-wrap gap-2">
@@ -251,13 +292,15 @@ function ArticleDetail({
             </div>
           )}
           <div className="mt-4 rounded-xl bg-brand-teal-50/30 border border-brand-teal-100 p-4">
-            <p className="text-xs text-gray-600">
-              Need personalized guidance? Ask the{" "}
-              <Link href="/project/demo/consultant" className="font-semibold text-brand-teal-800 hover:underline">
-                Neufert AI Consultant
-              </Link>{" "}
-              about this topic.
-            </p>
+            <Link
+              href={`/project/demo/consultant?q=${encodeURIComponent(`Tell me more about ${article.title}`)}`}
+              className="flex items-center gap-2 text-xs font-semibold text-brand-teal-800 hover:underline"
+            >
+              <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
+              </svg>
+              Ask AI Consultant about &ldquo;{article.title}&rdquo;
+            </Link>
           </div>
         </div>
       )}
@@ -293,9 +336,13 @@ function ArticleDetail({
 function ArticleCard({
   article,
   onClick,
+  bookmarked,
+  onToggleBookmark,
 }: {
   article: KBDocumentMeta;
   onClick: () => void;
+  bookmarked?: boolean;
+  onToggleBookmark?: () => void;
 }) {
   const region = article.region ? REGIONS.find((r) => r.code === article.region) : null;
 
@@ -324,12 +371,25 @@ function ArticleCard({
             </span>
           </div>
         </div>
-        <svg
-          className="h-4 w-4 text-gray-300 group-hover:text-brand-teal-800 flex-shrink-0 mt-1"
-          fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
-        >
-          <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
-        </svg>
+        <div className="flex flex-col items-center gap-1 flex-shrink-0 mt-0.5">
+          {onToggleBookmark && (
+            <button
+              onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }}
+              className="p-0.5 rounded hover:bg-gray-100 transition-colors"
+              title={bookmarked ? "Remove bookmark" : "Bookmark"}
+            >
+              <svg className={`h-4 w-4 ${bookmarked ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
+              </svg>
+            </button>
+          )}
+          <svg
+            className="h-4 w-4 text-gray-300 group-hover:text-brand-teal-800"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M9 5l7 7-7 7" />
+          </svg>
+        </div>
       </div>
     </button>
   );
@@ -345,6 +405,20 @@ export default function LibraryPage() {
   const [activeArticle, setActiveArticle] = useState<KBDocumentMeta | null>(null);
   const [search, setSearch] = useState("");
   const [regionFilter, setRegionFilter] = useState<string | null>(null);
+  const [bookmarks, setBookmarks] = useState<Set<string>>(new Set());
+  const [showBookmarks, setShowBookmarks] = useState(false);
+
+  // Load bookmarks from localStorage
+  useEffect(() => { setBookmarks(loadBookmarks()); }, []);
+
+  const toggleBookmark = (id: string) => {
+    setBookmarks((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      saveBookmarks(next);
+      return next;
+    });
+  };
 
   // Non-empty categories sorted by taxonomy order
   const categories = useMemo(() => {
@@ -379,6 +453,19 @@ export default function LibraryPage() {
 
   const activeCategory = activeCategoryId ? categories.find((c) => c.id === activeCategoryId) : null;
   const regionsWithArticles = REGIONS.filter((r) => (r.articleCount ?? 0) > 0);
+
+  // Keyboard: Escape to go back
+  useEffect(() => {
+    const handler = (e: KeyboardEvent) => {
+      if (e.key === "Escape") {
+        if (activeArticle) setActiveArticle(null);
+        else if (activeCategoryId) { setActiveCategoryId(null); setRegionFilter(null); }
+        else if (search) setSearch("");
+      }
+    };
+    window.addEventListener("keydown", handler);
+    return () => window.removeEventListener("keydown", handler);
+  }, [activeArticle, activeCategoryId, search]);
 
   return (
     <div className="min-h-screen bg-brand-bone-100">
@@ -417,8 +504,21 @@ export default function LibraryPage() {
             </div>
           </div>
 
-          {/* Search */}
-          <div className="mt-4 max-w-xl">
+          {/* Search + Bookmarks */}
+          <div className="mt-4 flex items-center gap-3 max-w-xl">
+            {bookmarks.size > 0 && (
+              <button
+                onClick={() => { setShowBookmarks(!showBookmarks); setActiveCategoryId(null); setActiveArticle(null); setSearch(""); }}
+                className={`flex items-center gap-1.5 rounded-full px-3 py-2 text-xs font-medium transition-colors whitespace-nowrap ${
+                  showBookmarks ? "bg-amber-500 text-white" : "bg-amber-50 text-amber-700 hover:bg-amber-100"
+                }`}
+              >
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" /></svg>
+                {bookmarks.size} saved
+              </button>
+            )}
+          </div>
+          <div className="mt-2 max-w-xl">
             <div className="relative">
               <svg
                 className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-400"
@@ -436,8 +536,19 @@ export default function LibraryPage() {
                   setRegionFilter(null);
                 }}
                 placeholder="Search standards, regulations, dimensions, styles..."
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-4 text-sm text-gray-700 placeholder:text-gray-400 focus:border-brand-teal-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-teal-800"
+                className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-9 text-sm text-gray-700 placeholder:text-gray-400 focus:border-brand-teal-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-teal-800"
               />
+              {search && (
+                <button
+                  onClick={() => { setSearch(""); }}
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  title="Clear search (Esc)"
+                >
+                  <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -445,13 +556,42 @@ export default function LibraryPage() {
 
       {/* Content */}
       <div className="mx-auto max-w-6xl px-4 py-6">
-        {activeArticle ? (
+        {showBookmarks && !activeArticle ? (
+          /* Bookmarked articles */
+          <div>
+            <div className="mb-4 flex items-center justify-between">
+              <h3 className="text-lg font-bold text-gray-900">Saved Articles ({bookmarks.size})</h3>
+              <button
+                onClick={() => setShowBookmarks(false)}
+                className="text-sm text-gray-500 hover:text-gray-700"
+              >
+                Back to library
+              </button>
+            </div>
+            <div className="grid gap-2 sm:grid-cols-2">
+              {ARTICLES.filter((a) => bookmarks.has(a.id)).map((article) => (
+                <ArticleCard
+                  key={article.id}
+                  article={article}
+                  onClick={() => setActiveArticle(article)}
+                  bookmarked={true}
+                  onToggleBookmark={() => toggleBookmark(article.id)}
+                />
+              ))}
+            </div>
+            {bookmarks.size === 0 && (
+              <div className="py-12 text-center text-sm text-gray-400">No saved articles yet</div>
+            )}
+          </div>
+        ) : activeArticle ? (
           /* Article detail view */
           <ArticleDetail
             article={activeArticle}
             onBack={() => setActiveArticle(null)}
             onSelectArticle={(a) => setActiveArticle(a)}
             tier={userTier}
+            bookmarked={bookmarks.has(activeArticle.id)}
+            onToggleBookmark={() => toggleBookmark(activeArticle.id)}
           />
         ) : activeCategoryId && activeCategory ? (
           /* Category article list */
@@ -512,6 +652,8 @@ export default function LibraryPage() {
                   key={article.id}
                   article={article}
                   onClick={() => setActiveArticle(article)}
+                  bookmarked={bookmarks.has(article.id)}
+                  onToggleBookmark={() => toggleBookmark(article.id)}
                 />
               ))}
               {categoryArticles.length === 0 && (
@@ -533,6 +675,8 @@ export default function LibraryPage() {
                   key={article.id}
                   article={article}
                   onClick={() => setActiveArticle(article)}
+                  bookmarked={bookmarks.has(article.id)}
+                  onToggleBookmark={() => toggleBookmark(article.id)}
                 />
               ))}
             </div>

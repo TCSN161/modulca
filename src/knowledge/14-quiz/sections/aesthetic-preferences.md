@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["modern-minimalist", "warm-organic", "scandinavian-functional"]
+relatedArticles: ["minimalism", "organic-architecture", "scandinavian-style"]
 ---
 
 # Section 3: Aesthetic Preferences

@@ -7,7 +7,7 @@ sources: ["NP I7-2002", "Romanian Electrical Standards"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-10"
 proOnly: false
-relatedArticles: ["plumbing", "fire-safety", "hvac-sizing"]
+relatedArticles: ["plumbing", "fire-safety-general", "hvac-sizing"]
 ---
 
 # Electrical Installation

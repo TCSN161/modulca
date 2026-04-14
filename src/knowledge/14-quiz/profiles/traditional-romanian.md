@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["romanian-vernacular", "pitched-roof", "timber-construction"]
+relatedArticles: ["vernacular-romanian", "vernacular-romanian", "clt-timber"]
 ---
 
 # Traditional Romanian Profile

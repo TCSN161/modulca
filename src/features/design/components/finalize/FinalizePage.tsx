@@ -1,23 +1,15 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useDesignStore } from "../../store";
+import { useAuthStore } from "@/features/auth/store";
+import { saveProject, listProjects } from "@/features/auth/projectService";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
 
-const MAX_FREE_PROJECTS = 3;
 type ContactMode = null | "quote" | "consultation";
-
-interface SavedProject {
-  id: string;
-  name: string;
-  date: string;
-  modules: number;
-  totalCost: number;
-  style: string | null;
-}
 
 export default function FinalizePage() {
   const modules = useDesignStore((s) => s.modules);
@@ -26,9 +18,12 @@ export default function FinalizePage() {
   const getStats = useDesignStore((s) => s.getStats);
   const stats = getStats();
 
+  const { userId, isAuthenticated, canCreateProject } = useAuthStore();
+
   const [projectName, setProjectName] = useState("My Modular Home");
+  const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [savedProjects, setSavedProjects] = useState<SavedProject[]>([]);
+  const [projectCount, setProjectCount] = useState(0);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [contactMode, setContactMode] = useState<ContactMode>(null);
   const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -36,40 +31,83 @@ export default function FinalizePage() {
 
   const finish = FINISH_LEVELS.find((f) => f.id === finishLevel) || FINISH_LEVELS[1];
 
+  // Load existing project count
+  useEffect(() => {
+    (async () => {
+      if (!userId) return;
+      const projects = await listProjects(userId);
+      setProjectCount(projects.length);
+    })();
+  }, [userId]);
+
+  // Check if resuming an existing project
   useEffect(() => {
     try {
-      const raw = localStorage.getItem("modulca-projects");
-      if (raw) setSavedProjects(JSON.parse(raw));
+      const active = localStorage.getItem("modulca-active-project");
+      if (active) {
+        const parsed = JSON.parse(active);
+        if (parsed?.name) setProjectName(parsed.name);
+      }
     } catch { /* ignore */ }
   }, []);
 
-  const handleSaveProject = () => {
-    if (savedProjects.length >= MAX_FREE_PROJECTS) {
+  const handleSaveProject = useCallback(async () => {
+    // Check tier limits
+    const access = canCreateProject();
+    if (!access.allowed) {
       setShowUpgrade(true);
       return;
     }
 
-    const project: SavedProject = {
-      id: `proj-${Date.now()}`,
-      name: projectName,
-      date: new Date().toISOString(),
-      modules: modules.length,
-      totalCost: stats.totalEstimate,
-      style: styleDirection,
+    setSaving(true);
+
+    // Build full design data to persist
+    const designData: Record<string, unknown> = {
+      modules: useDesignStore.getState().modules,
+      finishLevel: useDesignStore.getState().finishLevel,
+      styleDirection: useDesignStore.getState().styleDirection,
+      styleDescription: useDesignStore.getState().styleDescription,
+      stylePhoto: useDesignStore.getState().stylePhoto,
+      moodboardPins: useDesignStore.getState().moodboardPins,
+      savedRenders: useDesignStore.getState().savedRenders,
+      moduleFixtures: useDesignStore.getState().moduleFixtures,
     };
 
-    const updated = [...savedProjects, project];
-    setSavedProjects(updated);
-    localStorage.setItem("modulca-projects", JSON.stringify(updated));
+    // Get grid data from land store
+    try {
+      const landRaw = localStorage.getItem("modulca-land");
+      if (landRaw) {
+        const landData = JSON.parse(landRaw);
+        designData.gridCells = landData.gridCells;
+        designData.gridRotation = landData.gridRotation;
+      }
+    } catch { /* ignore */ }
 
-    // Also save the full design data tagged with this project id
-    const designData = localStorage.getItem("modulca-design");
-    if (designData) {
-      localStorage.setItem(`modulca-design-${project.id}`, designData);
+    // Check if we're updating an existing project
+    let existingId: string | undefined;
+    try {
+      const active = localStorage.getItem("modulca-active-project");
+      if (active) existingId = JSON.parse(active)?.id;
+    } catch { /* ignore */ }
+
+    const result = await saveProject(userId ?? "", {
+      id: existingId,
+      name: projectName,
+      data: designData,
+    });
+
+    if (result) {
+      // Store active project reference
+      localStorage.setItem("modulca-active-project", JSON.stringify({
+        id: result.id,
+        name: result.name,
+      }));
+      setSaved(true);
+      setProjectCount((c) => existingId ? c : c + 1);
     }
 
-    setSaved(true);
-  };
+    setSaving(false);
+  }, [userId, projectName, canCreateProject]);
 
   // Module type summary
   const typeCounts: Record<string, number> = {};
@@ -210,56 +248,67 @@ export default function FinalizePage() {
 
           {/* Save project */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
-            <h2 className="text-lg font-semibold text-brand-teal-800 mb-4">Save Your Project</h2>
+            <h2 className="text-lg font-semibold text-brand-teal-800 mb-4">
+              {isAuthenticated ? "Save to Cloud" : "Save Your Project"}
+            </h2>
+            {!isAuthenticated && (
+              <div className="mb-4 rounded-lg bg-amber-50 border border-amber-200 p-3 text-xs text-amber-800">
+                <Link href="/login" className="font-semibold underline">Log in</Link> to save your project to the cloud and access it from any device.
+              </div>
+            )}
             <div className="flex gap-3 mb-4">
               <input
                 type="text"
                 value={projectName}
-                onChange={(e) => setProjectName(e.target.value)}
+                onChange={(e) => { setProjectName(e.target.value); setSaved(false); }}
                 className="flex-1 px-4 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-brand-amber-400"
                 placeholder="Project name..."
               />
               <button
                 onClick={handleSaveProject}
-                disabled={saved}
+                disabled={saving || saved}
                 className={`px-6 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
                   saved
                     ? "bg-emerald-100 text-emerald-700 cursor-default"
+                    : saving
+                    ? "bg-gray-200 text-gray-500 cursor-wait"
                     : "bg-brand-amber-500 text-white hover:bg-brand-amber-600"
                 }`}
               >
-                {saved ? "Saved!" : "Save Project"}
+                {saved ? "Saved!" : saving ? "Saving..." : "Save Project"}
               </button>
             </div>
-            <p className="text-xs text-gray-400">
-              {savedProjects.length}/{MAX_FREE_PROJECTS} free projects used.
-              {savedProjects.length >= MAX_FREE_PROJECTS - 1 && !saved && " Upgrade to Pro for unlimited projects."}
-            </p>
+            {isAuthenticated && (
+              <p className="text-xs text-gray-400">
+                {projectCount} project{projectCount !== 1 ? "s" : ""} saved
+                {isAuthenticated && " — synced to cloud"}
+              </p>
+            )}
           </div>
 
           {/* Upgrade modal */}
           {showUpgrade && (
             <div className="bg-gradient-to-br from-brand-teal-800 to-brand-teal-700 rounded-xl shadow-lg p-6 mb-6 text-white">
-              <h2 className="text-lg font-bold mb-2">Upgrade to ModulCA Pro</h2>
+              <h2 className="text-lg font-bold mb-2">Upgrade Your Plan</h2>
               <p className="text-sm text-brand-teal-200 mb-4">
-                You&apos;ve used all {MAX_FREE_PROJECTS} free project slots. Upgrade to save unlimited projects and unlock premium features.
+                You&apos;ve reached your project limit. Upgrade to save more projects and unlock premium features.
               </p>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <div className="bg-white/10 rounded-lg p-4">
-                  <div className="text-sm font-semibold mb-1">Free Plan</div>
+                  <div className="text-sm font-semibold mb-1">Explorer (Free)</div>
                   <ul className="text-xs text-brand-teal-200 space-y-1">
-                    <li>- {MAX_FREE_PROJECTS} saved projects</li>
+                    <li>- 1 saved project</li>
                     <li>- Basic AI renders</li>
                     <li>- PDF exports</li>
                   </ul>
                 </div>
                 <div className="bg-white/10 rounded-lg p-4 ring-2 ring-brand-amber-400">
-                  <div className="text-sm font-semibold mb-1 text-brand-amber-400">Pro Plan &mdash; &euro;29/mo</div>
+                  <div className="text-sm font-semibold mb-1 text-brand-amber-400">Premium &mdash; &euro;29/mo</div>
                   <ul className="text-xs text-brand-teal-200 space-y-1">
-                    <li>- Unlimited projects</li>
+                    <li>- 10 projects</li>
                     <li>- HD AI renders</li>
                     <li>- Priority support</li>
-                    <li>- Real product catalog</li>
+                    <li>- AI Consultant</li>
                   </ul>
                 </div>
               </div>

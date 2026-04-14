@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["biophilic-design", "natural-materials", "timber-construction"]
+relatedArticles: ["biophilic-principles", "natural-materials-biophilic", "clt-timber"]
 ---
 
 # Warm Organic Profile

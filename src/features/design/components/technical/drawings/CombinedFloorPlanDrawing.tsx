@@ -1,6 +1,6 @@
 import { MODULE_TYPES } from "@/shared/types";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS } from "../../../layouts";
-import type { ModuleConfig } from "../../../store";
+import type { ModuleConfig, WallType } from "../../../store";
 import { WALL_THICKNESS } from "../drawingConstants";
 
 interface CombinedFloorPlanProps {
@@ -154,48 +154,19 @@ export default function CombinedFloorPlanDrawing({ modules }: CombinedFloorPlanP
               opacity="0.2"
             />
 
-            {/* Walls — only draw if no neighbor (exterior) or thin line (interior) */}
-            {/* North wall */}
-            {!hasNorth ? (
-              <rect x={mx} y={my} width={modW} height={WT} fill="#333" stroke="#000" strokeWidth="0.3" />
-            ) : (
-              <line x1={mx} y1={my} x2={mx + modW} y2={my} stroke="#999" strokeWidth="0.3" strokeDasharray="2,2" />
-            )}
-            {/* South wall */}
-            {!hasSouth ? (
-              <rect x={mx} y={my + modW - WT} width={modW} height={WT} fill="#333" stroke="#000" strokeWidth="0.3" />
-            ) : null}
-            {/* West wall */}
-            {!hasWest ? (
-              <rect x={mx} y={my} width={WT} height={modW} fill="#333" stroke="#000" strokeWidth="0.3" />
-            ) : (
-              <line x1={mx} y1={my} x2={mx} y2={my + modW} stroke="#999" strokeWidth="0.3" strokeDasharray="2,2" />
-            )}
-            {/* East wall */}
-            {!hasEast ? (
-              <rect x={mx + modW - WT} y={my} width={WT} height={modW} fill="#333" stroke="#000" strokeWidth="0.3" />
-            ) : null}
-
-            {/* Door opening in south wall (if exterior) */}
-            {!hasSouth && mod.wallConfigs?.south !== "none" && (
-              (() => {
-                const doorW = 900 * S;
-                const doorX = mx + (modW - doorW) / 2;
-                const doorY = my + modW - WT;
-                return (
-                  <g>
-                    {/* Clear door opening */}
-                    <rect x={doorX} y={doorY} width={doorW} height={WT} fill="white" />
-                    {/* Door swing */}
-                    <line x1={doorX} y1={doorY} x2={doorX} y2={doorY - doorW} stroke="#000" strokeWidth="0.5" />
-                    <path
-                      d={`M ${doorX} ${doorY - doorW} A ${doorW} ${doorW} 0 0 1 ${doorX + doorW} ${doorY}`}
-                      fill="none" stroke="#000" strokeWidth="0.3" strokeDasharray="2,1"
-                    />
-                  </g>
-                );
-              })()
-            )}
+            {/* Walls — driven by wallConfigs, with neighbor awareness */}
+            {/* NORTH wall */}
+            <CombinedWall wt={mod.wallConfigs?.north ?? (hasNorth ? "shared" : "solid")}
+              x={mx} y={my} len={modW} thick={WT} orient="h" S={S} swingDir="down" />
+            {/* SOUTH wall */}
+            <CombinedWall wt={mod.wallConfigs?.south ?? (hasSouth ? "shared" : "solid")}
+              x={mx} y={my + modW - WT} len={modW} thick={WT} orient="h" S={S} swingDir="up" />
+            {/* WEST wall */}
+            <CombinedWall wt={mod.wallConfigs?.west ?? (hasWest ? "shared" : "solid")}
+              x={mx} y={my} len={modW} thick={WT} orient="v" S={S} swingDir="right" />
+            {/* EAST wall */}
+            <CombinedWall wt={mod.wallConfigs?.east ?? (hasEast ? "shared" : "solid")}
+              x={mx + modW - WT} y={my} len={modW} thick={WT} orient="v" S={S} swingDir="left" />
 
             {/* Furniture */}
             {furniture.map((item) => {
@@ -291,4 +262,95 @@ export default function CombinedFloorPlanDrawing({ modules }: CombinedFloorPlanP
       })()}
     </g>
   );
+}
+
+/* ── Wall segment for combined plan ── */
+function CombinedWall({
+  wt, x, y, len, thick, orient, S, swingDir,
+}: {
+  wt: WallType;
+  x: number; y: number;
+  len: number; thick: number;
+  orient: "h" | "v";
+  S: number;
+  swingDir: "up" | "down" | "left" | "right";
+}) {
+  const isH = orient === "h";
+  const doorW = 900 * S;
+  const winW = 1200 * S;
+
+  if (wt === "none" || wt === "shared") {
+    return isH
+      ? <line x1={x} y1={y + thick / 2} x2={x + len} y2={y + thick / 2} stroke="#999" strokeWidth="0.3" strokeDasharray="2,2" />
+      : <line x1={x + thick / 2} y1={y} x2={x + thick / 2} y2={y + len} stroke="#999" strokeWidth="0.3" strokeDasharray="2,2" />;
+  }
+
+  if (wt === "solid") {
+    return isH
+      ? <rect x={x} y={y} width={len} height={thick} fill="#333" stroke="#000" strokeWidth="0.3" />
+      : <rect x={x} y={y} width={thick} height={len} fill="#333" stroke="#000" strokeWidth="0.3" />;
+  }
+
+  if (wt === "door") {
+    const gap = (len - doorW) / 2;
+    return isH ? (
+      <g>
+        <rect x={x} y={y} width={gap} height={thick} fill="#333" stroke="#000" strokeWidth="0.3" />
+        <rect x={x + gap + doorW} y={y} width={len - gap - doorW} height={thick} fill="#333" stroke="#000" strokeWidth="0.3" />
+        {swingDir === "up" && (
+          <g>
+            <line x1={x + gap} y1={y} x2={x + gap} y2={y - doorW} stroke="#000" strokeWidth="0.5" />
+            <path d={`M ${x + gap} ${y - doorW} A ${doorW} ${doorW} 0 0 1 ${x + gap + doorW} ${y}`} fill="none" stroke="#000" strokeWidth="0.3" strokeDasharray="2,1" />
+          </g>
+        )}
+        {swingDir === "down" && (
+          <g>
+            <line x1={x + gap} y1={y + thick} x2={x + gap} y2={y + thick + doorW} stroke="#000" strokeWidth="0.5" />
+            <path d={`M ${x + gap} ${y + thick + doorW} A ${doorW} ${doorW} 0 0 0 ${x + gap + doorW} ${y + thick}`} fill="none" stroke="#000" strokeWidth="0.3" strokeDasharray="2,1" />
+          </g>
+        )}
+      </g>
+    ) : (
+      <g>
+        <rect x={x} y={y} width={thick} height={gap} fill="#333" stroke="#000" strokeWidth="0.3" />
+        <rect x={x} y={y + gap + doorW} width={thick} height={len - gap - doorW} fill="#333" stroke="#000" strokeWidth="0.3" />
+        {swingDir === "right" && (
+          <g>
+            <line x1={x + thick} y1={y + gap} x2={x + thick + doorW} y2={y + gap} stroke="#000" strokeWidth="0.5" />
+            <path d={`M ${x + thick + doorW} ${y + gap} A ${doorW} ${doorW} 0 0 1 ${x + thick} ${y + gap + doorW}`} fill="none" stroke="#000" strokeWidth="0.3" strokeDasharray="2,1" />
+          </g>
+        )}
+        {swingDir === "left" && (
+          <g>
+            <line x1={x} y1={y + gap} x2={x - doorW} y2={y + gap} stroke="#000" strokeWidth="0.5" />
+            <path d={`M ${x - doorW} ${y + gap} A ${doorW} ${doorW} 0 0 0 ${x} ${y + gap + doorW}`} fill="none" stroke="#000" strokeWidth="0.3" strokeDasharray="2,1" />
+          </g>
+        )}
+      </g>
+    );
+  }
+
+  if (wt === "window") {
+    const gap = (len - winW) / 2;
+    return isH ? (
+      <g>
+        <rect x={x} y={y} width={gap} height={thick} fill="#333" stroke="#000" strokeWidth="0.3" />
+        <rect x={x + gap + winW} y={y} width={len - gap - winW} height={thick} fill="#333" stroke="#000" strokeWidth="0.3" />
+        <line x1={x + gap} y1={y + thick / 2 - 0.5} x2={x + gap + winW} y2={y + thick / 2 - 0.5} stroke="#4DA6FF" strokeWidth="1" />
+        <line x1={x + gap} y1={y + thick / 2 + 0.5} x2={x + gap + winW} y2={y + thick / 2 + 0.5} stroke="#4DA6FF" strokeWidth="1" />
+      </g>
+    ) : (
+      <g>
+        <rect x={x} y={y} width={thick} height={gap} fill="#333" stroke="#000" strokeWidth="0.3" />
+        <rect x={x} y={y + gap + winW} width={thick} height={len - gap - winW} fill="#333" stroke="#000" strokeWidth="0.3" />
+        <line x1={x + thick / 2 - 0.5} y1={y + gap} x2={x + thick / 2 - 0.5} y2={y + gap + winW} stroke="#4DA6FF" strokeWidth="1" />
+        <line x1={x + thick / 2 + 0.5} y1={y + gap} x2={x + thick / 2 + 0.5} y2={y + gap + winW} stroke="#4DA6FF" strokeWidth="1" />
+      </g>
+    );
+  }
+
+  // Fallback: solid
+  return isH
+    ? <rect x={x} y={y} width={len} height={thick} fill="#333" stroke="#000" strokeWidth="0.3" />
+    : <rect x={x} y={y} width={thick} height={len} fill="#333" stroke="#000" strokeWidth="0.3" />;
 }

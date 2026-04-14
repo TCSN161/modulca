@@ -7,7 +7,7 @@ sources: ["EU EPBD 2010/31/EU", "Romanian MC 001/2022", "Dutch BENG"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["energy-performance", "passive-house", "nl-energy-beng", "thermal-c107"]
+relatedArticles: ["energy-performance", "passive-house", "nl-beng", "ro-thermal-c107"]
 ---
 
 # Nearly Zero-Energy Building (nZEB) Standards

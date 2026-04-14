@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["biophilic-design", "green-roof", "sustainability", "landscape"]
+relatedArticles: ["biophilic-principles", "renewable-energy", "nzeb-standards"]
 ---
 
 # Biophilic Nature Profile

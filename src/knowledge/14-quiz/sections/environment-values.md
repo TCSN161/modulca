@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["sustainability", "biophilic-design", "energy-efficiency"]
+relatedArticles: ["nzeb-standards", "biophilic-principles", "energy-performance"]
 ---
 
 # Section 4: Environment & Values

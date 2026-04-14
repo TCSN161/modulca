@@ -7,7 +7,7 @@ sources: ["Vitruvius — De Architectura", "Banister Fletcher"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["vitruvius-principles", "roman-architecture", "proportion-and-scale"]
+relatedArticles: ["vitruvius-principles", "ancient-architecture", "proportion-and-scale"]
 ---
 
 # Ancient Architecture (3000 BC – 500 AD)

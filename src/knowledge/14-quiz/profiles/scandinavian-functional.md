@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["space-planning", "natural-light", "functional-design"]
+relatedArticles: ["space-planning", "natural-light-biophilic", "design-process"]
 ---
 
 # Scandinavian Functional Profile

@@ -86,6 +86,7 @@ export default function TechnicalDrawing({
           floorMat={floorMat}
           wallMat={wallMat}
           preset={preset}
+          wallConfigs={module.wallConfigs}
         />
       )}
       {drawingType === "section-aa" && (
@@ -93,16 +94,17 @@ export default function TechnicalDrawing({
           floorColor={floorColor}
           wallColor={wallColor}
           floorMat={floorMat}
+          wallConfigs={module.wallConfigs}
         />
       )}
       {drawingType === "front-elevation" && (
-        <FrontElevationDrawing wallColor={wallColor} wallMat={wallMat} />
+        <FrontElevationDrawing wallColor={wallColor} wallMat={wallMat} wallConfigs={module.wallConfigs} />
       )}
       {drawingType === "wall-detail" && (
         <WallDetailDrawing wallColor={wallColor} />
       )}
-      {drawingType === "mep-plan" && <MEPPlanDrawing />}
-      {drawingType === "foundation-detail" && <FoundationDetailDrawing />}
+      {drawingType === "mep-plan" && <MEPPlanDrawing moduleType={module.moduleType} />}
+      {drawingType === "foundation-detail" && <FoundationDetailDrawing modules={allModules} />}
 
       {/* ═══════════ TITLE BLOCK (bottom) ═══════════ */}
       <g>

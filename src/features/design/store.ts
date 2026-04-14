@@ -160,14 +160,68 @@ const WALL_UPGRADE_PRICES: Record<WallType, number> = {
 function computeWallConfigs(
   row: number,
   col: number,
-  occupiedSet: Set<string>
+  occupiedSet: Set<string>,
+  moduleType?: string
 ): WallConfigs {
-  return {
-    north: occupiedSet.has(`${row - 1},${col}`) ? "shared" : "solid",
-    south: occupiedSet.has(`${row + 1},${col}`) ? "shared" : "solid",
-    west: occupiedSet.has(`${row},${col - 1}`) ? "shared" : "solid",
-    east: occupiedSet.has(`${row},${col + 1}`) ? "shared" : "solid",
+  const sides: WallSide[] = ["north", "south", "east", "west"];
+  const deltas: Record<WallSide, string> = {
+    north: `${row - 1},${col}`,
+    south: `${row + 1},${col}`,
+    west: `${row},${col - 1}`,
+    east: `${row},${col + 1}`,
   };
+
+  // Base: shared if neighbor, solid if exterior
+  const cfg: WallConfigs = {
+    north: occupiedSet.has(deltas.north) ? "shared" : "solid",
+    south: occupiedSet.has(deltas.south) ? "shared" : "solid",
+    west: occupiedSet.has(deltas.west) ? "shared" : "solid",
+    east: occupiedSet.has(deltas.east) ? "shared" : "solid",
+  };
+
+  // Smart defaults: assign door + windows on exterior walls
+  const exteriorSides = sides.filter((s) => cfg[s] === "solid");
+  if (exteriorSides.length === 0) return cfg; // fully interior module
+
+  // Rooms that don't get an exterior door (accessed via hallway/interior)
+  const noExteriorDoor = ["bathroom", "storage"];
+  // Rooms that prefer windows on all exterior walls
+  const prefersWindows = ["bedroom", "living", "office", "kitchen"];
+  // Terrace: open walls (none)
+  const isOpenType = moduleType === "terrace";
+
+  if (isOpenType) {
+    // Terrace: exterior walls become "none" (open)
+    for (const s of exteriorSides) cfg[s] = "none";
+    return cfg;
+  }
+
+  // Pick one exterior wall for the door (prefer south > east > west > north)
+  const doorPriority: WallSide[] = ["south", "east", "west", "north"];
+  if (!noExteriorDoor.includes(moduleType || "")) {
+    for (const s of doorPriority) {
+      if (cfg[s] === "solid") {
+        cfg[s] = "door";
+        break;
+      }
+    }
+  }
+
+  // Assign windows on remaining solid exterior walls for room types that want them
+  if (prefersWindows.includes(moduleType || "")) {
+    for (const s of exteriorSides) {
+      if (cfg[s] === "solid") cfg[s] = "window";
+    }
+  }
+
+  // Bathroom: one small window if it has an exterior wall (not the door one)
+  if (moduleType === "bathroom") {
+    for (const s of exteriorSides) {
+      if (cfg[s] === "solid") { cfg[s] = "window"; break; }
+    }
+  }
+
+  return cfg;
 }
 
 function computeWallUpgradeCost(modules: ModuleConfig[]): number {
@@ -256,7 +310,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
         floorFinish: defaultFloor,
         wallColor: defaultWall,
         furnitureOverrides: {},
-        wallConfigs: computeWallConfigs(c.row, c.col, occupiedSet),
+        wallConfigs: computeWallConfigs(c.row, c.col, occupiedSet, type),
       };
     });
     set({
@@ -374,16 +428,21 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
             }
           }
         }
-        // Default adjacent walls to "shared" (open) only if no wallConfigs exist yet.
-        // If user has customized a wall (e.g. to "door" or "window"), respect that choice.
-        const existingConfigs = m.wallConfigs ?? computeWallConfigs(m.row, m.col, occupiedSet);
-        const enforcedConfigs = { ...existingConfigs };
-        // Only set to "shared" if the wall hasn't been loaded yet (was computed fresh)
+        // Compute smart wall configs if none exist, or upgrade old all-solid configs
+        let enforcedConfigs: WallConfigs;
         if (!m.wallConfigs) {
-          if (occupiedSet.has(`${m.row - 1},${m.col}`)) enforcedConfigs.north = "shared";
-          if (occupiedSet.has(`${m.row + 1},${m.col}`)) enforcedConfigs.south = "shared";
-          if (occupiedSet.has(`${m.row},${m.col - 1}`)) enforcedConfigs.west = "shared";
-          if (occupiedSet.has(`${m.row},${m.col + 1}`)) enforcedConfigs.east = "shared";
+          // No configs at all — compute fresh with smart defaults
+          enforcedConfigs = computeWallConfigs(m.row, m.col, occupiedSet, m.moduleType);
+        } else {
+          enforcedConfigs = { ...m.wallConfigs };
+          // Check if user has ever customized any wall (has door/window/none set)
+          const hasCustom = (["north", "south", "east", "west"] as WallSide[]).some(
+            (s) => enforcedConfigs[s] === "door" || enforcedConfigs[s] === "window" || enforcedConfigs[s] === "none"
+          );
+          if (!hasCustom) {
+            // All walls are solid/shared — user never configured, apply smart defaults
+            enforcedConfigs = computeWallConfigs(m.row, m.col, occupiedSet, m.moduleType);
+          }
         }
 
         return {

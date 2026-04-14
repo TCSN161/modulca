@@ -400,7 +400,7 @@ async function getLocalAnswer(question: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, tier } = await req.json();
+    const { messages, tier, quizProfile } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Messages array required" }, { status: 400 });
@@ -418,7 +418,21 @@ export async function POST(req: NextRequest) {
     const tierNote = tierCfg.answerNote
       ? `\n\nNote to assistant: The user is on the free tier. Keep answers helpful but concise. End with: "${tierCfg.answerNote}"`
       : "";
-    const systemPrompt = BASE_SYSTEM_PROMPT + ragContext + tierNote;
+    // Optional quiz profile context
+    let quizContext = "";
+    if (quizProfile && quizProfile.primaryStyle) {
+      quizContext = `\n\n## User's Architectural Profile (from quiz)\n` +
+        `- Style: ${quizProfile.primaryStyle}\n` +
+        `- Household: ${quizProfile.householdSize} people\n` +
+        `- Modules: ${quizProfile.totalModules} (${quizProfile.grossArea}m² gross)\n` +
+        `- Layout: ${quizProfile.layout}\n` +
+        `- Budget: ${quizProfile.budgetLevel}\n` +
+        `- Sustainability: ${quizProfile.sustainability}/5\n` +
+        `- Biophilic affinity: ${quizProfile.biophilic}/5\n` +
+        `\nUse this profile to personalize recommendations. Reference their style preference and home size when relevant.`;
+    }
+
+    const systemPrompt = BASE_SYSTEM_PROMPT + quizContext + ragContext + tierNote;
 
     const fullMessages = [
       { role: "system", content: systemPrompt },

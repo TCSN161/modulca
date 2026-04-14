@@ -9,7 +9,7 @@ sources: ["Vlaams Energie- en Klimaatagentschap (VEKA)", "Walloon Energy Decree"
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["be-building-permit", "nl-energy-beng", "de-energy-geg", "nzeb-standards"]
+relatedArticles: ["be-building-permit", "nl-beng", "de-energy-geg", "nzeb-standards"]
 ---
 
 # Energy Standards — EPB/PEB (Belgium)

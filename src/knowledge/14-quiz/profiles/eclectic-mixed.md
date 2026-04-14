@@ -7,7 +7,7 @@ sources: ["ModulCA Design Research"]
 difficulty: "beginner"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["interior-design", "color-theory", "material-combinations"]
+relatedArticles: ["space-planning", "color-theory", "materials-in-architecture"]
 ---
 
 # Eclectic Mixed Profile

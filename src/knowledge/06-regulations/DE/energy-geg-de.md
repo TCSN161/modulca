@@ -9,7 +9,7 @@ sources: ["Gebäudeenergiegesetz (GEG) 2024", "KfW Förderung"]
 difficulty: "intermediate"
 lastUpdated: "2026-04-11"
 proOnly: false
-relatedArticles: ["de-building-permit", "nl-energy-beng", "nzeb-standards", "passive-house"]
+relatedArticles: ["de-building-permit", "nl-beng", "nzeb-standards", "passive-house"]
 ---
 
 # Energy Standards — GEG 2024 (Germany)
