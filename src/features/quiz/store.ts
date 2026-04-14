@@ -41,7 +41,7 @@ interface QuizStore {
   setProfile: (p: QuizProfile) => void;
   clearProfile: () => void;
   /** Map quiz style → design store StyleDirectionId */
-  getDesignStyleDirection: () => "scandinavian" | "industrial" | "warm-contemporary" | null;
+  getDesignStyleDirection: () => string | null;
   /** Map quiz budget → design store FinishLevelId */
   getDesignFinishLevel: () => "basic" | "standard" | "premium";
 }
@@ -68,17 +68,17 @@ function loadFromStorage(): QuizProfile | null {
 }
 
 /**
- * Map quiz style IDs → design store's 3 style directions.
- * The design store only has scandinavian | industrial | warm-contemporary.
+ * Map quiz style IDs → design store's 8 style directions.
+ * Each quiz profile now maps to a dedicated design style (1:1 where possible).
  */
-const STYLE_MAP: Record<string, "scandinavian" | "industrial" | "warm-contemporary"> = {
+const STYLE_MAP: Record<string, string> = {
   "modern-minimalist": "scandinavian",
   "warm-organic": "warm-contemporary",
   "scandinavian-functional": "scandinavian",
   "industrial-loft": "industrial",
-  "traditional-romanian": "warm-contemporary",
-  "biophilic-nature": "warm-contemporary",
-  "eclectic-mixed": "warm-contemporary",
+  "traditional-romanian": "traditional-romanian",
+  "biophilic-nature": "biophilic-organic",
+  "eclectic-mixed": "eclectic-mixed",
 };
 
 export const useQuizStore = create<QuizStore>((set, get) => ({
@@ -94,7 +94,7 @@ export const useQuizStore = create<QuizStore>((set, get) => ({
     saveToStorage(null);
   },
 
-  getDesignStyleDirection: () => {
+  getDesignStyleDirection: (): string | null => {
     const { profile } = get();
     if (!profile) return null;
     return STYLE_MAP[profile.primaryStyle] ?? "warm-contemporary";

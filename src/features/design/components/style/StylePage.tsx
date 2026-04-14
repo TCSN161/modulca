@@ -3,6 +3,7 @@
 import { useCallback, useRef, useState } from "react";
 import Link from "next/link";
 import { useDesignStore } from "../../store";
+import { useAuthStore } from "@/features/auth/store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { STYLE_DIRECTIONS, getStyleDirection } from "../../styles";
 import { cn } from "@/shared/utils/cn";
@@ -22,9 +23,15 @@ export default function StylePage() {
   const [activeTab, setActiveTab] = useState<"style" | "moodboard">("style");
   const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
 
+  const canAccess = useAuthStore((s) => s.canAccess);
+  const betaPromoActive = useAuthStore((s) => s.betaPromoActive);
+
   const selectedStyle = styleDirection
     ? getStyleDirection(styleDirection)
     : null;
+
+  // Check if user can use premium styles (premium tier, architect, constructor, or beta promo)
+  const canUsePremiumStyles = canAccess("customStyleUpload") || betaPromoActive;
 
   const handlePhotoUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -271,55 +278,85 @@ export default function StylePage() {
           {activeTab === "moodboard" ? (
             <Moodboard />
           ) : !selectedStyle ? (
-            /* Style selection grid */
+            /* Style selection grid — 8 styles */
             <div>
               <h2 className="mb-1 text-lg font-bold text-brand-teal-800">
                 Choose Your Style Direction
               </h2>
               <p className="mb-6 text-sm text-gray-500">
                 Select a style to generate your moodboard and apply materials to
-                all modules.
+                all modules. {!canUsePremiumStyles && (
+                  <span className="text-brand-amber-600 font-medium">
+                    Upgrade to Premium to unlock 5 additional styles.
+                  </span>
+                )}
               </p>
-              <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                {STYLE_DIRECTIONS.map((style) => (
-                  <div
-                    key={style.id}
-                    className="overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow"
-                  >
-                    {/* Hero image */}
-                    <div className="relative aspect-[16/10] w-full overflow-hidden">
-                      <img
-                        src={style.heroImage}
-                        alt={style.label}
-                        className="absolute inset-0 h-full w-full object-cover"
-                        onError={(e) => {
-                          (e.target as HTMLImageElement).style.display = "none";
-                          (e.target as HTMLImageElement).parentElement!.style.backgroundColor = style.moodColors[0];
-                        }}
-                      />
-                    </div>
-                    <div className="p-5">
-                      <div className="mb-1 text-xs font-bold text-gray-400 uppercase tracking-wider">
-                        {style.tier} tier
+              <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
+                {STYLE_DIRECTIONS.map((style) => {
+                  const isPremiumStyle = style.tier === "premium";
+                  const isLocked = isPremiumStyle && !canUsePremiumStyles;
+
+                  return (
+                    <div
+                      key={style.id}
+                      className={cn(
+                        "overflow-hidden rounded-xl border bg-white shadow-sm hover:shadow-md transition-shadow",
+                        isLocked ? "border-gray-200 opacity-75" : "border-gray-200"
+                      )}
+                    >
+                      {/* Hero image */}
+                      <div className="relative aspect-[16/10] w-full overflow-hidden">
+                        <img
+                          src={style.heroImage}
+                          alt={style.label}
+                          className="absolute inset-0 h-full w-full object-cover"
+                          onError={(e) => {
+                            (e.target as HTMLImageElement).style.display = "none";
+                            (e.target as HTMLImageElement).parentElement!.style.backgroundColor = style.moodColors[0];
+                          }}
+                        />
+                        {isPremiumStyle && (
+                          <div className="absolute top-2 right-2 rounded-full bg-brand-amber-500 px-2 py-0.5 text-[9px] font-bold text-white shadow-sm">
+                            Premium
+                          </div>
+                        )}
+                        {isLocked && (
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/20">
+                            <svg className="h-8 w-8 text-white/80" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                          </div>
+                        )}
                       </div>
-                      <h3 className="text-base font-bold text-brand-teal-800">
-                        {style.label}
-                      </h3>
-                      <p className="mt-0.5 text-sm font-medium text-brand-amber-600">
-                        {style.tagline}
-                      </p>
-                      <p className="mt-2 text-xs text-gray-500 leading-relaxed">
-                        {style.description}
-                      </p>
-                      <button
-                        onClick={() => handleSelectStyle(style.id)}
-                        className="mt-4 w-full rounded-lg bg-brand-teal-800 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-teal-700 transition-colors"
-                      >
-                        Select This Style
-                      </button>
+                      <div className="p-4">
+                        <h3 className="text-sm font-bold text-brand-teal-800">
+                          {style.label}
+                        </h3>
+                        <p className="mt-0.5 text-xs font-medium text-brand-amber-600">
+                          {style.tagline}
+                        </p>
+                        <p className="mt-1.5 text-[11px] text-gray-500 leading-relaxed line-clamp-2">
+                          {style.description}
+                        </p>
+                        {isLocked ? (
+                          <Link
+                            href="/pricing"
+                            className="mt-3 block w-full rounded-lg border-2 border-brand-amber-400 px-3 py-2 text-center text-xs font-semibold text-brand-amber-600 hover:bg-brand-amber-50 transition-colors"
+                          >
+                            Upgrade to Unlock
+                          </Link>
+                        ) : (
+                          <button
+                            onClick={() => handleSelectStyle(style.id)}
+                            className="mt-3 w-full rounded-lg bg-brand-teal-800 px-3 py-2 text-xs font-semibold text-white hover:bg-brand-teal-700 transition-colors"
+                          >
+                            Select This Style
+                          </button>
+                        )}
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  );
+                })}
               </div>
             </div>
           ) : (
@@ -511,14 +548,22 @@ export default function StylePage() {
           )}
 
           <div className="mt-6 space-y-3 border-t border-gray-100 pt-5">
-            <div className="rounded-lg bg-brand-amber-50 p-3">
-              <p className="text-xs font-medium text-brand-amber-700">
-                Free tier: 3 styles included
-              </p>
-            </div>
+            {canUsePremiumStyles ? (
+              <div className="rounded-lg bg-green-50 p-3">
+                <p className="text-xs font-medium text-green-700">
+                  All 8 styles unlocked {betaPromoActive && "(Beta bonus)"}
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-lg bg-brand-amber-50 p-3">
+                <p className="text-xs font-medium text-brand-amber-700">
+                  Free tier: 3 styles &bull; Premium: all 8 styles
+                </p>
+              </div>
+            )}
             <div className="rounded-lg bg-gray-50 p-3">
               <p className="text-xs text-gray-500">
-                Premium: Coming soon &mdash; custom AI-generated moodboards
+                Each style auto-applies floor, wall, and color materials to all modules.
               </p>
             </div>
           </div>

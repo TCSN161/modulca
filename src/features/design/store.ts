@@ -13,7 +13,7 @@ import { useQuizStore } from "@/features/quiz/store";
 const STORE_VERSION = 2;
 
 export type FinishLevelId = "basic" | "standard" | "premium";
-export type StyleDirectionId = "scandinavian" | "industrial" | "warm-contemporary" | null;
+export type StyleDirectionId = "scandinavian" | "industrial" | "warm-contemporary" | "mediterranean" | "japanese-wabi-sabi" | "traditional-romanian" | "biophilic-organic" | "eclectic-mixed" | null;
 export type WallType = "solid" | "window" | "door" | "none" | "shared";
 export type WallSide = "north" | "south" | "east" | "west";
 
@@ -38,6 +38,14 @@ export interface SavedRender {
   engine: string;
   moduleType: string;
   createdAt: string;
+  /** Auto-generated description for presentation (Step 13) */
+  description?: string;
+  /** The prompt used to generate this render */
+  prompt?: string;
+  /** Render mode: text2img or img2img */
+  mode?: "text2img" | "img2img";
+  /** Resolution used */
+  resolution?: string;
 }
 
 export interface WallConfigs {
@@ -240,6 +248,11 @@ const STYLE_DEFAULTS: Record<string, { floor: string; wall: string }> = {
   scandinavian: { floor: "oak", wall: "alabaster" },
   industrial: { floor: "concrete", wall: "slate" },
   "warm-contemporary": { floor: "walnut", wall: "sage" },
+  mediterranean: { floor: "terracotta", wall: "cream" },
+  "japanese-wabi-sabi": { floor: "bamboo", wall: "parchment" },
+  "traditional-romanian": { floor: "oak", wall: "ivory" },
+  "biophilic-organic": { floor: "oak", wall: "moss" },
+  "eclectic-mixed": { floor: "walnut", wall: "sand" },
 };
 
 export const useDesignStore = create<DesignStore>((set, get) => ({
@@ -316,7 +329,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
     set({
       modules,
       gridRotation: rotation,
-      ...(quizStyle ? { styleDirection: quizStyle } : {}),
+      ...(quizStyle ? { styleDirection: quizStyle as StyleDirectionId } : {}),
       ...(quizFinish ? { finishLevel: quizFinish } : {}),
     });
   },
