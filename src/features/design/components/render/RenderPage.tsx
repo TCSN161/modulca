@@ -398,21 +398,36 @@ export default function RenderPage() {
                 <p className="mt-1 text-[10px] text-gray-400">{AI_ENGINES[aiEngine].description}</p>
               </div>
 
-              {/* Use 3D Scene as Base (img2img) */}
+              {/* Render Mode Selector — text2img / img2img / text+img */}
               <div className="mb-3">
-                <label className="flex items-center justify-between rounded-lg bg-brand-teal-50 border border-brand-teal-200 px-3 py-2.5 cursor-pointer">
-                  <div>
-                    <span className="text-xs font-medium text-brand-teal-800">Use 3D Scene as Base</span>
-                    <p className="text-[10px] text-brand-teal-600 mt-0.5">Captures the 3D view and uses it as reference for AI</p>
-                  </div>
-                  <button type="button" role="switch" aria-checked={useSceneAsBase}
-                    onClick={() => setUseSceneAsBase((p) => !p)}
-                    className={`relative inline-flex h-5 w-9 items-center rounded-full transition-colors flex-shrink-0 ml-2 ${useSceneAsBase ? "bg-brand-teal-700" : "bg-gray-300"}`}>
-                    <span className={`inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform ${useSceneAsBase ? "translate-x-4" : "translate-x-0.5"}`} />
+                <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Render Mode</label>
+                <div className="grid grid-cols-3 gap-1">
+                  <button
+                    onClick={() => setUseSceneAsBase(false)}
+                    className={`rounded-lg px-2 py-2.5 text-center transition-colors ${!useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  >
+                    <div className="text-[10px] font-bold">Text → Image</div>
+                    <div className="text-[8px] mt-0.5 opacity-75">From prompt only</div>
                   </button>
-                </label>
-                {useSceneAsBase && aiEngine === "auto" && (
-                  <p className="mt-1 text-[10px] text-brand-amber-600">Tip: Select &quot;Stability AI&quot; engine for best img2img results</p>
+                  <button
+                    onClick={() => setUseSceneAsBase(true)}
+                    className={`rounded-lg px-2 py-2.5 text-center transition-colors ${useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
+                  >
+                    <div className="text-[10px] font-bold">3D + Text → Image</div>
+                    <div className="text-[8px] mt-0.5 opacity-75">3D scene as base</div>
+                  </button>
+                  <button
+                    disabled
+                    className="rounded-lg px-2 py-2.5 text-center bg-gray-50 text-gray-300 cursor-not-allowed"
+                  >
+                    <div className="text-[10px] font-bold">Image → Image</div>
+                    <div className="text-[8px] mt-0.5 opacity-75">Coming soon</div>
+                  </button>
+                </div>
+                {useSceneAsBase && (
+                  <p className="mt-1.5 text-[10px] text-brand-teal-600 bg-brand-teal-50 border border-brand-teal-200 rounded-md px-2 py-1.5">
+                    The 3D scene will be captured and used as a structural base. The AI will apply your style prompt while preserving the room layout.
+                  </p>
                 )}
               </div>
 
@@ -506,13 +521,29 @@ export default function RenderPage() {
                         const reader = new FileReader();
                         reader.onloadend = () => {
                           const base64 = reader.result as string;
+                          // Auto-generate description for presentation
+                          const styleName = style?.label || "Modern";
+                          const moduleName = currentMod?.label || "Module";
+                          const modeLabel = useSceneAsBase ? "3D scene conversion" : "AI text-to-image";
+                          const engineName = aiUsedEngine || "AI";
+                          const resLabel = RENDER_RESOLUTIONS[renderResolution]?.label || "Standard";
+                          const autoDescription = [
+                            `${styleName} interior design visualization of ${moduleName}.`,
+                            `Generated via ${modeLabel} using ${engineName} engine at ${resLabel} resolution.`,
+                            aiPrompt ? `Style prompt: "${aiPrompt.slice(0, 150)}${aiPrompt.length > 150 ? "..." : ""}"` : "",
+                          ].filter(Boolean).join(" ");
+
                           const render: SavedRender = {
                             id: `render-${Date.now()}`,
                             imageUrl: base64,
-                            label: `${currentMod?.label || "Module"} — AI Render`,
-                            engine: aiUsedEngine || "AI",
+                            label: `${moduleName} — ${styleName} AI Render`,
+                            engine: engineName,
                             moduleType: currentMod?.moduleType || "unknown",
                             createdAt: new Date().toISOString(),
+                            description: autoDescription,
+                            prompt: aiPrompt,
+                            mode: useSceneAsBase ? "img2img" : "text2img",
+                            resolution: resLabel,
                           };
                           useDesignStore.getState().addSavedRender(render);
                           useDesignStore.getState().saveToLocalStorage();
@@ -820,6 +851,23 @@ export default function RenderPage() {
                               </button>
                             );
                           })}
+                        </div>
+                      </div>
+                      {/* Render Mode selector (mobile) */}
+                      <div className="mb-3">
+                        <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Render Mode</label>
+                        <div className="grid grid-cols-3 gap-1">
+                          <button onClick={() => setUseSceneAsBase(false)}
+                            className={`rounded-lg px-2 py-2 text-center transition-colors ${!useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600"}`}>
+                            <div className="text-[10px] font-bold">Text→Img</div>
+                          </button>
+                          <button onClick={() => setUseSceneAsBase(true)}
+                            className={`rounded-lg px-2 py-2 text-center transition-colors ${useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600"}`}>
+                            <div className="text-[10px] font-bold">3D+Text→Img</div>
+                          </button>
+                          <button disabled className="rounded-lg px-2 py-2 text-center bg-gray-50 text-gray-300 cursor-not-allowed">
+                            <div className="text-[10px] font-bold">Img→Img</div>
+                          </button>
                         </div>
                       </div>
                       {/* AI Engine selector (mobile) */}

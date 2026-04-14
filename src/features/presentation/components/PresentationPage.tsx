@@ -719,9 +719,22 @@ export default function PresentationPage() {
                       <div key={render.id} className="rounded-xl overflow-hidden border" style={{ borderColor: tmpl.text + "20" }}>
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img src={render.imageUrl} alt={render.label} className="w-full aspect-video object-cover" />
-                        <div className="p-2">
+                        <div className="p-3">
                           <p className="text-xs font-medium" style={{ color: tmpl.text }}>{render.label}</p>
-                          <p className="text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Engine: {render.engine}</p>
+                          {render.description && (
+                            <p className="text-[10px] leading-relaxed mt-1" style={{ color: tmpl.text, opacity: 0.6 }}>{render.description}</p>
+                          )}
+                          <div className="flex items-center gap-2 mt-1">
+                            <p className="text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Engine: {render.engine}</p>
+                            {render.resolution && (
+                              <p className="text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>{render.resolution}</p>
+                            )}
+                            {render.mode && (
+                              <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: tmpl.accent + "20", color: tmpl.accent }}>
+                                {render.mode === "img2img" ? "3D+AI" : "AI"}
+                              </span>
+                            )}
+                          </div>
                         </div>
                       </div>
                     ))}
