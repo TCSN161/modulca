@@ -7,7 +7,7 @@ create table if not exists public.profiles (
   id uuid references auth.users(id) on delete cascade primary key,
   email text not null,
   display_name text,
-  tier text not null default 'free' check (tier in ('guest_free', 'free', 'premium', 'architect')),
+  tier text not null default 'free' check (tier in ('guest_free', 'free', 'premium', 'architect', 'constructor')),
   avatar_url text,
   project_count integer not null default 0,
   storage_used_mb real not null default 0,

@@ -2,7 +2,7 @@
 
 import { create } from "zustand";
 import type { AccountTier } from "./types";
-import { getTierConfig } from "./types";
+import { getTierConfig, getEffectiveTier, isBetaPromoActive, getBetaPromoDaysLeft } from "./types";
 import { getSupabase } from "@/shared/lib/supabase";
 
 /**
@@ -32,6 +32,11 @@ interface AuthStore {
   // Stripe
   stripeCustomerId: string | null;
 
+  // Beta promo
+  userCreatedAt: string | null;
+  betaPromoActive: boolean;
+  betaPromoDaysLeft: number;
+
   // Auth actions
   signUp: (email: string, password: string, name: string) => Promise<boolean>;
   signIn: (email: string, password: string) => Promise<boolean>;
@@ -41,6 +46,7 @@ interface AuthStore {
   clearError: () => void;
 
   // Helpers
+  getEffectiveTier: () => AccountTier;
   canAccess: (feature: string) => boolean;
   canCreateProject: () => { allowed: boolean; reason?: string };
   canUseAiCall: () => { allowed: boolean; reason?: string };
@@ -87,6 +93,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   monthlyRenderCount: 0,
   totalCostUsd: 0,
   stripeCustomerId: null,
+  userCreatedAt: null,
+  betaPromoActive: false,
+  betaPromoDaysLeft: 0,
 
   /* ── Sign Up ── */
   signUp: async (email, password, name) => {
@@ -230,6 +239,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       monthlyRenderCount: 0,
       totalCostUsd: 0,
       stripeCustomerId: null,
+      userCreatedAt: null,
+      betaPromoActive: false,
+      betaPromoDaysLeft: 0,
     });
   },
 
@@ -248,10 +260,17 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   clearError: () => set({ error: null }),
 
-  /* ── Feature Access ── */
+  /* ── Effective Tier (considers beta promo) ── */
+  getEffectiveTier: () => {
+    const { userTier, userCreatedAt } = get();
+    return getEffectiveTier(userTier, userCreatedAt);
+  },
+
+  /* ── Feature Access (uses effective tier for beta promo) ── */
   canAccess: (feature) => {
-    const { userTier } = get();
-    const config = getTierConfig(userTier);
+    const { userTier, userCreatedAt } = get();
+    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const config = getTierConfig(effectiveTier);
     const val = (config.features as unknown as Record<string, unknown>)[feature];
     if (typeof val === "boolean") return val;
     if (typeof val === "number") return val > 0 || val === -1;
@@ -259,8 +278,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   canCreateProject: () => {
-    const { userTier, projectCount } = get();
-    const config = getTierConfig(userTier);
+    const { userTier, userCreatedAt, projectCount } = get();
+    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const config = getTierConfig(effectiveTier);
     const max = config.features.maxProjects;
     if (max === -1) return { allowed: true };
     if (projectCount >= max) {
@@ -270,8 +290,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   canUseAiCall: () => {
-    const { userTier, aiCallsToday } = get();
-    const config = getTierConfig(userTier);
+    const { userTier, userCreatedAt, aiCallsToday } = get();
+    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const config = getTierConfig(effectiveTier);
     const max = config.features.aiRendersPerMonth;
     if (max === -1) return { allowed: true };
     // Daily limit = monthly / 30, minimum 1
@@ -296,8 +317,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   canUseMonthlyRender: () => {
-    const { userTier, monthlyRenderCount } = get();
-    const config = getTierConfig(userTier);
+    const { userTier, userCreatedAt, monthlyRenderCount } = get();
+    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const config = getTierConfig(effectiveTier);
     const max = config.features.aiRendersPerMonth;
     if (max === -1) return { allowed: true };
     if (monthlyRenderCount >= max) {
@@ -329,7 +351,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     }
   },
 
-  getTierLabel: () => getTierConfig(get().userTier).label,
+  getTierLabel: () => {
+    const { userTier, userCreatedAt } = get();
+    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const config = getTierConfig(effectiveTier);
+    if (userTier === "free" && effectiveTier === "premium") {
+      const daysLeft = getBetaPromoDaysLeft(userTier, userCreatedAt);
+      return `${config.label} (Beta — ${daysLeft}d left)`;
+    }
+    return config.label;
+  },
 
   /* ── Load Session (on page load) ── */
   loadSession: async () => {
@@ -372,7 +403,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     // Query profile — use basic columns first, extended columns may not exist yet
     let profile: Record<string, unknown> | null = null;
     const { data: p, error: profileErr } = await sb.from("profiles")
-      .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at, ai_renders_this_month, ai_renders_month, total_cost_usd, stripe_customer_id")
+      .select("display_name, tier, avatar_url, project_count, storage_used_mb, ai_calls_today, ai_calls_reset_at, ai_renders_this_month, ai_renders_month, total_cost_usd, stripe_customer_id, created_at")
       .eq("id", session.user.id)
       .single();
 
@@ -409,6 +440,15 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       monthlyRenderCount: monthlyRenders,
       totalCostUsd: (profile?.total_cost_usd as number) ?? 0,
       stripeCustomerId: (profile?.stripe_customer_id as string) ?? null,
+      userCreatedAt: (profile?.created_at as string) ?? session.user.created_at ?? null,
+      betaPromoActive: isBetaPromoActive(
+        ((profile?.tier as string) ?? "free") as AccountTier,
+        (profile?.created_at as string) ?? session.user.created_at ?? null,
+      ),
+      betaPromoDaysLeft: getBetaPromoDaysLeft(
+        ((profile?.tier as string) ?? "free") as AccountTier,
+        (profile?.created_at as string) ?? session.user.created_at ?? null,
+      ),
     });
   },
 }));

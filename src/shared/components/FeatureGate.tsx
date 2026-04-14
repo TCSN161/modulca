@@ -43,7 +43,7 @@ export default function FeatureGate({
   if (fallback) return <>{fallback}</>;
 
   // Find which tier unlocks this feature
-  const tiers = (["free", "premium", "architect"] as const);
+  const tiers = (["free", "premium", "architect", "constructor"] as const);
   const requiredTier = tiers.find((t) => {
     const config = getTierConfig(t);
     const val = (config.features as unknown as Record<string, unknown>)[requires];

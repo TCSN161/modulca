@@ -183,9 +183,12 @@ function mapPriceToTier(priceId: string | undefined): string {
   const premiumYearly = process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY;
   const architectMonthly = process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_MONTHLY;
   const architectYearly = process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_YEARLY;
+  const constructorMonthly = process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUCTOR_MONTHLY;
+  const constructorYearly = process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUCTOR_YEARLY;
 
   if (priceId === premiumMonthly || priceId === premiumYearly) return "premium";
   if (priceId === architectMonthly || priceId === architectYearly) return "architect";
+  if (priceId === constructorMonthly || priceId === constructorYearly) return "constructor";
 
   return "free";
 }

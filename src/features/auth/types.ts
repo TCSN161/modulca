@@ -1,13 +1,19 @@
 /**
  * ModulCA Account Architecture
  * ─────────────────────────────
- * Three tiers with progressive feature access:
- *   1. Free       — basic exploration & design
- *   2. Premium    — full client experience
- *   3. Architect  — professional tools + multi-project management
+ * Five tiers with progressive feature access:
+ *   1. Guest (Visitor) — browse without account, very limited
+ *   2. Free (Explorer) — registered, basic features (3-month beta promo → Premium)
+ *   3. Premium          — €29/mo, full individual experience
+ *   4. Architect         — €79/mo, professional tools + team collaboration
+ *   5. Constructor       — €149/mo, enterprise: unlimited, white-label, API
+ *
+ * Beta promotion (until ~July 2026):
+ *   Free accounts get Premium-level access for 3 months after registration.
+ *   After 3 months, they revert to standard Free tier limits.
  */
 
-export type AccountTier = "guest_free" | "free" | "premium" | "architect";
+export type AccountTier = "guest_free" | "free" | "premium" | "architect" | "constructor";
 
 export interface AccountTierConfig {
   id: AccountTier;
@@ -36,8 +42,8 @@ export interface FeatureAccess {
   moduleSwap: boolean;              // right-click swap feature
 
   // Step 4 — Design Vision
-  styleDirections: number;          // number of style presets
-  moodboardPins: number;            // max moodboard images
+  styleDirections: number;          // number of style presets (-1 = unlimited)
+  moodboardPins: number;            // max moodboard images (-1 = unlimited)
   customStyleUpload: boolean;       // upload reference photos
 
   // Step 5 — Configure (Materials)
@@ -51,10 +57,10 @@ export interface FeatureAccess {
   directPurchase: boolean;          // buy through platform
 
   // Step 7 — AI Render
-  aiRendersPerMonth: number;        // monthly AI render quota
+  aiRendersPerMonth: number;        // monthly AI render quota (-1 = unlimited)
   maxCostUsdPerImage: number;       // max cost per single render (USD) — controls which engines are allowed
   renderResolution: "sd" | "hd" | "4k";
-  savedRenders: number;             // max saved renders
+  savedRenders: number;             // max saved renders (-1 = unlimited)
 
   // Step 8 — Technical
   allDrawingTypes: boolean;         // all 6 drawing types
@@ -80,14 +86,14 @@ export interface FeatureAccess {
   builderDirectory: boolean;        // find builders/architects
 
   // Project Management
-  maxProjects: number;              // total saved projects
+  maxProjects: number;              // total saved projects (-1 = unlimited)
   projectCollaboration: boolean;    // invite team members
   clientDashboard: boolean;         // client-facing view
   analytics: boolean;               // project analytics
   whiteLabel: boolean;              // remove ModulCA branding
 
   // Support
-  supportLevel: "community" | "email" | "priority";
+  supportLevel: "community" | "email" | "priority" | "dedicated";
 }
 
 /** ────────────────────────────────────────────────────────────── */
@@ -95,6 +101,7 @@ export interface FeatureAccess {
 /** ────────────────────────────────────────────────────────────── */
 
 export const ACCOUNT_TIERS: AccountTierConfig[] = [
+  /* ── 1. Guest / Visitor ── */
   {
     id: "guest_free",
     label: "Guest",
@@ -102,263 +109,271 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
     description: "Try ModulCA without signing up. Limited features.",
     priceMonthly: null,
     priceYearly: null,
-    color: "#9CA3AF", // light gray
+    color: "#9CA3AF",
     features: {
-      // Land
       maxTerrainSize: 500,
       customTerrainShape: false,
       importCadastralData: false,
-      // Layout
       maxModules: 4,
       allModuleTypes: false,
       customModuleDimensions: false,
-      // Preview
       highQualityPreview: false,
       moduleSwap: false,
-      // Vision
       styleDirections: 1,
       moodboardPins: 3,
       customStyleUpload: false,
-      // Materials
       allMaterials: false,
       customMaterials: false,
       furnitureOverrides: false,
-      // Products
       productCatalog: true,
       partnerPricing: false,
       directPurchase: false,
-      // Render
-      aiRendersPerMonth: 3, // ~3/day via daily limit logic
-      maxCostUsdPerImage: 0.005, // only free engines (Pollinations, AI Horde)
+      aiRendersPerMonth: 3,
+      maxCostUsdPerImage: 0.005,
       renderResolution: "sd",
       savedRenders: 3,
-      // Technical
       allDrawingTypes: false,
       drawingPresentation: false,
       knowledgeBase: false,
       permitTracker: false,
       exportPdf: false,
       exportDwg: false,
-      // Walkthrough
       walkthrough: true,
       autoTour: false,
       vrMode: false,
-      // Presentation
       presentationTemplates: 0,
       pdfPresentation: false,
       sharableLink: false,
-      // Marketplace
       marketplaceBrowse: true,
       marketplaceList: false,
       builderDirectory: false,
-      // Projects
       maxProjects: 1,
       projectCollaboration: false,
       clientDashboard: false,
       analytics: false,
       whiteLabel: false,
-      // Support
       supportLevel: "community",
     },
   },
+
+  /* ── 2. Free / Explorer ── */
   {
     id: "free",
     label: "Explorer",
     labelRo: "Explorator",
-    description: "Discover modular construction. Design your first home for free.",
+    description: "Design your first modular home for free. Upgrade anytime.",
     priceMonthly: null,
     priceYearly: null,
-    color: "#6B7280", // gray
+    color: "#6B7280",
     features: {
-      // NOTE: Free tier is fully unlocked for demo/MVP phase.
-      // Re-enable limits when real billing (Stripe) is connected.
-      // Land
-      maxTerrainSize: 2000,
-      customTerrainShape: true,
+      // Post-beta limits (during beta promo, free users get Premium features)
+      maxTerrainSize: 1000,
+      customTerrainShape: false,
       importCadastralData: false,
-      // Layout
-      maxModules: 12,
+      maxModules: 6,
       allModuleTypes: true,
       customModuleDimensions: false,
-      // Preview
       highQualityPreview: true,
       moduleSwap: true,
-      // Vision
-      styleDirections: 3,
-      moodboardPins: 12,
-      customStyleUpload: true,
-      // Materials
+      styleDirections: 2,
+      moodboardPins: 6,
+      customStyleUpload: false,
       allMaterials: true,
       customMaterials: false,
       furnitureOverrides: true,
-      // Products
       productCatalog: true,
-      partnerPricing: true,
+      partnerPricing: false,
       directPurchase: false,
-      // Render
-      aiRendersPerMonth: -1, // unlimited for demo
-      maxCostUsdPerImage: 0.01, // free tier: only free/near-free engines
-      renderResolution: "hd",
-      savedRenders: 20,
-      // Technical
-      allDrawingTypes: true,
-      drawingPresentation: true,
+      aiRendersPerMonth: 5,
+      maxCostUsdPerImage: 0.005,
+      renderResolution: "sd",
+      savedRenders: 10,
+      allDrawingTypes: false,
+      drawingPresentation: false,
       knowledgeBase: true,
-      permitTracker: true,
-      exportPdf: true,
+      permitTracker: false,
+      exportPdf: false,
       exportDwg: false,
-      // Walkthrough
       walkthrough: true,
-      autoTour: true,
+      autoTour: false,
       vrMode: false,
-      // Presentation
-      presentationTemplates: 3,
-      pdfPresentation: true,
-      sharableLink: true,
-      // Marketplace
+      presentationTemplates: 1,
+      pdfPresentation: false,
+      sharableLink: false,
       marketplaceBrowse: true,
-      marketplaceList: true,
-      builderDirectory: true,
-      // Projects
-      maxProjects: 5,
+      marketplaceList: false,
+      builderDirectory: false,
+      maxProjects: 2,
       projectCollaboration: false,
       clientDashboard: false,
       analytics: false,
       whiteLabel: false,
-      // Support
       supportLevel: "community",
     },
   },
+
+  /* ── 3. Premium — €29/month ── */
   {
     id: "premium",
     label: "Premium",
     labelRo: "Premium",
-    description: "Full design experience. Everything you need to plan your modular home.",
-    priceMonthly: 19,
-    priceYearly: 190, // ~17% savings
-    color: "#F59E0B", // amber
+    description: "Full design experience. Everything to plan your modular home.",
+    priceMonthly: 29,
+    priceYearly: 290, // ~17% savings (2 months free)
+    color: "#F59E0B",
     features: {
-      // Land
-      maxTerrainSize: 2000,
+      maxTerrainSize: 5000,
       customTerrainShape: true,
       importCadastralData: true,
-      // Layout
       maxModules: 12,
       allModuleTypes: true,
       customModuleDimensions: false,
-      // Preview
       highQualityPreview: true,
       moduleSwap: true,
-      // Vision
-      styleDirections: 3,
-      moodboardPins: 12,
+      styleDirections: 5,
+      moodboardPins: 20,
       customStyleUpload: true,
-      // Materials
       allMaterials: true,
       customMaterials: false,
       furnitureOverrides: true,
-      // Products
       productCatalog: true,
       partnerPricing: true,
       directPurchase: true,
-      // Render
-      aiRendersPerMonth: 30,
-      maxCostUsdPerImage: 0.05, // premium: mid-tier engines (Stability, Together Kontext)
+      aiRendersPerMonth: 50,
+      maxCostUsdPerImage: 0.05,
       renderResolution: "hd",
-      savedRenders: 20,
-      // Technical
+      savedRenders: 30,
       allDrawingTypes: true,
       drawingPresentation: true,
       knowledgeBase: true,
       permitTracker: true,
       exportPdf: true,
       exportDwg: false,
-      // Walkthrough
       walkthrough: true,
       autoTour: true,
       vrMode: false,
-      // Presentation
       presentationTemplates: 3,
       pdfPresentation: true,
       sharableLink: true,
-      // Marketplace
       marketplaceBrowse: true,
       marketplaceList: true,
       builderDirectory: true,
-      // Projects
-      maxProjects: 5,
+      maxProjects: 10,
       projectCollaboration: false,
       clientDashboard: false,
       analytics: false,
       whiteLabel: false,
-      // Support
       supportLevel: "email",
     },
   },
+
+  /* ── 4. Architect — €79/month ── */
   {
     id: "architect",
-    label: "Architect / Builder",
-    labelRo: "Arhitect / Constructor",
-    description: "Professional toolkit. Manage clients, projects, and collaborate with your team.",
-    priceMonthly: 49,
-    priceYearly: 490, // ~17% savings
-    color: "#1D6B6B", // teal
+    label: "Architect",
+    labelRo: "Arhitect",
+    description: "Professional toolkit. Manage clients, projects, and collaborate.",
+    priceMonthly: 79,
+    priceYearly: 790, // ~17% savings
+    color: "#1D6B6B",
     features: {
-      // Land
       maxTerrainSize: 10000,
       customTerrainShape: true,
       importCadastralData: true,
-      // Layout
       maxModules: 50,
       allModuleTypes: true,
       customModuleDimensions: true,
-      // Preview
       highQualityPreview: true,
       moduleSwap: true,
-      // Vision
-      styleDirections: 3,
+      styleDirections: -1, // unlimited
       moodboardPins: 50,
       customStyleUpload: true,
-      // Materials
       allMaterials: true,
       customMaterials: true,
       furnitureOverrides: true,
-      // Products
       productCatalog: true,
       partnerPricing: true,
       directPurchase: true,
-      // Render
-      aiRendersPerMonth: 100,
-      maxCostUsdPerImage: 0.10, // architect: all engines including premium
+      aiRendersPerMonth: 200,
+      maxCostUsdPerImage: 0.10,
       renderResolution: "4k",
       savedRenders: 100,
-      // Technical
       allDrawingTypes: true,
       drawingPresentation: true,
       knowledgeBase: true,
       permitTracker: true,
       exportPdf: true,
       exportDwg: true,
-      // Walkthrough
       walkthrough: true,
       autoTour: true,
       vrMode: true,
-      // Presentation
-      presentationTemplates: 3,
+      presentationTemplates: 5,
       pdfPresentation: true,
       sharableLink: true,
-      // Marketplace
       marketplaceBrowse: true,
       marketplaceList: true,
       builderDirectory: true,
-      // Projects
       maxProjects: -1, // unlimited
       projectCollaboration: true,
       clientDashboard: true,
       analytics: true,
-      whiteLabel: true,
-      // Support
+      whiteLabel: false,
       supportLevel: "priority",
+    },
+  },
+
+  /* ── 5. Constructor — €149/month ── */
+  {
+    id: "constructor",
+    label: "Constructor",
+    labelRo: "Constructor",
+    description: "Enterprise solution. Unlimited projects, white-label, dedicated support.",
+    priceMonthly: 149,
+    priceYearly: 1490, // ~17% savings
+    color: "#7C3AED",
+    features: {
+      maxTerrainSize: 50000,
+      customTerrainShape: true,
+      importCadastralData: true,
+      maxModules: 200,
+      allModuleTypes: true,
+      customModuleDimensions: true,
+      highQualityPreview: true,
+      moduleSwap: true,
+      styleDirections: -1,
+      moodboardPins: -1,
+      customStyleUpload: true,
+      allMaterials: true,
+      customMaterials: true,
+      furnitureOverrides: true,
+      productCatalog: true,
+      partnerPricing: true,
+      directPurchase: true,
+      aiRendersPerMonth: -1, // unlimited
+      maxCostUsdPerImage: 0.15,
+      renderResolution: "4k",
+      savedRenders: -1,
+      allDrawingTypes: true,
+      drawingPresentation: true,
+      knowledgeBase: true,
+      permitTracker: true,
+      exportPdf: true,
+      exportDwg: true,
+      walkthrough: true,
+      autoTour: true,
+      vrMode: true,
+      presentationTemplates: 10,
+      pdfPresentation: true,
+      sharableLink: true,
+      marketplaceBrowse: true,
+      marketplaceList: true,
+      builderDirectory: true,
+      maxProjects: -1,
+      projectCollaboration: true,
+      clientDashboard: true,
+      analytics: true,
+      whiteLabel: true,
+      supportLevel: "dedicated",
     },
   },
 ];
@@ -377,6 +392,39 @@ export function hasFeature(tier: AccountTier, feature: keyof FeatureAccess): boo
   return value !== "community"; // for supportLevel, anything above community
 }
 
+/**
+ * Beta promotion: free accounts get Premium-level access for 3 months.
+ * Check if a free account qualifies based on created_at timestamp.
+ */
+export function isBetaPromoActive(tier: AccountTier, createdAt: string | Date | null): boolean {
+  if (tier !== "free" || !createdAt) return false;
+  const created = new Date(createdAt);
+  const promoEnd = new Date(created);
+  promoEnd.setMonth(promoEnd.getMonth() + 3);
+  return new Date() < promoEnd;
+}
+
+/**
+ * Get the effective tier considering beta promo.
+ * Free users within 3 months of registration → Premium features.
+ */
+export function getEffectiveTier(tier: AccountTier, createdAt: string | Date | null): AccountTier {
+  if (isBetaPromoActive(tier, createdAt)) return "premium";
+  return tier;
+}
+
+/**
+ * Get remaining beta promo days (0 if expired or not eligible).
+ */
+export function getBetaPromoDaysLeft(tier: AccountTier, createdAt: string | Date | null): number {
+  if (tier !== "free" || !createdAt) return 0;
+  const created = new Date(createdAt);
+  const promoEnd = new Date(created);
+  promoEnd.setMonth(promoEnd.getMonth() + 3);
+  const diff = promoEnd.getTime() - Date.now();
+  return diff > 0 ? Math.ceil(diff / 86400_000) : 0;
+}
+
 /** Features that differ between tiers — for comparison table */
 export const FEATURE_COMPARISON_ROWS: {
   category: string;
@@ -388,7 +436,7 @@ export const FEATURE_COMPARISON_ROWS: {
       { label: "Max modules per project", key: "maxModules", format: "number" },
       { label: "All module types", key: "allModuleTypes" },
       { label: "Custom module dimensions", key: "customModuleDimensions" },
-      { label: "Max terrain size (m²)", key: "maxTerrainSize", format: "number" },
+      { label: "Max terrain size (m\u00B2)", key: "maxTerrainSize", format: "number" },
       { label: "Cadastral data import", key: "importCadastralData" },
     ],
   },

@@ -29,10 +29,12 @@ export function getStripe() {
  * Each with monthly + yearly prices.
  */
 export const STRIPE_PRICES = {
-  premium_monthly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY  || "",
-  premium_yearly:   process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY   || "",
-  architect_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_MONTHLY || "",
-  architect_yearly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_YEARLY  || "",
+  premium_monthly:     process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY     || "",
+  premium_yearly:      process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY      || "",
+  architect_monthly:   process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_MONTHLY   || "",
+  architect_yearly:    process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_YEARLY    || "",
+  constructor_monthly: process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUCTOR_MONTHLY || "",
+  constructor_yearly:  process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUCTOR_YEARLY  || "",
 } as const;
 
 /**
