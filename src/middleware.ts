@@ -23,6 +23,8 @@ const PUBLIC_PATHS = [
   "/blog",
   "/portfolio",
   "/pricing",
+  "/library",
+  "/quiz",
 ];
 
 const PUBLIC_PREFIXES = [

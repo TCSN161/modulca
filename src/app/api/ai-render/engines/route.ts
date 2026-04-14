@@ -43,5 +43,13 @@ const ENGINE_LIST: EngineInfo[] = [
 ];
 
 export async function GET() {
-  return NextResponse.json(ENGINE_LIST);
+  try {
+    return NextResponse.json(ENGINE_LIST);
+  } catch (error) {
+    console.error("[api/ai-render/engines] GET error:", error);
+    return NextResponse.json(
+      { error: "Failed to retrieve engine list" },
+      { status: 500 },
+    );
+  }
 }

@@ -29,30 +29,38 @@ const PROVIDER_INFO: { id: string; keyCheck?: () => boolean; keyEnv?: string; mo
 ];
 
 export async function GET() {
-  const providers: ProviderStatus[] = PROVIDER_INFO.map((p) => ({
-    id: p.id,
-    configured: p.keyCheck ? p.keyCheck() : p.keyEnv ? !!process.env[p.keyEnv] : true,
-    model: p.model,
-    tiers: p.tiers,
-  }));
+  try {
+    const providers: ProviderStatus[] = PROVIDER_INFO.map((p) => ({
+      id: p.id,
+      configured: p.keyCheck ? p.keyCheck() : p.keyEnv ? !!process.env[p.keyEnv] : true,
+      model: p.model,
+      tiers: p.tiers,
+    }));
 
-  const configuredCount = providers.filter((p) => p.configured).length;
+    const configuredCount = providers.filter((p) => p.configured).length;
 
-  return NextResponse.json({
-    status: "ok",
-    timestamp: new Date().toISOString(),
-    knowledge: {
-      articles: ARTICLES.length,
-      categories: CATEGORIES.filter((c) => c.articleCount > 0).length,
-      regions: REGIONS.filter((r) => (r.articleCount ?? 0) > 0).length,
-    },
-    providers,
-    summary: {
-      total: providers.length,
-      configured: configuredCount,
-      freeTierReady: providers.some((p) => p.configured && p.tiers.includes("free")),
-      premiumReady: providers.some((p) => p.configured && p.tiers.includes("premium") && p.id !== "groq"),
-      architectReady: providers.some((p) => p.configured && p.tiers.includes("architect") && p.id === "anthropic"),
-    },
-  });
+    return NextResponse.json({
+      status: "ok",
+      timestamp: new Date().toISOString(),
+      knowledge: {
+        articles: ARTICLES.length,
+        categories: CATEGORIES.filter((c) => c.articleCount > 0).length,
+        regions: REGIONS.filter((r) => (r.articleCount ?? 0) > 0).length,
+      },
+      providers,
+      summary: {
+        total: providers.length,
+        configured: configuredCount,
+        freeTierReady: providers.some((p) => p.configured && p.tiers.includes("free")),
+        premiumReady: providers.some((p) => p.configured && p.tiers.includes("premium") && p.id !== "groq"),
+        architectReady: providers.some((p) => p.configured && p.tiers.includes("architect") && p.id === "anthropic"),
+      },
+    });
+  } catch (error) {
+    console.error("[api/health] GET error:", error);
+    return NextResponse.json(
+      { error: "Health check failed" },
+      { status: 500 },
+    );
+  }
 }

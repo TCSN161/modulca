@@ -10,6 +10,14 @@ export const dynamic = "force-dynamic";
  * Used by admin dashboard to monitor spending and remaining credits.
  */
 export async function GET() {
-  const summary = getBudgetSummary();
-  return NextResponse.json(summary);
+  try {
+    const summary = getBudgetSummary();
+    return NextResponse.json(summary);
+  } catch (error) {
+    console.error("[api/ai-render/budget] GET error:", error);
+    return NextResponse.json(
+      { error: "Failed to retrieve budget summary" },
+      { status: 500 },
+    );
+  }
 }
