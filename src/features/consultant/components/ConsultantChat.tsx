@@ -35,7 +35,7 @@ const KB_TOPICS = [
 ];
 
 export default function ConsultantChat() {
-  const userTier = useAuthStore((s) => s.userTier);
+  const userTier = useAuthStore((s) => s.getEffectiveTier());
   const quizProfile = useQuizStore((s) => s.profile);
   const searchParams = useSearchParams();
   const [messages, setMessages] = useState<Message[]>([]);

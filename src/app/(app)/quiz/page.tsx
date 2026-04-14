@@ -7,6 +7,7 @@ import { AuthNav } from "@/features/auth/components/AuthNav";
 import { useQuizStore } from "@/features/quiz/store";
 import { computeStyleScores, STYLE_LABELS, STYLE_MATERIALS, STYLE_ARTICLE_MAP } from "@/knowledge/14-quiz/scoring/style-mapping";
 import { quickEstimate } from "@/knowledge/14-quiz/scoring/module-estimator";
+import { exportQuizProfilePdf } from "@/features/quiz/exportPdf";
 
 /* ------------------------------------------------------------------ */
 /*  Quiz Data — hardcoded from .md section files                       */
@@ -15,6 +16,8 @@ import { quickEstimate } from "@/knowledge/14-quiz/scoring/module-estimator";
 interface QuizOption {
   label: string;
   value: string;
+  /** Optional image URL for visual questions */
+  image?: string;
 }
 
 interface QuizQuestionDef {
@@ -178,32 +181,32 @@ const SECTIONS: QuizSection[] = [
         id: "style-overall",
         text: "Which architectural style resonates with you most?",
         options: [
-          { label: "Modern — clean geometry, flat roof, glass", value: "modern-minimalist" },
-          { label: "Traditional — pitched roof, warm materials", value: "traditional-romanian" },
-          { label: "Organic — flowing shapes, natural integration", value: "warm-organic" },
-          { label: "Industrial — exposed structure, raw materials", value: "industrial-loft" },
-          { label: "Scandinavian — light wood, functional beauty", value: "scandinavian-functional" },
+          { label: "Modern — clean geometry, flat roof, glass", value: "modern-minimalist", image: "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=300&fit=crop" },
+          { label: "Traditional — pitched roof, warm materials", value: "traditional-romanian", image: "https://images.unsplash.com/photo-1518780664697-55e3ad937233?w=400&h=300&fit=crop" },
+          { label: "Organic — flowing shapes, natural integration", value: "warm-organic", image: "https://images.unsplash.com/photo-1600596542815-ffad4c1539a9?w=400&h=300&fit=crop" },
+          { label: "Industrial — exposed structure, raw materials", value: "industrial-loft", image: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&h=300&fit=crop" },
+          { label: "Scandinavian — light wood, functional beauty", value: "scandinavian-functional", image: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&h=300&fit=crop" },
         ],
       },
       {
         id: "material-preference",
         text: "Which building material do you find most appealing?",
         options: [
-          { label: "Wood — warm, natural, versatile", value: "wood" },
-          { label: "Concrete — bold, sculptural, modern", value: "concrete" },
-          { label: "Glass — transparent, light-filled", value: "glass" },
-          { label: "Stone — solid, timeless, grounded", value: "stone" },
-          { label: "Mixed — combination depending on context", value: "mixed" },
+          { label: "Wood — warm, natural, versatile", value: "wood", image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop" },
+          { label: "Concrete — bold, sculptural, modern", value: "concrete", image: "https://images.unsplash.com/photo-1481277542470-605612bd2d61?w=400&h=300&fit=crop" },
+          { label: "Glass — transparent, light-filled", value: "glass", image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop" },
+          { label: "Stone — solid, timeless, grounded", value: "stone", image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=400&h=300&fit=crop" },
+          { label: "Mixed — combination depending on context", value: "mixed", image: "https://images.unsplash.com/photo-1600566753190-17f0baa2a6c3?w=400&h=300&fit=crop" },
         ],
       },
       {
         id: "color-palette",
         text: "What color palette do you prefer for interiors?",
         options: [
-          { label: "Warm — earth tones, amber, terracotta", value: "warm" },
-          { label: "Cool — blues, greens, greys", value: "cool" },
-          { label: "Neutral — whites, beiges, light wood", value: "neutral" },
-          { label: "Bold — strong colors, high contrast", value: "bold" },
+          { label: "Warm — earth tones, amber, terracotta", value: "warm", image: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&h=300&fit=crop" },
+          { label: "Cool — blues, greens, greys", value: "cool", image: "https://images.unsplash.com/photo-1600121848594-d8644e57abab?w=400&h=300&fit=crop" },
+          { label: "Neutral — whites, beiges, light wood", value: "neutral", image: "https://images.unsplash.com/photo-1600210491892-03d54c0aaf87?w=400&h=300&fit=crop" },
+          { label: "Bold — strong colors, high contrast", value: "bold", image: "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=400&h=300&fit=crop" },
         ],
       },
       {
@@ -474,21 +477,49 @@ function QuestionCard({
   answer: string | undefined;
   onAnswer: (value: string) => void;
 }) {
+  const hasImages = question.options.some((o) => o.image);
+
   return (
     <div className="mx-auto max-w-xl">
       <h3 className="mb-6 text-lg font-semibold text-gray-900">{question.text}</h3>
-      <div className="space-y-3">
+      <div className={hasImages ? "grid grid-cols-2 sm:grid-cols-3 gap-3" : "space-y-3"}>
         {question.options.map((opt) => (
           <button
             key={opt.value}
             onClick={() => onAnswer(opt.value)}
-            className={`w-full rounded-xl border-2 p-4 text-left text-sm transition-all ${
-              answer === opt.value
-                ? "border-brand-teal-800 bg-brand-teal-50 text-brand-teal-900 font-medium"
-                : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
-            }`}
+            className={hasImages
+              ? `rounded-xl border-2 overflow-hidden text-left transition-all ${
+                  answer === opt.value
+                    ? "border-brand-teal-800 ring-2 ring-brand-teal-200"
+                    : "border-gray-200 hover:border-gray-300"
+                }`
+              : `w-full rounded-xl border-2 p-4 text-left text-sm transition-all ${
+                  answer === opt.value
+                    ? "border-brand-teal-800 bg-brand-teal-50 text-brand-teal-900 font-medium"
+                    : "border-gray-200 bg-white text-gray-700 hover:border-gray-300 hover:bg-gray-50"
+                }`
+            }
           >
-            {opt.label}
+            {opt.image ? (
+              <>
+                <div className="aspect-[4/3] w-full bg-gray-100 overflow-hidden">
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src={opt.image}
+                    alt={opt.label}
+                    className="h-full w-full object-cover"
+                    loading="lazy"
+                  />
+                </div>
+                <div className={`p-2.5 text-xs leading-snug ${
+                  answer === opt.value ? "font-medium text-brand-teal-900 bg-brand-teal-50" : "text-gray-600"
+                }`}>
+                  {opt.label}
+                </div>
+              </>
+            ) : (
+              opt.label
+            )}
           </button>
         ))}
       </div>
@@ -584,8 +615,20 @@ function ProfileResult({ profile, onStartDesign, onRetake }: { profile: ReturnTy
         </Link>
       </div>
 
-      {/* Retake */}
-      <div className="mt-4 text-center">
+      {/* Secondary actions */}
+      <div className="mt-4 flex items-center justify-center gap-4">
+        <button
+          onClick={() => {
+            const quizProfile = useQuizStore.getState().profile;
+            if (quizProfile) exportQuizProfilePdf(quizProfile);
+          }}
+          className="flex items-center gap-1.5 text-xs text-gray-500 hover:text-gray-700 hover:underline"
+        >
+          <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+          </svg>
+          Download PDF
+        </button>
         <button onClick={onRetake} className="text-xs text-gray-400 hover:text-gray-600 hover:underline">
           Retake quiz
         </button>

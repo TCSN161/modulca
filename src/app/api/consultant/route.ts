@@ -10,9 +10,55 @@ export const dynamic = "force-dynamic";
  * Neufert AI Architectural Consultant — API route
  * RAG-powered: scores user question → fetches top KB articles → injects into LLM context.
  * Fallback chain: Groq → Together → Pollinations → Local KB.
+ * Includes an in-memory LRU cache (1h TTL, 100 entries) to reduce API costs.
  */
 
 const KB_ROOT = join(process.cwd(), "src", "knowledge");
+
+/* ------------------------------------------------------------------ */
+/*  In-memory response cache                                           */
+/* ------------------------------------------------------------------ */
+
+interface CacheEntry {
+  reply: string;
+  provider: string;
+  model: string;
+  articlesUsed: string[];
+  timestamp: number;
+}
+
+const CACHE_MAX_ENTRIES = 100;
+const CACHE_TTL_MS = 60 * 60 * 1000; // 1 hour
+
+const responseCache = new Map<string, CacheEntry>();
+
+function getCacheKey(question: string, tier: string): string {
+  // Normalize: lowercase, collapse whitespace, trim
+  const normalized = question.toLowerCase().replace(/\s+/g, " ").trim();
+  return `${tier}:${normalized}`;
+}
+
+function getCachedResponse(key: string): CacheEntry | null {
+  const entry = responseCache.get(key);
+  if (!entry) return null;
+  if (Date.now() - entry.timestamp > CACHE_TTL_MS) {
+    responseCache.delete(key);
+    return null;
+  }
+  // Move to end (LRU refresh)
+  responseCache.delete(key);
+  responseCache.set(key, entry);
+  return entry;
+}
+
+function setCachedResponse(key: string, entry: Omit<CacheEntry, "timestamp">) {
+  // Evict oldest entries if at capacity
+  if (responseCache.size >= CACHE_MAX_ENTRIES) {
+    const oldest = responseCache.keys().next().value!;
+    responseCache.delete(oldest);
+  }
+  responseCache.set(key, { ...entry, timestamp: Date.now() });
+}
 
 const BASE_SYSTEM_PROMPT = `You are an expert architectural consultant for ModulCA (modulca.eu) — a platform for designing modular wooden homes using a 3×3m module system.
 
@@ -413,6 +459,26 @@ export async function POST(req: NextRequest) {
     const lastUserMsg = messages.filter((m: { role: string }) => m.role === "user").pop();
     const question = lastUserMsg?.content || "";
 
+    // Check cache for single-turn questions (no conversation history beyond system+user)
+    const userMessages = messages.filter((m: { role: string }) => m.role === "user");
+    const isSimpleQuery = userMessages.length === 1 && !quizProfile;
+    const cacheKey = isSimpleQuery ? getCacheKey(question, tier || "free") : null;
+
+    if (cacheKey) {
+      const cached = getCachedResponse(cacheKey);
+      if (cached) {
+        console.log(`[consultant] Cache hit for "${question.slice(0, 50)}..."`);
+        return NextResponse.json({
+          reply: cached.reply,
+          provider: cached.provider,
+          model: cached.model,
+          tier: tier || "free",
+          articlesUsed: cached.articlesUsed,
+          cached: true,
+        });
+      }
+    }
+
     // Build dynamic system prompt with relevant KB articles (depth varies by tier)
     const { context: ragContext, articlesUsed } = await buildRAGContext(question, tierCfg.maxArticles, tierCfg.maxChars);
     const tierNote = tierCfg.answerNote
@@ -478,8 +544,20 @@ export async function POST(req: NextRequest) {
 
         if (reply && reply.trim()) {
           console.log(`[consultant] ${provider.id} success (${reply.length} chars)`);
+          const trimmedReply = reply.trim();
+
+          // Cache single-turn responses
+          if (cacheKey) {
+            setCachedResponse(cacheKey, {
+              reply: trimmedReply,
+              provider: provider.id,
+              model: provider.model,
+              articlesUsed,
+            });
+          }
+
           return NextResponse.json({
-            reply: reply.trim(),
+            reply: trimmedReply,
             provider: provider.id,
             model: provider.model,
             tier: tier || "free",

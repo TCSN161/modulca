@@ -3,7 +3,7 @@
 import { useState } from "react";
 import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store";
-import { ACCOUNT_TIERS, type AccountTier } from "@/features/auth/types";
+import { ACCOUNT_TIERS, FEATURE_COMPARISON_ROWS, type AccountTier } from "@/features/auth/types";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import { STRIPE_PRICES, redirectToCheckout, isStripeConfigured } from "@/shared/lib/stripe";
 
@@ -233,6 +233,61 @@ export default function PricingPage() {
           </p>
         </div>
 
+        {/* Feature comparison table */}
+        <div className="mt-14">
+          <h2 className="text-lg font-bold text-brand-teal-800 text-center mb-6">
+            Detailed Feature Comparison
+          </h2>
+          <div className="overflow-x-auto rounded-xl border border-gray-200 bg-white">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="border-b border-gray-200 bg-gray-50">
+                  <th className="py-3 px-4 text-left font-semibold text-gray-700 w-[200px]">Feature</th>
+                  {VISIBLE_TIERS.map((t) => (
+                    <th key={t.id} className="py-3 px-3 text-center font-semibold" style={{ color: t.color }}>
+                      {t.label}
+                    </th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {FEATURE_COMPARISON_ROWS.map((group) => (
+                  <>
+                    <tr key={`cat-${group.category}`} className="border-t border-gray-100 bg-gray-50/50">
+                      <td colSpan={VISIBLE_TIERS.length + 1} className="py-2 px-4 text-xs font-bold text-gray-500 uppercase tracking-wide">
+                        {group.category}
+                      </td>
+                    </tr>
+                    {group.features.map((feat) => (
+                      <tr key={feat.key} className="border-t border-gray-50 hover:bg-gray-50/40">
+                        <td className="py-2 px-4 text-gray-600">{feat.label}</td>
+                        {VISIBLE_TIERS.map((t) => {
+                          const val = t.features[feat.key];
+                          let display: string;
+                          if (typeof val === "boolean") {
+                            display = val ? "\u2713" : "\u2014";
+                          } else if (typeof val === "number") {
+                            display = val === -1 ? "Unlimited" : String(val);
+                          } else {
+                            display = String(val);
+                          }
+                          return (
+                            <td key={t.id} className={`py-2 px-3 text-center ${
+                              typeof val === "boolean" ? (val ? "text-brand-teal-600 font-bold" : "text-gray-300") : "text-gray-700"
+                            }`}>
+                              {display}
+                            </td>
+                          );
+                        })}
+                      </tr>
+                    ))}
+                  </>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
         {/* FAQ */}
         <div className="mt-12 text-center">
           <h2 className="text-lg font-bold text-brand-teal-800 mb-4">Questions?</h2>
@@ -276,7 +331,8 @@ function getFeatureList(tier: string): string[] {
         "5 AI renders/month (SD)",
         "Floor plan + section drawings",
         "3D walkthrough",
-        "Knowledge base access",
+        "Knowledge base (123 free articles)",
+        "AI consultant (basic, 1 country)",
         "2 saved projects",
         "3-month Premium beta bonus",
       ];
@@ -286,9 +342,10 @@ function getFeatureList(tier: string): string[] {
         "50 AI renders/month (HD)",
         "All 6 drawing types + PDF export",
         "Auto-tour + permit tracker",
+        "Full knowledge library (180 articles)",
+        "AI consultant (GPT-4o, 3 countries)",
         "Product catalog with real pricing",
         "10 projects + sharable links",
-        "Cadastral data import",
         "Email support",
       ];
     case "architect":
@@ -296,22 +353,23 @@ function getFeatureList(tier: string): string[] {
         "Up to 50 modules, custom sizes",
         "200 AI renders/month (4K)",
         "DWG/DXF export for CAD",
+        "Full library + all country regulations",
+        "AI consultant (Claude, deep context)",
         "Team collaboration (5 members)",
         "Client dashboard + analytics",
         "Unlimited projects",
-        "Custom materials",
         "VR mode + priority support",
       ];
     case "constructor":
       return [
         "Up to 200 modules per project",
         "Unlimited AI renders (4K)",
+        "Full library + unlimited AI context",
         "White-label branding",
         "Unlimited team members",
         "Advanced analytics + API",
         "Unlimited projects",
         "Dedicated account manager",
-        "Custom enterprise pricing",
       ];
     default:
       return [];

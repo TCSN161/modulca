@@ -172,6 +172,7 @@ function ArticleDetail({
   const [content, setContent] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
   const [truncated, setTruncated] = useState(false);
+  const [readingTime, setReadingTime] = useState(0);
 
   useEffect(() => {
     setLoading(true);
@@ -182,6 +183,7 @@ function ArticleDetail({
         if (data.content) {
           setContent(data.content);
           setTruncated(!!data.truncated);
+          setReadingTime(data.readingTime || 0);
         } else if (data.error === "Premium required") {
           setContent(null);
         } else {
@@ -234,6 +236,16 @@ function ArticleDetail({
         {article.proOnly && (
           <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700">
             Pro
+          </span>
+        )}
+        {readingTime > 0 && (
+          <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
+            {readingTime} min read
+          </span>
+        )}
+        {article.lastUpdated && (
+          <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-400">
+            Updated {article.lastUpdated}
           </span>
         )}
       </div>
@@ -400,7 +412,10 @@ function ArticleCard({
 /* ------------------------------------------------------------------ */
 
 export default function LibraryPage() {
-  const userTier = useAuthStore((s) => s.userTier);
+  const effectiveTier = useAuthStore((s) => {
+    const { getEffectiveTier } = s;
+    return getEffectiveTier();
+  });
   const [activeCategoryId, setActiveCategoryId] = useState<string | null>(null);
   const [activeArticle, setActiveArticle] = useState<KBDocumentMeta | null>(null);
   const [search, setSearch] = useState("");
@@ -589,7 +604,7 @@ export default function LibraryPage() {
             article={activeArticle}
             onBack={() => setActiveArticle(null)}
             onSelectArticle={(a) => setActiveArticle(a)}
-            tier={userTier}
+            tier={effectiveTier}
             bookmarked={bookmarks.has(activeArticle.id)}
             onToggleBookmark={() => toggleBookmark(activeArticle.id)}
           />

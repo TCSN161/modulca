@@ -70,6 +70,13 @@ export interface FeatureAccess {
   exportPdf: boolean;               // PDF export
   exportDwg: boolean;               // DWG/DXF export (future)
 
+  // Knowledge Library & AI Consultant
+  knowledgeArticlesFull: boolean;   // full article content (vs. truncated)
+  knowledgeProArticles: boolean;    // access to pro-only articles
+  knowledgeRegions: number;         // number of country regulations (-1 = all)
+  aiConsultantTier: "free" | "premium" | "architect"; // AI quality level
+  aiConsultantHistory: number;      // chat messages kept in context
+
   // Step 9 — Walkthrough
   walkthrough: boolean;             // 3D walkthrough
   autoTour: boolean;                // guided auto-tour
@@ -138,6 +145,11 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       permitTracker: false,
       exportPdf: false,
       exportDwg: false,
+      knowledgeArticlesFull: false,
+      knowledgeProArticles: false,
+      knowledgeRegions: 0,
+      aiConsultantTier: "free",
+      aiConsultantHistory: 5,
       walkthrough: true,
       autoTour: false,
       vrMode: false,
@@ -194,6 +206,11 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       permitTracker: false,
       exportPdf: false,
       exportDwg: false,
+      knowledgeArticlesFull: false,
+      knowledgeProArticles: false,
+      knowledgeRegions: 1,
+      aiConsultantTier: "free",
+      aiConsultantHistory: 10,
       walkthrough: true,
       autoTour: false,
       vrMode: false,
@@ -249,6 +266,11 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       permitTracker: true,
       exportPdf: true,
       exportDwg: false,
+      knowledgeArticlesFull: true,
+      knowledgeProArticles: true,
+      knowledgeRegions: 3,
+      aiConsultantTier: "premium",
+      aiConsultantHistory: 20,
       walkthrough: true,
       autoTour: true,
       vrMode: false,
@@ -304,6 +326,11 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       permitTracker: true,
       exportPdf: true,
       exportDwg: true,
+      knowledgeArticlesFull: true,
+      knowledgeProArticles: true,
+      knowledgeRegions: -1,
+      aiConsultantTier: "architect",
+      aiConsultantHistory: 50,
       walkthrough: true,
       autoTour: true,
       vrMode: true,
@@ -359,6 +386,11 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       permitTracker: true,
       exportPdf: true,
       exportDwg: true,
+      knowledgeArticlesFull: true,
+      knowledgeProArticles: true,
+      knowledgeRegions: -1,
+      aiConsultantTier: "architect",
+      aiConsultantHistory: -1,
       walkthrough: true,
       autoTour: true,
       vrMode: true,
@@ -458,6 +490,16 @@ export const FEATURE_COMPARISON_ROWS: {
       { label: "Permit tracker", key: "permitTracker" },
       { label: "PDF export", key: "exportPdf" },
       { label: "DWG/DXF export", key: "exportDwg" },
+    ],
+  },
+  {
+    category: "Knowledge & AI",
+    features: [
+      { label: "Full article content", key: "knowledgeArticlesFull" },
+      { label: "Pro-only articles (regulations)", key: "knowledgeProArticles" },
+      { label: "Country regulations", key: "knowledgeRegions", format: "number" },
+      { label: "AI consultant quality", key: "aiConsultantTier", format: "text" },
+      { label: "AI chat history depth", key: "aiConsultantHistory", format: "number" },
     ],
   },
   {
