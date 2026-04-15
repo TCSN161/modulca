@@ -243,13 +243,16 @@ export default function PresentationPage() {
               Share Link
             </button>
           </FeatureGate>
-          <button
-            onClick={handleHtmlExport}
-            disabled={exporting}
-            className="rounded-lg border border-brand-olive-700 px-4 py-2 text-xs font-semibold text-brand-olive-700 hover:bg-brand-olive-50 transition-colors disabled:opacity-50"
-          >
-            {exporting ? "Exporting..." : "Export HD PDF"}
-          </button>
+          <FeatureGate requires="pdfPresentation" hideIfLocked>
+            <button
+              onClick={handleHtmlExport}
+              disabled={exporting}
+              className="rounded-lg border border-brand-olive-700 px-4 py-2 text-xs font-semibold text-brand-olive-700 hover:bg-brand-olive-50 transition-colors disabled:opacity-50"
+            >
+              {exporting ? "Exporting..." : "Export HD PDF"}
+            </button>
+          </FeatureGate>
+          <FeatureGate requires="pdfPresentation" hideIfLocked>
           <Suspense fallback={<span className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white opacity-50">Loading...</span>}>
             <PdfDownloadButton
               template={template}
@@ -266,6 +269,7 @@ export default function PresentationPage() {
               isFreeUser={userTier === "free"}
             />
           </Suspense>
+          </FeatureGate>
         </div>
       </header>
 
