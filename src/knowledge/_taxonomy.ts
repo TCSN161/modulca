@@ -122,6 +122,13 @@ export const CATEGORY_DEFINITIONS: Omit<KBCategory, "articleCount">[] = [
     order: 14,
     hasRegions: false,
   },
+  {
+    id: "books",
+    label: "Books & References",
+    icon: "📕",
+    order: 15,
+    hasRegions: false,
+  },
 ];
 
 /**
@@ -144,6 +151,7 @@ export const FOLDER_TO_CATEGORY: Record<string, string> = {
   "12-project-management": "project-management",
   "13-glossary": "glossary",
   "14-quiz": "quiz",
+  "15-books": "books",
 };
 
 /**

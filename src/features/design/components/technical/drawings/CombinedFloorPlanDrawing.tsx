@@ -193,7 +193,21 @@ export default function CombinedFloorPlanDrawing({ modules }: CombinedFloorPlanP
               );
             })}
 
-            {/* Room label with module type color */}
+            {/* Room type label (watermark) */}
+            <text
+              x={mx + modW / 2}
+              y={my + modW / 2 + 2}
+              fontSize={Math.min(8, modW / 14)}
+              fontWeight="bold"
+              textAnchor="middle"
+              fill="#000"
+              opacity="0.2"
+              letterSpacing="1"
+            >
+              {(moduleType?.label || mod.moduleType).toUpperCase()}
+            </text>
+
+            {/* Module ID badge with type color */}
             <rect
               x={mx + modW / 2 - 28}
               y={my + modW - 20}

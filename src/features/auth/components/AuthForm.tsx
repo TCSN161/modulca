@@ -32,6 +32,8 @@ export default function AuthForm({ mode }: AuthFormProps) {
     }
 
     if (success) {
+      // Small delay to ensure auth state is hydrated before navigation
+      await new Promise((r) => setTimeout(r, 100));
       router.push("/dashboard");
     }
   };

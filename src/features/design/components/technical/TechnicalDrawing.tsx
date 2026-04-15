@@ -87,6 +87,8 @@ export default function TechnicalDrawing({
           wallMat={wallMat}
           preset={preset}
           wallConfigs={module.wallConfigs}
+          moduleTypeLabel={moduleType?.label}
+          moduleLabel={module.label}
         />
       )}
       {drawingType === "section-aa" && (
@@ -105,6 +107,9 @@ export default function TechnicalDrawing({
       )}
       {drawingType === "mep-plan" && <MEPPlanDrawing moduleType={module.moduleType} />}
       {drawingType === "foundation-detail" && <FoundationDetailDrawing modules={allModules} />}
+
+      {/* ═══════════ GRAPHICAL SCALE BAR ═══════════ */}
+      <ScaleBar scaleLabel={scaleLabel} />
 
       {/* ═══════════ TITLE BLOCK (bottom) ═══════════ */}
       <g>
@@ -180,5 +185,81 @@ export default function TechnicalDrawing({
         </text>
       </g>
     </svg>
+  );
+}
+
+/* ─── Graphical Scale Bar ─── */
+const SCALE_BAR_CONFIGS: Record<string, { segMm: number; segments: number }> = {
+  "1:5": { segMm: 100, segments: 4 },
+  "1:10": { segMm: 200, segments: 4 },
+  "1:25": { segMm: 500, segments: 4 },
+  "1:50": { segMm: 1000, segments: 4 },
+};
+
+function ScaleBar({ scaleLabel }: { scaleLabel: string }) {
+  const config = SCALE_BAR_CONFIGS[scaleLabel];
+  if (!config) return null;
+
+  const scaleDenom = parseInt(scaleLabel.split(":")[1], 10);
+  const pxPerPaperMm = 800 / 420; // SVG viewBox width / A3 width in mm
+  const segPx = (config.segMm * pxPerPaperMm) / scaleDenom;
+  const barX = 30;
+  const barY = 855;
+  const barH = 5;
+
+  return (
+    <g>
+      {Array.from({ length: config.segments }, (_, i) => (
+        <g key={`seg-${i}`}>
+          <rect
+            x={barX + i * segPx}
+            y={barY}
+            width={segPx}
+            height={barH}
+            fill={i % 2 === 0 ? "#000" : "#fff"}
+            stroke="#000"
+            strokeWidth="0.5"
+          />
+          {/* Tick label */}
+          <text
+            x={barX + i * segPx}
+            y={barY + barH + 9}
+            fontSize="6"
+            textAnchor="middle"
+            fill="#000"
+          >
+            {i * config.segMm}
+          </text>
+        </g>
+      ))}
+      {/* Final tick label */}
+      <text
+        x={barX + config.segments * segPx}
+        y={barY + barH + 9}
+        fontSize="6"
+        textAnchor="middle"
+        fill="#000"
+      >
+        {config.segments * config.segMm}
+      </text>
+      {/* Unit label */}
+      <text
+        x={barX + config.segments * segPx + 12}
+        y={barY + barH + 9}
+        fontSize="6"
+        fill="#555"
+      >
+        mm
+      </text>
+      {/* Top border to close bar */}
+      <line
+        x1={barX}
+        y1={barY}
+        x2={barX + config.segments * segPx}
+        y2={barY}
+        stroke="#000"
+        strokeWidth="0.5"
+      />
+    </g>
   );
 }

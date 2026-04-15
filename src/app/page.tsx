@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import MobileNav from "./MobileNav";
+import Footer from "@/features/shared/components/Footer";
 
 /**
  * ModulCA Landing Page — "Digital Arboretum" Theme
@@ -275,7 +276,7 @@ export default function HomePage() {
                 Beta Promo &mdash; Sign up free and get <strong>3 months of Premium access</strong> included.
               </p>
             </div>
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid gap-5 pt-2 sm:grid-cols-2 xl:grid-cols-4">
               {[
                 {
                   name: "Explorer",
@@ -465,26 +466,7 @@ export default function HomePage() {
       </main>
 
       {/* ---- Footer ---- */}
-      <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-10">
-        <div className="mx-auto max-w-5xl px-4">
-          <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
-            <span className="text-sm font-bold tracking-heading text-brand-charcoal">
-              ModulCA
-            </span>
-            <div className="flex flex-wrap items-center justify-center gap-6 text-xs text-brand-gray">
-              <a href="#" className="uppercase tracking-label hover:text-brand-charcoal transition-colors">Sustainability</a>
-              <a href="#" className="uppercase tracking-label hover:text-brand-charcoal transition-colors">Privacy Policy</a>
-              <a href="#" className="uppercase tracking-label hover:text-brand-charcoal transition-colors">Terms of Service</a>
-              <a href="#" className="uppercase tracking-label hover:text-brand-charcoal transition-colors">Environmental Impact</a>
-            </div>
-          </div>
-          <div className="mt-6 flex flex-col items-center justify-between gap-2 sm:flex-row">
-            <p className="text-xs text-brand-gray">
-              &copy; {new Date().getFullYear()} ModulCA. Built for sustainability.
-            </p>
-          </div>
-        </div>
-      </footer>
+      <Footer />
     </div>
   );
 }

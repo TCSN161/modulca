@@ -9,6 +9,7 @@ import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import FeatureGate from "@/shared/components/FeatureGate";
 
 type ContactMode = null | "quote" | "consultation";
 
@@ -332,11 +333,19 @@ export default function FinalizePage() {
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
             <h2 className="text-lg font-semibold text-brand-teal-800 mb-4">What&apos;s Next?</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <Link href={`/project/${projectId}/presentation`} className="text-center p-4 rounded-lg bg-brand-amber-50 border border-brand-amber-200 hover:bg-brand-amber-100 transition-colors">
-                <div className="text-2xl mb-2">🎨</div>
-                <div className="text-xs font-semibold text-brand-amber-700 mb-1">Create Presentation</div>
-                <div className="text-[10px] text-gray-400">Generate a professional PDF deck</div>
-              </Link>
+              <FeatureGate requires="pdfPresentation" fallback={
+                <div className="text-center p-4 rounded-lg bg-gray-50 border border-dashed border-gray-200">
+                  <div className="text-2xl mb-2">🔒</div>
+                  <div className="text-xs font-semibold text-gray-500 mb-1">PDF Presentation</div>
+                  <div className="text-[10px] text-gray-400">Upgrade to Premium</div>
+                </div>
+              }>
+                <Link href={`/project/${projectId}/presentation`} className="text-center p-4 rounded-lg bg-brand-amber-50 border border-brand-amber-200 hover:bg-brand-amber-100 transition-colors">
+                  <div className="text-2xl mb-2">🎨</div>
+                  <div className="text-xs font-semibold text-brand-amber-700 mb-1">Create Presentation</div>
+                  <div className="text-[10px] text-gray-400">Generate a professional PDF deck</div>
+                </Link>
+              </FeatureGate>
               <button onClick={() => { setContactMode("quote"); setContactSent(false); }} className="text-center p-4 rounded-lg bg-brand-teal-50 border border-brand-teal-200 hover:bg-brand-teal-100 transition-colors">
                 <div className="text-2xl mb-2">📋</div>
                 <div className="text-xs font-semibold text-brand-teal-700 mb-1">Request a Quote</div>

@@ -15,6 +15,8 @@ interface FloorPlanProps {
   wallMat: WallMat;
   preset: Preset;
   wallConfigs?: WallConfigs;
+  moduleTypeLabel?: string;
+  moduleLabel?: string;
 }
 
 export default function FloorPlanDrawing({
@@ -24,6 +26,8 @@ export default function FloorPlanDrawing({
   wallMat,
   preset,
   wallConfigs,
+  moduleTypeLabel,
+  moduleLabel,
 }: FloorPlanProps) {
   const S = 550 / 3000;
   const fpX = (800 - EXT * S) / 2;
@@ -53,6 +57,13 @@ export default function FloorPlanDrawing({
       <circle cx={fpX + w + 22} cy={fpY + w / 2} r="9" fill="none" stroke="#000" strokeWidth="0.5" />
       <circle cx={fpX + w / 2} cy={fpY - 28} r="9" fill="none" stroke="#000" strokeWidth="0.5" />
       <circle cx={fpX + w / 2} cy={fpY + w + 32} r="9" fill="none" stroke="#000" strokeWidth="0.5" />
+
+      {/* Wall insulation hatch pattern */}
+      <defs>
+        <pattern id="wall-insul-hatch" width="4" height="4" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+          <line x1="0" y1="0" x2="0" y2="4" stroke="#fff" strokeWidth="0.5" opacity="0.35" />
+        </pattern>
+      </defs>
 
       {/* Floor fill (interior) */}
       <rect x={fpX + wt} y={fpY + wt} width={w - wt * 2} height={w - wt * 2} fill={floorColor} opacity="0.25" />
@@ -116,6 +127,46 @@ export default function FloorPlanDrawing({
           </g>
         );
       })}
+
+      {/* Room type label + area */}
+      {moduleTypeLabel && (
+        <g>
+          <text
+            x={fpX + w / 2}
+            y={fpY + w / 2 - 6}
+            fontSize="11"
+            fontWeight="bold"
+            textAnchor="middle"
+            fill="#000"
+            opacity="0.35"
+            letterSpacing="2"
+          >
+            {moduleTypeLabel.toUpperCase()}
+          </text>
+          <text
+            x={fpX + w / 2}
+            y={fpY + w / 2 + 8}
+            fontSize="8"
+            textAnchor="middle"
+            fill="#555"
+            opacity="0.5"
+          >
+            {(INT / 1000 * INT / 1000).toFixed(2)} m²
+          </text>
+          {moduleLabel && (
+            <text
+              x={fpX + w / 2}
+              y={fpY + w / 2 + 20}
+              fontSize="7"
+              textAnchor="middle"
+              fill="#888"
+              opacity="0.4"
+            >
+              [{moduleLabel}]
+            </text>
+          )}
+        </g>
+      )}
 
       {/* Dimension lines - exterior horizontal (top) */}
       {(() => {
@@ -246,15 +297,23 @@ function WallSegment2D({
     );
   }
 
-  // ── Solid wall: full thick filled rectangle ──
+  // ── Solid wall: filled rectangle with insulation hatching ──
   if (wallType === "solid") {
     return (
-      <rect
-        x={x} y={y}
-        width={isH ? length : thickness}
-        height={isH ? thickness : length}
-        fill="#333" stroke="#000" strokeWidth="0.5"
-      />
+      <g>
+        <rect
+          x={x} y={y}
+          width={isH ? length : thickness}
+          height={isH ? thickness : length}
+          fill="#333" stroke="#000" strokeWidth="0.5"
+        />
+        <rect
+          x={x} y={y}
+          width={isH ? length : thickness}
+          height={isH ? thickness : length}
+          fill="url(#wall-insul-hatch)"
+        />
+      </g>
     );
   }
 

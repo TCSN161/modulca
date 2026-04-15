@@ -16,6 +16,7 @@ export type FinishLevelId = "basic" | "standard" | "premium";
 export type StyleDirectionId = "scandinavian" | "industrial" | "warm-contemporary" | "mediterranean" | "japanese-wabi-sabi" | "traditional-romanian" | "biophilic-organic" | "eclectic-mixed" | null;
 export type WallType = "solid" | "window" | "door" | "none" | "shared";
 export type WallSide = "north" | "south" | "east" | "west";
+export type WallThickness = 15 | 20 | 30; // cm — 15 interior/shared, 20 standard exterior, 30 enhanced insulation
 
 export interface FurnitureOverride {
   x?: number;
@@ -55,6 +56,45 @@ export interface WallConfigs {
   west: WallType;
 }
 
+/** Per-side wall thickness in cm. Auto-computed from wall types if not set. */
+export interface WallThicknessConfigs {
+  north: WallThickness;
+  south: WallThickness;
+  east: WallThickness;
+  west: WallThickness;
+}
+
+/** Wall layer compositions by thickness class */
+export const WALL_THICKNESS_SPECS: Record<WallThickness, {
+  label: string;
+  labelRo: string;
+  layers: string;
+  uValue: number;  // W/(m²·K) — lower is better insulation
+  costPerWall: number; // EUR per wall segment
+}> = {
+  15: {
+    label: "Interior (15cm)",
+    labelRo: "Interior (15cm)",
+    layers: "12.5mm gypsum + 80mm steel frame + 40mm mineral wool + 12.5mm gypsum",
+    uValue: 0.55,
+    costPerWall: 0,  // included in base
+  },
+  20: {
+    label: "Standard Exterior (20cm)",
+    labelRo: "Exterior Standard (20cm)",
+    layers: "15mm cladding + 25mm air gap + 80mm insulation + 60mm frame + 15mm interior",
+    uValue: 0.28,
+    costPerWall: 0,  // included in base exterior
+  },
+  30: {
+    label: "Enhanced Insulation (30cm)",
+    labelRo: "Izolație Îmbunătățită (30cm)",
+    layers: "20mm cladding + 25mm air gap + 120mm mineral wool + 80mm SIP + 5mm vapour barrier + 15mm interior + 35mm additional insulation",
+    uValue: 0.15,
+    costPerWall: 450,  // EUR premium per wall segment
+  },
+};
+
 export interface ModuleConfig {
   row: number;
   col: number;
@@ -66,6 +106,8 @@ export interface ModuleConfig {
   /** Per-preset furniture overrides: layoutPreset → furnitureId → override */
   furnitureOverrides: Record<string, Record<string, FurnitureOverride>>;
   wallConfigs: WallConfigs;
+  /** Per-side wall thickness (cm). Auto-populated from wall types if missing. */
+  wallThicknessConfigs?: WallThicknessConfigs;
 }
 
 /** Get the furniture overrides for the module's current layout preset. */
@@ -108,6 +150,7 @@ interface DesignStore {
   setFinishLevel: (level: FinishLevelId) => void;
   updateModuleConfig: (row: number, col: number, config: Partial<ModuleConfig>) => void;
   updateWallConfig: (row: number, col: number, side: WallSide, wallType: WallType) => void;
+  updateWallThickness: (row: number, col: number, side: WallSide, thickness: WallThickness) => void;
   updateFurnitureOverride: (row: number, col: number, furnitureId: string, override: FurnitureOverride) => void;
   resetAllFurnitureOverrides: () => void;
   selectedModule: { row: number; col: number } | null;
@@ -131,6 +174,7 @@ interface DesignStore {
     moduleCost: number;
     sharedWallDiscount: number;
     wallUpgradeCost: number;
+    thicknessUpgradeCost: number;
     designFee: number;
     totalEstimate: number;
   };
@@ -154,6 +198,47 @@ function countSharedWalls(modules: ModuleConfig[]): number {
     }
   }
   return count;
+}
+
+/** Compute default wall thickness from wall type */
+export function defaultThicknessForWallType(wallType: WallType): WallThickness {
+  switch (wallType) {
+    case "shared":  return 15; // interior shared wall — thinnest
+    case "none":    return 15; // placeholder, no physical wall
+    case "solid":   return 20; // standard exterior
+    case "window":  return 20; // exterior with window
+    case "door":    return 20; // exterior with door
+    default:        return 20;
+  }
+}
+
+/** Auto-compute thickness configs from wall types */
+export function computeWallThicknessDefaults(wallConfigs: WallConfigs): WallThicknessConfigs {
+  return {
+    north: defaultThicknessForWallType(wallConfigs.north),
+    south: defaultThicknessForWallType(wallConfigs.south),
+    east: defaultThicknessForWallType(wallConfigs.east),
+    west: defaultThicknessForWallType(wallConfigs.west),
+  };
+}
+
+/** Get the effective thickness configs (user-set or auto-default) */
+export function getEffectiveThickness(mod: ModuleConfig): WallThicknessConfigs {
+  if (mod.wallThicknessConfigs) return mod.wallThicknessConfigs;
+  return computeWallThicknessDefaults(mod.wallConfigs);
+}
+
+/** Compute thickness upgrade cost for all modules */
+function computeThicknessUpgradeCost(modules: ModuleConfig[]): number {
+  let cost = 0;
+  for (const mod of modules) {
+    const tc = getEffectiveThickness(mod);
+    for (const side of ["north", "south", "east", "west"] as WallSide[]) {
+      const t = tc[side];
+      cost += WALL_THICKNESS_SPECS[t].costPerWall;
+    }
+  }
+  return cost;
 }
 
 /** Wall upgrade pricing (in EUR) */
@@ -314,6 +399,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
       const label = generateLabel(type, typeCounts[type]);
       typeCounts[type]++;
       const presets = getPresetsForType(type);
+      const wc = computeWallConfigs(c.row, c.col, occupiedSet, type);
       return {
         row: c.row,
         col: c.col,
@@ -323,7 +409,8 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
         floorFinish: defaultFloor,
         wallColor: defaultWall,
         furnitureOverrides: {},
-        wallConfigs: computeWallConfigs(c.row, c.col, occupiedSet, type),
+        wallConfigs: wc,
+        wallThicknessConfigs: computeWallThicknessDefaults(wc),
       };
     });
     set({
@@ -348,7 +435,23 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
       modules: state.modules.map((m) => {
         if (m.row !== row || m.col !== col) return m;
         // Allow changing any wall type — user can set interior doors/windows between modules
-        return { ...m, wallConfigs: { ...m.wallConfigs, [side]: wallType } };
+        const newWallConfigs = { ...m.wallConfigs, [side]: wallType };
+        // Auto-update thickness when wall type changes (unless user already customized)
+        const currentThickness = m.wallThicknessConfigs;
+        const newThickness = currentThickness
+          ? { ...currentThickness, [side]: defaultThicknessForWallType(wallType) }
+          : undefined; // let it auto-compute from defaults
+        return { ...m, wallConfigs: newWallConfigs, wallThicknessConfigs: newThickness };
+      }),
+    })),
+
+  updateWallThickness: (row, col, side, thickness) =>
+    set((state) => ({
+      modules: state.modules.map((m) => {
+        if (m.row !== row || m.col !== col) return m;
+        // Initialize thickness configs from defaults if not yet set
+        const current = m.wallThicknessConfigs ?? computeWallThicknessDefaults(m.wallConfigs);
+        return { ...m, wallThicknessConfigs: { ...current, [side]: thickness } };
       }),
     })),
 
@@ -490,7 +593,8 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
     const moduleCost = totalModules * finish.pricePerModule;
     const sharedWallDiscount = sharedWalls * SHARED_WALL_DISCOUNT;
     const wallUpgradeCost = computeWallUpgradeCost(modules);
-    const subtotal = moduleCost - sharedWallDiscount + wallUpgradeCost;
+    const thicknessUpgradeCost = computeThicknessUpgradeCost(modules);
+    const subtotal = moduleCost - sharedWallDiscount + wallUpgradeCost + thicknessUpgradeCost;
     const designFee = subtotal * DESIGN_FEE_PERCENTAGE;
     const totalEstimate = subtotal + designFee;
 
@@ -502,6 +606,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
       moduleCost,
       sharedWallDiscount,
       wallUpgradeCost,
+      thicknessUpgradeCost,
       designFee,
       totalEstimate,
     };

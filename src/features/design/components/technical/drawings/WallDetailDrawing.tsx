@@ -35,6 +35,12 @@ export default function WallDetailDrawing({ wallColor }: WallDetailProps) {
       opacity: 0.5,
     },
     {
+      label: "Vapour Barrier",
+      thickness: 5,
+      color: "#7EC8E3",
+      opacity: 0.6,
+    },
+    {
       label: "Int. Finish",
       thickness: 15,
       color: wallColor,

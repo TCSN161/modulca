@@ -5,6 +5,7 @@ import Link from "next/link";
 import { ARTICLES, CATEGORIES, REGIONS } from "@/knowledge/_index";
 import { CATEGORY_DEFINITIONS } from "@/knowledge/_taxonomy";
 import type { KBDocumentMeta } from "@/knowledge/_types";
+import { getFreeBooks, getPaidBooks } from "@/knowledge/15-books/_registry";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig, type AccountTier } from "@/features/auth/types";
@@ -51,7 +52,8 @@ function formatInline(text: string): string {
   return text
     .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.*?)\*/g, "<em>$1</em>")
-    .replace(/`(.*?)`/g, '<code class="rounded bg-gray-100 px-1 py-0.5 text-xs">$1</code>');
+    .replace(/`(.*?)`/g, '<code class="rounded bg-gray-100 px-1 py-0.5 text-xs">$1</code>')
+    .replace(/\[([^\]]+)\]\((https?:\/\/[^)]+)\)/g, '<a href="$2" target="_blank" rel="noopener noreferrer" class="text-brand-teal-700 underline hover:text-brand-teal-900">$1</a>');
 }
 
 function MarkdownContent({ content }: { content: string }) {
@@ -130,6 +132,16 @@ function MarkdownContent({ content }: { content: string }) {
     // Italic paragraph
     if (line.startsWith("*") && line.endsWith("*") && !line.startsWith("**")) {
       elements.push(<p key={i} className="text-xs text-gray-500 italic">{line.slice(1, -1)}</p>);
+      i++; continue;
+    }
+
+    // Blockquote
+    if (line.startsWith("> ")) {
+      elements.push(
+        <div key={i} className="my-3 border-l-3 border-brand-teal-300 bg-brand-teal-50/30 rounded-r-lg px-4 py-2.5">
+          <span className="text-sm text-brand-teal-800" dangerouslySetInnerHTML={{ __html: formatInline(line.slice(2)) }} />
+        </div>
+      );
       i++; continue;
     }
 
@@ -719,7 +731,90 @@ export default function LibraryPage() {
             </div>
           </div>
         ) : (
-          /* Category grid */
+          /* Category grid + featured articles */
+          <>
+            {/* Featured articles row */}
+            <div className="mb-6">
+              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">Featured Articles</h3>
+              <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
+                {ARTICLES.filter((a) => ["room-dimensions", "modulca-platform", "ro-building-permit", "passive-house"].includes(a.id)).map((article) => (
+                  <button
+                    key={article.id}
+                    onClick={() => setActiveArticle(article)}
+                    className="rounded-lg border border-gray-100 bg-white p-3 text-left hover:border-brand-teal-200 hover:shadow-sm transition-all"
+                  >
+                    <div className="text-xs font-semibold text-gray-800 line-clamp-1">{article.title}</div>
+                    <div className="mt-1 text-[10px] text-gray-400 line-clamp-1">{article.tags.slice(0, 3).join(" · ")}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+            {/* Books & References section */}
+            <div className="mb-6">
+              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">📕 Books & References</h3>
+              <div className="grid gap-3 sm:grid-cols-2">
+                {/* Free resources */}
+                <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">📖</span>
+                    <h4 className="text-sm font-bold text-green-800">Free Resources ({getFreeBooks().length})</h4>
+                  </div>
+                  <div className="space-y-1.5">
+                    {getFreeBooks().slice(0, 5).map((book) => (
+                      <a
+                        key={book.id}
+                        href={book.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-xs text-green-700 hover:text-green-900 hover:underline"
+                      >
+                        <span className="shrink-0">→</span>
+                        <span className="line-clamp-1">{book.title}</span>
+                      </a>
+                    ))}
+                    {getFreeBooks().length > 5 && (
+                      <button
+                        onClick={() => setActiveCategoryId("books")}
+                        className="text-xs text-green-600 hover:underline mt-1"
+                      >
+                        +{getFreeBooks().length - 5} more free resources →
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Paid essentials */}
+                <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4">
+                  <div className="flex items-center gap-2 mb-3">
+                    <span className="text-lg">⭐</span>
+                    <h4 className="text-sm font-bold text-amber-800">Essential Books ({getPaidBooks().length})</h4>
+                  </div>
+                  <div className="space-y-1.5">
+                    {getPaidBooks().slice(0, 5).map((book) => (
+                      <a
+                        key={book.id}
+                        href={book.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-between gap-2 text-xs text-amber-700 hover:text-amber-900 hover:underline group"
+                      >
+                        <span className="line-clamp-1 flex-1">→ {book.title}</span>
+                        {book.cost && <span className="shrink-0 text-[10px] text-amber-500 group-hover:text-amber-700">{book.cost}</span>}
+                      </a>
+                    ))}
+                    {getPaidBooks().length > 5 && (
+                      <button
+                        onClick={() => setActiveCategoryId("books")}
+                        className="text-xs text-amber-600 hover:underline mt-1"
+                      >
+                        +{getPaidBooks().length - 5} more essential books →
+                      </button>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((cat) => (
               <button
@@ -752,6 +847,7 @@ export default function LibraryPage() {
               </button>
             ))}
           </div>
+          </>
         )}
       </div>
 

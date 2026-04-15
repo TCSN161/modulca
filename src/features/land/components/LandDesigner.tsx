@@ -16,6 +16,7 @@ import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import { useQuizStore } from "@/features/quiz/store";
 
 /* ------------------------------------------------------------------ */
 /*  Predefined building layouts                                        */
@@ -133,6 +134,14 @@ export default function LandDesigner() {
   const maxModules = getTierConfig(userTier).features.maxModules;
   const placedModules = gridCells.filter((c) => c.moduleType !== null);
   const [showPresets, setShowPresets] = useState(true);
+  const quizProfile = useQuizStore((s) => s.profile);
+
+  // Find best matching preset for quiz profile
+  const quizRecommendedPreset = quizProfile
+    ? PRESET_LAYOUTS.reduce((best, p) =>
+        Math.abs(p.modules - quizProfile.totalModules) < Math.abs(best.modules - quizProfile.totalModules) ? p : best
+      , PRESET_LAYOUTS[0])
+    : null;
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
   /* ---- Read URL params from Choose page (Step 1) ---- */
@@ -244,6 +253,25 @@ export default function LandDesigner() {
               ? `Selected terrain: ${terrainAddr}${terrainCity ? `, ${terrainCity}` : ""}`
               : "Search for your location, then click and drag on the map to draw your building area."}
           </p>
+
+          {/* Quiz recommendation banner */}
+          {showPresets && phase === "map" && gridCells.length === 0 && quizRecommendedPreset && quizProfile && (
+            <div className="mb-3 rounded-lg border border-brand-teal-200 bg-brand-teal-50 p-3">
+              <div className="flex items-center gap-2 mb-1">
+                <span className="text-sm">🎯</span>
+                <span className="text-[10px] font-bold text-brand-teal-700 uppercase tracking-wider">Based on Your Quiz Profile</span>
+              </div>
+              <p className="text-[11px] text-brand-teal-600 mb-2">
+                Your profile suggests <strong>{quizProfile.totalModules} modules</strong> ({quizProfile.grossArea}m²) in a <strong>{quizProfile.layout}</strong> layout for {quizProfile.householdSize} people.
+              </p>
+              <button
+                onClick={() => applyPreset(quizRecommendedPreset)}
+                className="w-full rounded-lg bg-brand-teal-700 px-3 py-2 text-xs font-bold text-white hover:bg-brand-teal-800 transition-colors"
+              >
+                Apply: {quizRecommendedPreset.label} ({quizRecommendedPreset.modules} modules, {quizRecommendedPreset.area})
+              </button>
+            </div>
+          )}
 
           {/* Quick Start Presets */}
           {showPresets && phase === "map" && gridCells.length === 0 && (

@@ -12,6 +12,7 @@ import type { ProductEntry } from "@/assets";
 import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import FeatureGate from "@/shared/components/FeatureGate";
 import {
   Layers,
   Sofa,
@@ -521,31 +522,41 @@ export default function ProductsPage() {
                       </div>
                     )}
 
-                    {/* Price */}
-                    <div className="flex items-baseline justify-between mt-3">
-                      <div className="flex items-baseline gap-1">
-                        <span className="text-[#E8913A] font-bold text-base">
-                          &euro;{product.price.toLocaleString()}
-                        </span>
-                        <span className="text-[10px] text-gray-400">{product.unit}</span>
+                    {/* Price (partner pricing gated) */}
+                    <FeatureGate requires="partnerPricing" hideIfLocked fallback={
+                      <div className="mt-3 text-xs text-gray-400 italic">Pricing available for Premium+</div>
+                    }>
+                      <div className="flex items-baseline justify-between mt-3">
+                        <div className="flex items-baseline gap-1">
+                          <span className="text-[#E8913A] font-bold text-base">
+                            &euro;{product.price.toLocaleString()}
+                          </span>
+                          <span className="text-[10px] text-gray-400">{product.unit}</span>
+                        </div>
                       </div>
-                    </div>
+                    </FeatureGate>
 
-                    {/* Add Button */}
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        addProduct(product.id);
-                      }}
-                      className={`mt-3 w-full py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${
-                        qty > 0
-                          ? "bg-[#1B3A4B] text-white hover:bg-[#24516b]"
-                          : "border border-[#1B3A4B] text-[#1B3A4B] hover:bg-[#1B3A4B] hover:text-white"
-                      }`}
-                    >
-                      <Plus size={14} />
-                      {qty > 0 ? "Add Another" : "Add to Project"}
-                    </button>
+                    {/* Add Button (direct purchase gated) */}
+                    <FeatureGate requires="directPurchase" hideIfLocked fallback={
+                      <div className="mt-3 w-full py-2 rounded-lg text-xs text-center text-gray-400 border border-dashed border-gray-200">
+                        Upgrade to add products
+                      </div>
+                    }>
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          addProduct(product.id);
+                        }}
+                        className={`mt-3 w-full py-2 rounded-lg text-xs font-semibold transition-colors flex items-center justify-center gap-1.5 ${
+                          qty > 0
+                            ? "bg-[#1B3A4B] text-white hover:bg-[#24516b]"
+                            : "border border-[#1B3A4B] text-[#1B3A4B] hover:bg-[#1B3A4B] hover:text-white"
+                        }`}
+                      >
+                        <Plus size={14} />
+                        {qty > 0 ? "Add Another" : "Add to Project"}
+                      </button>
+                    </FeatureGate>
                   </div>
                 </div>
               );

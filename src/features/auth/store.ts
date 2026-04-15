@@ -61,12 +61,25 @@ interface AuthStore {
 
 const STORAGE_KEY = "modulca-auth";
 
+/** Set auth cookie so middleware allows access to protected routes */
+function setAuthCookie() {
+  try {
+    document.cookie = "modulca-auth-active=1; path=/; max-age=2592000; SameSite=Lax";
+  } catch { /* */ }
+}
+
+/** Clear auth cookie on sign out */
+function clearAuthCookie() {
+  try {
+    document.cookie = "modulca-auth-active=; path=/; max-age=0";
+  } catch { /* */ }
+}
+
 /** Save to localStorage (demo fallback) + set cookie for middleware */
 function saveLocal(data: { id?: string; name: string; email: string; tier: AccountTier }) {
   try {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
-    // Set a cookie so middleware knows the user is "authenticated" in demo mode
-    document.cookie = "modulca-auth-active=1; path=/; max-age=2592000; SameSite=Lax";
+    setAuthCookie();
   } catch { /* */ }
 }
 
@@ -117,12 +130,20 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     });
 
     if (error) {
+      console.error("[ModulCA] SignUp error:", error.message);
       set({ loading: false, error: error.message });
       return false;
     }
 
+    // Supabase may return user but with no session if email confirmation is required
+    if (data.user && !data.session) {
+      console.warn("[ModulCA] SignUp: email confirmation may be required");
+      set({ loading: false, error: "Check your email for a confirmation link, then sign in." });
+      return false;
+    }
+
     if (data.user) {
-      // Create profile row — default to "premium" during beta testing
+      // Create profile row
       await sb.from("profiles").upsert({
         id: data.user.id,
         email,
@@ -138,6 +159,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         userTier: "free",
         loading: false,
       });
+
+      // Set cookie so middleware allows access to protected routes
+      setAuthCookie();
 
       // Send welcome email (fire-and-forget)
       fetch("/api/email/send", {
@@ -166,6 +190,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     const { data, error } = await sb.auth.signInWithPassword({ email, password });
     if (error) {
+      console.error("[ModulCA] SignIn error:", error.message);
       set({ loading: false, error: error.message });
       return false;
     }
@@ -182,6 +207,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         userAvatar: profile?.avatar_url ?? null,
         loading: false,
       });
+
+      // Set cookie so middleware allows access to protected routes
+      setAuthCookie();
     }
     return true;
   },
@@ -223,7 +251,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
     if (sb) await sb.auth.signOut();
     try {
       localStorage.removeItem(STORAGE_KEY);
-      document.cookie = "modulca-auth-active=; path=/; max-age=0";
+      clearAuthCookie();
     } catch { /* */ }
     set({
       isAuthenticated: false,
@@ -390,7 +418,13 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     // Supabase mode — check session
     const { data: { session } } = await sb.auth.getSession();
-    if (!session?.user) return;
+    if (!session?.user) {
+      clearAuthCookie();
+      return;
+    }
+
+    // Set cookie so middleware allows access
+    setAuthCookie();
 
     // Ensure profile exists (Google OAuth may not trigger signUp flow)
     await sb.from("profiles").upsert({

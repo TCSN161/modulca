@@ -4,9 +4,9 @@
  * Five tiers with progressive feature access:
  *   1. Guest (Visitor) — browse without account, very limited
  *   2. Free (Explorer) — registered, basic features (3-month beta promo → Premium)
- *   3. Premium          — €29/mo, full individual experience
- *   4. Architect         — €79/mo, professional tools + team collaboration
- *   5. Constructor       — €149/mo, enterprise: unlimited, white-label, API
+ *   3. Premium          — €19.99/mo (€290/yr), full individual experience
+ *   4. Architect         — €49.99/mo (€790/yr), professional tools + team collaboration
+ *   5. Constructor       — €149.90/mo (€1490/yr), enterprise: unlimited, white-label, API
  *
  * Beta promotion (until ~July 2026):
  *   Free accounts get Premium-level access for 3 months after registration.
@@ -229,14 +229,14 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
     },
   },
 
-  /* ── 3. Premium — €29/month ── */
+  /* ── 3. Premium — €19.99/month ── */
   {
     id: "premium",
     label: "Premium",
     labelRo: "Premium",
     description: "Full design experience. Everything to plan your modular home.",
-    priceMonthly: 29,
-    priceYearly: 290, // ~17% savings (2 months free)
+    priceMonthly: 19.99,
+    priceYearly: 290, // ~€24/mo — save vs monthly
     color: "#F59E0B",
     features: {
       maxTerrainSize: 5000,
@@ -289,14 +289,14 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
     },
   },
 
-  /* ── 4. Architect — €79/month ── */
+  /* ── 4. Architect — €49.99/month ── */
   {
     id: "architect",
     label: "Architect",
     labelRo: "Arhitect",
     description: "Professional toolkit. Manage clients, projects, and collaborate.",
-    priceMonthly: 79,
-    priceYearly: 790, // ~17% savings
+    priceMonthly: 49.99,
+    priceYearly: 790, // ~€66/mo — save vs monthly
     color: "#1D6B6B",
     features: {
       maxTerrainSize: 10000,
@@ -349,14 +349,14 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
     },
   },
 
-  /* ── 5. Constructor — €149/month ── */
+  /* ── 5. Constructor — €149.90/month ── */
   {
     id: "constructor",
     label: "Constructor",
     labelRo: "Constructor",
     description: "Enterprise solution. Unlimited projects, white-label, dedicated support.",
-    priceMonthly: 149,
-    priceYearly: 1490, // ~17% savings
+    priceMonthly: 149.90,
+    priceYearly: 1490, // ~€124/mo — save vs monthly
     color: "#7C3AED",
     features: {
       maxTerrainSize: 50000,

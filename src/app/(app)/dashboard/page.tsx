@@ -202,6 +202,14 @@ export default function DashboardPage() {
               <span className="text-sm font-bold" style={{ color: tierConfig.color }}>
                 {tierConfig.label}
               </span>
+              {userTier !== "architect" && userTier !== "constructor" && (
+                <Link
+                  href="/pricing"
+                  className="mt-2 inline-block text-[10px] font-bold text-brand-amber-600 hover:text-brand-amber-700 transition-colors"
+                >
+                  Upgrade →
+                </Link>
+              )}
             </div>
           </div>
 
@@ -217,7 +225,7 @@ export default function DashboardPage() {
               {TEMPLATES.map((t) => (
                 <Link
                   key={t.name}
-                  href="/project/demo/choose"
+                  href="/project/new"
                   className="flex-shrink-0 w-64 rounded-[16px] overflow-hidden shadow-card hover:shadow-subtle transition-all group"
                 >
                   <div className={`h-36 bg-gradient-to-br ${t.gradient} relative p-4 flex flex-col justify-end`}>
@@ -251,7 +259,7 @@ export default function DashboardPage() {
                 </div>
                 <h3 className="text-sm font-bold text-brand-charcoal mb-1">No projects yet</h3>
                 <p className="text-xs text-brand-gray mb-5">Start designing your first modular building</p>
-                <Link href="/project/demo/choose" className="btn-primary text-sm">
+                <Link href="/project/new" className="btn-primary text-sm">
                   Create Your First Project
                 </Link>
               </div>
@@ -309,7 +317,7 @@ export default function DashboardPage() {
                 {/* New project row */}
                 {!atLimit && (
                   <Link
-                    href="/project/demo/choose"
+                    href="/project/new"
                     className="flex items-center justify-center gap-2 rounded-[12px] border border-dashed border-brand-bone-400 bg-white p-4 text-sm font-semibold text-brand-gray hover:text-brand-olive-700 hover:border-brand-olive-400 hover:bg-brand-olive-50/30 transition-all"
                   >
                     <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

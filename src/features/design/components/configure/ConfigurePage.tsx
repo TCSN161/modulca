@@ -6,7 +6,8 @@ import ModuleFloorPlan from "./ModuleFloorPlan";
 import CombinedFloorPlan from "./CombinedFloorPlan";
 import ConfigPanel from "./ConfigPanel";
 import { useDesignStore } from "../../store";
-import type { WallSide, WallType, WallConfigs, ModuleConfig } from "../../store";
+import type { WallSide, WallType, WallThickness, WallConfigs, ModuleConfig } from "../../store";
+import { getEffectiveThickness, WALL_THICKNESS_SPECS } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
@@ -14,6 +15,7 @@ import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from ".
 import StepNav from "../shared/StepNav";
 import MobileStepFooter from "../shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import FeatureGate from "@/shared/components/FeatureGate";
 
 type ViewMode = "single" | "all";
 
@@ -59,10 +61,14 @@ function moduleWallCost(wc: WallConfigs): number {
 }
 
 /** Sidebar section: Wall configuration dropdowns + module inspection */
+const THICKNESS_OPTIONS: WallThickness[] = [15, 20, 30];
+
 function WallSidebar({ mod }: { mod: ModuleConfig }) {
   const updateWallConfig = useDesignStore((s) => s.updateWallConfig);
+  const updateWallThickness = useDesignStore((s) => s.updateWallThickness);
   const modules = useDesignStore((s) => s.modules);
   const finishLevel = useDesignStore((s) => s.finishLevel);
+  const thickness = getEffectiveThickness(mod);
 
   const mt = MODULE_TYPES.find((t) => t.id === mod.moduleType);
   const preset = getPreset(mod.moduleType, mod.layoutPreset)
@@ -73,7 +79,8 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
   const finish = FINISH_LEVELS.find((f) => f.id === finishLevel);
   const basePrice = finish?.pricePerModule ?? 0;
   const wallCost = moduleWallCost(mod.wallConfigs);
-  const estimatedCost = basePrice + wallCost;
+  const thicknessCost = WALL_SIDES.reduce((sum, s) => sum + WALL_THICKNESS_SPECS[thickness[s]].costPerWall, 0);
+  const estimatedCost = basePrice + wallCost + thicknessCost;
 
   // Detect interior walls
   const occupied = new Set(modules.map((m) => `${m.row},${m.col}`));
@@ -159,6 +166,32 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
                     </option>
                   ))}
                 </select>
+                {/* Wall thickness selector — only for physical walls */}
+                {current !== "none" && (
+                  <div className="mt-1 flex items-center gap-1">
+                    <span className="text-[9px] text-gray-400 min-w-[50px]">Thickness:</span>
+                    <div className="flex gap-0.5 flex-1">
+                      {THICKNESS_OPTIONS.map((t) => {
+                        const active = thickness[side] === t;
+                        const spec = WALL_THICKNESS_SPECS[t];
+                        return (
+                          <button
+                            key={t}
+                            onClick={() => updateWallThickness(mod.row, mod.col, side, t)}
+                            className={`flex-1 rounded px-1 py-0.5 text-[9px] font-medium transition-colors ${
+                              active
+                                ? "bg-brand-teal-600 text-white"
+                                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+                            }`}
+                            title={`${spec.label} — U=${spec.uValue} W/(m²·K)${spec.costPerWall > 0 ? ` +€${spec.costPerWall}` : ""}`}
+                          >
+                            {t}cm
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                )}
               </div>
             );
           })}
@@ -170,6 +203,12 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
             {wallCost > 0 ? "+" : ""}&euro;{wallCost.toLocaleString()}
           </span>
         </div>
+        {thicknessCost > 0 && (
+          <div className="mt-1 flex items-center justify-between rounded-md bg-amber-50 px-2 py-1.5 text-[10px]">
+            <span className="font-semibold text-amber-700 uppercase">Insulation Upgrade</span>
+            <span className="font-bold text-amber-600">+&euro;{thicknessCost.toLocaleString()}</span>
+          </div>
+        )}
       </div>
     </div>
   );
@@ -330,13 +369,15 @@ export default function ConfigurePage() {
           )}
         </main>
 
-        {/* Right — config panel */}
+        {/* Right — config panel (furniture overrides gated) */}
         <aside className="hidden md:block w-80 flex-shrink-0 border-l border-gray-200 bg-gray-50">
           {selectedModule && (
-            <ConfigPanel
-              moduleRow={selectedModule.row}
-              moduleCol={selectedModule.col}
-            />
+            <FeatureGate requires="furnitureOverrides">
+              <ConfigPanel
+                moduleRow={selectedModule.row}
+                moduleCol={selectedModule.col}
+              />
+            </FeatureGate>
           )}
         </aside>
 
