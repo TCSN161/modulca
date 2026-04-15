@@ -7,6 +7,7 @@ import { CATEGORY_DEFINITIONS } from "@/knowledge/_taxonomy";
 import type { KBDocumentMeta } from "@/knowledge/_types";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import { useAuthStore } from "@/features/auth/store";
+import { getTierConfig, type AccountTier } from "@/features/auth/types";
 
 /* ------------------------------------------------------------------ */
 /*  Bookmarks (localStorage)                                           */
@@ -194,7 +195,8 @@ function ArticleDetail({
       .finally(() => setLoading(false));
   }, [article.id, tier]);
 
-  const isLocked = article.proOnly && tier === "free";
+  const tierConfig = getTierConfig(tier as AccountTier);
+  const isLocked = article.proOnly && !tierConfig.features.knowledgeProArticles;
 
   return (
     <div className="mx-auto max-w-2xl">
@@ -469,6 +471,18 @@ export default function LibraryPage() {
   const activeCategory = activeCategoryId ? categories.find((c) => c.id === activeCategoryId) : null;
   const regionsWithArticles = REGIONS.filter((r) => (r.articleCount ?? 0) > 0);
 
+  // Tier-based region access: knowledgeRegions = number of country regs available (-1 = all)
+  const tierConfig = getTierConfig(effectiveTier as AccountTier);
+  const maxRegions = tierConfig.features.knowledgeRegions;
+  // Priority order for region access: RO first (primary market), then NL, then others
+  const regionPriority = ["RO", "NL"];
+  const allowedRegionCodes = useMemo(() => {
+    if (maxRegions === -1) return null; // null = all allowed
+    const ordered = [...regionPriority, ...regionsWithArticles.map((r) => r.code).filter((c) => !regionPriority.includes(c))];
+    return new Set(ordered.slice(0, maxRegions));
+  }, [maxRegions, regionsWithArticles]);
+  const isRegionLocked = (code: string) => allowedRegionCodes !== null && !allowedRegionCodes.has(code);
+
   // Keyboard: Escape to go back
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
@@ -639,17 +653,25 @@ export default function LibraryPage() {
                 >
                   All
                 </button>
-                {regionsWithArticles.map((r) => (
-                  <button
-                    key={r.code}
-                    onClick={() => setRegionFilter(r.code)}
-                    className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
-                      regionFilter === r.code ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-                    }`}
-                  >
-                    {r.flag} {r.name} ({r.articleCount})
-                  </button>
-                ))}
+                {regionsWithArticles.map((r) => {
+                  const locked = isRegionLocked(r.code);
+                  return (
+                    <button
+                      key={r.code}
+                      onClick={() => locked ? undefined : setRegionFilter(r.code)}
+                      className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${
+                        locked
+                          ? "bg-gray-50 text-gray-300 cursor-not-allowed"
+                          : regionFilter === r.code
+                          ? "bg-brand-teal-800 text-white"
+                          : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                      }`}
+                      title={locked ? `Upgrade to access ${r.name} regulations` : undefined}
+                    >
+                      {r.flag} {r.name} ({r.articleCount}){locked && " 🔒"}
+                    </button>
+                  );
+                })}
                 <button
                   onClick={() => setRegionFilter("EU")}
                   className={`rounded-full px-3 py-1 text-xs font-medium transition-colors ${

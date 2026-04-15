@@ -1,6 +1,7 @@
 -- ModulCA Database Schema
 -- Run this in Supabase SQL Editor to set up tables.
--- Minimal MVP: profiles + projects. Extend later.
+-- Full schema: profiles, projects, render_logs, render_cache.
+-- Includes Stripe columns and beta promo support.
 
 -- ── Profiles (extends Supabase auth.users) ──
 create table if not exists public.profiles (
@@ -18,6 +19,12 @@ create table if not exists public.profiles (
   ai_renders_month text, -- 'YYYY-MM' format, resets when month changes
   -- Cost tracking
   total_cost_usd real not null default 0,
+  -- Stripe subscription
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  subscription_status text default 'free'
+    check (subscription_status in ('free', 'active', 'past_due', 'canceled', 'unpaid', 'trialing')),
+  -- Timestamps (created_at also used for beta promo calculation)
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
 );
@@ -89,3 +96,93 @@ create trigger set_profiles_updated_at before update on public.profiles
   for each row execute function public.set_updated_at();
 create trigger set_projects_updated_at before update on public.projects
   for each row execute function public.set_updated_at();
+
+-- ── Stripe lookup indexes ──
+create index if not exists idx_profiles_stripe_customer
+  on public.profiles(stripe_customer_id)
+  where stripe_customer_id is not null;
+create index if not exists idx_profiles_tier
+  on public.profiles(tier);
+
+-- ── Render Logs (per-render analytics, cost tracking, debugging) ──
+create table if not exists public.render_logs (
+  id uuid default gen_random_uuid() primary key,
+  user_id uuid references public.profiles(id) on delete set null,
+  prompt text not null,
+  width integer not null,
+  height integer not null,
+  seed text,
+  mode text not null default 'text2img' check (mode in ('text2img', 'img2img')),
+  tier text not null default 'free',
+  engine_id text not null,
+  engine_label text,
+  status text not null check (status in ('success', 'failed', 'error')),
+  error_message text,
+  cost_usd real not null default 0,
+  latency_ms integer,
+  image_size_bytes integer,
+  content_type text,
+  cache_hit boolean not null default false,
+  cache_key text,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists idx_render_logs_user on public.render_logs(user_id);
+create index if not exists idx_render_logs_engine on public.render_logs(engine_id);
+create index if not exists idx_render_logs_created on public.render_logs(created_at desc);
+create index if not exists idx_render_logs_cache_key on public.render_logs(cache_key) where cache_key is not null;
+
+alter table public.render_logs enable row level security;
+
+create policy "Users can view own render logs"
+  on public.render_logs for select using (auth.uid() = user_id);
+create policy "Service role full access on render_logs"
+  on public.render_logs for all using (
+    auth.jwt() ->> 'role' = 'service_role'
+  );
+
+-- ── Render Cache (content-addressable image cache) ──
+create table if not exists public.render_cache (
+  id uuid default gen_random_uuid() primary key,
+  cache_key text not null unique,
+  storage_path text not null,
+  engine_id text not null,
+  content_type text not null default 'image/png',
+  image_size_bytes integer,
+  width integer not null,
+  height integer not null,
+  created_at timestamptz not null default now(),
+  last_accessed_at timestamptz not null default now(),
+  access_count integer not null default 1
+);
+
+create index if not exists idx_render_cache_key on public.render_cache(cache_key);
+create index if not exists idx_render_cache_created on public.render_cache(created_at);
+
+alter table public.render_cache enable row level security;
+
+create policy "Authenticated users can read cache"
+  on public.render_cache for select using (true);
+create policy "Service role can manage cache"
+  on public.render_cache for all using (
+    auth.jwt() ->> 'role' = 'service_role'
+  );
+
+-- ── Updated_at triggers for new tables ──
+create trigger set_render_logs_updated_at before update on public.render_logs
+  for each row execute function public.set_updated_at();
+
+-- ── Beta promo: admin view for users with active 3-month promo ──
+-- Application code: if tier='free' AND now() < created_at + 3 months → premium access
+create or replace view public.beta_promo_users as
+  select
+    id,
+    email,
+    display_name,
+    tier,
+    created_at,
+    created_at + interval '3 months' as promo_expires_at,
+    greatest(0, extract(day from (created_at + interval '3 months' - now()))) as days_remaining
+  from public.profiles
+  where tier = 'free'
+    and created_at + interval '3 months' > now();

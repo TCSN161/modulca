@@ -3,6 +3,7 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import { ARTICLES } from "@/knowledge/_index";
 import type { KBDocumentMeta } from "@/knowledge/_types";
+import { getTierConfig as getAuthTierConfig, type AccountTier } from "@/features/auth/types";
 
 export const dynamic = "force-dynamic";
 
@@ -72,7 +73,7 @@ You are powered by a comprehensive knowledge library covering Neufert standards,
 - Modules connect via bolted connections — fully demountable
 - Layouts: line, L-shape, T-shape, U-shape, courtyard configurations
 - Markets: Romania (active), Netherlands (expansion)
-- Account tiers: Explorer (free), Premium (€19/mo), Architect (€49/mo)
+- Account tiers: Guest (visitor), Explorer (free), Premium (€29/mo), Architect (€79/mo), Constructor (€149/mo enterprise)
 
 ## The 13 Design Steps (guide users through these)
 1. **Choose** (/project/demo/choose) — Browse land marketplace or enter your own plot
@@ -109,6 +110,9 @@ You are powered by a comprehensive knowledge library covering Neufert standards,
 const REGION_HINTS: Record<string, string[]> = {
   RO: ["romania", "romanian", "bucuresti", "bucharest", "cluj", "timisoara", "autorizatie", "certificat", "urbanism", "p100", "c107", "np i7"],
   NL: ["netherlands", "dutch", "holland", "amsterdam", "rotterdam", "den haag", "utrecht", "bouwbesluit", "bbl", "omgevingswet", "beng", "kadaster", "waterschap", "kwaliteitsborger", "flexwonen"],
+  DE: ["germany", "german", "deutschland", "berlin", "munich", "münchen", "hamburg", "frankfurt", "bauordnung", "mbo", "geg", "enev", "din 4102", "din 18040", "din 4109", "bebauungsplan", "grundbuch", "kfw"],
+  FR: ["france", "french", "paris", "lyon", "marseille", "re2020", "rt2012", "avis technique", "dtu", "permis de construire", "cadastre", "plu", "urbanisme"],
+  BE: ["belgium", "belgian", "belgique", "brussels", "bruxelles", "flanders", "wallonia", "epb", "peb", "nbn", "bouwbesluit", "stedenbouwkundig", "kadaster"],
   EU: ["european", "eu ", "eurocode", "epbd", "ce marking", "cpr"],
 };
 
@@ -185,9 +189,11 @@ async function loadArticleContent(filePath: string): Promise<string> {
 
 /* ------------------------------------------------------------------ */
 /*  Tier-based context depth                                           */
+/*  Derives AI consultant quality from canonical tier config in        */
+/*  src/features/auth/types.ts (aiConsultantTier field).               */
 /* ------------------------------------------------------------------ */
 
-interface TierConfig {
+interface ConsultantTierConfig {
   maxArticles: number;
   maxChars: number;
   maxTokens: number;
@@ -196,7 +202,8 @@ interface TierConfig {
   providerChain: string[];
 }
 
-const TIER_CONFIGS: Record<string, TierConfig> = {
+/** Maps the aiConsultantTier level to RAG depth + provider chain */
+const CONSULTANT_DEPTH: Record<string, ConsultantTierConfig> = {
   free: {
     maxArticles: 2,
     maxChars: 2000,
@@ -220,8 +227,17 @@ const TIER_CONFIGS: Record<string, TierConfig> = {
   },
 };
 
-function getTierConfig(tier: string): TierConfig {
-  return TIER_CONFIGS[tier] ?? TIER_CONFIGS.free;
+/**
+ * Resolve consultant config for a given user tier.
+ * Uses the canonical FeatureAccess.aiConsultantTier to pick the right depth.
+ */
+function getConsultantConfig(tier: string): ConsultantTierConfig {
+  // Look up the canonical tier config to find aiConsultantTier
+  const validTiers: AccountTier[] = ["guest_free", "free", "premium", "architect", "constructor"];
+  const accountTier = validTiers.includes(tier as AccountTier) ? (tier as AccountTier) : "free";
+  const authCfg = getAuthTierConfig(accountTier);
+  const consultantLevel = authCfg.features.aiConsultantTier; // "free" | "premium" | "architect"
+  return CONSULTANT_DEPTH[consultantLevel] ?? CONSULTANT_DEPTH.free;
 }
 
 interface RAGResult { context: string; articlesUsed: string[] }
@@ -453,7 +469,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Tier-aware context depth
-    const tierCfg = getTierConfig(tier || "free");
+    const tierCfg = getConsultantConfig(tier || "free");
 
     // Extract the latest user question for RAG context retrieval
     const lastUserMsg = messages.filter((m: { role: string }) => m.role === "user").pop();

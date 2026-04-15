@@ -6,6 +6,7 @@ import { useSearchParams } from "next/navigation";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { getLocalAnswer } from "../neufertKB";
 import { useAuthStore } from "@/features/auth/store";
+import { getTierConfig, type AccountTier } from "@/features/auth/types";
 import { useQuizStore } from "@/features/quiz/store";
 
 interface Message {
@@ -60,11 +61,18 @@ export default function ConsultantChat() {
       setLoading(true);
 
       try {
+        // Limit chat history depth based on tier
+        const tierConfig = getTierConfig(userTier as AccountTier);
+        const historyLimit = tierConfig.features.aiConsultantHistory;
+        const limitedMessages = historyLimit === -1
+          ? updated
+          : updated.slice(-Math.max(2, historyLimit)); // always keep at least last exchange
+
         const res = await fetch("/api/consultant", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
-            messages: updated,
+            messages: limitedMessages,
             tier: userTier,
             ...(quizProfile ? { quizProfile: {
               primaryStyle: quizProfile.primaryStyle,

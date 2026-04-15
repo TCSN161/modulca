@@ -38,11 +38,11 @@ export const STYLE_LABELS: Record<StyleId, string> = {
 /** Map quiz profile ID → related knowledge base article IDs */
 export const STYLE_ARTICLE_MAP: Record<StyleId, string[]> = {
   "modern-minimalist": ["minimalism", "space-planning", "lighting-design"],
-  "warm-organic": ["organic-architecture", "natural-materials", "color-theory"],
-  "scandinavian-functional": ["scandinavian", "natural-light", "furniture-ergonomics"],
-  "industrial-loft": ["industrial", "materials-finishes", "lighting-design"],
-  "traditional-romanian": ["vernacular-romanian", "natural-materials", "color-theory"],
-  "biophilic-nature": ["principles", "natural-light", "indoor-plants", "water-features"],
+  "warm-organic": ["organic-architecture", "natural-materials-biophilic", "color-theory"],
+  "scandinavian-functional": ["scandinavian-style", "natural-light-biophilic", "furniture-ergonomics"],
+  "industrial-loft": ["industrial-style", "materials-finishes", "lighting-design"],
+  "traditional-romanian": ["vernacular-romanian", "natural-materials-biophilic", "color-theory"],
+  "biophilic-nature": ["biophilic-principles", "natural-light-biophilic", "indoor-plants", "water-features"],
   "eclectic-mixed": ["color-theory", "materials-finishes", "space-planning"],
 };
 
