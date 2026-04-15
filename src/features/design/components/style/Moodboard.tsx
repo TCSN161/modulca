@@ -48,6 +48,24 @@ export default function Moodboard() {
     return 0;
   });
 
+  /** Auto-populate moodboard with all curated images for the selected style */
+  const handleAutoPopulate = useCallback(() => {
+    if (!styleDirection) return;
+    const styleImages = curatedImages.filter((img) => img.styleId === styleDirection);
+    let added = 0;
+    for (const img of styleImages) {
+      if (moodboardPins.some((p) => p.imageUrl === img.url)) continue;
+      addMoodboardPin({
+        id: pinId(),
+        imageUrl: img.url,
+        label: img.label,
+        source: "curated",
+      });
+      added++;
+    }
+    return added;
+  }, [styleDirection, curatedImages, moodboardPins, addMoodboardPin]);
+
   const handleFileUpload = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
@@ -167,6 +185,15 @@ export default function Moodboard() {
           >
             {showCurated ? "Hide Library" : "Browse Library"}
           </button>
+          {styleDirection && (
+            <button
+              onClick={handleAutoPopulate}
+              className="rounded-lg border border-brand-teal-300 bg-brand-teal-50 px-3 py-1.5 text-xs font-medium text-brand-teal-700 hover:bg-brand-teal-100 transition-colors"
+              title="Add all curated images for this style"
+            >
+              Auto-fill Style
+            </button>
+          )}
           <button
             onClick={() => setShowUrlInput(!showUrlInput)}
             className="rounded-lg border border-gray-300 px-3 py-1.5 text-xs font-medium text-gray-600 hover:bg-gray-100 transition-colors"
