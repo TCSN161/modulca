@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEffect } from "react";
 
 /**
@@ -9,11 +9,13 @@ import { useEffect } from "react";
  */
 export default function ProjectPage() {
   const router = useRouter();
+  const params = useParams();
+  const projectId = typeof params?.id === "string" ? params.id : "demo";
 
   useEffect(() => {
     // For now, redirect to the first step
-    router.replace("/project/demo/choose");
-  }, [router]);
+    router.replace(`/project/${projectId}/choose`);
+  }, [router, projectId]);
 
   return (
     <div className="flex h-screen items-center justify-center">

@@ -78,7 +78,7 @@ export default function DashboardPage() {
       localStorage.setItem("modulca-design", JSON.stringify(project.data));
       localStorage.setItem("modulca-active-project", JSON.stringify({ id: project.id, name: project.name }));
     } catch { /* */ }
-    router.push("/project/demo/land");
+    router.push(`/project/${project.id}/land`);
   };
 
   const handleSignOut = async () => {

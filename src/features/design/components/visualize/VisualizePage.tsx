@@ -12,6 +12,7 @@ import { FURNITURE_COLORS } from "../../styles";
 import ConfigPanel from "../configure/ConfigPanel";
 import StepNav from "../shared/StepNav";
 import MobileStepFooter from "../shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 type ViewMode = "single" | "all";
 
@@ -19,6 +20,7 @@ const ModuleScene3D = dynamic(() => import("./ModuleScene3D"), { ssr: false });
 const CombinedScene3D = dynamic(() => import("./CombinedScene3D"), { ssr: false });
 
 export default function VisualizePage() {
+  const projectId = useProjectId();
   const { gridCells, gridRotation } = useLandStore();
   const {
     setModulesFromGrid, modules, selectedModule, setSelectedModule,
@@ -65,7 +67,7 @@ export default function VisualizePage() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500">No modules configured yet.</p>
-          <Link href="/project/demo/land" className="mt-4 btn-accent inline-block">
+          <Link href={`/project/${projectId}/land`} className="mt-4 btn-accent inline-block">
             Go to Step 1
           </Link>
         </div>
@@ -144,11 +146,11 @@ export default function VisualizePage() {
         })}
 
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/project/demo/configure" className="text-sm text-gray-500 hover:text-brand-teal-800">
+          <Link href={`/project/${projectId}/configure`} className="text-sm text-gray-500 hover:text-brand-teal-800">
             ← Back to Configure
           </Link>
           <Link
-            href="/project/demo/render"
+            href={`/project/${projectId}/render`}
             className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             Render View →

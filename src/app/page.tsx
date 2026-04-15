@@ -147,7 +147,7 @@ export default function HomePage() {
             {[
               { value: "13", label: "DESIGN STEPS" },
               { value: "8", label: "MODULE TYPES" },
-              { value: "24/7", label: "CLOUD ACCESS" },
+              { value: "8", label: "DESIGN STYLES" },
               { value: "100%", label: "SUSTAINABLE TIMBER" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
@@ -260,63 +260,94 @@ export default function HomePage() {
 
         {/* ---- Pricing ---- */}
         <section id="pricing" className="px-4 py-20 sm:py-24">
-          <div className="mx-auto max-w-5xl">
+          <div className="mx-auto max-w-6xl">
             <p className="label-caps mb-3 text-center">Plans</p>
             <h2 className="mb-3 text-center text-3xl font-bold tracking-heading text-brand-charcoal sm:text-4xl">
               Simple, Transparent Pricing
             </h2>
-            <p className="mx-auto mb-14 max-w-xl text-center text-brand-gray">
+            <p className="mx-auto mb-4 max-w-xl text-center text-brand-gray">
               Start free, upgrade when you need more. No hidden fees.
             </p>
-            <div className="grid gap-6 sm:grid-cols-3">
+            {/* Beta promo banner */}
+            <div className="mx-auto mb-14 max-w-xl rounded-[12px] border border-brand-olive-200 bg-brand-olive-50 px-5 py-3 text-center">
+              <p className="text-sm font-semibold text-brand-olive-700">
+                <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-brand-olive-500 animate-pulse" />
+                Beta Promo &mdash; Sign up free and get <strong>3 months of Premium access</strong> included.
+              </p>
+            </div>
+            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 {
                   name: "Explorer",
                   price: "Free",
                   period: "",
-                  description: "Discover modular construction. Design your first home for free.",
+                  description: "Design your first modular home for free. Upgrade anytime.",
                   features: [
-                    "Up to 4 modules per project",
+                    "Up to 6 modules per project",
                     "5 AI renders per month",
-                    "Floor plan & section drawings",
                     "3D walkthrough",
                     "Knowledge base access",
-                    "1 saved project",
+                    "2 saved projects",
+                    "3-month Premium beta promo",
                   ],
                   cta: "Start Free",
+                  href: "/project/demo/choose",
                   highlight: false,
+                  badge: null,
                 },
                 {
                   name: "Premium",
-                  price: "\u20AC19",
+                  price: "\u20AC29",
                   period: "/month",
                   description: "Full design experience with all tools and export options.",
                   features: [
                     "Up to 12 modules per project",
-                    "30 AI renders per month (HD)",
+                    "50 AI renders per month (HD)",
                     "All 6 drawing types + PDF export",
                     "Auto-tour & building permits",
                     "Product catalog with real pricing",
-                    "5 projects + sharable links",
+                    "10 projects + sharable links",
                   ],
                   cta: "Get Premium",
+                  href: "/pricing",
                   highlight: true,
+                  badge: "Most Popular",
                 },
                 {
-                  name: "Architect / Builder",
-                  price: "\u20AC49",
+                  name: "Architect",
+                  price: "\u20AC79",
                   period: "/month",
                   description: "Professional toolkit for managing clients and projects.",
                   features: [
                     "Up to 50 modules, custom sizes",
-                    "100 AI renders per month (4K)",
+                    "200 AI renders per month (4K)",
                     "DWG/DXF export for CAD",
                     "Team collaboration & client dashboard",
-                    "White-label branding",
-                    "Unlimited projects + priority support",
+                    "Unlimited projects",
+                    "Priority support",
                   ],
                   cta: "Go Professional",
+                  href: "/pricing",
                   highlight: false,
+                  badge: null,
+                },
+                {
+                  name: "Constructor",
+                  price: "\u20AC149",
+                  period: "/month",
+                  description: "Enterprise solution. Unlimited everything, white-label, API.",
+                  features: [
+                    "Up to 200 modules per project",
+                    "Unlimited AI renders (4K)",
+                    "White-label branding",
+                    "Dedicated support",
+                    "Full analytics & API access",
+                    "Everything in Architect",
+                  ],
+                  cta: "Contact Sales",
+                  href: "/pricing",
+                  highlight: false,
+                  badge: "Enterprise",
                 },
               ].map((plan) => (
                 <div
@@ -324,12 +355,14 @@ export default function HomePage() {
                   className={`rounded-[12px] border-2 p-6 text-center shadow-card transition-shadow hover:shadow-subtle ${
                     plan.highlight
                       ? "border-brand-olive-700 bg-white relative"
-                      : "border-brand-bone-300 bg-white"
+                      : "border-brand-bone-300 bg-white relative"
                   }`}
                 >
-                  {plan.highlight && (
-                    <div className="absolute -top-3 left-1/2 -translate-x-1/2 rounded-full bg-brand-olive-700 px-4 py-0.5 text-xs font-bold text-white">
-                      Most Popular
+                  {plan.badge && (
+                    <div className={`absolute -top-3 left-1/2 -translate-x-1/2 rounded-full px-4 py-0.5 text-xs font-bold text-white ${
+                      plan.highlight ? "bg-brand-olive-700" : "bg-brand-charcoal"
+                    }`}>
+                      {plan.badge}
                     </div>
                   )}
                   <h3 className="mb-1 text-lg font-bold text-brand-charcoal">{plan.name}</h3>
@@ -346,7 +379,7 @@ export default function HomePage() {
                     ))}
                   </ul>
                   <Link
-                    href={plan.highlight ? "/pricing" : "/project/demo/choose"}
+                    href={plan.href}
                     className={`block w-full rounded-[12px] px-4 py-2.5 text-sm font-semibold transition-colors ${
                       plan.highlight
                         ? "bg-brand-olive-700 text-white hover:bg-brand-olive-800"

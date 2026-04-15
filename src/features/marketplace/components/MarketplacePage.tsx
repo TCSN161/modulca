@@ -7,6 +7,7 @@ import StepNav from "@/features/design/components/shared/StepNav";
 import { useMarketplaceStore, filterTerrains } from "../store";
 import FeatureGate from "@/shared/components/FeatureGate";
 import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 import type { Terrain } from "../store";
 
 type LandMode = "choose" | "have-land" | "want-land" | "play";
@@ -32,6 +33,7 @@ const STATUS_STYLES: Record<string, string> = {
 /* ------------------------------------------------------------------ */
 
 export default function MarketplacePage() {
+  const projectId = useProjectId();
   const { terrains, filters, favorites, setFilter, clearFilters, toggleFavorite } =
     useMarketplaceStore();
 
@@ -42,7 +44,7 @@ export default function MarketplacePage() {
   // "Let me play" mode — redirect to Land page with no params
   useEffect(() => {
     if (mode === "play") {
-      router.push("/project/demo/land?mode=play");
+      router.push(`/project/${projectId}/land?mode=play`);
     }
   }, [mode, router]);
 
@@ -60,7 +62,7 @@ export default function MarketplacePage() {
           </span>
         </Link>
         <StepNav activeStep={0} />
-        <Link href="/project/demo/land" className="shrink-0 rounded-lg bg-brand-olive-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-olive-800 transition-colors">
+        <Link href={`/project/${projectId}/land`} className="shrink-0 rounded-lg bg-brand-olive-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-olive-800 transition-colors">
           Next: Draw Land →
         </Link>
       </header>
@@ -339,6 +341,7 @@ function LandModeChooser({ onSelect }: { onSelect: (mode: LandMode) => void }) {
 /* ------------------------------------------------------------------ */
 
 function HaveLandFlow({ onBack }: { onBack: () => void }) {
+  const projectId = useProjectId();
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [county, setCounty] = useState("");
@@ -513,7 +516,7 @@ function HaveLandFlow({ onBack }: { onBack: () => void }) {
 
           <div className="flex gap-3 pt-2">
             <Link
-              href={`/project/demo/land?${buildQueryString()}`}
+              href={`/project/${projectId}/land?${buildQueryString()}`}
               className={`flex-1 rounded-lg py-3 text-center text-sm font-bold text-white transition-colors ${
                 canProceed
                   ? "bg-brand-amber-500 hover:bg-brand-amber-600"
@@ -544,6 +547,7 @@ function TerrainCard({
   onToggleFavorite: () => void;
   onViewDetails: () => void;
 }) {
+  const projectId = useProjectId();
   const zc = ZONING_COLORS[t.zoning] || ZONING_COLORS.residential;
   const scoreColor = t.suitabilityScore > 70 ? "bg-emerald-500" : t.suitabilityScore > 40 ? "bg-amber-500" : "bg-red-500";
 
@@ -615,7 +619,7 @@ function TerrainCard({
           </button>
           {t.status === "available" && (
             <Link
-              href={`/project/demo/land?lat=${t.location.lat}&lng=${t.location.lng}&address=${encodeURIComponent(t.location.address + ", " + t.location.city)}`}
+              href={`/project/${projectId}/land?lat=${t.location.lat}&lng=${t.location.lng}&address=${encodeURIComponent(t.location.address + ", " + t.location.city)}`}
               className="flex-1 rounded-lg bg-brand-amber-500 py-2 text-xs font-semibold text-white text-center hover:bg-brand-amber-600 transition-colors"
             >
               Use Terrain
@@ -642,6 +646,7 @@ function TerrainDetailModal({
   onToggleFavorite: () => void;
   onClose: () => void;
 }) {
+  const projectId = useProjectId();
   const zc = ZONING_COLORS[t.zoning] || ZONING_COLORS.residential;
   const scoreColor = t.suitabilityScore > 70 ? "text-emerald-600" : t.suitabilityScore > 40 ? "text-amber-600" : "text-red-600";
 
@@ -735,7 +740,7 @@ function TerrainDetailModal({
           <div className="flex gap-3">
             {t.status === "available" && (
               <Link
-                href={`/project/demo/land?lat=${t.location.lat}&lng=${t.location.lng}&address=${encodeURIComponent(t.location.address + ", " + t.location.city)}`}
+                href={`/project/${projectId}/land?lat=${t.location.lat}&lng=${t.location.lng}&address=${encodeURIComponent(t.location.address + ", " + t.location.city)}`}
                 className="flex-1 rounded-lg bg-brand-amber-500 py-3 text-sm font-semibold text-white text-center hover:bg-brand-amber-600 transition-colors"
               >
                 Use This Terrain

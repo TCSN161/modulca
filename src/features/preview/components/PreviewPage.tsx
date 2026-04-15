@@ -9,6 +9,7 @@ import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
 import StepNav from "@/features/design/components/shared/StepNav";
 import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 const Scene3D = dynamic(() => import("./Scene3D"), {
   ssr: false,
@@ -20,6 +21,7 @@ const Scene3D = dynamic(() => import("./Scene3D"), {
 });
 
 export default function PreviewPage() {
+  const projectId = useProjectId();
   const { gridCells, gridRotation } = useLandStore();
   const { setModulesFromGrid, modules, loadFromLocalStorage } = useDesignStore();
   // Ensure design store is hydrated from localStorage before rendering 3D,
@@ -53,7 +55,7 @@ export default function PreviewPage() {
         <StepNav activeStep={3} />
         <div className="flex items-center gap-3">
           <Link
-            href="/project/demo/style"
+            href={`/project/${projectId}/style`}
             className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             Choose Style &rarr;

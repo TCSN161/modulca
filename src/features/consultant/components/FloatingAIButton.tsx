@@ -3,6 +3,7 @@
 import { useState, useRef, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 /**
  * Floating "Ask AI" button — appears on every project step.
@@ -10,6 +11,7 @@ import Link from "next/link";
  * Hidden when already on the consultant page.
  */
 export default function FloatingAIButton() {
+  const projectId = useProjectId();
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -48,7 +50,7 @@ export default function FloatingAIButton() {
             Ask questions about architecture standards, Romanian building regulations, room dimensions, and modular construction.
           </p>
           <Link
-            href="/project/demo/consultant"
+            href={`/project/${projectId}/consultant`}
             className="flex items-center justify-center gap-2 w-full rounded-[12px] bg-brand-olive-700 px-4 py-2.5 text-sm font-semibold text-white hover:bg-brand-olive-800 transition-colors"
             onClick={() => setOpen(false)}
           >

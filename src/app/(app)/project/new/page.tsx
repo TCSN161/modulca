@@ -26,7 +26,7 @@ export default function NewProjectPage() {
       try {
         localStorage.setItem("modulca-active-project", JSON.stringify({ id: result.id, name: result.name }));
       } catch { /* */ }
-      router.push("/project/demo/land");
+      router.push(`/project/${result.id}/land`);
     }
     setCreating(false);
   };

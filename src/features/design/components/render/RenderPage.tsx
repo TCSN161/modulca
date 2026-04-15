@@ -18,11 +18,13 @@ import { useRenderEngine } from "./useRenderEngine";
 import RenderGallery from "./RenderGallery";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 const RenderScene3D = dynamic(() => import("./RenderScene3D"), { ssr: false });
 const CombinedScene3D = dynamic(() => import("../visualize/CombinedScene3D"), { ssr: false });
 
 export default function RenderPage() {
+  const projectId = useProjectId();
   const { gridCells, gridRotation } = useLandStore();
   const {
     modules, selectedModule, setSelectedModule,
@@ -219,7 +221,7 @@ export default function RenderPage() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500">No modules configured yet.</p>
-          <Link href="/project/demo/land" className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white">
+          <Link href={`/project/${projectId}/land`} className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white">
             Go to Step 1
           </Link>
         </div>
@@ -254,8 +256,8 @@ export default function RenderPage() {
           );
         })}
         <div className="ml-auto flex items-center gap-2">
-          <Link href="/project/demo/visualize" className="text-sm text-gray-500 hover:text-brand-teal-800">← Back to Visualize</Link>
-          <Link href="/project/demo/technical" className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600">Technical Drawings →</Link>
+          <Link href={`/project/${projectId}/visualize`} className="text-sm text-gray-500 hover:text-brand-teal-800">← Back to Visualize</Link>
+          <Link href={`/project/${projectId}/technical`} className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600">Technical Drawings →</Link>
         </div>
       </div>
 
@@ -739,7 +741,7 @@ export default function RenderPage() {
                 </div>
               </div>
 
-              <Link href="/project/demo/technical"
+              <Link href={`/project/${projectId}/technical`}
                 className="block w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-center text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors">
                 CONTINUE →
               </Link>
@@ -936,7 +938,7 @@ export default function RenderPage() {
                           <span>&euro;{stats.totalEstimate.toLocaleString()}</span>
                         </div>
                       </div>
-                      <Link href="/project/demo/technical"
+                      <Link href={`/project/${projectId}/technical`}
                         className="block w-full rounded-lg bg-brand-amber-500 px-4 py-3 text-center text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors">
                         CONTINUE →
                       </Link>

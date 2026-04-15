@@ -13,6 +13,7 @@ import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import StepNav from "../shared/StepNav";
 import MobileStepFooter from "../shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 type ViewMode = "single" | "all";
 
@@ -175,6 +176,7 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
 }
 
 export default function ConfigurePage() {
+  const projectId = useProjectId();
   const { gridCells, gridRotation } = useLandStore();
   const { setModulesFromGrid, modules, selectedModule, setSelectedModule, loadFromLocalStorage } =
     useDesignStore();
@@ -209,7 +211,7 @@ export default function ConfigurePage() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500">No modules configured yet.</p>
-          <Link href="/project/demo/land" className="mt-4 btn-accent inline-block">
+          <Link href={`/project/${projectId}/land`} className="mt-4 btn-accent inline-block">
             Go to Step 1
           </Link>
         </div>
@@ -290,13 +292,13 @@ export default function ConfigurePage() {
 
         <div className="ml-auto flex items-center gap-2">
           <Link
-            href="/project/demo/style"
+            href={`/project/${projectId}/style`}
             className="text-sm text-gray-500 hover:text-brand-teal-800"
           >
             ← Back to Style
           </Link>
           <Link
-            href="/project/demo/visualize"
+            href={`/project/${projectId}/visualize`}
             className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             3D Preview →

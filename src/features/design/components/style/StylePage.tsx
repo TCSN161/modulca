@@ -10,8 +10,10 @@ import { cn } from "@/shared/utils/cn";
 import Moodboard from "./Moodboard";
 import StepNav from "../shared/StepNav";
 import MobileStepFooter from "../shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 export default function StylePage() {
+  const projectId = useProjectId();
   const styleDirection = useDesignStore((s) => s.styleDirection);
   const styleDescription = useDesignStore((s) => s.styleDescription);
   const stylePhoto = useDesignStore((s) => s.stylePhoto);
@@ -80,7 +82,7 @@ export default function StylePage() {
       {/* Navigation bar */}
       <div className="flex items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6 py-2 md:py-3 gap-2">
         <Link
-          href="/project/demo/design"
+          href={`/project/${projectId}/design`}
           className="hidden md:inline text-sm text-gray-500 hover:text-brand-teal-800"
         >
           &larr; Back to Preview
@@ -124,7 +126,7 @@ export default function StylePage() {
           </button>
         </div>
         <Link
-          href="/project/demo/configure"
+          href={`/project/${projectId}/configure`}
           className="hidden md:inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
         >
           Configure Modules &rarr;

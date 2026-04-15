@@ -8,6 +8,7 @@ import { getLocalAnswer } from "../neufertKB";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig, type AccountTier } from "@/features/auth/types";
 import { useQuizStore } from "@/features/quiz/store";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 interface Message {
   role: "user" | "assistant";
@@ -36,6 +37,7 @@ const KB_TOPICS = [
 ];
 
 export default function ConsultantChat() {
+  const projectId = useProjectId();
   const userTier = useAuthStore((s) => s.getEffectiveTier());
   const quizProfile = useQuizStore((s) => s.profile);
   const searchParams = useSearchParams();
@@ -132,7 +134,7 @@ export default function ConsultantChat() {
         </Link>
         <StepNav activeStep={8} />
         <Link
-          href="/project/demo/technical"
+          href={`/project/${projectId}/technical`}
           className="shrink-0 rounded-[12px] bg-brand-olive-700 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-olive-800 transition-colors"
         >
           Back to Technical

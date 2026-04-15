@@ -15,6 +15,7 @@ import { MODULE_TYPES } from "@/shared/types";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
 import { AuthNav } from "@/features/auth/components/AuthNav";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 /* ------------------------------------------------------------------ */
 /*  Predefined building layouts                                        */
@@ -126,6 +127,7 @@ const MapView = dynamic(() => import("./MapView"), {
 });
 
 export default function LandDesigner() {
+  const projectId = useProjectId();
   const { phase, gridCells, setGridCells, setPhase } = useLandStore();
   const userTier = useAuthStore((s) => s.userTier);
   const maxModules = getTierConfig(userTier).features.maxModules;
@@ -379,7 +381,7 @@ export default function LandDesigner() {
           {/* Next Step CTA */}
           {placedModules.length > 0 && (
             <Link
-              href="/project/demo/design"
+              href={`/project/${projectId}/design`}
               className="mt-5 flex w-full items-center justify-center gap-2 rounded-lg bg-brand-amber-500
                          px-6 py-3.5 text-sm font-semibold text-white transition-colors
                          hover:bg-brand-amber-600"
@@ -389,7 +391,7 @@ export default function LandDesigner() {
           )}
           {/* Back to Choose page */}
           <Link
-            href="/project/demo/choose"
+            href={`/project/${projectId}/choose`}
             className="mt-3 w-full block text-center text-[11px] text-gray-400 hover:text-gray-600 transition-colors"
           >
             ← Back to Choose

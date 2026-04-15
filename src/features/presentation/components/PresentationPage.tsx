@@ -11,6 +11,7 @@ import StepNav from "@/features/design/components/shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
 import { useAuthStore } from "@/features/auth/store";
 import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
@@ -128,6 +129,7 @@ const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
 };
 
 export default function PresentationPage() {
+  const projectId = useProjectId();
   const { gridCells, gridRotation, polygon, mapCenter } = useLandStore();
   const {
     modules, setModulesFromGrid, styleDirection, finishLevel, getStats,
@@ -217,7 +219,7 @@ export default function PresentationPage() {
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
           <p className="text-gray-500">No modules configured yet.</p>
-          <Link href="/project/demo/land" className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white">
+          <Link href={`/project/${projectId}/land`} className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white">
             Go to Step 1
           </Link>
         </div>
@@ -355,7 +357,7 @@ export default function PresentationPage() {
 
           {/* Navigation */}
           <div className="space-y-2">
-            <Link href="/project/demo/finalize" className="block text-center text-sm text-gray-500 hover:text-brand-teal-800">
+            <Link href={`/project/${projectId}/finalize`} className="block text-center text-sm text-gray-500 hover:text-brand-teal-800">
               &larr; Back to Finalize
             </Link>
           </div>

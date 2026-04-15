@@ -4,6 +4,7 @@ import { useMemo, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import { useDesignStore, type WallType, type WallSide } from "../store";
 import { MODULE_TYPES } from "@/shared/types";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 const CELL_PX = 140; // pixels per 3m module
 const PADDING = 40;
@@ -54,6 +55,7 @@ interface FloorPlanProps {
 }
 
 export default function FloorPlan({ layers }: FloorPlanProps) {
+  const projectId = useProjectId();
   const showWalls = layers?.walls ?? true;
   const showAnnotations = layers?.annotations ?? true;
   const showPlumbing = layers?.plumbing ?? true;
@@ -177,7 +179,7 @@ export default function FloorPlan({ layers }: FloorPlanProps) {
                 onClick={() => setSelectedModule({ row: mod.row, col: mod.col })}
                 onDoubleClick={() => {
                   setSelectedModule({ row: mod.row, col: mod.col });
-                  router.push("/project/demo/configure");
+                  router.push(`/project/${projectId}/configure`);
                 }}
                 className="cursor-pointer"
               >

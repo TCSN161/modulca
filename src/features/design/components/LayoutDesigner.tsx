@@ -9,8 +9,10 @@ import { useDesignStore } from "../store";
 import { useLandStore } from "@/features/land/store";
 import StepNav from "./shared/StepNav";
 import MobileStepFooter from "./shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 export default function LayoutDesigner() {
+  const projectId = useProjectId();
   const { gridCells, gridRotation } = useLandStore();
   const { setModulesFromGrid, modules, loadFromLocalStorage } = useDesignStore();
   const [layers, setLayers] = useState<LayerVisibility>(DEFAULT_LAYERS);
@@ -37,13 +39,13 @@ export default function LayoutDesigner() {
         <StepNav activeStep={2} />
         <div className="flex items-center gap-2 md:gap-3">
           <Link
-            href="/project/demo/land"
+            href={`/project/${projectId}/land`}
             className="text-sm text-gray-500 hover:text-brand-teal-800 hidden md:inline"
           >
             &larr; Back to Land
           </Link>
           <Link
-            href="/project/demo/output"
+            href={`/project/${projectId}/output`}
             className="rounded-lg bg-brand-amber-500 px-3 md:px-4 py-2 text-xs md:text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             Preview &rarr;

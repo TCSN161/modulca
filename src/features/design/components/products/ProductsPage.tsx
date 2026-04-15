@@ -11,6 +11,7 @@ import { PRODUCT_CATALOG, getProductsByCategory } from "@/assets";
 import type { ProductEntry } from "@/assets";
 import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 import {
   Layers,
   Sofa,
@@ -257,6 +258,7 @@ function ProductDetailModal({
 // ─── Component ───────────────────────────────────────────────
 
 export default function ProductsPage() {
+  const projectId = useProjectId();
   const { modules, setModulesFromGrid, getStats, loadFromLocalStorage } = useDesignStore();
   const { gridCells, gridRotation } = useLandStore();
 
@@ -353,13 +355,13 @@ export default function ProductsPage() {
       {/* ── NAVIGATION BAR ── */}
       <div className="flex items-center justify-between h-12 px-6 bg-white border-b border-gray-200 shrink-0">
         <Link
-          href="/project/demo/walkthrough"
+          href={`/project/${projectId}/walkthrough`}
           className="text-sm text-[#1B3A4B] hover:text-[#E8913A] transition-colors flex items-center gap-1"
         >
           <span>&larr;</span> Back to Walkthrough
         </Link>
         <Link
-          href="/project/demo/finalize"
+          href={`/project/${projectId}/finalize`}
           className="text-sm font-medium text-[#E8913A] hover:text-[#d07e2e] transition-colors flex items-center gap-1"
         >
           Finalize Project <span>&rarr;</span>
@@ -721,7 +723,7 @@ export default function ProductsPage() {
           {/* Action Buttons */}
           <div className="mt-5 space-y-2">
             <Link
-              href="/project/demo/finalize"
+              href={`/project/${projectId}/finalize`}
               className="block w-full py-3 rounded-lg bg-[#E8913A] text-white text-sm font-semibold text-center hover:bg-[#d07e2e] transition-colors"
             >
               Proceed to Finalize

@@ -8,10 +8,12 @@ import { saveProject, listProjects } from "@/features/auth/projectService";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 type ContactMode = null | "quote" | "consultation";
 
 export default function FinalizePage() {
+  const projectId = useProjectId();
   const modules = useDesignStore((s) => s.modules);
   const finishLevel = useDesignStore((s) => s.finishLevel);
   const styleDirection = useDesignStore((s) => s.styleDirection);
@@ -330,7 +332,7 @@ export default function FinalizePage() {
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
             <h2 className="text-lg font-semibold text-brand-teal-800 mb-4">What&apos;s Next?</h2>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-              <Link href="/project/demo/presentation" className="text-center p-4 rounded-lg bg-brand-amber-50 border border-brand-amber-200 hover:bg-brand-amber-100 transition-colors">
+              <Link href={`/project/${projectId}/presentation`} className="text-center p-4 rounded-lg bg-brand-amber-50 border border-brand-amber-200 hover:bg-brand-amber-100 transition-colors">
                 <div className="text-2xl mb-2">🎨</div>
                 <div className="text-xs font-semibold text-brand-amber-700 mb-1">Create Presentation</div>
                 <div className="text-[10px] text-gray-400">Generate a professional PDF deck</div>
@@ -345,7 +347,7 @@ export default function FinalizePage() {
                 <div className="text-xs font-semibold text-blue-700 mb-1">Book Consultation</div>
                 <div className="text-[10px] text-gray-400">Speak with an architect</div>
               </button>
-              <Link href="/project/demo/design" className="text-center p-4 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
+              <Link href={`/project/${projectId}/design`} className="text-center p-4 rounded-lg bg-gray-50 border border-gray-200 hover:bg-gray-100 transition-colors">
                 <div className="text-2xl mb-2">🔄</div>
                 <div className="text-xs font-semibold text-gray-700 mb-1">Revise Design</div>
                 <div className="text-[10px] text-gray-400">Go back and make changes</div>
@@ -443,14 +445,14 @@ export default function FinalizePage() {
           {/* Navigation */}
           <div className="flex items-center justify-between">
             <Link
-              href="/project/demo/products"
+              href={`/project/${projectId}/products`}
               className="text-sm text-brand-teal-800 hover:text-brand-amber-500 transition-colors"
             >
               &larr; Back to Products
             </Link>
             <div className="flex items-center gap-3">
               <Link
-                href="/project/demo/presentation"
+                href={`/project/${projectId}/presentation`}
                 className="px-6 py-3 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors"
               >
                 Create Presentation &rarr;

@@ -2,21 +2,23 @@
 
 import Link from "next/link";
 import { cn } from "@/shared/utils/cn";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
-const STEPS = [
-  { label: "Choose", href: "/project/demo/choose" },
-  { label: "Land", href: "/project/demo/land" },
-  { label: "Design", href: "/project/demo/design" },
-  { label: "Preview", href: "/project/demo/output" },
-  { label: "Style", href: "/project/demo/style" },
-  { label: "Configure", href: "/project/demo/configure" },
-  { label: "Visualize", href: "/project/demo/visualize" },
-  { label: "Render", href: "/project/demo/render" },
-  { label: "Technical", href: "/project/demo/technical" },
-  { label: "Walkthrough", href: "/project/demo/walkthrough" },
-  { label: "Products", href: "/project/demo/products" },
-  { label: "Finalize", href: "/project/demo/finalize" },
-  { label: "Present", href: "/project/demo/presentation" },
+/** Step slugs — used to build dynamic hrefs */
+const STEP_SLUGS = [
+  { label: "Choose", slug: "choose" },
+  { label: "Land", slug: "land" },
+  { label: "Design", slug: "design" },
+  { label: "Preview", slug: "output" },
+  { label: "Style", slug: "style" },
+  { label: "Configure", slug: "configure" },
+  { label: "Visualize", slug: "visualize" },
+  { label: "Render", slug: "render" },
+  { label: "Technical", slug: "technical" },
+  { label: "Walkthrough", slug: "walkthrough" },
+  { label: "Products", slug: "products" },
+  { label: "Finalize", slug: "finalize" },
+  { label: "Present", slug: "presentation" },
 ];
 
 interface StepNavProps {
@@ -25,13 +27,15 @@ interface StepNavProps {
 }
 
 export default function StepNav({ activeStep }: StepNavProps) {
+  const projectId = useProjectId();
+
   return (
     <nav className="flex-1 overflow-x-auto mx-1 md:mx-4 scrollbar-none">
       <div className="flex items-center gap-1 md:gap-1 min-w-max md:justify-center">
-        {STEPS.map((step, i) => (
+        {STEP_SLUGS.map((step, i) => (
           <Link
             key={step.label}
-            href={step.href}
+            href={`/project/${projectId}/${step.slug}`}
             className={cn(
               "font-semibold uppercase transition-colors whitespace-nowrap rounded-md inline-flex items-center",
               // Mobile: bigger touch targets (min 32px height)
@@ -61,4 +65,4 @@ export default function StepNav({ activeStep }: StepNavProps) {
   );
 }
 
-export { STEPS };
+export { STEP_SLUGS };

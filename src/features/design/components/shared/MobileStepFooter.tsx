@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { STEPS } from "./StepNav";
+import { STEP_SLUGS } from "./StepNav";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 interface MobileStepFooterProps {
   /** Zero-based index of the active step */
@@ -17,14 +18,15 @@ interface MobileStepFooterProps {
  * Hidden on desktop (md:hidden).
  */
 export default function MobileStepFooter({ activeStep, info }: MobileStepFooterProps) {
-  const prevStep = activeStep > 0 ? STEPS[activeStep - 1] : null;
-  const nextStep = activeStep < STEPS.length - 1 ? STEPS[activeStep + 1] : null;
+  const projectId = useProjectId();
+  const prevStep = activeStep > 0 ? STEP_SLUGS[activeStep - 1] : null;
+  const nextStep = activeStep < STEP_SLUGS.length - 1 ? STEP_SLUGS[activeStep + 1] : null;
 
   return (
     <div className="md:hidden flex items-center justify-between border-t border-gray-200 bg-white px-2 py-2.5 mb-16 shrink-0">
       {prevStep ? (
         <Link
-          href={prevStep.href}
+          href={`/project/${projectId}/${prevStep.slug}`}
           className="flex items-center gap-1 rounded-lg border border-gray-200 px-2.5 py-2 text-xs font-semibold text-gray-500 active:bg-gray-50"
         >
           <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -38,7 +40,7 @@ export default function MobileStepFooter({ activeStep, info }: MobileStepFooterP
 
       <div className="text-center min-w-0 px-1">
         <div className="text-[11px] font-bold text-brand-charcoal">
-          {activeStep + 1}/{STEPS.length}
+          {activeStep + 1}/{STEP_SLUGS.length}
         </div>
         {info && (
           <div className="text-[9px] text-gray-400 truncate">
@@ -49,7 +51,7 @@ export default function MobileStepFooter({ activeStep, info }: MobileStepFooterP
 
       {nextStep ? (
         <Link
-          href={nextStep.href}
+          href={`/project/${projectId}/${nextStep.slug}`}
           className="flex items-center gap-1 rounded-lg bg-brand-amber-500 px-3 py-2 text-xs font-bold text-white active:scale-95 transition-transform whitespace-nowrap shadow-sm"
         >
           {nextStep.label}

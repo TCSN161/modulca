@@ -13,6 +13,7 @@ import { Vector3 } from "three";
 import StepNav from "../shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
 import MobileStepFooter from "../shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 const WalkthroughScene = dynamic(() => import("./WalkthroughScene"), {
   ssr: false,
@@ -112,6 +113,7 @@ function Minimap({
 /* ------------------------------------------------------------------ */
 
 export default function WalkthroughPage() {
+  const projectId = useProjectId();
   const { gridCells, gridRotation } = useLandStore();
   const {
     modules,
@@ -232,7 +234,7 @@ export default function WalkthroughPage() {
         <div className="text-center">
           <p className="text-gray-500">No modules configured yet.</p>
           <Link
-            href="/project/demo/land"
+            href={`/project/${projectId}/land`}
             className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             Go to Step 1
@@ -294,13 +296,13 @@ export default function WalkthroughPage() {
 
         <div className="ml-auto flex items-center gap-2">
           <Link
-            href="/project/demo/technical"
+            href={`/project/${projectId}/technical`}
             className="text-sm text-gray-500 hover:text-brand-teal-800"
           >
             &larr; Back to Technical
           </Link>
           <Link
-            href="/project/demo/products"
+            href={`/project/${projectId}/products`}
             className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             Products &amp; Shop &rarr;

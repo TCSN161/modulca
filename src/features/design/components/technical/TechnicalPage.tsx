@@ -20,6 +20,7 @@ import PermitTracker from "./PermitTracker";
 import DrawingPresentation from "./DrawingPresentation";
 import FeatureGate from "@/shared/components/FeatureGate";
 import MobileStepFooter from "../shared/MobileStepFooter";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 
 const DRAWING_TYPES = [
@@ -42,6 +43,7 @@ const WALL_LAYERS = [
 ];
 
 export default function TechnicalPage() {
+  const projectId = useProjectId();
   const {
     modules,
     selectedModule,
@@ -121,7 +123,7 @@ export default function TechnicalPage() {
         <div className="text-center">
           <p className="text-gray-500">No modules configured yet.</p>
           <Link
-            href="/project/demo/land"
+            href={`/project/${projectId}/land`}
             className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             Go to Step 1
@@ -185,7 +187,7 @@ export default function TechnicalPage() {
 
         <div className="ml-auto flex items-center gap-2">
           <Link
-            href="/project/demo/render"
+            href={`/project/${projectId}/render`}
             className="text-sm text-gray-500 hover:text-brand-teal-800"
           >
             &larr; Back to Render
@@ -197,7 +199,7 @@ export default function TechnicalPage() {
             Export PDF
           </button>
           <Link
-            href="/project/demo/walkthrough"
+            href={`/project/${projectId}/walkthrough`}
             className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
           >
             Walkthrough &rarr;
@@ -350,7 +352,7 @@ export default function TechnicalPage() {
           {/* AI Architect Consultant */}
           <div className="mt-4 pt-4 border-t border-gray-100">
             <Link
-              href="/project/demo/consultant"
+              href={`/project/${projectId}/consultant`}
               className="flex items-center gap-3 rounded-xl border-2 border-dashed border-brand-olive-300 bg-brand-olive-50 p-3 group hover:border-brand-olive-500 transition-colors"
             >
               <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-brand-olive-100 text-lg group-hover:bg-brand-olive-200 transition-colors">

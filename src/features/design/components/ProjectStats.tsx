@@ -3,6 +3,7 @@
 import { useDesignStore, type FinishLevelId } from "../store";
 import { FINISH_LEVELS } from "@/shared/types";
 import Link from "next/link";
+import { useProjectId } from "@/shared/hooks/useProjectId";
 
 function formatEuro(n: number): string {
   return new Intl.NumberFormat("en-EU", {
@@ -13,6 +14,7 @@ function formatEuro(n: number): string {
 }
 
 export default function ProjectStats() {
+  const projectId = useProjectId();
   const { finishLevel, setFinishLevel, getStats, selectedModule, modules } =
     useDesignStore();
   const stats = getStats();
@@ -204,7 +206,7 @@ export default function ProjectStats() {
       {/* CTA */}
       <div className="p-5 mt-auto">
         <Link
-          href="/project/demo/output"
+          href={`/project/${projectId}/output`}
           className="flex w-full items-center justify-center rounded-lg bg-brand-teal-800
                      px-6 py-3.5 text-sm font-bold text-white uppercase tracking-wider
                      transition-colors hover:bg-brand-teal-700"
