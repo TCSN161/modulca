@@ -560,6 +560,66 @@ export default function RenderPage() {
                   >
                     {"🎨 Save to Presentation"}
                   </button>
+                  {/* Upscale & Remove BG buttons — premium features */}
+                  <div className="pt-2 border-t border-gray-100 space-y-2">
+                    <p className="text-[10px] font-bold text-gray-400 uppercase">Enhance</p>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const resp = await fetch(aiImageUrl);
+                          const blob = await resp.blob();
+                          const reader = new FileReader();
+                          reader.onloadend = async () => {
+                            const base64 = (reader.result as string).split(",")[1];
+                            const upRes = await fetch("/api/ai-render/upscale", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ image: base64, mode: "upscale" }),
+                            });
+                            if (!upRes.ok) { alert("Upscale failed. Try again later."); return; }
+                            const upBlob = await upRes.blob();
+                            const url = URL.createObjectURL(upBlob);
+                            const a = document.createElement("a");
+                            a.href = url; a.download = `modulca-upscaled-${Date.now()}.png`;
+                            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          };
+                          reader.readAsDataURL(blob);
+                        } catch { alert("Upscale failed."); }
+                      }}
+                      className="block w-full rounded-lg border border-purple-300 px-4 py-2 text-center text-xs font-semibold text-purple-700 hover:bg-purple-50 transition-colors"
+                    >
+                      {"🔍 Upscale (HD)"}
+                    </button>
+                    <button
+                      onClick={async () => {
+                        try {
+                          const resp = await fetch(aiImageUrl);
+                          const blob = await resp.blob();
+                          const reader = new FileReader();
+                          reader.onloadend = async () => {
+                            const base64 = (reader.result as string).split(",")[1];
+                            const bgRes = await fetch("/api/ai-render/upscale", {
+                              method: "POST",
+                              headers: { "Content-Type": "application/json" },
+                              body: JSON.stringify({ image: base64, mode: "remove-bg" }),
+                            });
+                            if (!bgRes.ok) { alert("Background removal failed."); return; }
+                            const bgBlob = await bgRes.blob();
+                            const url = URL.createObjectURL(bgBlob);
+                            const a = document.createElement("a");
+                            a.href = url; a.download = `modulca-nobg-${Date.now()}.png`;
+                            document.body.appendChild(a); a.click(); document.body.removeChild(a);
+                            URL.revokeObjectURL(url);
+                          };
+                          reader.readAsDataURL(blob);
+                        } catch { alert("Background removal failed."); }
+                      }}
+                      className="block w-full rounded-lg border border-indigo-300 px-4 py-2 text-center text-xs font-semibold text-indigo-700 hover:bg-indigo-50 transition-colors"
+                    >
+                      {"✂️ Remove Background"}
+                    </button>
+                  </div>
                 </div>
               )}
             </>

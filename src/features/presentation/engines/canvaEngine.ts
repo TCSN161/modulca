@@ -6,14 +6,9 @@ import type { PresentationEngine, ExportOptions } from "./types";
  * Canva Connect API engine — premium, full visual editor.
  * Requires NEXT_PUBLIC_CANVA_API_KEY in .env.local.
  *
- * Status: PLACEHOLDER — will be implemented when Canva API key is ready.
- * See: https://www.canva.dev/docs/connect/
- *
- * Flow:
- * 1. Create a design from template via Canva API
- * 2. Autofill template fields with project data
- * 3. Open Canva editor for user customization (or skip)
- * 4. Export finished design as PDF
+ * Status: NOT VIABLE — Canva API requires Enterprise plan (30+ seats, custom pricing).
+ * This stub falls back to html2canvas engine which works well for our needs.
+ * Our built-in @react-pdf/renderer system is the primary PDF export path.
  */
 export const canvaEngine: PresentationEngine = {
   id: "canva",
