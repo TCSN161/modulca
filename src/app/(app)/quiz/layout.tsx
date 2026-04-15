@@ -8,6 +8,13 @@ export const metadata: Metadata = {
     title: "Architectural Profile Quiz — ModulCA",
     description:
       "Find your ideal modular home style with our professional architectural profiling quiz.",
+    images: [
+      {
+        url: "/og?title=Architectural+Profile+Quiz&subtitle=Discover+your+style+and+get+personalized+recommendations",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 };
 

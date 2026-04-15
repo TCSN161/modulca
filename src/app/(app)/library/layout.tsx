@@ -8,6 +8,13 @@ export const metadata: Metadata = {
     title: "Knowledge Library — ModulCA",
     description:
       "Architecture knowledge library with Neufert standards, building regulations, and modular construction guides.",
+    images: [
+      {
+        url: "/og?title=Knowledge+Library&subtitle=180%2B+articles+on+architecture%2C+regulations+%26+modular+construction",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 };
 

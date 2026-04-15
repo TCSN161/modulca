@@ -20,9 +20,13 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#FAF8F5" },
+    { media: "(prefers-color-scheme: dark)", color: "#1B3A4B" },
+  ],
 };
 
-const SITE_URL = "https://modulca.com";
+const SITE_URL = "https://www.modulca.eu";
 
 export const metadata: Metadata = {
   title: {
@@ -56,7 +60,7 @@ export const metadata: Metadata = {
       "AI-powered modular construction platform. Design, visualize, and build your modular home with professional tools.",
     images: [
       {
-        url: "/og-image.svg",
+        url: "/og?title=Design+Your+Modular+Home+in+Minutes&subtitle=AI-powered+modular+construction+platform",
         width: 1200,
         height: 630,
         alt: "ModulCA — Modular Construction Platform",
@@ -68,7 +72,7 @@ export const metadata: Metadata = {
     title: "ModulCA — Design Your Modular Home in Minutes",
     description:
       "AI-powered modular construction platform. Design, visualize, and build your modular home.",
-    images: ["/og-image.svg"],
+    images: ["/og?title=Design+Your+Modular+Home+in+Minutes&subtitle=AI-powered+modular+construction+platform"],
   },
   robots: {
     index: true,

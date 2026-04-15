@@ -8,6 +8,13 @@ export const metadata: Metadata = {
     title: "Pricing Plans — ModulCA",
     description:
       "Flexible pricing for modular home design. Start free, upgrade when you need more.",
+    images: [
+      {
+        url: "/og?title=Choose+Your+Plan&subtitle=Start+free.+Upgrade+when+you+need+more+power.",
+        width: 1200,
+        height: 630,
+      },
+    ],
   },
 };
 

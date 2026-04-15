@@ -11,6 +11,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: ["/api/", "/admin/", "/_next/"],
       },
     ],
-    sitemap: "https://modulca.com/sitemap.xml",
+    sitemap: "https://www.modulca.eu/sitemap.xml",
   };
 }

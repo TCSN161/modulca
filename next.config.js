@@ -1,4 +1,7 @@
 const { withSentryConfig } = require("@sentry/nextjs");
+const withBundleAnalyzer = require("@next/bundle-analyzer")({
+  enabled: process.env.ANALYZE === "true",
+});
 
 /** @type {import('next').NextConfig} */
 const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
@@ -8,7 +11,7 @@ const nextConfig = {
   reactStrictMode: true,
   turbopack: {},
   images: {
-    unoptimized: true,
+    unoptimized: isGitHubPages, // only disable optimization for static export
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "tile.openstreetmap.org" },
@@ -28,8 +31,10 @@ const nextConfig = {
 // Only wrap with Sentry if DSN is configured
 const sentryEnabled = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
 
+const finalConfig = withBundleAnalyzer(nextConfig);
+
 module.exports = sentryEnabled
-  ? withSentryConfig(nextConfig, {
+  ? withSentryConfig(finalConfig, {
       // Sentry webpack plugin options
       org: process.env.SENTRY_ORG || "modulca",
       project: process.env.SENTRY_PROJECT || "modulca-web",
@@ -46,4 +51,4 @@ module.exports = sentryEnabled
       // Hide source maps from users
       hideSourceMaps: true,
     })
-  : nextConfig;
+  : finalConfig;

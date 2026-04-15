@@ -914,7 +914,7 @@ export default function PresentationPage() {
                   <div className="text-center pt-6">
                     <div className="h-1 w-16 rounded mx-auto mb-4" style={{ backgroundColor: tmpl.accent }} />
                     <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
-                      Generated with ModulCA | modulca.com
+                      Generated with ModulCA | modulca.eu
                     </p>
                   </div>
                 </div>

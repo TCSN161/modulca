@@ -223,10 +223,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         isAuthenticated: true,
         userId: "demo-google",
         userName: "Demo User",
-        userEmail: "demo@modulca.com",
+        userEmail: "demo@modulca.eu",
         userTier: "free",
       });
-      saveLocal({ name: "Demo User", email: "demo@modulca.com", tier: "free" });
+      saveLocal({ name: "Demo User", email: "demo@modulca.eu", tier: "free" });
       return;
     }
     const { data, error } = await sb.auth.signInWithOAuth({

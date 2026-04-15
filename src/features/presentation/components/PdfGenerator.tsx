@@ -185,7 +185,7 @@ function SlidePage({
           opacity: 0.04,
           transform: "rotate(-30deg)",
         }}>
-          ModulCA Free — modulca.com
+          ModulCA Free — modulca.eu
         </Text>
       )}
     </Page>
@@ -577,7 +577,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
             </View>
             <View style={{ marginTop: 40 }}>
               <Text style={{ ...s.body, opacity: 0.4 }}>
-                ModulCA — Modular Construction Platform | modulca.com
+                ModulCA — Modular Construction Platform | modulca.eu
               </Text>
             </View>
           </SlidePage>
