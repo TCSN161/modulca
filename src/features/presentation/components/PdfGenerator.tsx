@@ -436,10 +436,18 @@ function PresentationDocument(props: PdfGeneratorProps) {
                     <View key={i} style={{ width: "48%", marginBottom: 8 }}>
                       <Image
                         src={render.imageUrl}
-                        style={{ width: "100%", height: 180, objectFit: "cover", borderRadius: 4 }}
+                        style={{ width: "100%", height: 160, objectFit: "cover", borderRadius: 4 }}
                       />
-                      <Text style={{ fontSize: 8, color: t.text, marginTop: 4 }}>
-                        {render.label} — {render.engine}
+                      <Text style={{ fontSize: 8, fontWeight: "bold", color: t.text, marginTop: 4 }}>
+                        {render.label}
+                      </Text>
+                      {render.description ? (
+                        <Text style={{ fontSize: 7, color: t.text, opacity: 0.6, marginTop: 2, lineHeight: 1.4 }}>
+                          {render.description.slice(0, 150)}
+                        </Text>
+                      ) : null}
+                      <Text style={{ fontSize: 7, color: t.text, opacity: 0.4, marginTop: 2 }}>
+                        {render.engine}{render.resolution ? ` | ${render.resolution}` : ""}{render.mode ? ` | ${render.mode}` : ""}
                       </Text>
                     </View>
                   ))}
