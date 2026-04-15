@@ -80,9 +80,10 @@ export const SHARED = {
 // }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
 /* ── Account Tiers ─────────────────────────────────────────── */
-// free:      Explorer  — 4 modules, 5 renders/mo, 1 project, basic features
-// premium:   Premium   — €19/mo, 12 modules, 30 renders/mo, 5 projects, full features
-// architect: Architect — €49/mo, 50 modules, 100 renders/mo, unlimited projects, DWG, collaboration, white-label
+// free:        Explorer    — 6 modules, 5 renders/mo, 2 projects, basic features (3-month beta → Premium)
+// premium:     Premium     — €29/mo, 12 modules, 50 renders/mo, 10 projects, full features
+// architect:   Architect   — €79/mo, 50 modules, 200 renders/mo, unlimited projects, DWG, collaboration
+// constructor: Constructor — €149/mo, 200 modules, unlimited renders, white-label, API, dedicated support
 
 /* ── Tech Stack ────────────────────────────────────────────── */
 // Next.js 16.2.1 (App Router, output: "export" for GitHub Pages)

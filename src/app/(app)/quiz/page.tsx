@@ -706,7 +706,7 @@ export default function QuizPage() {
   }, [completed, answers, setQuizProfile]);
 
   const handleStartDesign = () => {
-    router.push("/project/demo/choose");
+    router.push("/project/new");
   };
 
   const handleRetake = () => {

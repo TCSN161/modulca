@@ -61,7 +61,7 @@ export default function MobileNav() {
             )}
             <div className="mt-2 border-t border-brand-bone-300 pt-3 px-4">
               <Link
-                href="/project/demo/choose"
+                href="/project/new"
                 onClick={() => setOpen(false)}
                 className="block w-full rounded-lg bg-brand-olive-700 px-4 py-2.5 text-center text-sm font-bold text-white hover:bg-brand-olive-800 transition-colors"
               >

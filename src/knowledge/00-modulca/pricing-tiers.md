@@ -2,10 +2,10 @@
 id: "modulca-pricing"
 title: "ModulCA Pricing & Account Tiers"
 category: "modulca"
-tags: ["modulca", "pricing", "tiers", "explorer", "premium", "architect"]
+tags: ["modulca", "pricing", "tiers", "explorer", "premium", "architect", "constructor"]
 sources: ["ModulCA Internal Documentation"]
 difficulty: "beginner"
-lastUpdated: "2026-04-11"
+lastUpdated: "2026-04-16"
 proOnly: false
 relatedArticles: ["modulca-platform", "modulca-13-steps", "cost-estimation"]
 ---
@@ -25,27 +25,36 @@ relatedArticles: ["modulca-platform", "modulca-13-steps", "cost-estimation"]
   - Save 1 project (with account)
 - **Best for**: Exploring modular design, first-time users
 
-### Premium (€19/month)
-- **Price**: €19/month
+### Premium (€29/month)
+- **Price**: €29/month (€290/year — 2 months free)
 - **Everything in Explorer, plus**:
-  - AI photorealistic renders (unlimited)
-  - Technical drawings (floor plans, sections, elevations)
-  - Full knowledge base library access
-  - Advanced Neufert AI (detailed consultations)
-  - Save multiple projects
-  - Export PDF presentations
+  - 50 AI renders per month (HD)
+  - All 6 technical drawing types + PDF export
+  - Auto-tour & building permit tracker
+  - Full knowledge base with pro articles
+  - Product catalog with real pricing
+  - 10 saved projects + sharable links
 - **Best for**: Homeowners actively designing their home
 
-### Architect (€49/month)
-- **Price**: €49/month
+### Architect (€79/month)
+- **Price**: €79/month (€790/year — 2 months free)
 - **Everything in Premium, plus**:
-  - Professional PDF presentation package
-  - Custom branding on presentations
-  - Client sharing links
-  - Advanced technical specifications
-  - Priority AI responses
+  - 200 AI renders per month (4K)
+  - DWG/DXF export for CAD
+  - Team collaboration & client dashboard
   - Unlimited projects
+  - Priority support
 - **Best for**: Architects and professionals using ModulCA for clients
+
+### Constructor (€149/month)
+- **Price**: €149/month (€1490/year — 2 months free)
+- **Everything in Architect, plus**:
+  - Unlimited AI renders (4K)
+  - White-label branding
+  - Full analytics & API access
+  - Dedicated support
+  - Up to 200 modules per project
+- **Best for**: Construction companies and enterprise users
 
 ## Construction Costs (Romania 2024-2025)
 

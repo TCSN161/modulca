@@ -176,7 +176,7 @@ export default function PricingPage() {
                   </div>
                 ) : tier.id === "free" ? (
                   <Link
-                    href="/project/demo/land"
+                    href="/project/new"
                     className="block w-full rounded-lg bg-gray-100 px-3 py-2 text-center text-xs font-semibold text-gray-600 hover:bg-gray-200 transition-colors"
                   >
                     Start Free

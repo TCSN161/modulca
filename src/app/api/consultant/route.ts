@@ -3,6 +3,7 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import { ARTICLES } from "@/knowledge/_index";
 import type { KBDocumentMeta } from "@/knowledge/_types";
+import { searchBooks, BOOK_REGISTRY } from "@/knowledge/15-books/_registry";
 import { getTierConfig as getAuthTierConfig, type AccountTier } from "@/features/auth/types";
 
 export const dynamic = "force-dynamic";
@@ -325,8 +326,25 @@ async function buildRAGContext(question: string, maxArticles = 4, maxChars = 600
   const articleIds = scored.filter(s => s.article?.filePath).map(s => s.article.id);
   if (sections.length === 0) return { context: "", articlesUsed: [] };
   const regionNote = detectedRegion ? `\n\nDetected region context: ${detectedRegion}` : "";
+
+  // Find relevant book references (search by question keywords)
+  const questionWords = question.toLowerCase().split(/\s+/).filter(w => w.length > 3);
+  const matchedBooks = new Set<string>();
+  for (const word of questionWords) {
+    for (const book of searchBooks(word)) {
+      matchedBooks.add(book.id);
+      if (matchedBooks.size >= 3) break;
+    }
+    if (matchedBooks.size >= 3) break;
+  }
+  const bookNote = matchedBooks.size > 0
+    ? `\n\n## Relevant Book References\n${BOOK_REGISTRY.filter(b => matchedBooks.has(b.id)).map(b =>
+        `- **${b.title}** by ${b.author} (${b.year})${b.free ? " — FREE" : b.cost ? ` — ${b.cost}` : ""}${b.url ? ` → ${b.url}` : ""}`
+      ).join("\n")}\nYou may cite these books when relevant to add credibility to your answers.`
+    : "";
+
   return {
-    context: `\n\n# Reference Articles (from ModulCA Knowledge Library)${regionNote}\n\n${sections.join("\n\n---\n\n")}`,
+    context: `\n\n# Reference Articles (from ModulCA Knowledge Library)${regionNote}\n\n${sections.join("\n\n---\n\n")}${bookNote}`,
     articlesUsed: articleIds,
   };
 }

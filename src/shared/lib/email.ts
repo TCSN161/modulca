@@ -88,7 +88,7 @@ export async function sendWelcomeEmail(to: string, displayName?: string) {
 export async function sendUpgradeEmail(to: string, tier: string, displayName?: string) {
   return sendEmail({
     to,
-    subject: `ModulCA — Your ${tier === "architect" ? "Architect" : "Premium"} Plan is Active`,
+    subject: `ModulCA — Your ${tier === "constructor" ? "Constructor" : tier === "architect" ? "Architect" : "Premium"} Plan is Active`,
     html: upgradeEmailHtml(tier, displayName),
   });
 }

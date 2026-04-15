@@ -13,7 +13,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     { url: `${SITE_URL}/login`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/register`, lastModified: new Date(), changeFrequency: "monthly", priority: 0.3 },
     { url: `${SITE_URL}/dashboard`, lastModified: new Date(), changeFrequency: "daily", priority: 0.6 },
-    { url: `${SITE_URL}/project/demo/land`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
+    { url: `${SITE_URL}/project/new`, lastModified: new Date(), changeFrequency: "weekly", priority: 0.9 },
   ];
 
   const blogPages: MetadataRoute.Sitemap = getAllSlugs().map((slug) => ({

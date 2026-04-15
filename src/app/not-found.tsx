@@ -43,7 +43,7 @@ export default function NotFound() {
             Back to Home
           </Link>
           <Link
-            href="/project/demo/land"
+            href="/project/new"
             className="rounded-lg border border-gray-200 bg-white px-6 py-3 text-sm font-semibold text-brand-teal-800 hover:bg-gray-50 transition-colors"
           >
             Start Designing

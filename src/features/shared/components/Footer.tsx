@@ -4,7 +4,7 @@ const FOOTER_LINKS = [
   {
     heading: "Platform",
     links: [
-      { label: "Design Your Home", href: "/project/demo/choose" },
+      { label: "Design Your Home", href: "/project/new" },
       { label: "AI Consultant", href: "/project/demo/consultant" },
       { label: "Knowledge Library", href: "/library" },
       { label: "Architectural Quiz", href: "/quiz" },

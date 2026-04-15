@@ -23,6 +23,12 @@ export default function WallDetailDrawing({ wallColor }: WallDetailProps) {
       opacity: 0.3,
     },
     {
+      label: "Sheathing (MgO)",
+      thickness: 15,
+      color: "#C8B89A",
+      opacity: 0.5,
+    },
+    {
       label: "Insulation",
       thickness: 120,
       color: "#FFE4B5",
@@ -39,6 +45,12 @@ export default function WallDetailDrawing({ wallColor }: WallDetailProps) {
       thickness: 5,
       color: "#7EC8E3",
       opacity: 0.6,
+    },
+    {
+      label: "Service Cavity",
+      thickness: 20,
+      color: "#DDD",
+      opacity: 0.3,
     },
     {
       label: "Int. Finish",

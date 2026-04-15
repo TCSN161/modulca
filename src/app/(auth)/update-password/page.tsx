@@ -82,6 +82,18 @@ export default function UpdatePasswordPage() {
       setError(updateError.message);
     } else {
       setSuccess(true);
+
+      // Send password-updated confirmation email (fire-and-forget)
+      sb.auth.getUser().then(({ data }) => {
+        if (data?.user?.email) {
+          fetch("/api/email/send", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ type: "password_reset_confirm", to: data.user.email }),
+          }).catch(() => { /* non-blocking */ });
+        }
+      });
+
       // Redirect to dashboard after 2 seconds
       setTimeout(() => router.push("/dashboard"), 2000);
     }

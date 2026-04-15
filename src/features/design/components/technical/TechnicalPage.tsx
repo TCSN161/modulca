@@ -36,9 +36,11 @@ const DRAWING_TYPES = [
 const WALL_LAYERS = [
   { material: "Exterior Cladding", thickness: "20mm" },
   { material: "Air Gap", thickness: "25mm" },
+  { material: "Exterior Sheathing (MgO Board)", thickness: "15mm" },
   { material: "Mineral Wool Insulation", thickness: "120mm" },
   { material: "Steel Frame (SIP)", thickness: "80mm" },
   { material: "Vapour Barrier", thickness: "5mm" },
+  { material: "Service Cavity (Battens)", thickness: "20mm" },
   { material: "Interior Finish", thickness: "15mm" },
 ];
 
@@ -192,12 +194,14 @@ export default function TechnicalPage() {
           >
             &larr; Back to Render
           </Link>
-          <button
-            onClick={handleDownloadPdf}
-            className="rounded-lg border border-brand-amber-500 px-3 py-2 text-sm font-semibold text-brand-amber-600 hover:bg-brand-amber-50"
-          >
-            Export PDF
-          </button>
+          <FeatureGate requires="exportPdf" hideIfLocked>
+            <button
+              onClick={handleDownloadPdf}
+              className="rounded-lg border border-brand-amber-500 px-3 py-2 text-sm font-semibold text-brand-amber-600 hover:bg-brand-amber-50"
+            >
+              Export PDF
+            </button>
+          </FeatureGate>
           <Link
             href={`/project/${projectId}/walkthrough`}
             className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
@@ -287,12 +291,14 @@ export default function TechnicalPage() {
                 Print Drawing
               </span>
             </button>
-            <button
-              onClick={handleDownloadPdf}
-              className="w-full rounded-lg bg-brand-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors"
-            >
-              Export All Sheets
-            </button>
+            <FeatureGate requires="exportPdf">
+              <button
+                onClick={handleDownloadPdf}
+                className="w-full rounded-lg bg-brand-amber-500 px-4 py-2.5 text-sm font-bold text-white hover:bg-brand-amber-600 transition-colors"
+              >
+                Export All Sheets
+              </button>
+            </FeatureGate>
             <FeatureGate requires="drawingPresentation">
             <button
               onClick={() => setPresentationOpen(true)}

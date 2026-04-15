@@ -213,7 +213,7 @@ export default function PortfolioPage() {
                 </ul>
 
                 <Link
-                  href="/project/demo/choose"
+                  href="/project/new"
                   className="self-start btn-primary text-sm px-5 py-2.5"
                 >
                   Design Something Similar
@@ -235,7 +235,7 @@ export default function PortfolioPage() {
           </p>
           <div className="flex flex-col sm:flex-row gap-3 justify-center">
             <Link
-              href="/project/demo/choose"
+              href="/project/new"
               className="inline-flex items-center justify-center rounded-[12px] bg-white px-6 py-3 text-sm font-semibold text-brand-olive-700 hover:bg-brand-bone-100 transition-colors"
             >
               Start Designing — Free

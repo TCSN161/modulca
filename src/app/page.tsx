@@ -120,7 +120,7 @@ export default function HomePage() {
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
-                  href="/project/demo/choose"
+                  href="/project/new"
                   className="btn-primary px-7 py-3.5 text-base shadow-subtle"
                 >
                   Start Designing — Free
@@ -252,7 +252,7 @@ export default function HomePage() {
               ))}
             </div>
             <div className="mt-12">
-              <Link href="/project/demo/choose" className="btn-primary px-8 py-3 text-sm">
+              <Link href="/project/new" className="btn-primary px-8 py-3 text-sm">
                 Try the Full 13-Step Flow
               </Link>
             </div>
@@ -292,7 +292,7 @@ export default function HomePage() {
                     "3-month Premium beta promo",
                   ],
                   cta: "Start Free",
-                  href: "/project/demo/choose",
+                  href: "/project/new",
                   highlight: false,
                   badge: null,
                 },
@@ -412,7 +412,7 @@ export default function HomePage() {
               </h2>
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
-                  href="/project/demo/choose"
+                  href="/project/new"
                   className="rounded-[12px] bg-white px-8 py-3.5 text-sm font-bold text-brand-charcoal transition-colors hover:bg-brand-bone-200 shadow-subtle"
                 >
                   Launch Designer

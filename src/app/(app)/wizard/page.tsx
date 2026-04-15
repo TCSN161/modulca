@@ -85,7 +85,7 @@ export default function WizardPage() {
     setApplying(true);
     applyToProject();
     setTimeout(() => {
-      router.push("/project/demo/design");
+      router.push("/project/new");
     }, 400);
   };
 
