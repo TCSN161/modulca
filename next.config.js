@@ -1,3 +1,5 @@
+const { withSentryConfig } = require("@sentry/nextjs");
+
 /** @type {import('next').NextConfig} */
 const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
 
@@ -23,4 +25,25 @@ const nextConfig = {
   },
 };
 
-module.exports = nextConfig;
+// Only wrap with Sentry if DSN is configured
+const sentryEnabled = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
+
+module.exports = sentryEnabled
+  ? withSentryConfig(nextConfig, {
+      // Sentry webpack plugin options
+      org: process.env.SENTRY_ORG || "modulca",
+      project: process.env.SENTRY_PROJECT || "modulca-web",
+
+      // Suppress source map upload logs in CI
+      silent: !process.env.CI,
+
+      // Upload source maps for better stack traces
+      widenClientFileUpload: true,
+
+      // Tree-shake Sentry logger in production
+      disableLogger: true,
+
+      // Hide source maps from users
+      hideSourceMaps: true,
+    })
+  : nextConfig;
