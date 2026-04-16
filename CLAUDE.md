@@ -7,6 +7,48 @@
 2. Work on ONE feature folder per session (don't mix technical/ with render/)
 3. Run `npx tsc --noEmit` and `npx next build` before committing
 
+## ⚠️ Parallel Session Safety (CRITICAL)
+Multiple Claude Code sessions may be running simultaneously on this repo.
+To avoid stepping on another session's work:
+
+**At the START of every session:**
+```bash
+git pull --rebase origin master       # get latest work from other sessions
+npm run collision-check               # scan for hotspot files & conflicts
+```
+
+**DURING work:**
+- Announce which files/folders you'll edit before starting
+- If you detect another session edited your target file in the last hour, STOP and ask the user
+- NEVER run `git push --force` — this can destroy another session's work
+
+**At the END of every session:**
+```bash
+npm run typecheck                     # verify clean
+npm run test:run                      # verify nothing broke
+git pull --rebase origin master       # catch any late pushes
+git push origin master
+npm run collision-check               # final sanity check
+```
+
+**Files with HIGH collision risk** (avoid editing unless it's your explicit task):
+- `src/app/page.tsx` (landing)
+- `src/app/layout.tsx`
+- `src/app/sitemap.ts` / `robots.ts`
+- `src/knowledge/_index.ts` (auto-generated — edit source YAMLs instead)
+- `package.json` / `package-lock.json`
+- `src/features/auth/store.ts`
+- `src/features/design/components/finalize/FinalizePage.tsx`
+- `PROJECT_DASHBOARD.md`
+
+**For LARGE features** (Stripe, Auth overhaul, new pages):
+Use a feature branch instead of master:
+```bash
+git checkout -b feature/[task-name]
+# ...work, commit, push...
+gh pr create                          # open PR for review
+```
+
 ## Tech Stack
 - Next.js 16.2.1 (App Router) | React 19 | TypeScript strict
 - Zustand 5 (state) | Three.js + R3F (3D) | Tailwind 3.4
