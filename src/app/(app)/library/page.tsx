@@ -810,6 +810,34 @@ export default function LibraryPage() {
                 </div>
               </div>
             </div>
+            {/* Practical Guides section */}
+            <div className="mb-6">
+              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">🗺️ Practical Guides</h3>
+              <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
+                <div className="flex items-center gap-2 mb-3">
+                  <span className="text-lg">💡</span>
+                  <h4 className="text-sm font-bold text-blue-800">Step-by-Step Guides</h4>
+                </div>
+                <div className="space-y-1.5">
+                  {ARTICLES.filter((a) => a.category === "guides").slice(0, 5).map((guide) => (
+                    <Link
+                      key={guide.id}
+                      href={`/library/${guide.id}`}
+                      className="flex items-center gap-2 text-xs text-blue-700 hover:text-blue-900 hover:underline"
+                    >
+                      <span className="shrink-0">→</span>
+                      <span className="line-clamp-1">{guide.title}</span>
+                    </Link>
+                  ))}
+                  <Link
+                    href="/library/guides"
+                    className="inline-block text-xs text-blue-600 hover:underline mt-1"
+                  >
+                    Browse all guides →
+                  </Link>
+                </div>
+              </div>
+            </div>
 
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {categories.map((cat) => (

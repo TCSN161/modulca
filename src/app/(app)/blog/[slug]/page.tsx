@@ -33,8 +33,24 @@ export default async function BlogArticlePage({ params }: Props) {
   const article = getArticle(slug);
   if (!article) notFound();
 
+  /* JSON-LD structured data for SEO */
+  const jsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: article.title,
+    description: article.excerpt,
+    datePublished: article.date,
+    author: { "@type": "Organization", name: article.author, url: "https://modulca.eu" },
+    publisher: { "@type": "Organization", name: "ModulCA", url: "https://modulca.eu" },
+    mainEntityOfPage: `https://modulca.eu/blog/${slug}`,
+  };
+
   return (
     <div className="min-h-screen bg-white">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+      />
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">
         <div className="mx-auto flex h-14 max-w-5xl items-center justify-between px-4">
