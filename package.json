@@ -10,7 +10,12 @@
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
-    "test:run": "vitest run"
+    "test:run": "vitest run",
+    "ops:check": "node scripts/ops-check.mjs",
+    "ops:check:json": "node scripts/ops-check.mjs --json",
+    "ops:check:ci": "node scripts/ops-check.mjs --ci",
+    "predeploy": "node scripts/pre-deploy.mjs",
+    "typecheck": "tsc --noEmit"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

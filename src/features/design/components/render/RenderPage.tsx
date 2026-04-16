@@ -781,7 +781,7 @@ export default function RenderPage() {
 
               <div className="rounded-lg bg-gray-50 p-3 space-y-2">
                 <div className="text-[10px] font-bold text-gray-400 uppercase">Cost Summary</div>
-                <div className="flex justify-between text-xs text-gray-600">
+                <div className="flex justify-between text-xs text-gray-600" suppressHydrationWarning>
                   <span>Module cost ({finishLevel})</span>
                   <span className="font-medium">&euro;{stats.moduleCost.toLocaleString()}</span>
                 </div>
@@ -795,7 +795,7 @@ export default function RenderPage() {
                   <span>Design fee (8%)</span>
                   <span className="font-medium">&euro;{stats.designFee.toLocaleString()}</span>
                 </div>
-                <div className="mt-1 border-t border-gray-200 pt-1 flex justify-between text-sm font-bold text-brand-teal-800">
+                <div className="mt-1 border-t border-gray-200 pt-1 flex justify-between text-sm font-bold text-brand-teal-800" suppressHydrationWarning>
                   <span>Total</span>
                   <span>&euro;{stats.totalEstimate.toLocaleString()}</span>
                 </div>
@@ -993,7 +993,7 @@ export default function RenderPage() {
                       </div>
                       <div className="rounded-lg bg-gray-50 p-3 space-y-2">
                         <div className="text-[10px] font-bold text-gray-400 uppercase">Cost Summary</div>
-                        <div className="mt-1 flex justify-between text-sm font-bold text-brand-teal-800">
+                        <div className="mt-1 flex justify-between text-sm font-bold text-brand-teal-800" suppressHydrationWarning>
                           <span>Total</span>
                           <span>&euro;{stats.totalEstimate.toLocaleString()}</span>
                         </div>

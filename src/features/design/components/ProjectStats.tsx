@@ -67,7 +67,7 @@ export default function ProjectStats() {
             <div className="text-[10px] font-semibold text-gray-400 uppercase">
               Total Area
             </div>
-            <div className="text-xl font-bold text-brand-teal-800">
+            <div className="text-xl font-bold text-brand-teal-800" suppressHydrationWarning>
               {stats.totalArea}.0 m²
             </div>
           </div>
@@ -75,7 +75,7 @@ export default function ProjectStats() {
             <div className="text-[10px] font-semibold text-gray-400 uppercase">
               Net Modules
             </div>
-            <div className="text-xl font-bold text-brand-teal-800">
+            <div className="text-xl font-bold text-brand-teal-800" suppressHydrationWarning>
               {stats.totalModules} Units
             </div>
           </div>
@@ -85,7 +85,7 @@ export default function ProjectStats() {
             <div className="text-[10px] font-semibold text-gray-400 uppercase">
               Usable Area
             </div>
-            <div className="text-lg font-bold text-brand-teal-700">
+            <div className="text-lg font-bold text-brand-teal-700" suppressHydrationWarning>
               {stats.usableArea}.0 m²
             </div>
           </div>
@@ -93,7 +93,7 @@ export default function ProjectStats() {
             <div className="text-[10px] font-semibold text-gray-400 uppercase">
               Shared Walls
             </div>
-            <div className="text-lg font-bold text-brand-teal-700">
+            <div className="text-lg font-bold text-brand-teal-700" suppressHydrationWarning>
               {stats.sharedWalls}
             </div>
           </div>
@@ -140,7 +140,7 @@ export default function ProjectStats() {
           Cost Breakdown
         </h3>
         <div className="space-y-1.5 text-sm">
-          <div className="flex justify-between text-gray-600">
+          <div className="flex justify-between text-gray-600" suppressHydrationWarning>
             <span>{stats.totalModules} modules × {formatEuro(FINISH_LEVELS.find(f => f.id === finishLevel)!.pricePerModule)}</span>
             <span>{formatEuro(stats.moduleCost)}</span>
           </div>
@@ -168,7 +168,7 @@ export default function ProjectStats() {
           <div className="text-[10px] font-semibold text-gray-400 uppercase">
             Total Estimate
           </div>
-          <div className="text-3xl font-bold text-brand-teal-800">
+          <div className="text-3xl font-bold text-brand-teal-800" suppressHydrationWarning>
             {formatEuro(stats.totalEstimate)}
           </div>
           <p className="mt-1 text-[10px] text-gray-400">

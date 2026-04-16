@@ -301,7 +301,7 @@ export default function Inspector() {
             Coordinates: X: {selectedMod ? (selectedMod.col * 3).toFixed(2) : "0.00"} Y: 0.00
             Z: {selectedMod ? (selectedMod.row * 3).toFixed(2) : "0.00"}
           </span>
-          <span className="font-semibold text-brand-teal-800">
+          <span className="font-semibold text-brand-teal-800" suppressHydrationWarning>
             Total Area: {stats.totalArea}.00 m²
           </span>
         </div>

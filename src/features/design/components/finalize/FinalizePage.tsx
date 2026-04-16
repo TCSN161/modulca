@@ -160,12 +160,12 @@ export default function FinalizePage() {
               </div>
               <div className="bg-gray-50 rounded-lg p-4">
                 <div className="text-xs text-gray-500 uppercase tracking-wider mb-1">Total Area</div>
-                <div className="text-sm font-medium text-brand-teal-800">{stats.totalArea}m² ({stats.usableArea}m² usable)</div>
+                <div className="text-sm font-medium text-brand-teal-800" suppressHydrationWarning>{stats.totalArea}m² ({stats.usableArea}m² usable)</div>
               </div>
             </div>
 
             {/* Module breakdown */}
-            <h3 className="text-sm font-semibold text-gray-700 mb-2">Modules ({stats.totalModules})</h3>
+            <h3 className="text-sm font-semibold text-gray-700 mb-2" suppressHydrationWarning>Modules ({stats.totalModules})</h3>
             <div className="flex flex-wrap gap-2 mb-6">
               {Object.entries(typeCounts).map(([type, count]) => {
                 const mt = MODULE_TYPES.find((m) => m.id === type);
@@ -204,21 +204,21 @@ export default function FinalizePage() {
                         <div className="text-sm font-semibold text-brand-charcoal">Structural Shell</div>
                         <div className="text-[11px] text-brand-gray">CLT Panels &amp; Insulation</div>
                       </div>
-                      <span className="text-sm font-bold text-brand-charcoal">&euro;{structuralCost.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{structuralCost.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between rounded-[12px] bg-brand-bone-100 p-4">
                       <div>
                         <div className="text-sm font-semibold text-brand-charcoal">Interior Finishes</div>
                         <div className="text-[11px] text-brand-gray">{finish.label} &amp; Wall Details</div>
                       </div>
-                      <span className="text-sm font-bold text-brand-charcoal">&euro;{interiorCost.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{interiorCost.toLocaleString()}</span>
                     </div>
                     <div className="flex items-center justify-between rounded-[12px] bg-brand-bone-100 p-4">
                       <div>
                         <div className="text-sm font-semibold text-brand-charcoal">System Integration</div>
                         <div className="text-[11px] text-brand-gray">HVAC, Electrical &amp; Plumbing</div>
                       </div>
-                      <span className="text-sm font-bold text-brand-charcoal">&euro;{systemCost.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{systemCost.toLocaleString()}</span>
                     </div>
                   </>
                 );
@@ -242,7 +242,7 @@ export default function FinalizePage() {
               <div className="flex items-baseline justify-between">
                 <div>
                   <div className="text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">Estimated Total</div>
-                  <span className="text-2xl font-bold text-brand-charcoal">&euro;{Math.round(stats.totalEstimate).toLocaleString()}</span>
+                  <span className="text-2xl font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{Math.round(stats.totalEstimate).toLocaleString()}</span>
                 </div>
                 <span className="text-[10px] text-brand-gray">*Excluding land &amp; permits</span>
               </div>

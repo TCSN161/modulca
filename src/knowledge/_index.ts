@@ -5598,7 +5598,7 @@ export const REGIONS: KBRegion[] = [
   {
     "name": "Belgium",
     "code": "BE",
-    "flag": "\\U0001F1E7\\U0001F1EA",
+    "flag": "🇧🇪",
     "language": "nl",
     "status": "complete",
     "market": "future",
@@ -5616,7 +5616,7 @@ export const REGIONS: KBRegion[] = [
   {
     "name": "Germany",
     "code": "DE",
-    "flag": "\\U0001F1E9\\U0001F1EA",
+    "flag": "🇩🇪",
     "language": "de",
     "status": "complete",
     "market": "future",
@@ -5634,7 +5634,7 @@ export const REGIONS: KBRegion[] = [
   {
     "name": "Spain",
     "code": "ES",
-    "flag": "\\U0001F1EA\\U0001F1F8",
+    "flag": "🇪🇸",
     "language": "es",
     "status": "complete",
     "market": "future",
@@ -5651,7 +5651,7 @@ export const REGIONS: KBRegion[] = [
   {
     "name": "France",
     "code": "FR",
-    "flag": "\\U0001F1EB\\U0001F1F7",
+    "flag": "🇫🇷",
     "language": "fr",
     "status": "complete",
     "market": "future",
@@ -5669,7 +5669,7 @@ export const REGIONS: KBRegion[] = [
   {
     "name": "Italy",
     "code": "IT",
-    "flag": "\\U0001F1EE\\U0001F1F9",
+    "flag": "🇮🇹",
     "language": "it",
     "status": "complete",
     "market": "future",
@@ -5686,7 +5686,7 @@ export const REGIONS: KBRegion[] = [
   {
     "name": "Netherlands",
     "code": "NL",
-    "flag": "\\U0001F1F3\\U0001F1F1",
+    "flag": "🇳🇱",
     "language": "nl",
     "status": "complete",
     "market": "expansion",
@@ -5707,7 +5707,7 @@ export const REGIONS: KBRegion[] = [
   {
     "name": "Romania",
     "code": "RO",
-    "flag": "\\U0001F1F7\\U0001F1F4",
+    "flag": "🇷🇴",
     "language": "ro",
     "status": "complete",
     "market": "active",

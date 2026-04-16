@@ -688,7 +688,7 @@ export default function ProductsPage() {
               Cost Summary
             </h4>
             <div className="space-y-2">
-              <div className="flex justify-between">
+              <div className="flex justify-between" suppressHydrationWarning>
                 <span className="text-xs text-gray-600">
                   Module Costs ({stats.totalModules} modules)
                 </span>
@@ -724,7 +724,7 @@ export default function ProductsPage() {
                 <span className="text-sm font-bold text-[#1B3A4B]">
                   Grand Total
                 </span>
-                <span className="text-sm font-bold text-[#1B3A4B]">
+                <span className="text-sm font-bold text-[#1B3A4B]" suppressHydrationWarning>
                   &euro;{grandTotal.toLocaleString()}
                 </span>
               </div>
