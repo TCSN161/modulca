@@ -7,7 +7,7 @@ import { useDesignStore, getEffectiveThickness } from "../../store";
 import type { ModuleConfig } from "../../store";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import {
-  MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS, wallThickM,
+  MODULE_SIZE, WALL_HEIGHT, wallThickM,
   ModuleWalls, ModuleFloor, ModuleCeiling,
   StaticFurniturePiece,
 } from "../shared/module3d";
