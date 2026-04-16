@@ -21,7 +21,7 @@ describe("STRIPE_PRICES", () => {
   });
 
   it("all prices should be strings (empty or price IDs)", () => {
-    for (const [key, val] of Object.entries(STRIPE_PRICES)) {
+    for (const [, val] of Object.entries(STRIPE_PRICES)) {
       expect(typeof val).toBe("string");
       // In test env, no env vars set so all should be empty string
       expect(val).toBe("");
