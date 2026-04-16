@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { ARTICLES, REGIONS, CATEGORIES } from "@/knowledge/_index";
+import { checkEnv } from "@/shared/config/env-check";
 
 export const dynamic = "force-dynamic";
 
@@ -39,8 +40,11 @@ export async function GET() {
 
     const configuredCount = providers.filter((p) => p.configured).length;
 
+    // Environment validation
+    const envCheck = checkEnv();
+
     return NextResponse.json({
-      status: "ok",
+      status: envCheck.ok ? "ok" : "degraded",
       timestamp: new Date().toISOString(),
       knowledge: {
         articles: ARTICLES.length,
@@ -54,6 +58,12 @@ export async function GET() {
         freeTierReady: providers.some((p) => p.configured && p.tiers.includes("free")),
         premiumReady: providers.some((p) => p.configured && p.tiers.includes("premium") && p.id !== "groq"),
         architectReady: providers.some((p) => p.configured && p.tiers.includes("architect") && p.id === "anthropic"),
+      },
+      env: {
+        ok: envCheck.ok,
+        missingCritical: envCheck.missing.filter((m) => m.critical).map((m) => m.key),
+        missingOptional: envCheck.missing.filter((m) => !m.critical).map((m) => m.key),
+        warnings: envCheck.warnings,
       },
     });
   } catch (error) {
