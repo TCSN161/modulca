@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import * as Sentry from "@sentry/nextjs";
 import {
   sendWelcomeEmail,
   sendPasswordResetConfirmEmail,
@@ -42,6 +43,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(result);
   } catch (err) {
     console.error("[Email API]", err);
+    Sentry.captureException(err, { tags: { source: "email-api" } });
     const message = err instanceof Error ? err.message : "Unknown error";
     return NextResponse.json({ error: message }, { status: 500 });
   }

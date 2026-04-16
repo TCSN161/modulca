@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@supabase/supabase-js";
 import {
   sendUpgradeEmail,
@@ -90,6 +91,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ received: true });
   } catch (err) {
     console.error("[Stripe Webhook] Error:", err);
+    Sentry.captureException(err, { tags: { source: "stripe-webhook" } });
     return NextResponse.json({ error: "Webhook error" }, { status: 500 });
   }
 }
@@ -173,6 +175,7 @@ async function handleSubscriptionCancel(sub: Stripe.Subscription) {
     }
   } catch (e) {
     console.error("[Stripe Webhook] Could not send cancel email:", e);
+    Sentry.captureException(e, { tags: { source: "stripe-webhook", action: "cancel-email" } });
   }
 }
 
