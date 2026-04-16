@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState } from "react";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
-import { useDesignStore } from "../../store";
+import { useDesignStore, getEffectiveThickness } from "../../store";
 import type { ModuleConfig } from "../../store";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import {
@@ -122,7 +122,7 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
         return (
           <group key={`mod-${mod.row}-${mod.col}`}>
             <ModuleFloor offsetX={ox} offsetZ={oz} color={floorColor} />
-            <ModuleWalls wallConfigs={mod.wallConfigs} wallColor={wallColor} offsetX={ox} offsetZ={oz} />
+            <ModuleWalls wallConfigs={mod.wallConfigs} wallColor={wallColor} offsetX={ox} offsetZ={oz} wallThickness={getEffectiveThickness(mod)} />
             {/* No ceiling in combined view — allows orbital camera to see interiors */}
 
             {furniture.map((item) => (

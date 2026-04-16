@@ -149,6 +149,12 @@ export interface KBSource {
   cost?: string;
   /** Applicable regions (empty = universal) */
   regions?: string[];
+  /** ISBN-13 or ISBN-10 for Open Library cover/metadata lookup */
+  isbn?: string;
+  /** Open Library Work ID (e.g. "OL123W") for books without ISBN */
+  olid?: string;
+  /** Cover image URL (auto-populated from Open Library or manual) */
+  coverUrl?: string;
 }
 
 /* ------------------------------------------------------------------ */

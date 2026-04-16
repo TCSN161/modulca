@@ -2,7 +2,8 @@
 
 import { useEffect, useRef, useState, useCallback } from "react";
 import Link from "next/link";
-import { useDesignStore } from "../../store";
+import { useDesignStore, WALL_THICKNESS_SPECS } from "../../store";
+import type { WallThickness } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES } from "@/shared/types";
@@ -33,16 +34,16 @@ const DRAWING_TYPES = [
   { id: "foundation-detail", label: "Foundation Detail" },
 ];
 
-const WALL_LAYERS = [
-  { material: "Exterior Cladding", thickness: "20mm" },
-  { material: "Air Gap", thickness: "25mm" },
-  { material: "Exterior Sheathing (MgO Board)", thickness: "15mm" },
-  { material: "Mineral Wool Insulation", thickness: "120mm" },
-  { material: "Steel Frame (SIP)", thickness: "80mm" },
-  { material: "Vapour Barrier", thickness: "5mm" },
-  { material: "Service Cavity (Battens)", thickness: "20mm" },
-  { material: "Interior Finish", thickness: "15mm" },
-];
+/** Get wall layer info from the single source of truth in store.ts */
+function getWallLayers(thickness: WallThickness = 25) {
+  const spec = WALL_THICKNESS_SPECS[thickness];
+  return spec.layers.map((l) => ({
+    material: l.material,
+    thickness: `${l.mm}mm`,
+  }));
+}
+
+const WALL_THICKNESS_OPTIONS: WallThickness[] = [15, 25, 30];
 
 export default function TechnicalPage() {
   const projectId = useProjectId();
@@ -63,6 +64,7 @@ export default function TechnicalPage() {
   const [permitOpen, setPermitOpen] = useState(false);
   const [presentationOpen, setPresentationOpen] = useState(false);
   const [mobilePanel, setMobilePanel] = useState<"none" | "drawings" | "specs">("none");
+  const [wallDetailType, setWallDetailType] = useState<WallThickness>(25);
   const drawingRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -555,10 +557,30 @@ export default function TechnicalPage() {
                 </div>
               </div>
 
-              {/* Layer buildup table */}
+              {/* Layer buildup table — wall type selector + layers from single source of truth */}
               <div className="rounded-lg bg-gray-50 p-3 space-y-2">
-                <div className="text-[10px] font-bold text-gray-400 uppercase">
-                  Wall Layer Buildup
+                <div className="flex items-center justify-between mb-1">
+                  <div className="text-[10px] font-bold text-gray-400 uppercase">
+                    Wall Layer Buildup
+                  </div>
+                  <div className="flex gap-0.5">
+                    {WALL_THICKNESS_OPTIONS.map((t) => (
+                      <button
+                        key={t}
+                        onClick={() => setWallDetailType(t)}
+                        className={`px-2 py-0.5 text-[9px] rounded font-medium transition-colors ${
+                          wallDetailType === t
+                            ? "bg-brand-amber-500 text-white"
+                            : "bg-gray-200 text-gray-500 hover:bg-gray-300"
+                        }`}
+                      >
+                        {t}cm
+                      </button>
+                    ))}
+                  </div>
+                </div>
+                <div className="text-[9px] text-gray-400 mb-1">
+                  {WALL_THICKNESS_SPECS[wallDetailType].label} — U={WALL_THICKNESS_SPECS[wallDetailType].uValue} W/(m²·K)
                 </div>
                 <table className="w-full text-xs">
                   <thead>
@@ -572,7 +594,7 @@ export default function TechnicalPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {WALL_LAYERS.map((layer, i) => (
+                    {getWallLayers(wallDetailType).map((layer, i) => (
                       <tr
                         key={i}
                         className="border-b border-gray-100 last:border-0"
@@ -590,7 +612,7 @@ export default function TechnicalPage() {
                         Total
                       </td>
                       <td className="py-1 text-right font-semibold text-gray-700">
-                        265mm
+                        {wallDetailType * 10}mm
                       </td>
                     </tr>
                   </tbody>

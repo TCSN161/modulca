@@ -157,5 +157,5 @@ export const SHARED_WALL_DISCOUNT = 1500;    // €1,500 per shared wall
 export const DESIGN_FEE_PERCENTAGE = 0.08;   // 8% design service fee
 export const MODULE_EXTERIOR_SIZE = 3;       // 3m x 3m
 export const MODULE_EXTERIOR_AREA = 9;       // 9m²
-export const MODULE_INTERIOR_AREA = 7;       // 7m² usable
-export const WALL_THICKNESS = 0.30;          // 30cm walls
+export const MODULE_INTERIOR_AREA = 6.25;    // 6.25m² usable (with 25cm default walls: 2.5m × 2.5m)
+export const WALL_THICKNESS = 0.25;          // 25cm — standard exterior wall default

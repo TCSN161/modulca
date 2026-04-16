@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useCallback, useMemo } from "react";
+import { useEffect, useRef, useState, useCallback, useMemo, Component, type ReactNode } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useDesignStore } from "../../store";
@@ -18,6 +18,40 @@ import { useProjectId } from "@/shared/hooks/useProjectId";
 const WalkthroughScene = dynamic(() => import("./WalkthroughScene"), {
   ssr: false,
 });
+
+/* Scene-level error boundary — catches Three.js / WebGL crashes
+   without tearing down the entire page */
+class SceneErrorBoundary extends Component<
+  { children: ReactNode },
+  { error: Error | null }
+> {
+  state: { error: Error | null } = { error: null };
+  static getDerivedStateFromError(error: Error) { return { error }; }
+  componentDidCatch(error: Error) {
+    console.error("[Walkthrough 3D]", error);
+  }
+  render() {
+    if (this.state.error) {
+      return (
+        <div className="flex h-full items-center justify-center bg-gray-100">
+          <div className="text-center max-w-sm px-4">
+            <p className="text-sm font-semibold text-brand-teal-800 mb-1">3D Scene Error</p>
+            <p className="text-xs text-gray-500 mb-3">
+              The WebGL renderer encountered an error. This is usually temporary.
+            </p>
+            <button
+              onClick={() => this.setState({ error: null })}
+              className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600"
+            >
+              Retry
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
 
 const MODULE_SIZE = 3;
 
@@ -481,15 +515,17 @@ export default function WalkthroughPage() {
 
         {/* ── Center — 3D Scene ── */}
         <main className="flex-1 overflow-hidden relative">
-          <WalkthroughScene
-            teleportTarget={teleportTarget}
-            onTeleportDone={handleTeleportDone}
-            controlsRef={controlsRef}
-            cameraPositionRef={cameraPositionRef}
-            enhanced={walkthroughQuality === "enhanced"}
-            autoTour={autoTour}
-            onAutoTourFinished={() => setAutoTour(false)}
-          />
+          <SceneErrorBoundary>
+            <WalkthroughScene
+              teleportTarget={teleportTarget}
+              onTeleportDone={handleTeleportDone}
+              controlsRef={controlsRef}
+              cameraPositionRef={cameraPositionRef}
+              enhanced={walkthroughQuality === "enhanced"}
+              autoTour={autoTour}
+              onAutoTourFinished={() => setAutoTour(false)}
+            />
+          </SceneErrorBoundary>
 
           {/* Crosshair overlay */}
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">

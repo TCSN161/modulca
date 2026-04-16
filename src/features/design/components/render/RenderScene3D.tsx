@@ -4,6 +4,7 @@ import { useEffect } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import type { ModuleConfig } from "../../store";
+import { getEffectiveThickness } from "../../store";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import {
   MODULE_SIZE, WALL_HEIGHT,
@@ -78,7 +79,7 @@ function SceneContent({ module, lighting, showPlants, showPeople }: {
 
       <group position={[-MODULE_SIZE / 2, 0, -MODULE_SIZE / 2]}>
         <ModuleFloor color={floorColor} />
-        <ModuleWalls wallConfigs={module.wallConfigs} wallColor={wallColor} />
+        <ModuleWalls wallConfigs={module.wallConfigs} wallColor={wallColor} wallThickness={getEffectiveThickness(module)} />
         <ModuleCeiling />
 
         {furniture.map((item) => (

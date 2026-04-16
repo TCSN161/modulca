@@ -19,6 +19,7 @@ const STEP_SLUGS = [
   { label: "Products", slug: "products" },
   { label: "Finalize", slug: "finalize" },
   { label: "Present", slug: "presentation" },
+  { label: "Architect", slug: "architect" },
 ];
 
 interface StepNavProps {

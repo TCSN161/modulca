@@ -4,7 +4,7 @@ import { useRef, useState, useCallback, useEffect, Suspense } from "react";
 import { Canvas, ThreeEvent } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import type { ModuleConfig } from "../../store";
-import { useDesignStore } from "../../store";
+import { useDesignStore, getEffectiveThickness } from "../../store";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import type { FurnitureItem } from "../../layouts";
 
@@ -199,7 +199,7 @@ function SceneContent({ module, furniture, floorColor, wallColor }: SceneContent
       {/* Module structure */}
       <group position={[-MODULE_SIZE / 2, 0, -MODULE_SIZE / 2]}>
         <Floor color={floorColor} />
-        <Walls color={wallColor} wallConfigs={module.wallConfigs} />
+        <Walls color={wallColor} wallConfigs={module.wallConfigs} wallThickness={getEffectiveThickness(module)} />
         <Ceiling />
 
         {/* Invisible drag plane */}

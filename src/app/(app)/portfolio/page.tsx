@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 
 interface CaseStudy {
@@ -161,11 +162,13 @@ export default function PortfolioPage() {
               className={`flex flex-col ${i % 2 === 1 ? "md:flex-row-reverse" : "md:flex-row"} gap-6 md:gap-8 rounded-[16px] bg-white border border-brand-bone-300/60 shadow-card overflow-hidden`}
             >
               {/* Image */}
-              <div className="md:w-1/2 relative">
-                <img
+              <div className="md:w-1/2 relative min-h-[256px]">
+                <Image
                   src={study.image}
                   alt={study.title}
-                  className="w-full h-64 md:h-full object-cover"
+                  fill
+                  sizes="(max-width: 768px) 100vw, 50vw"
+                  className="object-cover"
                   loading="lazy"
                 />
                 <div className="absolute top-4 left-4 flex gap-2">

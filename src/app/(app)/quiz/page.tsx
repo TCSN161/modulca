@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import { useQuizStore } from "@/features/quiz/store";
@@ -502,12 +503,13 @@ function QuestionCard({
           >
             {opt.image ? (
               <>
-                <div className="aspect-[4/3] w-full bg-gray-100 overflow-hidden">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
+                <div className="aspect-[4/3] w-full bg-gray-100 overflow-hidden relative">
+                  <Image
                     src={opt.image}
                     alt={opt.label}
-                    className="h-full w-full object-cover"
+                    fill
+                    sizes="(max-width: 640px) 50vw, 25vw"
+                    className="object-cover"
                     loading="lazy"
                   />
                 </div>

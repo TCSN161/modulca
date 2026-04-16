@@ -3,11 +3,11 @@
 import { useRef, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { PointerLockControls } from "@react-three/drei";
-import { useDesignStore } from "../../store";
+import { useDesignStore, getEffectiveThickness } from "../../store";
 import type { ModuleConfig } from "../../store";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
 import {
-  MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS,
+  MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS, wallThickM,
   ModuleWalls, ModuleFloor, ModuleCeiling,
   StaticFurniturePiece,
 } from "../shared/module3d";
@@ -33,29 +33,34 @@ interface WallBox {
  *  Only solid walls and window pillars block movement — doors and "none" are passable. */
 function buildWallBoxes(modules: ModuleConfig[]): WallBox[] {
   const boxes: WallBox[] = [];
-  const T = WALL_THICKNESS;
-  const HT = T / 2;
 
   for (const mod of modules) {
     const ox = mod.col * MODULE_SIZE;
     const oz = mod.row * MODULE_SIZE;
     const cfg = mod.wallConfigs;
+    const tc = getEffectiveThickness(mod);
+
+    // Per-wall half-thickness for accurate collision
+    const htN = wallThickM(tc.north) / 2;
+    const htS = wallThickM(tc.south) / 2;
+    const htW = wallThickM(tc.west)  / 2;
+    const htE = wallThickM(tc.east)  / 2;
 
     // North wall (z = oz)
     if (cfg.north === "solid" || cfg.north === "window") {
-      boxes.push({ minX: ox - HT, maxX: ox + MODULE_SIZE + HT, minZ: oz - HT, maxZ: oz + HT });
+      boxes.push({ minX: ox - htW, maxX: ox + MODULE_SIZE + htE, minZ: oz - htN, maxZ: oz + htN });
     }
     // South wall (z = oz + MODULE_SIZE)
     if (cfg.south === "solid" || cfg.south === "window") {
-      boxes.push({ minX: ox - HT, maxX: ox + MODULE_SIZE + HT, minZ: oz + MODULE_SIZE - HT, maxZ: oz + MODULE_SIZE + HT });
+      boxes.push({ minX: ox - htW, maxX: ox + MODULE_SIZE + htE, minZ: oz + MODULE_SIZE - htS, maxZ: oz + MODULE_SIZE + htS });
     }
     // West wall (x = ox)
     if (cfg.west === "solid" || cfg.west === "window") {
-      boxes.push({ minX: ox - HT, maxX: ox + HT, minZ: oz - HT, maxZ: oz + MODULE_SIZE + HT });
+      boxes.push({ minX: ox - htW, maxX: ox + htW, minZ: oz - htN, maxZ: oz + MODULE_SIZE + htS });
     }
     // East wall (x = ox + MODULE_SIZE)
     if (cfg.east === "solid" || cfg.east === "window") {
-      boxes.push({ minX: ox + MODULE_SIZE - HT, maxX: ox + MODULE_SIZE + HT, minZ: oz - HT, maxZ: oz + MODULE_SIZE + HT });
+      boxes.push({ minX: ox + MODULE_SIZE - htE, maxX: ox + MODULE_SIZE + htE, minZ: oz - htN, maxZ: oz + MODULE_SIZE + htS });
     }
   }
 
@@ -375,7 +380,7 @@ function SceneContent({
         return (
           <group key={`mod-${mod.row}-${mod.col}`}>
             <ModuleFloor offsetX={ox} offsetZ={oz} color={floorColor} />
-            <ModuleWalls wallConfigs={mod.wallConfigs} wallColor={wallColor} offsetX={ox} offsetZ={oz} />
+            <ModuleWalls wallConfigs={mod.wallConfigs} wallColor={wallColor} offsetX={ox} offsetZ={oz} wallThickness={getEffectiveThickness(mod)} />
             <ModuleCeiling offsetX={ox} offsetZ={oz} />
 
             {furniture.map((item) => (

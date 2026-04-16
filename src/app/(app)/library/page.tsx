@@ -772,14 +772,12 @@ export default function LibraryPage() {
                         <span className="line-clamp-1">{book.title}</span>
                       </a>
                     ))}
-                    {getFreeBooks().length > 5 && (
-                      <button
-                        onClick={() => setActiveCategoryId("books")}
-                        className="text-xs text-green-600 hover:underline mt-1"
-                      >
-                        +{getFreeBooks().length - 5} more free resources →
-                      </button>
-                    )}
+                    <Link
+                      href="/library/books"
+                      className="inline-block text-xs text-green-600 hover:underline mt-1"
+                    >
+                      Browse all free books →
+                    </Link>
                   </div>
                 </div>
 
@@ -802,14 +800,12 @@ export default function LibraryPage() {
                         {book.cost && <span className="shrink-0 text-[10px] text-amber-500 group-hover:text-amber-700">{book.cost}</span>}
                       </a>
                     ))}
-                    {getPaidBooks().length > 5 && (
-                      <button
-                        onClick={() => setActiveCategoryId("books")}
-                        className="text-xs text-amber-600 hover:underline mt-1"
-                      >
-                        +{getPaidBooks().length - 5} more essential books →
-                      </button>
-                    )}
+                    <Link
+                      href="/library/books"
+                      className="inline-block text-xs text-amber-600 hover:underline mt-1"
+                    >
+                      Browse all books →
+                    </Link>
                   </div>
                 </div>
               </div>

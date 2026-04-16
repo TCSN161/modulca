@@ -61,7 +61,7 @@ function moduleWallCost(wc: WallConfigs): number {
 }
 
 /** Sidebar section: Wall configuration dropdowns + module inspection */
-const THICKNESS_OPTIONS: WallThickness[] = [15, 20, 30];
+const THICKNESS_OPTIONS: WallThickness[] = [15, 25, 30];
 
 function WallSidebar({ mod }: { mod: ModuleConfig }) {
   const updateWallConfig = useDesignStore((s) => s.updateWallConfig);

@@ -1,64 +1,53 @@
-import { WALL_THICKNESS } from "../drawingConstants";
+import { WALL_THICKNESS_SPECS } from "../../../store";
+import type { WallThickness } from "../../../store";
+
+/** Colour map for drawing layers — maps material keywords to fill colours */
+const LAYER_COLORS: Record<string, { color: string; opacity: number }> = {
+  cladding:     { color: "#888", opacity: 0.6 },
+  plasterboard: { color: "#ccc", opacity: 0.4 },
+  air:          { color: "#fff", opacity: 0.3 },
+  mgo:          { color: "#C8B89A", opacity: 0.5 },
+  sheathing:    { color: "#C8B89A", opacity: 0.5 },
+  insulation:   { color: "#FFE4B5", opacity: 0.5 },
+  wool:         { color: "#FFE4B5", opacity: 0.5 },
+  steel:        { color: "#999", opacity: 0.5 },
+  frame:        { color: "#999", opacity: 0.5 },
+  sip:          { color: "#999", opacity: 0.5 },
+  stud:         { color: "#999", opacity: 0.5 },
+  vapour:       { color: "#7EC8E3", opacity: 0.6 },
+  barrier:      { color: "#7EC8E3", opacity: 0.6 },
+  service:      { color: "#DDD", opacity: 0.3 },
+  cavity:       { color: "#DDD", opacity: 0.3 },
+  batten:       { color: "#DDD", opacity: 0.3 },
+};
+
+function colorFor(material: string, wallColor: string): { color: string; opacity: number } {
+  const lower = material.toLowerCase();
+  // Check for keyword matches
+  for (const [key, val] of Object.entries(LAYER_COLORS)) {
+    if (lower.includes(key)) return val;
+  }
+  // Fallback: use wall colour (interior/exterior finish)
+  return { color: wallColor, opacity: 0.5 };
+}
 
 interface WallDetailProps {
   wallColor: string;
+  wallType?: WallThickness;
 }
 
-export default function WallDetailDrawing({ wallColor }: WallDetailProps) {
+export default function WallDetailDrawing({ wallColor, wallType = 25 }: WallDetailProps) {
   const dtlX = 80;
   const dtlY = 90;
-  const layerScale = 2.2; // px per mm at larger scale
 
-  const layers = [
-    {
-      label: "Ext. Cladding",
-      thickness: 20,
-      color: wallColor,
-      opacity: 0.6,
-    },
-    {
-      label: "Air Gap",
-      thickness: 25,
-      color: "#fff",
-      opacity: 0.3,
-    },
-    {
-      label: "Sheathing (MgO)",
-      thickness: 15,
-      color: "#C8B89A",
-      opacity: 0.5,
-    },
-    {
-      label: "Insulation",
-      thickness: 120,
-      color: "#FFE4B5",
-      opacity: 0.5,
-    },
-    {
-      label: "Steel Frame",
-      thickness: 80,
-      color: "#999",
-      opacity: 0.5,
-    },
-    {
-      label: "Vapour Barrier",
-      thickness: 5,
-      color: "#7EC8E3",
-      opacity: 0.6,
-    },
-    {
-      label: "Service Cavity",
-      thickness: 20,
-      color: "#DDD",
-      opacity: 0.3,
-    },
-    {
-      label: "Int. Finish",
-      thickness: 15,
-      color: wallColor,
-      opacity: 0.4,
-    },
-  ];
+  const spec = WALL_THICKNESS_SPECS[wallType];
+  const totalMm = spec.layers.reduce((s, l) => s + l.mm, 0);
+  const layerScale = Math.min(2.2, 440 / totalMm); // auto-scale to fit
+
+  const layers = spec.layers.map((l) => {
+    const { color, opacity } = colorFor(l.material, wallColor);
+    return { label: l.material, thickness: l.mm, color, opacity };
+  });
 
   let runX = dtlX + 60;
 
@@ -163,7 +152,7 @@ export default function WallDetailDrawing({ wallColor }: WallDetailProps) {
         textAnchor="middle"
         fill="#666"
       >
-        Total wall: {WALL_THICKNESS * 1000}mm
+        Total wall: {totalMm}mm ({spec.label}) — U={spec.uValue} W/(m²·K)
       </text>
 
       {/* Connection indicator to adjacent module */}

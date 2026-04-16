@@ -16,7 +16,7 @@ export type FinishLevelId = "basic" | "standard" | "premium";
 export type StyleDirectionId = "scandinavian" | "industrial" | "warm-contemporary" | "mediterranean" | "japanese-wabi-sabi" | "traditional-romanian" | "biophilic-organic" | "eclectic-mixed" | null;
 export type WallType = "solid" | "window" | "door" | "none" | "shared";
 export type WallSide = "north" | "south" | "east" | "west";
-export type WallThickness = 15 | 20 | 30; // cm — 15 interior/shared, 20 standard exterior, 30 enhanced insulation
+export type WallThickness = 15 | 25 | 30; // cm — 15 interior, 25 standard exterior, 30 enhanced insulation
 
 export interface FurnitureOverride {
   x?: number;
@@ -64,34 +64,57 @@ export interface WallThicknessConfigs {
   west: WallThickness;
 }
 
-/** Wall layer compositions by thickness class */
+/** Wall layer compositions by thickness class.
+ *  Each buildup sums exactly to its stated thickness.
+ *  15cm = 150mm, 25cm = 250mm, 30cm = 300mm. */
 export const WALL_THICKNESS_SPECS: Record<WallThickness, {
   label: string;
   labelRo: string;
-  layers: string;
+  layers: { material: string; mm: number }[];
   uValue: number;  // W/(m²·K) — lower is better insulation
   costPerWall: number; // EUR per wall segment
 }> = {
   15: {
     label: "Interior (15cm)",
     labelRo: "Interior (15cm)",
-    layers: "12.5mm gypsum + 80mm steel frame + 40mm mineral wool + 12.5mm gypsum",
+    layers: [
+      { material: "Plasterboard", mm: 12.5 },
+      { material: "Steel C-Studs + Mineral Wool", mm: 125 },
+      { material: "Plasterboard", mm: 12.5 },
+    ], // total 150mm
     uValue: 0.55,
-    costPerWall: 0,  // included in base
+    costPerWall: 0,
   },
-  20: {
-    label: "Standard Exterior (20cm)",
-    labelRo: "Exterior Standard (20cm)",
-    layers: "15mm cladding + 25mm air gap + 80mm insulation + 60mm frame + 15mm interior",
-    uValue: 0.28,
-    costPerWall: 0,  // included in base exterior
+  25: {
+    label: "Standard Exterior (25cm)",
+    labelRo: "Exterior Standard (25cm)",
+    layers: [
+      { material: "Exterior Cladding", mm: 20 },
+      { material: "Ventilated Air Gap", mm: 25 },
+      { material: "Wind Barrier (MgO Board)", mm: 10 },
+      { material: "Mineral Wool Insulation", mm: 100 },
+      { material: "Steel Frame (C-Studs)", mm: 75 },
+      { material: "Vapour Barrier (PE Film)", mm: 5 },
+      { material: "Interior Plasterboard", mm: 15 },
+    ], // total 250mm
+    uValue: 0.22,
+    costPerWall: 0,
   },
   30: {
     label: "Enhanced Insulation (30cm)",
     labelRo: "Izolație Îmbunătățită (30cm)",
-    layers: "20mm cladding + 25mm air gap + 120mm mineral wool + 80mm SIP + 5mm vapour barrier + 15mm interior + 35mm additional insulation",
+    layers: [
+      { material: "Exterior Cladding", mm: 20 },
+      { material: "Ventilated Air Gap", mm: 25 },
+      { material: "Exterior Sheathing (MgO Board)", mm: 15 },
+      { material: "Mineral Wool Insulation", mm: 120 },
+      { material: "Steel Frame (SIP)", mm: 80 },
+      { material: "Vapour Barrier", mm: 5 },
+      { material: "Service Cavity (Battens)", mm: 20 },
+      { material: "Interior Plasterboard", mm: 15 },
+    ], // total 300mm
     uValue: 0.15,
-    costPerWall: 450,  // EUR premium per wall segment
+    costPerWall: 450,
   },
 };
 
@@ -205,10 +228,10 @@ export function defaultThicknessForWallType(wallType: WallType): WallThickness {
   switch (wallType) {
     case "shared":  return 15; // interior shared wall — thinnest
     case "none":    return 15; // placeholder, no physical wall
-    case "solid":   return 20; // standard exterior
-    case "window":  return 20; // exterior with window
-    case "door":    return 20; // exterior with door
-    default:        return 20;
+    case "solid":   return 25; // standard exterior
+    case "window":  return 25; // exterior with window
+    case "door":    return 25; // exterior with door
+    default:        return 25;
   }
 }
 
@@ -561,10 +584,24 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
           }
         }
 
+        // Migrate old 20cm thickness → 25cm
+        let migratedThickness = m.wallThicknessConfigs;
+        if (migratedThickness) {
+          const sides: WallSide[] = ["north", "south", "east", "west"];
+          const needsMigration = sides.some((s) => (migratedThickness as any)[s] === 20);
+          if (needsMigration) {
+            migratedThickness = { ...migratedThickness };
+            for (const s of sides) {
+              if ((migratedThickness as any)[s] === 20) (migratedThickness as any)[s] = 25;
+            }
+          }
+        }
+
         return {
           ...m,
           wallConfigs: enforcedConfigs,
           furnitureOverrides: cleanedOverrides,
+          wallThicknessConfigs: migratedThickness,
         };
       });
       set({

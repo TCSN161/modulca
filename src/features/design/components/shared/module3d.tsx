@@ -10,7 +10,7 @@ import { useRef, useEffect, Suspense, Component } from "react";
 import type { ReactElement } from "react";
 import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
-import type { WallConfigs, FurnitureOverride } from "../../store";
+import type { WallConfigs, WallThicknessConfigs, FurnitureOverride } from "../../store";
 import type { FurnitureItem } from "../../layouts";
 
 /* ------------------------------------------------------------------ */
@@ -19,13 +19,19 @@ import type { FurnitureItem } from "../../layouts";
 
 export const MODULE_SIZE = 3; // 3m x 3m modules
 export const WALL_HEIGHT = 2.7;
-export const WALL_THICKNESS = 0.08;
+/** Default 3D wall thickness (meters). Used when per-wall thickness is not provided. */
+export const WALL_THICKNESS = 0.25; // 25cm — standard exterior
 export const HALF_THICK = WALL_THICKNESS / 2;
 export const HALF_HEIGHT = WALL_HEIGHT / 2;
 export const DOOR_WIDTH = 0.9;
 export const DOOR_HEIGHT = 2.1;
 export const WINDOW_BOTTOM = 0.9;
 export const WINDOW_TOP = 2.1;
+
+/** Convert a WallThickness value (cm) to meters for 3D rendering. */
+export function wallThickM(cm: number): number {
+  return cm / 100;
+}
 
 /* ------------------------------------------------------------------ */
 /*  GLB model mapping — single source of truth                         */
@@ -197,6 +203,9 @@ export function buildWall(
   // Shared wall = open space between adjacent modules — no geometry
   if (wallType === "shared") return walls;
 
+  // Derive wall thickness from the fullSize already passed in
+  const wt = isHorizontal ? fullSize[2] : fullSize[0];
+
   if (wallType === "solid") {
     walls.push(<WallSegment key={key} position={pos} size={fullSize} color={wallColor} />);
     return walls;
@@ -207,21 +216,21 @@ export function buildWall(
     const windowH = WINDOW_TOP - WINDOW_BOTTOM;
 
     if (isHorizontal) {
-      walls.push(<WallSegment key={`${key}-bot`} position={[pos[0], WINDOW_BOTTOM / 2, pos[2]]} size={[wallLen, WINDOW_BOTTOM, WALL_THICKNESS]} color={wallColor} />);
-      walls.push(<GlassPane key={`${key}-glass`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[wallLen * 0.7, windowH, WALL_THICKNESS * 0.5]} />);
+      walls.push(<WallSegment key={`${key}-bot`} position={[pos[0], WINDOW_BOTTOM / 2, pos[2]]} size={[wallLen, WINDOW_BOTTOM, wt]} color={wallColor} />);
+      walls.push(<GlassPane key={`${key}-glass`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[wallLen * 0.7, windowH, wt * 0.5]} />);
       const pillarW = wallLen * 0.15;
-      walls.push(<WallSegment key={`${key}-pl`} position={[pos[0] - wallLen / 2 + pillarW / 2, WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[pillarW, windowH, WALL_THICKNESS]} color={wallColor} />);
-      walls.push(<WallSegment key={`${key}-pr`} position={[pos[0] + wallLen / 2 - pillarW / 2, WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[pillarW, windowH, WALL_THICKNESS]} color={wallColor} />);
+      walls.push(<WallSegment key={`${key}-pl`} position={[pos[0] - wallLen / 2 + pillarW / 2, WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[pillarW, windowH, wt]} color={wallColor} />);
+      walls.push(<WallSegment key={`${key}-pr`} position={[pos[0] + wallLen / 2 - pillarW / 2, WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[pillarW, windowH, wt]} color={wallColor} />);
       const topH = WALL_HEIGHT - WINDOW_TOP;
-      walls.push(<WallSegment key={`${key}-top`} position={[pos[0], WINDOW_TOP + topH / 2, pos[2]]} size={[wallLen, topH, WALL_THICKNESS]} color={wallColor} />);
+      walls.push(<WallSegment key={`${key}-top`} position={[pos[0], WINDOW_TOP + topH / 2, pos[2]]} size={[wallLen, topH, wt]} color={wallColor} />);
     } else {
-      walls.push(<WallSegment key={`${key}-bot`} position={[pos[0], WINDOW_BOTTOM / 2, pos[2]]} size={[WALL_THICKNESS, WINDOW_BOTTOM, wallLen]} color={wallColor} />);
-      walls.push(<GlassPane key={`${key}-glass`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[WALL_THICKNESS * 0.5, windowH, wallLen * 0.7]} />);
+      walls.push(<WallSegment key={`${key}-bot`} position={[pos[0], WINDOW_BOTTOM / 2, pos[2]]} size={[wt, WINDOW_BOTTOM, wallLen]} color={wallColor} />);
+      walls.push(<GlassPane key={`${key}-glass`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2]]} size={[wt * 0.5, windowH, wallLen * 0.7]} />);
       const pillarD = wallLen * 0.15;
-      walls.push(<WallSegment key={`${key}-pl`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2] - wallLen / 2 + pillarD / 2]} size={[WALL_THICKNESS, windowH, pillarD]} color={wallColor} />);
-      walls.push(<WallSegment key={`${key}-pr`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2] + wallLen / 2 - pillarD / 2]} size={[WALL_THICKNESS, windowH, pillarD]} color={wallColor} />);
+      walls.push(<WallSegment key={`${key}-pl`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2] - wallLen / 2 + pillarD / 2]} size={[wt, windowH, pillarD]} color={wallColor} />);
+      walls.push(<WallSegment key={`${key}-pr`} position={[pos[0], WINDOW_BOTTOM + windowH / 2, pos[2] + wallLen / 2 - pillarD / 2]} size={[wt, windowH, pillarD]} color={wallColor} />);
       const topH = WALL_HEIGHT - WINDOW_TOP;
-      walls.push(<WallSegment key={`${key}-top`} position={[pos[0], WINDOW_TOP + topH / 2, pos[2]]} size={[WALL_THICKNESS, topH, wallLen]} color={wallColor} />);
+      walls.push(<WallSegment key={`${key}-top`} position={[pos[0], WINDOW_TOP + topH / 2, pos[2]]} size={[wt, topH, wallLen]} color={wallColor} />);
     }
     return walls;
   }
@@ -236,15 +245,15 @@ export function buildWall(
   if (isHorizontal) {
     const baseX = pos[0] - wallLen / 2;
     const baseZ = pos[2];
-    walls.push(<WallSegment key={`${key}-l`} position={[baseX + doorLeft / 2, HALF_HEIGHT, baseZ]} size={[doorLeft, WALL_HEIGHT, WALL_THICKNESS]} color={wallColor} />);
-    walls.push(<WallSegment key={`${key}-r`} position={[baseX + doorRight + rightWidth / 2, HALF_HEIGHT, baseZ]} size={[rightWidth, WALL_HEIGHT, WALL_THICKNESS]} color={wallColor} />);
-    walls.push(<WallSegment key={`${key}-t`} position={[pos[0], DOOR_HEIGHT + topHeight / 2, baseZ]} size={[DOOR_WIDTH, topHeight, WALL_THICKNESS]} color={wallColor} />);
+    walls.push(<WallSegment key={`${key}-l`} position={[baseX + doorLeft / 2, HALF_HEIGHT, baseZ]} size={[doorLeft, WALL_HEIGHT, wt]} color={wallColor} />);
+    walls.push(<WallSegment key={`${key}-r`} position={[baseX + doorRight + rightWidth / 2, HALF_HEIGHT, baseZ]} size={[rightWidth, WALL_HEIGHT, wt]} color={wallColor} />);
+    walls.push(<WallSegment key={`${key}-t`} position={[pos[0], DOOR_HEIGHT + topHeight / 2, baseZ]} size={[DOOR_WIDTH, topHeight, wt]} color={wallColor} />);
   } else {
     const baseX = pos[0];
     const baseZ = pos[2] - wallLen / 2;
-    walls.push(<WallSegment key={`${key}-l`} position={[baseX, HALF_HEIGHT, baseZ + doorLeft / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, doorLeft]} color={wallColor} />);
-    walls.push(<WallSegment key={`${key}-r`} position={[baseX, HALF_HEIGHT, baseZ + doorRight + rightWidth / 2]} size={[WALL_THICKNESS, WALL_HEIGHT, rightWidth]} color={wallColor} />);
-    walls.push(<WallSegment key={`${key}-t`} position={[baseX, DOOR_HEIGHT + topHeight / 2, pos[2]]} size={[WALL_THICKNESS, topHeight, DOOR_WIDTH]} color={wallColor} />);
+    walls.push(<WallSegment key={`${key}-l`} position={[baseX, HALF_HEIGHT, baseZ + doorLeft / 2]} size={[wt, WALL_HEIGHT, doorLeft]} color={wallColor} />);
+    walls.push(<WallSegment key={`${key}-r`} position={[baseX, HALF_HEIGHT, baseZ + doorRight + rightWidth / 2]} size={[wt, WALL_HEIGHT, rightWidth]} color={wallColor} />);
+    walls.push(<WallSegment key={`${key}-t`} position={[baseX, DOOR_HEIGHT + topHeight / 2, pos[2]]} size={[wt, topHeight, DOOR_WIDTH]} color={wallColor} />);
   }
 
   return walls;
@@ -254,39 +263,51 @@ export function buildWall(
 /*  Walls component — renders all 4 walls of a module                  */
 /* ------------------------------------------------------------------ */
 
-/** Render walls for a module at a given offset. */
+/** Render walls for a module at a given offset.
+ *  When wallThickness is provided, each wall uses its real thickness (meters).
+ *  Otherwise falls back to the WALL_THICKNESS constant. */
 export function ModuleWalls({
-  wallConfigs, wallColor, offsetX = 0, offsetZ = 0,
+  wallConfigs, wallColor, offsetX = 0, offsetZ = 0, wallThickness,
 }: {
   wallConfigs: WallConfigs;
   wallColor: string;
   offsetX?: number;
   offsetZ?: number;
+  wallThickness?: WallThicknessConfigs;
 }) {
   const wc = wallConfigs;
   const walls: ReactElement[] = [];
 
-  walls.push(...buildWall("north", [offsetX + MODULE_SIZE / 2, HALF_HEIGHT, offsetZ + HALF_THICK], [MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS], wc.north, wallColor, true));
-  walls.push(...buildWall("south", [offsetX + MODULE_SIZE / 2, HALF_HEIGHT, offsetZ + MODULE_SIZE - HALF_THICK], [MODULE_SIZE, WALL_HEIGHT, WALL_THICKNESS], wc.south, wallColor, true));
-  walls.push(...buildWall("west", [offsetX + HALF_THICK, HALF_HEIGHT, offsetZ + MODULE_SIZE / 2], [WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE], wc.west, wallColor, false));
-  walls.push(...buildWall("east", [offsetX + MODULE_SIZE - HALF_THICK, HALF_HEIGHT, offsetZ + MODULE_SIZE / 2], [WALL_THICKNESS, WALL_HEIGHT, MODULE_SIZE], wc.east, wallColor, false));
+  // Per-wall thickness in meters (default 25cm)
+  const tN = wallThickness ? wallThickM(wallThickness.north) : WALL_THICKNESS;
+  const tS = wallThickness ? wallThickM(wallThickness.south) : WALL_THICKNESS;
+  const tW = wallThickness ? wallThickM(wallThickness.west)  : WALL_THICKNESS;
+  const tE = wallThickness ? wallThickM(wallThickness.east)  : WALL_THICKNESS;
+
+  walls.push(...buildWall("north", [offsetX + MODULE_SIZE / 2, HALF_HEIGHT, offsetZ + tN / 2],                      [MODULE_SIZE, WALL_HEIGHT, tN], wc.north, wallColor, true));
+  walls.push(...buildWall("south", [offsetX + MODULE_SIZE / 2, HALF_HEIGHT, offsetZ + MODULE_SIZE - tS / 2],         [MODULE_SIZE, WALL_HEIGHT, tS], wc.south, wallColor, true));
+  walls.push(...buildWall("west",  [offsetX + tW / 2,                      HALF_HEIGHT, offsetZ + MODULE_SIZE / 2],  [tW, WALL_HEIGHT, MODULE_SIZE], wc.west,  wallColor, false));
+  walls.push(...buildWall("east",  [offsetX + MODULE_SIZE - tE / 2,        HALF_HEIGHT, offsetZ + MODULE_SIZE / 2],  [tE, WALL_HEIGHT, MODULE_SIZE], wc.east,  wallColor, false));
 
   // Baseboards (skirting boards) — thin dark strip at bottom of visible walls
   const baseH = 0.06;
-  const baseD = WALL_THICKNESS + 0.01;
   const baseColor = darken(wallColor, 30);
   const baseOffset = 0.005; // slight protrusion from wall
   if (wc.north !== "none" && wc.north !== "shared") {
-    walls.push(<WallSegment key="base-n" position={[offsetX + MODULE_SIZE / 2, baseH / 2, offsetZ + HALF_THICK + baseOffset]} size={[MODULE_SIZE, baseH, baseD]} color={baseColor} />);
+    const bd = tN + 0.01;
+    walls.push(<WallSegment key="base-n" position={[offsetX + MODULE_SIZE / 2, baseH / 2, offsetZ + tN / 2 + baseOffset]} size={[MODULE_SIZE, baseH, bd]} color={baseColor} />);
   }
   if (wc.south !== "none" && wc.south !== "shared") {
-    walls.push(<WallSegment key="base-s" position={[offsetX + MODULE_SIZE / 2, baseH / 2, offsetZ + MODULE_SIZE - HALF_THICK - baseOffset]} size={[MODULE_SIZE, baseH, baseD]} color={baseColor} />);
+    const bd = tS + 0.01;
+    walls.push(<WallSegment key="base-s" position={[offsetX + MODULE_SIZE / 2, baseH / 2, offsetZ + MODULE_SIZE - tS / 2 - baseOffset]} size={[MODULE_SIZE, baseH, bd]} color={baseColor} />);
   }
   if (wc.west !== "none" && wc.west !== "shared") {
-    walls.push(<WallSegment key="base-w" position={[offsetX + HALF_THICK + baseOffset, baseH / 2, offsetZ + MODULE_SIZE / 2]} size={[baseD, baseH, MODULE_SIZE]} color={baseColor} />);
+    const bd = tW + 0.01;
+    walls.push(<WallSegment key="base-w" position={[offsetX + tW / 2 + baseOffset, baseH / 2, offsetZ + MODULE_SIZE / 2]} size={[bd, baseH, MODULE_SIZE]} color={baseColor} />);
   }
   if (wc.east !== "none" && wc.east !== "shared") {
-    walls.push(<WallSegment key="base-e" position={[offsetX + MODULE_SIZE - HALF_THICK - baseOffset, baseH / 2, offsetZ + MODULE_SIZE / 2]} size={[baseD, baseH, MODULE_SIZE]} color={baseColor} />);
+    const bd = tE + 0.01;
+    walls.push(<WallSegment key="base-e" position={[offsetX + MODULE_SIZE - tE / 2 - baseOffset, baseH / 2, offsetZ + MODULE_SIZE / 2]} size={[bd, baseH, MODULE_SIZE]} color={baseColor} />);
   }
 
   return <group>{walls}</group>;

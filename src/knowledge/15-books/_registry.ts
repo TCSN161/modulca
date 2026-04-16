@@ -4,8 +4,10 @@
  * Centralized catalog of architecture books, standards, and references.
  * Each entry links to external sources (no PDFs stored) — zero storage cost.
  *
- * Revenue model: Amazon affiliate links (tag=modulca-21) on paid books.
- * Free resources link directly to source (Archive.org, Project Gutenberg, etc.)
+ * Integration:
+ *   - Open Library API → covers + "Read Free Online" links (via ISBN/OLID)
+ *   - Amazon affiliate links → paid books (tag=modulca-21)
+ *   - Direct links → Gutenberg, Archive.org, Wikisource, Smithsonian
  *
  * Add a book → add entry here + optional .md summary in this folder.
  */
@@ -17,7 +19,7 @@ import type { KBSource } from "../_types";
 /* ------------------------------------------------------------------ */
 
 export const BOOK_REGISTRY: KBSource[] = [
-  /* ── FREE / Public Domain ────────────────────────────── */
+  /* ── FREE / Public Domain Books ─────────────────────────── */
   {
     id: "vitruvius-ten-books",
     title: "De Architectura (Ten Books on Architecture)",
@@ -26,6 +28,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: true,
     url: "https://www.gutenberg.org/ebooks/20239",
+    olid: "OL38640W",
     regions: [],
   },
   {
@@ -36,6 +39,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: true,
     url: "https://archive.org/details/fourbooksofarch00pall",
+    olid: "OL1170027W",
     regions: [],
   },
   {
@@ -46,6 +50,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: true,
     url: "https://archive.org/details/towardsnewarchi00leco",
+    olid: "OL1340562W",
     regions: [],
   },
   {
@@ -56,6 +61,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: true,
     url: "https://archive.org/details/modulor-le-corbusier",
+    olid: "OL5765972W",
     regions: [],
   },
   {
@@ -66,6 +72,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: true,
     url: "https://www.gutenberg.org/ebooks/35898",
+    olid: "OL1174283W",
     regions: [],
   },
   {
@@ -86,10 +93,21 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: true,
     url: "https://archive.org/details/autobiographyofi0000sull",
+    olid: "OL6039028W",
+    regions: [],
+  },
+  {
+    id: "mckay-building-construction",
+    title: "Building Construction (Volume 1)",
+    author: "W.B. McKay",
+    year: "1945",
+    type: "book",
+    free: true,
+    url: "https://archive.org/details/W.B.McKayVol11945",
     regions: [],
   },
 
-  /* ── FREE Online Resources ───────────────────────────── */
+  /* ── FREE Online Resources ───────────────────────────────── */
   {
     id: "eurocode-jrc",
     title: "Eurocodes: Building the Future (JRC Reference Reports)",
@@ -181,7 +199,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     regions: [],
   },
 
-  /* ── PAID — Essential References (affiliate links) ──── */
+  /* ── PAID — Essential References (affiliate links) ──────── */
   {
     id: "neufert-architects-data",
     title: "Neufert — Architects' Data (43rd Edition)",
@@ -190,6 +208,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€80–120",
+    isbn: "9781119284352",
     url: "https://www.amazon.com/dp/1119284354?tag=modulca-21",
     regions: [],
   },
@@ -201,6 +220,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€45–55",
+    isbn: "9781119583073",
     url: "https://www.amazon.com/dp/1119583071?tag=modulca-21",
     regions: [],
   },
@@ -212,6 +232,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€45–55",
+    isbn: "9781118745083",
     url: "https://www.amazon.com/dp/1118745086?tag=modulca-21",
     regions: [],
   },
@@ -223,6 +244,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€35–45",
+    isbn: "9780195019193",
     url: "https://www.amazon.com/dp/0195019199?tag=modulca-21",
     regions: [],
   },
@@ -234,6 +256,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€40–50",
+    isbn: "9780470163344",
     url: "https://www.amazon.com/dp/0470163348?tag=modulca-21",
     regions: [],
   },
@@ -245,6 +268,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€120–160",
+    isbn: "9780071432092",
     url: "https://www.amazon.com/dp/0071432094?tag=modulca-21",
     regions: [],
   },
@@ -267,6 +291,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€50–70",
+    isbn: "9780714848747",
     url: "https://www.amazon.com/dp/0714848743?tag=modulca-21",
     regions: [],
   },
@@ -278,6 +303,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€55–70",
+    isbn: "9780470275610",
     url: "https://www.amazon.com/dp/0470275618?tag=modulca-21",
     regions: [],
   },
@@ -289,6 +315,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€30–40",
+    isbn: "9781423603498",
     url: "https://www.amazon.com/dp/1423603494?tag=modulca-21",
     regions: [],
   },
@@ -300,23 +327,59 @@ export const BOOK_REGISTRY: KBSource[] = [
     type: "book",
     free: false,
     cost: "€50–65",
+    isbn: "9780080993591",
     url: "https://www.amazon.com/dp/0080993591?tag=modulca-21",
     regions: [],
   },
 ];
 
 /* ------------------------------------------------------------------ */
-/*  Helper functions                                                    */
+/*  Open Library Integration Helpers                                    */
 /* ------------------------------------------------------------------ */
+
+/**
+ * Get the Open Library cover URL for a book.
+ * Uses ISBN (preferred) or OLID as fallback.
+ * Size: S (small), M (medium), L (large)
+ */
+export function getBookCoverUrl(book: KBSource, size: "S" | "M" | "L" = "M"): string | null {
+  if (book.isbn) return `https://covers.openlibrary.org/b/isbn/${book.isbn}-${size}.jpg`;
+  if (book.olid) return `https://covers.openlibrary.org/b/olid/${book.olid}-${size}.jpg`;
+  return null;
+}
+
+/**
+ * Get the Open Library reading page URL for a book.
+ * Only meaningful for free/public domain books.
+ */
+export function getOpenLibraryUrl(book: KBSource): string | null {
+  if (book.isbn) return `https://openlibrary.org/isbn/${book.isbn}`;
+  if (book.olid) return `https://openlibrary.org/works/${book.olid}`;
+  return null;
+}
+
+/* ------------------------------------------------------------------ */
+/*  Filter & Search Helpers                                             */
+/* ------------------------------------------------------------------ */
+
+/** Get only books (not websites/standards/courses) */
+export function getBooks(): KBSource[] {
+  return BOOK_REGISTRY.filter((b) => b.type === "book");
+}
 
 /** Get all free resources */
 export function getFreeBooks(): KBSource[] {
   return BOOK_REGISTRY.filter((b) => b.free);
 }
 
+/** Get all free books specifically (not websites/standards) */
+export function getFreeReadableBooks(): KBSource[] {
+  return BOOK_REGISTRY.filter((b) => b.free && b.type === "book");
+}
+
 /** Get all paid books (with affiliate links) */
 export function getPaidBooks(): KBSource[] {
-  return BOOK_REGISTRY.filter((b) => !b.free);
+  return BOOK_REGISTRY.filter((b) => !b.free && b.type === "book");
 }
 
 /** Get books relevant to a specific region */

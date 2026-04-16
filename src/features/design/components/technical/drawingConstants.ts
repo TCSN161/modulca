@@ -1,16 +1,16 @@
 import type { FLOOR_MATERIALS, WALL_MATERIALS, getPreset } from "../../layouts";
 
-export const WALL_THICKNESS = 0.3; // meters (default 30cm for technical drawings — legacy)
+export const WALL_THICKNESS = 0.25; // meters — default 25cm (standard exterior)
 export const EXT = 3000; // exterior in mm
-export const INT = EXT - WALL_THICKNESS * 2 * 1000; // interior in mm = 2400
+export const INT = EXT - WALL_THICKNESS * 2 * 1000; // interior in mm = 2500
 
 /** Convert WallThickness (cm) to meters for drawing calculations */
-export function wallThicknessMeters(cm: 15 | 20 | 30): number {
+export function wallThicknessMeters(cm: 15 | 25 | 30): number {
   return cm / 100;
 }
 
 /** Interior dimension in mm for a given thickness (cm) */
-export function interiorDimension(thicknessCm: 15 | 20 | 30): number {
+export function interiorDimension(thicknessCm: 15 | 25 | 30): number {
   return EXT - (thicknessCm / 100) * 2 * 1000;
 }
 export const CEIL_H = 2700; // mm
