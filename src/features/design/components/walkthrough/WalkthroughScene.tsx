@@ -2,7 +2,18 @@
 
 import { useRef, useEffect, useMemo } from "react";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
-import { PointerLockControls } from "@react-three/drei";
+import { PointerLockControls, Environment } from "@react-three/drei";
+import {
+  EffectComposer,
+  Bloom,
+  DepthOfField,
+  Vignette,
+  ChromaticAberration,
+  N8AO,
+  SMAA,
+} from "@react-three/postprocessing";
+import { BlendFunction } from "postprocessing";
+import { XR, createXRStore } from "@react-three/xr";
 import { useDesignStore, getEffectiveThickness } from "../../store";
 import type { ModuleConfig } from "../../store";
 import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
@@ -19,6 +30,12 @@ const EYE_HEIGHT = 1.6;
 const AUTO_TOUR_SPEED = 1.2; // m/s — slower for guided tour
 const AUTO_TOUR_PAUSE_MS = 2500; // pause in each room
 const PLAYER_RADIUS = 0.25; // collision radius around player
+
+/** Shared WebXR store for VR session management */
+export const xrStore = createXRStore({
+  controller: { rayPointer: true },
+  hand: { rayPointer: true },
+});
 
 /* ------------------------------------------------------------------ */
 /*  Wall collision system                                              */
@@ -418,13 +435,54 @@ interface WalkthroughSceneProps {
   controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
   enhanced?: boolean;
+  cinematic?: boolean;
+  vrEnabled?: boolean;
   autoTour?: boolean;
   onAutoTourFinished?: () => void;
 }
 
+/**
+ * Post-processing pipeline — three presets:
+ *  - standard: no effects, fastest
+ *  - enhanced: SMAA + N8AO (free, subtle)
+ *  - cinematic: SMAA + N8AO + Bloom + DoF + Vignette + ChromaticAberration (Premium+)
+ */
+function PostFX({ enhanced, cinematic }: { enhanced: boolean; cinematic: boolean }) {
+  if (!enhanced && !cinematic) return null;
+  return (
+    <EffectComposer multisampling={0} enableNormalPass>
+      <N8AO aoRadius={0.5} intensity={cinematic ? 2 : 1} distanceFalloff={0.5} />
+      {cinematic && (
+        <>
+          <Bloom
+            intensity={0.35}
+            luminanceThreshold={0.85}
+            luminanceSmoothing={0.4}
+            mipmapBlur
+          />
+          <DepthOfField
+            focusDistance={0.02}
+            focalLength={0.05}
+            bokehScale={2.5}
+            height={480}
+          />
+          <ChromaticAberration
+            offset={[0.0005, 0.0005]}
+            radialModulation={false}
+            modulationOffset={0}
+            blendFunction={BlendFunction.NORMAL}
+          />
+          <Vignette eskil={false} offset={0.15} darkness={0.6} />
+        </>
+      )}
+      <SMAA />
+    </EffectComposer>
+  );
+}
+
 export default function WalkthroughScene({
   teleportTarget, onTeleportDone, controlsRef, cameraPositionRef, enhanced = false,
-  autoTour = false, onAutoTourFinished,
+  cinematic = false, vrEnabled = false, autoTour = false, onAutoTourFinished,
 }: WalkthroughSceneProps) {
   const modules = useDesignStore((s) => s.modules);
 
@@ -440,23 +498,38 @@ export default function WalkthroughScene({
 
   if (modules.length === 0) return null;
 
+  // Cinematic implies enhanced lighting
+  const useEnhanced = enhanced || cinematic;
+  // Background: cinematic gets darker sky for dramatic contrast
+  const bgColor = cinematic ? "#c4c4c8" : useEnhanced ? "#d4d0ca" : "#e8e5e0";
+
   return (
     <Canvas
       shadows
       camera={{ position: initialPos, fov: 70, near: 0.1, far: 200 }}
-      style={{ background: enhanced ? "#d4d0ca" : "#e8e5e0", width: "100%", height: "100%" }}
-      gl={{ antialias: true, toneMapping: enhanced ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping, toneMappingExposure: enhanced ? 1.2 : 1 }}
+      style={{ background: bgColor, width: "100%", height: "100%" }}
+      gl={{
+        antialias: true,
+        toneMapping: useEnhanced ? THREE.ACESFilmicToneMapping : THREE.NoToneMapping,
+        toneMappingExposure: cinematic ? 1.35 : useEnhanced ? 1.2 : 1,
+      }}
     >
-      <SceneContent
-        modules={modules}
-        teleportTarget={teleportTarget}
-        onTeleportDone={onTeleportDone}
-        controlsRef={controlsRef}
-        cameraPositionRef={cameraPositionRef}
-        enhanced={enhanced}
-        autoTour={autoTour}
-        onAutoTourFinished={onAutoTourFinished || (() => {})}
-      />
+      <XR store={xrStore}>
+        {/* Cinematic mode uses HDRI environment for reflections + realistic lighting */}
+        {cinematic && <Environment preset="apartment" background={false} />}
+        <SceneContent
+          modules={modules}
+          teleportTarget={teleportTarget}
+          onTeleportDone={onTeleportDone}
+          controlsRef={controlsRef}
+          cameraPositionRef={cameraPositionRef}
+          enhanced={useEnhanced}
+          autoTour={autoTour}
+          onAutoTourFinished={onAutoTourFinished || (() => {})}
+        />
+        {/* Post-processing pipeline (disabled in VR — breaks stereo rendering) */}
+        {!vrEnabled && <PostFX enhanced={enhanced && !cinematic} cinematic={cinematic} />}
+      </XR>
     </Canvas>
   );
 }

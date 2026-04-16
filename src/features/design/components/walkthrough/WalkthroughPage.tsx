@@ -14,10 +14,27 @@ import StepNav from "../shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
 import MobileStepFooter from "../shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import { useAuthStore } from "@/features/auth/store";
 
 const WalkthroughScene = dynamic(() => import("./WalkthroughScene"), {
   ssr: false,
 });
+
+/** Dynamically-loaded XR store reference (avoids loading XR SDK on standard mode) */
+let xrStoreRef: { enterVR: () => void } | null = null;
+
+async function enterVRSession() {
+  if (!xrStoreRef) {
+    const { xrStore } = await import("./WalkthroughScene");
+    xrStoreRef = xrStore;
+  }
+  try {
+    xrStoreRef.enterVR();
+  } catch (err) {
+    console.error("[VR] Failed to enter session:", err);
+    alert("VR not supported on this device. Requires a WebXR-compatible headset (Meta Quest, Vision Pro, etc.)");
+  }
+}
 
 /* Scene-level error boundary — catches Three.js / WebGL crashes
    without tearing down the entire page */
@@ -55,21 +72,21 @@ class SceneErrorBoundary extends Component<
 
 const MODULE_SIZE = 3;
 
-type WalkthroughQuality = "standard" | "enhanced" | "gaussian";
+type WalkthroughQuality = "standard" | "enhanced" | "cinematic";
 
 const WALKTHROUGH_ENGINES: Record<WalkthroughQuality, { label: string; description: string; badge?: string }> = {
   standard: {
-    label: "Standard (Three.js)",
-    description: "Default 3D walkthrough",
+    label: "Standard",
+    description: "Fast 3D walkthrough — works on any device",
   },
   enhanced: {
-    label: "Enhanced (Post-Processing)",
-    description: "Better lighting, shadows, and ambient occlusion",
+    label: "Enhanced",
+    description: "Ambient occlusion, anti-aliasing, and richer lighting",
     badge: "FREE",
   },
-  gaussian: {
-    label: "Premium (Gaussian Splatting)",
-    description: "Photorealistic walkthrough — available in Architect tier",
+  cinematic: {
+    label: "Cinematic",
+    description: "Photorealistic: HDRI lighting, bloom, depth-of-field, vignette",
     badge: "PREMIUM",
   },
 };
@@ -159,6 +176,8 @@ export default function WalkthroughPage() {
   } = useDesignStore();
 
   const { saved, handleSave } = useSaveDesign();
+  const canUseCinematic = useAuthStore((s) => s.canAccess("pdfPresentation")); // Premium+
+  const canUseVR = useAuthStore((s) => s.canAccess("vrMode")); // Architect+
   const controlsRef = useRef<any>(null);
   const cameraPositionRef = useRef<Vector3>(
     new Vector3(0, 1.6, 0),
@@ -392,26 +411,58 @@ export default function WalkthroughPage() {
 
           {/* 3D Engine Quality Selector */}
           <div className="mb-5">
-            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">3D Engine</label>
+            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Render Quality</label>
             <select
               value={walkthroughQuality}
-              onChange={(e) => setWalkthroughQuality(e.target.value as WalkthroughQuality)}
+              onChange={(e) => {
+                const next = e.target.value as WalkthroughQuality;
+                if (next === "cinematic" && !canUseCinematic) {
+                  alert("Cinematic mode requires Premium plan. Upgrade in Pricing.");
+                  return;
+                }
+                setWalkthroughQuality(next);
+              }}
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
             >
               {(Object.keys(WALKTHROUGH_ENGINES) as WalkthroughQuality[]).map((key) => (
-                <option key={key} value={key} disabled={key === "gaussian"}>
+                <option key={key} value={key}>
                   {WALKTHROUGH_ENGINES[key].label}
                   {WALKTHROUGH_ENGINES[key].badge ? ` [${WALKTHROUGH_ENGINES[key].badge}]` : ""}
                 </option>
               ))}
             </select>
             <p className="mt-1 text-[10px] text-gray-400">{WALKTHROUGH_ENGINES[walkthroughQuality].description}</p>
-            {walkthroughQuality === "gaussian" && (
+            {walkthroughQuality === "cinematic" && !canUseCinematic && (
               <p className="mt-1 text-[10px] text-brand-amber-600">
-                Gaussian Splatting creates photorealistic 3D from captured photos.
-                Available with the Architect / Builder plan.
+                Upgrade to Premium to unlock photorealistic rendering.
               </p>
             )}
+          </div>
+
+          {/* VR Mode Button — Architect+ tier */}
+          <div className="mb-5">
+            <button
+              onClick={() => {
+                if (!canUseVR) {
+                  alert("VR mode is available with the Architect plan. Upgrade in Pricing.");
+                  return;
+                }
+                enterVRSession();
+              }}
+              className={`w-full rounded-lg border-2 px-4 py-2.5 text-sm font-bold transition-colors flex items-center justify-center gap-2 ${
+                canUseVR
+                  ? "border-purple-500 bg-purple-50 text-purple-700 hover:bg-purple-100"
+                  : "border-gray-200 bg-gray-50 text-gray-400 cursor-not-allowed"
+              }`}
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                <path d="M3 12a9 9 0 0 1 9-9 9 9 0 0 1 9 9v5a2 2 0 0 1-2 2h-3v-4a2 2 0 0 0-2-2h-6a2 2 0 0 0-2 2v4H5a2 2 0 0 1-2-2v-5z" />
+              </svg>
+              Enter VR {!canUseVR && <span className="text-[9px] uppercase">[Architect]</span>}
+            </button>
+            <p className="mt-1 text-[10px] text-gray-400">
+              Experience your home in virtual reality (Meta Quest, Vision Pro, etc.)
+            </p>
           </div>
 
           {/* Room list */}
@@ -522,6 +573,7 @@ export default function WalkthroughPage() {
               controlsRef={controlsRef}
               cameraPositionRef={cameraPositionRef}
               enhanced={walkthroughQuality === "enhanced"}
+              cinematic={walkthroughQuality === "cinematic" && canUseCinematic}
               autoTour={autoTour}
               onAutoTourFinished={() => setAutoTour(false)}
             />

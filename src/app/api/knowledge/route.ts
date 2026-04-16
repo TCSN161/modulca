@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { ARTICLES } from "@/knowledge/_index";
+import { trackView } from "./_viewTracker";
 
 export const dynamic = "force-dynamic";
 
@@ -13,24 +14,6 @@ export const dynamic = "force-dynamic";
  */
 
 const KB_ROOT = join(process.cwd(), "src", "knowledge");
-
-/* ------------------------------------------------------------------ */
-/*  In-memory view counter                                             */
-/* ------------------------------------------------------------------ */
-
-const viewCounts = new Map<string, number>();
-
-function trackView(articleId: string) {
-  viewCounts.set(articleId, (viewCounts.get(articleId) || 0) + 1);
-}
-
-/** Top N articles by view count */
-export function getPopularArticles(n = 10): { id: string; views: number }[] {
-  return [...viewCounts.entries()]
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, n)
-    .map(([id, views]) => ({ id, views }));
-}
 
 const TIER_LIMITS: Record<string, number> = {
   free: 800,       // ~first section only

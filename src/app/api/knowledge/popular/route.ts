@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPopularArticles } from "../route";
+import { getPopularArticles } from "../_viewTracker";
 
 export const dynamic = "force-dynamic";
 
