@@ -1,4 +1,5 @@
 import FloatingAIButton from "@/features/consultant/components/FloatingAIButton";
+import CloudSyncProvider from "@/features/design/components/shared/CloudSyncProvider";
 
 export function generateStaticParams() {
   return [{ id: "demo" }];
@@ -6,9 +7,9 @@ export function generateStaticParams() {
 
 export default function ProjectLayout({ children }: { children: React.ReactNode }) {
   return (
-    <>
+    <CloudSyncProvider>
       {children}
       <FloatingAIButton />
-    </>
+    </CloudSyncProvider>
   );
 }

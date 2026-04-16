@@ -66,12 +66,17 @@ export default function DashboardPage() {
     loadProjects();
   }, [loadProjects]);
 
-  // Available for future use (e.g. swipe-to-delete, context menu)
-  const _handleDelete = async (id: string) => {
-    await deleteProject(userId ?? "", id);
-    setProjects((prev) => prev.filter((p) => p.id !== id));
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+
+  const handleDelete = async (id: string) => {
+    if (deletingId) return;
+    setDeletingId(id);
+    const ok = await deleteProject(userId ?? "", id);
+    if (ok) {
+      setProjects((prev) => prev.filter((p) => p.id !== id));
+    }
+    setDeletingId(null);
   };
-  void _handleDelete;
 
   const handleLoad = (project: ProjectRecord) => {
     try {
@@ -294,7 +299,7 @@ export default function DashboardPage() {
                           {cost > 0 && (
                             <>
                               <span className="text-brand-bone-400">|</span>
-                              <span>${cost.toLocaleString()}</span>
+                              <span>&euro;{cost.toLocaleString()}</span>
                             </>
                           )}
                           {style && (
@@ -303,13 +308,40 @@ export default function DashboardPage() {
                               <span className="capitalize">{style}</span>
                             </>
                           )}
+                          <span className="text-brand-bone-400">|</span>
+                          {project.id.startsWith("local-") ? (
+                            <span className="text-amber-500" title="Saved locally only">Local</span>
+                          ) : (
+                            <span className="text-emerald-500" title="Synced to cloud">Cloud</span>
+                          )}
                         </div>
                       </div>
 
-                      {/* Arrow */}
-                      <svg className="w-5 h-5 text-brand-bone-400 group-hover:text-brand-olive-600 transition-colors flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
-                      </svg>
+                      {/* Actions */}
+                      <div className="flex items-center gap-1 shrink-0">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (confirm("Delete this project? This cannot be undone.")) {
+                              handleDelete(project.id);
+                            }
+                          }}
+                          disabled={deletingId === project.id}
+                          className="p-1.5 rounded-lg text-brand-bone-400 hover:text-red-500 hover:bg-red-50 transition-colors opacity-0 group-hover:opacity-100"
+                          title="Delete project"
+                        >
+                          {deletingId === project.id ? (
+                            <div className="h-4 w-4 animate-spin rounded-full border-2 border-red-400 border-t-transparent" />
+                          ) : (
+                            <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                              <path strokeLinecap="round" strokeLinejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                          )}
+                        </button>
+                        <svg className="w-5 h-5 text-brand-bone-400 group-hover:text-brand-olive-600 transition-colors" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                        </svg>
+                      </div>
                     </div>
                   );
                 })}
