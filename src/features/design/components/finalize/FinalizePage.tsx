@@ -306,7 +306,7 @@ export default function FinalizePage() {
                   </ul>
                 </div>
                 <div className="bg-white/10 rounded-lg p-4 ring-2 ring-brand-amber-400">
-                  <div className="text-sm font-semibold mb-1 text-brand-amber-400">Premium &mdash; &euro;29/mo</div>
+                  <div className="text-sm font-semibold mb-1 text-brand-amber-400">Premium &mdash; &euro;19.99/mo</div>
                   <ul className="text-xs text-brand-teal-200 space-y-1">
                     <li>- 10 projects</li>
                     <li>- HD AI renders</li>

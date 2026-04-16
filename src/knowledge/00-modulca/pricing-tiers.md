@@ -25,8 +25,8 @@ relatedArticles: ["modulca-platform", "modulca-13-steps", "cost-estimation"]
   - Save 1 project (with account)
 - **Best for**: Exploring modular design, first-time users
 
-### Premium (€29/month)
-- **Price**: €29/month (€290/year — 2 months free)
+### Premium (€19.99/month)
+- **Price**: €19.99/month (€199/year — 2 months free)
 - **Everything in Explorer, plus**:
   - 50 AI renders per month (HD)
   - All 6 technical drawing types + PDF export
@@ -36,8 +36,8 @@ relatedArticles: ["modulca-platform", "modulca-13-steps", "cost-estimation"]
   - 10 saved projects + sharable links
 - **Best for**: Homeowners actively designing their home
 
-### Architect (€79/month)
-- **Price**: €79/month (€790/year — 2 months free)
+### Architect (€49.99/month)
+- **Price**: €49.99/month (€499/year — 2 months free)
 - **Everything in Premium, plus**:
   - 200 AI renders per month (4K)
   - DWG/DXF export for CAD
@@ -46,8 +46,8 @@ relatedArticles: ["modulca-platform", "modulca-13-steps", "cost-estimation"]
   - Priority support
 - **Best for**: Architects and professionals using ModulCA for clients
 
-### Constructor (€149/month)
-- **Price**: €149/month (€1490/year — 2 months free)
+### Constructor (€149.90/month)
+- **Price**: €149.90/month (€1499/year — 2 months free)
 - **Everything in Architect, plus**:
   - Unlimited AI renders (4K)
   - White-label branding
