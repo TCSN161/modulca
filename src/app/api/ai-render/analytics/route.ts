@@ -10,6 +10,7 @@ export const dynamic = "force-dynamic";
  * Used by admin dashboard for cost/usage insights.
  */
 export async function GET(req: NextRequest) {
+  try {
   const supabase = getSupabaseServer();
   if (!supabase) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
@@ -65,4 +66,11 @@ export async function GET(req: NextRequest) {
     byEngine,
     recentLogs: (logs || []).slice(0, 50),
   });
+  } catch (err) {
+    console.error("[ai-render/analytics] Unhandled error:", err);
+    return NextResponse.json(
+      { error: "Analytics request failed." },
+      { status: 500 }
+    );
+  }
 }

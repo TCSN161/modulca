@@ -124,7 +124,7 @@ export default function HomePage() {
               backgroundImage: "url('https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=1920&q=80')",
             }}
           >
-            <div className="absolute inset-0 bg-gradient-to-r from-brand-bone-100/95 via-brand-bone-100/70 to-transparent" />
+            <div className="absolute inset-0 bg-gradient-to-r from-brand-bone-100 via-brand-bone-100/90 to-brand-bone-100/60 sm:from-brand-bone-100/95 sm:via-brand-bone-100/70 sm:to-transparent" />
           </div>
 
           <div className="relative mx-auto max-w-7xl px-4 sm:px-6 lg:px-8 py-20 sm:py-28 lg:py-36">
@@ -133,7 +133,7 @@ export default function HomePage() {
                 <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-brand-olive-500 animate-pulse" />
                 Version 1.0 Live
               </div>
-              <h1 className="mb-6 text-3xl font-extrabold tracking-heading text-brand-charcoal sm:text-5xl lg:text-[3.5rem] lg:leading-[1.1]">
+              <h1 className="mb-6 text-2xl font-extrabold tracking-heading text-brand-charcoal sm:text-4xl lg:text-[3.5rem] lg:leading-[1.1]">
                 Design Your
                 <br />
                 <em className="text-brand-olive-700 not-italic font-extrabold" style={{ fontStyle: "italic" }}>Modular Home</em>
@@ -148,7 +148,7 @@ export default function HomePage() {
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
                   href="/project/new"
-                  className="btn-primary px-7 py-3.5 text-base shadow-subtle"
+                  className="btn-primary px-7 py-3.5 text-base shadow-subtle min-h-[44px]"
                 >
                   Start Designing — Free
                 </Link>
@@ -179,7 +179,7 @@ export default function HomePage() {
               { value: "100%", label: "SUSTAINABLE TIMBER" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
-                <div className="text-3xl font-bold tracking-heading text-brand-charcoal sm:text-4xl">
+                <div className="text-2xl font-bold tracking-heading text-brand-charcoal sm:text-3xl md:text-4xl">
                   {stat.value}
                 </div>
                 <div className="mt-1 text-[10px] font-semibold uppercase tracking-label text-brand-gray">
@@ -303,7 +303,7 @@ export default function HomePage() {
                 Beta Promo &mdash; Sign up free and get <strong>3 months of Premium access</strong> included.
               </p>
             </div>
-            <div className="grid gap-5 pt-2 sm:grid-cols-2 xl:grid-cols-4">
+            <div className="grid gap-5 pt-2 sm:grid-cols-2 lg:grid-cols-4">
               {[
                 {
                   name: "Explorer",
@@ -433,8 +433,8 @@ export default function HomePage() {
             >
               <div className="absolute inset-0 bg-brand-charcoal/50 backdrop-blur-[2px]" />
             </div>
-            <div className="relative px-8 py-16 text-center sm:py-20">
-              <h2 className="mb-6 text-3xl font-bold tracking-heading text-white sm:text-4xl">
+            <div className="relative px-5 sm:px-8 py-16 text-center sm:py-20">
+              <h2 className="mb-6 text-2xl font-bold tracking-heading text-white sm:text-3xl md:text-4xl">
                 Ready to evolve your living space?
               </h2>
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">

@@ -61,6 +61,7 @@ const DEFAULT_POLICY: PolicyFlags = {
  * Uses small dimensions by default to save credits.
  */
 export async function GET(req: NextRequest) {
+  try {
   const { searchParams } = req.nextUrl;
   const prompt = searchParams.get("prompt") || "modern scandinavian living room, natural light, minimalist furniture";
   const width = Number(searchParams.get("width") || "512");
@@ -148,4 +149,11 @@ export async function GET(req: NextRequest) {
     timestamp: new Date().toISOString(),
     engines: output,
   });
+  } catch (err) {
+    console.error("[ai-render/compare] Unhandled error:", err);
+    return NextResponse.json(
+      { error: "Compare request failed." },
+      { status: 500 }
+    );
+  }
 }

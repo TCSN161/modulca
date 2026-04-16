@@ -69,6 +69,7 @@ async function fetchOpenLibraryMeta(isbn?: string, olid?: string): Promise<OLMet
 /* ── Route Handler ─────────────────────────────────────────── */
 
 export async function GET(req: NextRequest) {
+  try {
   const { searchParams } = new URL(req.url);
   const id = searchParams.get("id");
   const query = searchParams.get("q");
@@ -125,4 +126,11 @@ export async function GET(req: NextRequest) {
     total: enriched.length,
     books: enriched,
   });
+  } catch (err) {
+    console.error("[books] Unhandled error:", err);
+    return NextResponse.json(
+      { error: "Books request failed.", books: [] },
+      { status: 500 }
+    );
+  }
 }

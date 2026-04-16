@@ -4,6 +4,7 @@ import {
   sendWelcomeEmail,
   sendPasswordResetConfirmEmail,
 } from "@/shared/lib/email";
+import { sendTemplateEmail } from "@/features/email";
 
 export const dynamic = "force-dynamic";
 
@@ -11,11 +12,18 @@ export const dynamic = "force-dynamic";
  * POST /api/email/send
  * Sends transactional emails.
  *
- * Body: { type: "welcome" | "password_reset_confirm", to: string, displayName?: string }
+ * Body: { type: string, to: string, displayName?: string, data?: Record<string, unknown> }
+ *
+ * Supported types:
+ *   - "welcome" — welcome email after signup
+ *   - "password_reset_confirm" — password reset confirmation
+ *   - "project_saved" — project saved notification (data: { userName, projectName })
+ *   - "quote_request" — quote request to team (data: { name, email, phone?, message?, modules, area, estimate, style? })
+ *   - "consultation_request" — consultation booking (data: { name, email, phone?, message?, modules?, area? })
  */
 export async function POST(req: NextRequest) {
   try {
-    const { type, to, displayName } = await req.json();
+    const { type, to, displayName, data } = await req.json();
 
     if (!to || !type) {
       return NextResponse.json(
@@ -32,6 +40,11 @@ export async function POST(req: NextRequest) {
         break;
       case "password_reset_confirm":
         result = await sendPasswordResetConfirmEmail(to);
+        break;
+      case "project_saved":
+      case "quote_request":
+      case "consultation_request":
+        result = await sendTemplateEmail({ to, template: type, data: data || {} });
         break;
       default:
         return NextResponse.json(

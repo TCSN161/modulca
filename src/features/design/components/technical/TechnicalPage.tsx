@@ -189,7 +189,7 @@ export default function TechnicalPage() {
           );
         })}
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto hidden md:flex items-center gap-2">
           <Link
             href={`/project/${projectId}/render`}
             className="text-sm text-gray-500 hover:text-brand-teal-800"
@@ -388,7 +388,7 @@ export default function TechnicalPage() {
           }}
         >
           <div
-            className="flex items-center justify-center p-8"
+            className="flex items-center justify-center p-4 md:p-8 max-w-full overflow-x-auto"
             style={{ minHeight: "100%" }}
           >
             <div

@@ -8,6 +8,7 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 /* ─── env vars (set in .env.local) ──────────────────────── */
 const GA_ID = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID || "";
 const CLARITY_ID = process.env.NEXT_PUBLIC_CLARITY_PROJECT_ID || "";
+const PLAUSIBLE_DOMAIN = process.env.NEXT_PUBLIC_PLAUSIBLE_DOMAIN || "";
 
 /* ─── Cookie consent key ────────────────────────────────── */
 const CONSENT_KEY = "modulca-analytics-consent";
@@ -139,6 +140,16 @@ export function Analytics() {
             })(window, document, "clarity", "script", "${CLARITY_ID}");
           `}
         </Script>
+      )}
+
+      {/* ── Plausible Analytics (privacy-friendly, no cookies) ── */}
+      {PLAUSIBLE_DOMAIN && (
+        <Script
+          defer
+          data-domain={PLAUSIBLE_DOMAIN}
+          src="https://plausible.io/js/script.js"
+          strategy="afterInteractive"
+        />
       )}
 
       {/* ── Cookie Consent Banner ── */}

@@ -40,26 +40,42 @@ function detectRegion(question: string): string | null {
 
 function scoreArticle(article: KBDocumentMeta, question: string, detectedRegion: string | null): number {
   const q = question.toLowerCase();
-  const words = q.split(/\s+/).filter((w) => w.length > 2);
+  // Require words of length >= 3 — prevents single-char tag noise
+  const words = q.split(/\s+/).filter((w) => w.length >= 3);
   let score = 0;
+  let hasRealMatch = false; // gate: require actual content overlap
 
   for (const tag of article.tags) {
-    if (q.includes(tag)) score += tag.length * 3;
+    // Only count full-tag matches for tags of length >= 3
+    if (tag.length >= 3 && q.includes(tag)) {
+      score += tag.length * 3;
+      hasRealMatch = true;
+    }
     for (const w of words) {
-      if (tag.includes(w)) score += w.length;
+      if (tag.length >= 3 && tag.includes(w)) {
+        score += w.length;
+        hasRealMatch = true;
+      }
     }
   }
 
   const titleLower = article.title.toLowerCase();
   for (const w of words) {
-    if (titleLower.includes(w)) score += w.length * 2;
+    if (titleLower.includes(w)) {
+      score += w.length * 2;
+      hasRealMatch = true;
+    }
   }
 
-  if (detectedRegion && article.region === detectedRegion) score += 15;
+  if (detectedRegion && article.region === detectedRegion) {
+    score += 15;
+    hasRealMatch = true;
+  }
   if (detectedRegion && article.region === "EU") score += 5;
   if (article.category === "modulca") score += 3;
 
-  return score;
+  // Without a real content match, return 0 so unknown queries hit fallback
+  return hasRealMatch ? score : 0;
 }
 
 /* ------------------------------------------------------------------ */
@@ -93,7 +109,9 @@ export function getLocalAnswer(question: string): string {
     article: a,
     score: scoreArticle(a, question, detectedRegion),
   }))
-    .filter((s) => s.score > 0)
+    // Require a real match signal — filter out articles that only got the
+    // category bonus (score <= 3) so truly unknown queries hit the fallback.
+    .filter((s) => s.score > 3)
     .sort((a, b) => b.score - a.score);
 
   // Try to return a pre-written summary for the best match

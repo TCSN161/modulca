@@ -66,15 +66,15 @@ export default function CloudSaveButton() {
         data: projectData,
       });
 
-      if (result) {
-        setProjectId(result.id);
+      if (result.ok) {
+        setProjectId(result.value.id);
         setStatus("saved");
         setLastSaved(new Date());
 
         // Persist active project reference
         localStorage.setItem(
           "modulca-active-project",
-          JSON.stringify({ id: result.id, name: projectName })
+          JSON.stringify({ id: result.value.id, name: projectName })
         );
       } else {
         setStatus("error");

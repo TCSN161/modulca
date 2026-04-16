@@ -121,7 +121,7 @@ describe("useSaveDesign", () => {
 
   it("attempts cloud save when user is authenticated", async () => {
     Object.assign(mockAuthState, { userId: "user-1", isAuthenticated: true });
-    mockSaveProject.mockResolvedValue({ id: "cloud-proj-1" });
+    mockSaveProject.mockResolvedValue({ ok: true, value: { id: "cloud-proj-1", name: "Test", data: {}, thumbnail: null, deleted_at: null, created_at: "", updated_at: "" } });
 
     const { result } = renderHook(() => useSaveDesign());
 

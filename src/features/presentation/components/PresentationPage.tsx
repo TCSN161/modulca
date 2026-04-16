@@ -230,7 +230,7 @@ export default function PresentationPage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* Top Nav */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6 print:hidden">
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6 print:hidden">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -368,7 +368,7 @@ export default function PresentationPage() {
         </aside>
 
         {/* Center — Slide Preview */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-3 md:p-6">
           {/* Slide navigation tabs */}
           <div className="mb-4 flex items-center gap-1 overflow-x-auto print:hidden">
             {enabledSlides.map((slide, i) => (
@@ -499,7 +499,7 @@ export default function PresentationPage() {
             {activeSlide === "site" && slides.find((s) => s.id === "site")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
                 <SlideHeader accent={tmpl.accent} text={tmpl.text} number={2} title="Site Plan" />
-                <div className="grid grid-cols-2 gap-6 mt-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
                   {/* SVG Site Plan — shows modules on terrain */}
                   <div className="rounded-xl overflow-hidden bg-emerald-50 border border-emerald-200 aspect-video flex items-center justify-center p-4">
                     {modules.length > 0 ? (
@@ -554,9 +554,9 @@ export default function PresentationPage() {
                       {numCols * MODULE_EXTERIOR_SIZE}m x {numRows * MODULE_EXTERIOR_SIZE}m footprint | {modules.length * MODULE_EXTERIOR_AREA}m{"\u00B2"} total | {modules.length * MODULE_INTERIOR_AREA}m{"\u00B2"} usable
                     </p>
                   </div>
-                  <div className="mt-4 flex justify-center">
+                  <div className="mt-4 flex justify-center overflow-x-auto">
                     <div className="grid gap-1" style={{
-                      gridTemplateColumns: `repeat(${numCols}, 80px)`,
+                      gridTemplateColumns: `repeat(${numCols}, minmax(60px, 80px))`,
                     }}>
                       {gridPositions.map(({ row, col, moduleType }) => {
                         const mt = moduleType ? MODULE_TYPES.find((m) => m.id === moduleType) : null;
@@ -615,8 +615,8 @@ export default function PresentationPage() {
             {activeSlide === "vision" && slides.find((s) => s.id === "vision")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
                 <SlideHeader accent={tmpl.accent} text={tmpl.text} number={4} title="Design Vision" />
-                <div className="mt-6 grid grid-cols-3 gap-6">
-                  <div className="col-span-2">
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="md:col-span-2">
                     <h3 className="text-xl font-bold mb-2" style={{ color: tmpl.text }}>{style?.label || "Modern Design"}</h3>
                     <p className="text-sm leading-relaxed mb-6" style={{ color: tmpl.text, opacity: 0.6 }}>
                       {style?.description || "A carefully curated design direction that balances aesthetics with functionality."}
@@ -766,7 +766,7 @@ export default function PresentationPage() {
             {activeSlide === "materials" && slides.find((s) => s.id === "materials")?.enabled && (
               <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
                 <SlideHeader accent={tmpl.accent} text={tmpl.text} number={7} title="Materials & Finishes" />
-                <div className="mt-6 grid grid-cols-2 gap-8">
+                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
                   <div>
                     <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: tmpl.text, opacity: 0.4 }}>Floor Materials</p>
                     <div className="space-y-2">
@@ -971,8 +971,8 @@ function SlideCard({ bg, text, children }: { bg: string; text: string; accent?: 
   return (
     <div
       data-slide="true"
-      className="rounded-2xl shadow-lg mb-6 p-8 print:shadow-none print:rounded-none print:mb-0 print:break-after-page"
-      style={{ backgroundColor: bg, color: text, minHeight: 500, aspectRatio: "297/210" }}
+      className="rounded-2xl shadow-lg mb-6 p-4 md:p-8 print:shadow-none print:rounded-none print:mb-0 print:break-after-page"
+      style={{ backgroundColor: bg, color: text, minHeight: 300, aspectRatio: "297/210" }}
     >
       {children}
     </div>

@@ -261,7 +261,7 @@ export default function ConfigurePage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* Top Nav */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -279,7 +279,7 @@ export default function ConfigurePage() {
       </header>
 
       {/* Module selector bar */}
-      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-6 py-3 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-3 md:px-6 py-2 md:py-3 overflow-x-auto">
         {modules.map((mod) => {
           const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
           const isActive =
@@ -306,7 +306,7 @@ export default function ConfigurePage() {
         })}
 
         {/* View mode toggle */}
-        <div className="ml-4 flex items-center rounded-lg border border-gray-200 bg-gray-50 p-0.5">
+        <div className="ml-4 hidden sm:flex items-center rounded-lg border border-gray-200 bg-gray-50 p-0.5">
           <button
             onClick={() => setViewMode("single")}
             className={`rounded-md px-3 py-1.5 text-xs font-medium transition-all ${
@@ -329,7 +329,7 @@ export default function ConfigurePage() {
           </button>
         </div>
 
-        <div className="ml-auto flex items-center gap-2">
+        <div className="ml-auto hidden md:flex items-center gap-2">
           <Link
             href={`/project/${projectId}/style`}
             className="text-sm text-gray-500 hover:text-brand-teal-800"

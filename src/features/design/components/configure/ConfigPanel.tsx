@@ -132,7 +132,7 @@ export default function ConfigPanel({ moduleRow, moduleCol }: ConfigPanelProps) 
               <h4 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Flooring Material
               </h4>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {FLOOR_MATERIALS.map((f) => (
                   <button
                     key={f.id}
@@ -164,7 +164,7 @@ export default function ConfigPanel({ moduleRow, moduleCol }: ConfigPanelProps) 
               <h4 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
                 Wall Color
               </h4>
-              <div className="flex gap-3">
+              <div className="flex flex-wrap gap-3">
                 {WALL_MATERIALS.map((w) => (
                   <button
                     key={w.id}

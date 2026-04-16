@@ -78,7 +78,7 @@ export default function VisualizePage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* Top Nav */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -94,7 +94,7 @@ export default function VisualizePage() {
       </header>
 
       {/* Module selector bar */}
-      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-6 py-3 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-3 md:px-6 py-3 overflow-x-auto">
         {/* View mode toggle */}
         <div className="flex items-center rounded-lg border border-gray-200 bg-gray-50 p-0.5">
           <button
@@ -293,6 +293,10 @@ export default function VisualizePage() {
             Use visibility:hidden + absolute positioning instead of display:none (Tailwind "hidden")
             because display:none destroys the WebGL context and causes the 3D view to disappear. */}
         <main className="flex-1 overflow-hidden relative">
+          {/* Mobile touch hint — visible only on small screens */}
+          <div className="md:hidden absolute bottom-3 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm text-white text-[10px] pointer-events-none">
+            Pinch to zoom &middot; Drag to rotate
+          </div>
           <div
             className="absolute inset-0"
             style={{ visibility: viewMode === "all" ? "visible" : "hidden" }}
@@ -355,7 +359,7 @@ export default function VisualizePage() {
             <div className="absolute inset-0 bg-black/30" onClick={() => setMobileSidebar(null)} />
             {/* Panel */}
             <aside
-              className={`absolute top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto transition-transform ${
+              className={`absolute top-0 bottom-0 w-full max-w-xs bg-white shadow-xl overflow-y-auto transition-transform ${
                 mobileSidebar === "left" ? "left-0" : "right-0"
               }`}
             >

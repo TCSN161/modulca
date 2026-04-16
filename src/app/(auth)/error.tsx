@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -12,6 +13,7 @@ export default function AuthError({
 }) {
   useEffect(() => {
     console.error("[ModulCA Auth Error]", error);
+    Sentry.captureException(error);
   }, [error]);
 
   return (

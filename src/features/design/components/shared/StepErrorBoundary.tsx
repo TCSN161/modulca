@@ -1,5 +1,6 @@
 "use client";
 
+import * as Sentry from "@sentry/nextjs";
 import Link from "next/link";
 import { useEffect } from "react";
 
@@ -25,6 +26,7 @@ export default function StepErrorBoundary({
 }: StepErrorBoundaryProps) {
   useEffect(() => {
     console.error(`[ModulCA ${stepName} Error]`, error);
+    Sentry.captureException(error);
   }, [error, stepName]);
 
   return (

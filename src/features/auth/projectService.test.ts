@@ -6,20 +6,9 @@ import {
   deleteProject,
 } from "./projectService";
 
-/**
- * Project Service tests — localStorage fallback mode.
- * In the test environment, Supabase is not configured (no env vars),
- * so all operations fall through to localStorage, which is mocked
- * in src/__tests__/setup.ts.
- */
-
 beforeEach(() => {
   localStorage.clear();
 });
-
-/* ═══════════════════════════════════════════════════════════
-   listProjects
-   ═══════════════════════════════════════════════════════════ */
 
 describe("listProjects", () => {
   it("returns empty array when no projects saved", async () => {
@@ -28,40 +17,31 @@ describe("listProjects", () => {
   });
 
   it("returns saved projects from localStorage", async () => {
-    // Pre-seed localStorage
     const seed = [
-      { id: "p1", name: "House A", data: { modules: [] }, created_at: "2025-01-01T00:00:00Z", updated_at: "2025-01-01T00:00:00Z" },
+      { id: "p1", name: "House A", data: { modules: [] }, thumbnail: null, deleted_at: null, created_at: "2025-01-01T00:00:00Z", updated_at: "2025-01-01T00:00:00Z" },
     ];
     localStorage.setItem("modulca-projects", JSON.stringify(seed));
-
     const projects = await listProjects("user-1");
     expect(projects).toHaveLength(1);
     expect(projects[0].name).toBe("House A");
   });
 });
 
-/* ═══════════════════════════════════════════════════════════
-   saveProject — create
-   ═══════════════════════════════════════════════════════════ */
-
-describe("saveProject — create", () => {
+describe("saveProject - create", () => {
   it("creates a new project with auto-generated ID", async () => {
     const result = await saveProject("user-1", {
       name: "My First House",
       data: { modules: [{ type: "living" }] },
     });
-
-    expect(result).not.toBeNull();
-    expect(result!.id).toMatch(/^local-\d+$/);
-    expect(result!.name).toBe("My First House");
-    expect(result!.data).toEqual({ modules: [{ type: "living" }] });
-    expect(result!.created_at).toBeTruthy();
-    expect(result!.updated_at).toBeTruthy();
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.id).toMatch(/^local-\d+$/);
+    expect(result.value.name).toBe("My First House");
+    expect(result.value.data).toEqual({ modules: [{ type: "living" }] });
   });
 
   it("persists to localStorage", async () => {
     await saveProject("user-1", { name: "House B", data: {} });
-
     const raw = localStorage.getItem("modulca-projects");
     expect(raw).toBeTruthy();
     const parsed = JSON.parse(raw!);
@@ -72,131 +52,97 @@ describe("saveProject — create", () => {
   it("prepends new projects (most recent first)", async () => {
     await saveProject("user-1", { name: "First", data: {} });
     await saveProject("user-1", { name: "Second", data: {} });
-
     const projects = await listProjects("user-1");
     expect(projects[0].name).toBe("Second");
     expect(projects[1].name).toBe("First");
   });
 });
 
-/* ═══════════════════════════════════════════════════════════
-   saveProject — update
-   ═══════════════════════════════════════════════════════════ */
-
-describe("saveProject — update", () => {
+describe("saveProject - update", () => {
   it("updates existing project by ID", async () => {
     const created = await saveProject("user-1", { name: "Original", data: { v: 1 } });
-    expect(created).not.toBeNull();
-
-    const updated = await saveProject("user-1", {
-      id: created!.id,
-      name: "Renamed",
-      data: { v: 2 },
-    });
-
-    expect(updated).not.toBeNull();
-    expect(updated!.id).toBe(created!.id);
-    expect(updated!.name).toBe("Renamed");
-    expect(updated!.data).toEqual({ v: 2 });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    const updated = await saveProject("user-1", { id: created.value.id, name: "Renamed", data: { v: 2 } });
+    expect(updated.ok).toBe(true);
+    if (!updated.ok) return;
+    expect(updated.value.id).toBe(created.value.id);
+    expect(updated.value.name).toBe("Renamed");
+    expect(updated.value.data).toEqual({ v: 2 });
   });
 
   it("updates updated_at timestamp", async () => {
     const created = await saveProject("user-1", { name: "Test", data: {} });
-    const originalTime = created!.updated_at;
-
-    // Small delay to ensure different timestamp
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    const originalTime = created.value.updated_at;
     await new Promise((r) => setTimeout(r, 5));
-
-    const updated = await saveProject("user-1", {
-      id: created!.id,
-      name: "Test Updated",
-      data: {},
-    });
-
-    expect(updated!.updated_at).not.toBe(originalTime);
+    const updated = await saveProject("user-1", { id: created.value.id, name: "Test Updated", data: {} });
+    expect(updated.ok).toBe(true);
+    if (!updated.ok) return;
+    expect(updated.value.updated_at).not.toBe(originalTime);
   });
 
-  it("creates new project when ID doesn't match", async () => {
+  it("creates new project when ID does not match", async () => {
     await saveProject("user-1", { name: "Existing", data: {} });
-
-    const result = await saveProject("user-1", {
-      id: "nonexistent-id",
-      name: "New One",
-      data: {},
-    });
-
-    // Since ID doesn't exist, it creates a new project
-    expect(result).not.toBeNull();
-    expect(result!.id).toMatch(/^local-\d+$/);
-    expect(result!.name).toBe("New One");
-
+    const result = await saveProject("user-1", { id: "nonexistent-id", name: "New One", data: {} });
+    expect(result.ok).toBe(true);
+    if (!result.ok) return;
+    expect(result.value.id).toMatch(/^local-\d+$/);
+    expect(result.value.name).toBe("New One");
     const all = await listProjects("user-1");
     expect(all).toHaveLength(2);
   });
 });
 
-/* ═══════════════════════════════════════════════════════════
-   loadProject
-   ═══════════════════════════════════════════════════════════ */
-
 describe("loadProject", () => {
   it("loads a project by ID", async () => {
-    const created = await saveProject("user-1", {
-      name: "Loadable",
-      data: { modules: ["a", "b"] },
-    });
-
-    const loaded = await loadProject("user-1", created!.id);
-    expect(loaded).not.toBeNull();
-    expect(loaded!.name).toBe("Loadable");
-    expect(loaded!.data).toEqual({ modules: ["a", "b"] });
+    const created = await saveProject("user-1", { name: "Loadable", data: { modules: ["a", "b"] } });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    const loaded = await loadProject("user-1", created.value.id);
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    expect(loaded.value.name).toBe("Loadable");
+    expect(loaded.value.data).toEqual({ modules: ["a", "b"] });
   });
 
-  it("returns null for nonexistent ID", async () => {
+  it("returns error for nonexistent ID", async () => {
     const loaded = await loadProject("user-1", "nope");
-    expect(loaded).toBeNull();
+    expect(loaded.ok).toBe(false);
+    if (loaded.ok) return;
+    expect(loaded.error.code).toBe("NOT_FOUND");
   });
 });
 
-/* ═══════════════════════════════════════════════════════════
-   deleteProject
-   ═══════════════════════════════════════════════════════════ */
-
-describe("deleteProject", () => {
-  it("removes the project from localStorage", async () => {
+describe("deleteProject (soft delete)", () => {
+  it("soft-deletes the project from active list", async () => {
     const created = await saveProject("user-1", { name: "To Delete", data: {} });
-
-    const success = await deleteProject("user-1", created!.id);
-    expect(success).toBe(true);
-
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    const result = await deleteProject("user-1", created.value.id);
+    expect(result.ok).toBe(true);
     const remaining = await listProjects("user-1");
     expect(remaining).toHaveLength(0);
   });
 
-  it("returns true even if project doesn't exist (idempotent)", async () => {
-    const success = await deleteProject("user-1", "nonexistent");
-    expect(success).toBe(true);
+  it("returns ok even if project does not exist (idempotent)", async () => {
+    const result = await deleteProject("user-1", "nonexistent");
+    expect(result.ok).toBe(true);
   });
 
   it("only deletes the targeted project", async () => {
     const a = await saveProject("user-1", { name: "Keep", data: {} });
-    // Small delay to ensure different Date.now() for unique local- ID
     await new Promise((r) => setTimeout(r, 5));
     const b = await saveProject("user-1", { name: "Delete", data: {} });
-
-    expect(a!.id).not.toBe(b!.id); // guard: IDs must differ
-
-    await deleteProject("user-1", b!.id);
-
+    expect(a.ok && b.ok).toBe(true);
+    if (!a.ok || !b.ok) return;
+    await deleteProject("user-1", b.value.id);
     const remaining = await listProjects("user-1");
     expect(remaining).toHaveLength(1);
-    expect(remaining[0].id).toBe(a!.id);
+    expect(remaining[0].id).toBe(a.value.id);
   });
 });
-
-/* ═══════════════════════════════════════════════════════════
-   Edge cases
-   ═══════════════════════════════════════════════════════════ */
 
 describe("edge cases", () => {
   it("handles corrupted localStorage gracefully", async () => {
@@ -220,13 +166,12 @@ describe("edge cases", () => {
       finishLevel: "premium",
       styleDirection: "scandinavian",
     };
-
-    const created = await saveProject("user-1", {
-      name: "Complex",
-      data: complexData,
-    });
-    const loaded = await loadProject("user-1", created!.id);
-
-    expect(loaded!.data).toEqual(complexData);
+    const created = await saveProject("user-1", { name: "Complex", data: complexData });
+    expect(created.ok).toBe(true);
+    if (!created.ok) return;
+    const loaded = await loadProject("user-1", created.value.id);
+    expect(loaded.ok).toBe(true);
+    if (!loaded.ok) return;
+    expect(loaded.value.data).toEqual(complexData);
   });
 });

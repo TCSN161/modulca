@@ -359,28 +359,36 @@ async function tryEngines(
 /* ------------------------------------------------------------------ */
 
 export async function GET(req: NextRequest) {
-  const { searchParams } = req.nextUrl;
-  const prompt = searchParams.get("prompt") || "modern interior design";
-  const width = Number(searchParams.get("width") || "1024");
-  const height = Number(searchParams.get("height") || "576");
-  const seed = searchParams.get("seed") || String(Date.now());
-  const engineParam = searchParams.get("engine");
-  const maxCost = Number(searchParams.get("maxCostUsd") || "1.0");
+  try {
+    const { searchParams } = req.nextUrl;
+    const prompt = searchParams.get("prompt") || "modern interior design";
+    const width = Number(searchParams.get("width") || "1024");
+    const height = Number(searchParams.get("height") || "576");
+    const seed = searchParams.get("seed") || String(Date.now());
+    const engineParam = searchParams.get("engine");
+    const maxCost = Number(searchParams.get("maxCostUsd") || "1.0");
 
-  const tier = searchParams.get("tier") || "free";
+    const tier = searchParams.get("tier") || "free";
 
-  const renderReq: AiRenderRequest = {
-    prompt, width, height, seed,
-    tier,
-    policyFlags: DEFAULT_POLICY,
-  };
+    const renderReq: AiRenderRequest = {
+      prompt, width, height, seed,
+      tier,
+      policyFlags: DEFAULT_POLICY,
+    };
 
-  console.log(
-    `[ai-render] GET: "${prompt.slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} tier=${tier} maxCost=$${maxCost}`
-  );
+    console.log(
+      `[ai-render] GET: "${prompt.slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} tier=${tier} maxCost=$${maxCost}`
+    );
 
-  const order = getFallbackChain(tier, false);
-  return tryEngines(renderReq, engineParam, order, maxCost);
+    const order = getFallbackChain(tier, false);
+    return await tryEngines(renderReq, engineParam, order, maxCost);
+  } catch (err) {
+    console.error("[ai-render] GET unhandled error:", err);
+    return NextResponse.json(
+      { error: "Render request failed. Please try again." },
+      { status: 500 }
+    );
+  }
 }
 
 /* ------------------------------------------------------------------ */
@@ -388,32 +396,58 @@ export async function GET(req: NextRequest) {
 /* ------------------------------------------------------------------ */
 
 export async function POST(req: NextRequest) {
-  const body = await req.json();
-  const {
-    prompt = "modern interior design",
-    width = 1024,
-    height = 576,
-    seed = String(Date.now()),
-    engine: engineParam = null,
-    baseImage = null,
-    tier = "free",
-    maxCostUsd = 1.0,
-  } = body;
+  try {
+    let body: Record<string, unknown>;
+    try {
+      body = await req.json();
+    } catch {
+      return NextResponse.json(
+        { error: "Invalid JSON body." },
+        { status: 400 }
+      );
+    }
 
-  const renderReq: AiRenderRequest = {
-    prompt,
-    width: Number(width),
-    height: Number(height),
-    seed: String(seed),
-    baseImage: baseImage || undefined,
-    tier,
-    policyFlags: DEFAULT_POLICY,
-  };
+    const {
+      prompt = "modern interior design",
+      width = 1024,
+      height = 576,
+      seed = String(Date.now()),
+      engine: engineParam = null,
+      baseImage = null,
+      tier = "free",
+      maxCostUsd = 1.0,
+    } = body as Record<string, unknown> & {
+      prompt?: string;
+      width?: number;
+      height?: number;
+      seed?: string | number;
+      engine?: string | null;
+      baseImage?: string | null;
+      tier?: string;
+      maxCostUsd?: number;
+    };
 
-  console.log(
-    `[ai-render] POST: "${prompt.slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} img2img=${!!baseImage} maxCost=$${maxCostUsd}`
-  );
+    const renderReq: AiRenderRequest = {
+      prompt: String(prompt),
+      width: Number(width),
+      height: Number(height),
+      seed: String(seed),
+      baseImage: baseImage ? String(baseImage) : undefined,
+      tier: String(tier),
+      policyFlags: DEFAULT_POLICY,
+    };
 
-  const order = getFallbackChain(tier, !!baseImage);
-  return tryEngines(renderReq, engineParam, order, Number(maxCostUsd));
+    console.log(
+      `[ai-render] POST: "${String(prompt).slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} img2img=${!!baseImage} maxCost=$${maxCostUsd}`
+    );
+
+    const order = getFallbackChain(String(tier), !!baseImage);
+    return await tryEngines(renderReq, engineParam as string | null, order, Number(maxCostUsd));
+  } catch (err) {
+    console.error("[ai-render] POST unhandled error:", err);
+    return NextResponse.json(
+      { error: "Render request failed. Please try again." },
+      { status: 500 }
+    );
+  }
 }

@@ -113,7 +113,7 @@ function ProductDetailModal({
       >
         {/* Close Button */}
         <div className="relative">
-          <div className="relative w-full h-64">
+          <div className="relative w-full h-48 md:h-64">
             <Image
               src={product.image.url}
               alt={product.name}
@@ -147,7 +147,7 @@ function ProductDetailModal({
         </div>
 
         {/* Content */}
-        <div className="p-6">
+        <div className="p-4 md:p-6">
           <div className="flex items-start justify-between gap-3">
             <div>
               <h2 className="text-lg font-bold text-[#1B3A4B]">{product.name}</h2>
@@ -354,7 +354,7 @@ export default function ProductsPage() {
       <DesignHeader activeStep={10} />
 
       {/* ── NAVIGATION BAR ── */}
-      <div className="flex items-center justify-between h-12 px-6 bg-white border-b border-gray-200 shrink-0">
+      <div className="flex items-center justify-between h-12 px-3 md:px-6 bg-white border-b border-gray-200 shrink-0">
         <Link
           href={`/project/${projectId}/walkthrough`}
           className="text-sm text-[#1B3A4B] hover:text-[#E8913A] transition-colors flex items-center gap-1"
@@ -372,7 +372,7 @@ export default function ProductsPage() {
       {/* ── MAIN CONTENT ── */}
       <div className="flex flex-1 overflow-hidden">
         {/* ── CENTER AREA ── */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-3 md:p-6">
           {/* Page Header */}
           <div className="mb-6 flex items-start justify-between">
             <div>

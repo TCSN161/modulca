@@ -54,8 +54,8 @@ export function useSaveDesign() {
           data,
         });
 
-        if (result) {
-          cloudProjectIdRef.current = result.id;
+        if (result.ok) {
+          cloudProjectIdRef.current = result.value.id;
           setCloudSynced(true);
         }
       } catch (err) {
@@ -109,9 +109,9 @@ export function useCloudLoad() {
     loadedRef.current = true;
 
     loadProject(userId, projectId)
-      .then((project) => {
-        if (project?.data) {
-          const d = project.data as Record<string, unknown>;
+      .then((result) => {
+        if (result.ok && result.value?.data) {
+          const d = result.value.data as Record<string, unknown>;
           // Hydrate store with cloud data via Zustand setState
           const patch: Record<string, unknown> = {};
           if (Array.isArray(d.modules) && d.modules.length > 0) patch.modules = d.modules;

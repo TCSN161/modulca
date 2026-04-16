@@ -95,7 +95,7 @@ export default function LayoutDesigner() {
       {mobilePanel !== "none" && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div className="absolute inset-0 bg-black/20" onClick={() => setMobilePanel("none")} />
-          <div className="absolute inset-y-0 right-0 w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto">
+          <div className="absolute inset-y-0 right-0 w-full max-w-xs bg-white shadow-xl overflow-y-auto">
             <div className="p-4">
               <button onClick={() => setMobilePanel("none")} className="mb-3 rounded-lg p-1 text-gray-400 hover:bg-gray-100">
                 <svg className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>

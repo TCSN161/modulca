@@ -40,13 +40,13 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
     loadedRef.current = true;
 
     loadProject(userId, projectId)
-      .then((project) => {
-        if (!project?.data) {
+      .then((result) => {
+        if (!result.ok) {
           setHydrated(true);
           return;
         }
 
-        const d = project.data as Record<string, unknown>;
+        const d = result.value.data as Record<string, unknown>;
 
         // Hydrate design store
         const designPatch: Record<string, unknown> = {};

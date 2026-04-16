@@ -34,7 +34,7 @@ export default function Footer() {
     <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-10">
       <div className="mx-auto max-w-5xl px-4">
         {/* Links grid */}
-        <div className="grid grid-cols-2 gap-8 sm:grid-cols-4">
+        <div className="grid grid-cols-1 gap-8 sm:grid-cols-2 md:grid-cols-4">
           {/* Brand */}
           <div>
             <Link href="/" className="text-sm font-bold tracking-heading text-brand-charcoal">

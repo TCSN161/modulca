@@ -20,7 +20,7 @@ export default function MobileNav() {
       {/* Hamburger button */}
       <button
         onClick={() => setOpen(!open)}
-        className="flex h-10 w-10 items-center justify-center rounded-lg text-brand-charcoal hover:bg-brand-bone-200 transition-colors"
+        className="flex h-11 w-11 items-center justify-center rounded-lg text-brand-charcoal hover:bg-brand-bone-200 transition-colors"
         aria-label="Toggle menu"
       >
         {open ? (

@@ -69,6 +69,7 @@ function extractSnippet(body: string, queryLower: string, maxLen = 160): string 
 }
 
 export async function GET(req: NextRequest) {
+  try {
   const { searchParams } = new URL(req.url);
   const query = searchParams.get("q")?.trim();
   const tier = searchParams.get("tier") || "free";
@@ -150,4 +151,11 @@ export async function GET(req: NextRequest) {
     total: results.length,
     results: results.slice(0, limit),
   });
+  } catch (err) {
+    console.error("[knowledge/search] Unhandled error:", err);
+    return NextResponse.json(
+      { error: "Search request failed.", results: [] },
+      { status: 500 }
+    );
+  }
 }

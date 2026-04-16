@@ -232,7 +232,7 @@ export default function RenderPage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* Top Nav */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -243,7 +243,7 @@ export default function RenderPage() {
       </header>
 
       {/* Module selector bar */}
-      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-6 py-3 overflow-x-auto">
+      <div className="flex items-center gap-2 border-b border-gray-200 bg-white px-3 md:px-6 py-3 overflow-x-auto">
         {modules.map((mod) => {
           const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
           const isActive = selectedModule?.row === mod.row && selectedModule?.col === mod.col;
@@ -627,7 +627,7 @@ export default function RenderPage() {
         </aside>
 
         {/* Center */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-3 md:p-6">
           {currentMod && (
             <div className="flex flex-col gap-6">
               {/* View mode toggle */}
@@ -832,7 +832,7 @@ export default function RenderPage() {
           <div className="md:hidden fixed inset-0 z-40">
             <div className="absolute inset-0 bg-black/30" onClick={() => setMobileSidebar(null)} />
             <aside
-              className={`absolute top-0 bottom-0 w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto ${
+              className={`absolute top-0 bottom-0 w-full max-w-xs bg-white shadow-xl overflow-y-auto ${
                 mobileSidebar === "left" ? "left-0" : "right-0"
               }`}
             >

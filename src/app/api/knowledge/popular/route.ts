@@ -8,6 +8,14 @@ export const dynamic = "force-dynamic";
  * Used by the library page to highlight trending content.
  */
 export async function GET() {
-  const popular = getPopularArticles(10);
-  return NextResponse.json({ popular });
+  try {
+    const popular = getPopularArticles(10);
+    return NextResponse.json({ popular });
+  } catch (err) {
+    console.error("[knowledge/popular] Unhandled error:", err);
+    return NextResponse.json(
+      { error: "Could not fetch popular articles.", popular: [] },
+      { status: 500 }
+    );
+  }
 }

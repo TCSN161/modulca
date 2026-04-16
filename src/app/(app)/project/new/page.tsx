@@ -22,11 +22,11 @@ export default function NewProjectPage() {
       const data: Record<string, unknown> = { preset: preset ?? undefined };
       const result = await saveProject(userId ?? "demo", { name: name.trim(), data });
 
-      if (result) {
+      if (result.ok) {
         try {
-          localStorage.setItem("modulca-active-project", JSON.stringify({ id: result.id, name: result.name }));
+          localStorage.setItem("modulca-active-project", JSON.stringify({ id: result.value.id, name: result.value.name }));
         } catch { /* */ }
-        router.push(`/project/${result.id}/land`);
+        router.push(`/project/${result.value.id}/land`);
       }
     } catch (err) {
       console.error("[NewProject] Failed to create:", err);

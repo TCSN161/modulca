@@ -527,6 +527,11 @@ export default function WalkthroughPage() {
             />
           </SceneErrorBoundary>
 
+          {/* Mobile touch hint — visible only on small screens */}
+          <div className="md:hidden absolute top-3 left-1/2 -translate-x-1/2 z-10 px-3 py-1.5 rounded-full bg-black/40 backdrop-blur-sm text-white text-[10px] pointer-events-none">
+            Drag to look around &middot; Use buttons below to walk
+          </div>
+
           {/* Crosshair overlay */}
           <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
             <div className="h-6 w-6 opacity-30">

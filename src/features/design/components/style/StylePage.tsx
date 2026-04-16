@@ -62,7 +62,7 @@ export default function StylePage() {
   return (
     <div className="flex h-screen flex-col bg-gray-50">
       {/* Top Nav */}
-      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-6">
+      <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
         <Link href="/" className="flex items-center gap-2">
           <span className="text-xl font-bold text-brand-teal-800">
             Modul<span className="text-brand-amber-500">CA</span>
@@ -276,7 +276,7 @@ export default function StylePage() {
         </aside>
 
         {/* CENTER */}
-        <main className="flex-1 overflow-y-auto p-6">
+        <main className="flex-1 overflow-y-auto p-4 md:p-6">
           {activeTab === "moodboard" ? (
             <Moodboard />
           ) : !selectedStyle ? (
@@ -387,7 +387,7 @@ export default function StylePage() {
                 <h3 className="mb-4 text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">
                   Color Palette
                 </h3>
-                <div className="flex items-center gap-5">
+                <div className="flex flex-wrap items-center gap-3 md:gap-5">
                   {selectedStyle.palette.map((swatch) => (
                     <div key={swatch.label} className="flex flex-col items-center gap-2">
                       <div
@@ -407,7 +407,7 @@ export default function StylePage() {
                 <h3 className="mb-4 text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">
                   Primary Materials
                 </h3>
-                <div className="flex items-center gap-5">
+                <div className="flex flex-wrap items-center gap-3 md:gap-5">
                   {selectedStyle.materials.map((mat, i) => {
                     const abbrevs = ["OAK", "CONC", "METAL", "GLASS", "LINEN", "LACQ", "WALNT", "SLATE"];
                     const abbrev = abbrevs[i] || mat.label.slice(0, 4).toUpperCase();
@@ -440,7 +440,7 @@ export default function StylePage() {
                 <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">
                   Product Recommendations
                 </h3>
-                <div className="grid grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">
                   {selectedStyle.products.map((product) => (
                     <div
                       key={product.label}

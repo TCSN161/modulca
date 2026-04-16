@@ -99,11 +99,11 @@ export default function FinalizePage() {
       data: designData,
     });
 
-    if (result) {
+    if (result.ok) {
       // Store active project reference
       localStorage.setItem("modulca-active-project", JSON.stringify({
-        id: result.id,
-        name: result.name,
+        id: result.value.id,
+        name: result.value.name,
       }));
       setSaved(true);
       setProjectCount((c) => existingId ? c : c + 1);
@@ -125,7 +125,7 @@ export default function FinalizePage() {
 
       {/* Main content */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto py-12 px-6">
+        <div className="max-w-3xl mx-auto py-8 md:py-12 px-4 md:px-6">
           {/* Success banner */}
           <div className="text-center mb-10">
             <div className="inline-flex items-center justify-center w-20 h-20 rounded-full bg-emerald-100 mb-4">
@@ -259,7 +259,7 @@ export default function FinalizePage() {
                 <Link href="/login" className="font-semibold underline">Log in</Link> to save your project to the cloud and access it from any device.
               </div>
             )}
-            <div className="flex gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
               <input
                 type="text"
                 value={projectName}
@@ -296,7 +296,7 @@ export default function FinalizePage() {
               <p className="text-sm text-brand-teal-200 mb-4">
                 You&apos;ve reached your project limit. Upgrade to save more projects and unlock premium features.
               </p>
-              <div className="grid grid-cols-2 gap-4 mb-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                 <div className="bg-white/10 rounded-lg p-4">
                   <div className="text-sm font-semibold mb-1">Explorer (Free)</div>
                   <ul className="text-xs text-brand-teal-200 space-y-1">
@@ -395,7 +395,7 @@ export default function FinalizePage() {
                         ? `Your project details (${stats.totalModules} modules, ${stats.totalArea}m², ~€${Math.round(stats.totalEstimate).toLocaleString()}) will be included automatically.`
                         : "Schedule a free 30-minute call with one of our modular construction architects."}
                     </p>
-                    <div className="grid grid-cols-2 gap-3">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                       <input
                         type="text"
                         value={contactForm.name}
@@ -452,23 +452,23 @@ export default function FinalizePage() {
           </div>
 
           {/* Navigation */}
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
             <Link
               href={`/project/${projectId}/products`}
               className="text-sm text-brand-teal-800 hover:text-brand-amber-500 transition-colors"
             >
               &larr; Back to Products
             </Link>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
               <Link
                 href={`/project/${projectId}/presentation`}
-                className="px-6 py-3 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors"
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-lg bg-brand-amber-500 text-white text-sm font-semibold hover:bg-brand-amber-600 transition-colors"
               >
                 Create Presentation &rarr;
               </Link>
               <Link
                 href="/dashboard"
-                className="px-6 py-3 rounded-lg bg-brand-teal-800 text-white text-sm font-semibold hover:bg-brand-teal-700 transition-colors"
+                className="w-full sm:w-auto text-center px-6 py-3 rounded-lg bg-brand-teal-800 text-white text-sm font-semibold hover:bg-brand-teal-700 transition-colors"
               >
                 My Projects
               </Link>

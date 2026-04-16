@@ -78,8 +78,8 @@ export default function DashboardPage() {
     if (deletingId) return;
     setDeletingId(id);
     try {
-      const ok = await deleteProject(userId ?? "", id);
-      if (ok) {
+      const result = await deleteProject(userId ?? "", id);
+      if (result.ok) {
         setProjects((prev) => prev.filter((p) => p.id !== id));
       }
     } catch (err) {

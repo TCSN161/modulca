@@ -4,6 +4,7 @@ import { create } from "zustand";
 import type { AccountTier } from "./types";
 import { getTierConfig, getEffectiveTier, isBetaPromoActive, getBetaPromoDaysLeft } from "./types";
 import { getSupabase } from "@/shared/lib/supabase";
+import { setUser as setSentryUser } from "@/shared/lib/monitoring";
 
 /**
  * Auth store — Supabase-backed with localStorage demo fallback.
@@ -183,8 +184,10 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       const name = email.split("@")[0];
       const local = loadLocal();
       const tier = local?.tier ?? "free";
-      set({ isAuthenticated: true, userId: `demo-${Date.now()}`, userName: name, userEmail: email, userTier: tier, loading: false });
+      const demoId = `demo-${Date.now()}`;
+      set({ isAuthenticated: true, userId: demoId, userName: name, userEmail: email, userTier: tier, loading: false });
       saveLocal({ name, email, tier });
+      setSentryUser({ id: demoId, email });
       return true;
     }
 
@@ -207,6 +210,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         userAvatar: profile?.avatar_url ?? null,
         loading: false,
       });
+
+      // Attach user context to error reports
+      setSentryUser({ id: data.user.id, email: data.user.email ?? undefined });
 
       // Set cookie so middleware allows access to protected routes
       setAuthCookie();
@@ -271,6 +277,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       betaPromoActive: false,
       betaPromoDaysLeft: 0,
     });
+    // Clear Sentry user context
+    setSentryUser(null);
   },
 
   /* ── Set Tier ── */
@@ -484,6 +492,9 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
         (profile?.created_at as string) ?? session.user.created_at ?? null,
       ),
     });
+
+    // Attach user context to error reports (persists across reloads via session)
+    setSentryUser({ id: session.user.id, email: session.user.email ?? undefined });
   },
 }));
 

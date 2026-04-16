@@ -46,10 +46,20 @@ export const metadata: Metadata = {
     "3D home visualization",
     "building permits Romania",
     "ModulCA",
+    "prefab home design",
+    "sustainable housing",
+    "timber frame house",
+    "casa modulara",
+    "constructii modulare",
+    "off-site construction",
   ],
   authors: [{ name: "ModulCA" }],
   creator: "ModulCA",
+  publisher: "ModulCA",
+  category: "Technology",
   metadataBase: new URL(SITE_URL),
+  alternates: { canonical: SITE_URL },
+  formatDetection: { telephone: false, email: false, address: false },
   openGraph: {
     type: "website",
     locale: "en_US",
@@ -69,10 +79,19 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
+    creator: "@modulca",
     title: "ModulCA — Design Your Modular Home in Minutes",
     description:
       "AI-powered modular construction platform. Design, visualize, and build your modular home.",
-    images: ["/og?title=Design+Your+Modular+Home+in+Minutes&subtitle=AI-powered+modular+construction+platform"],
+    images: [
+      {
+        url: "/og?title=Design+Your+Modular+Home+in+Minutes&subtitle=AI-powered+modular+construction+platform",
+        alt: "ModulCA — Modular Construction Platform",
+      },
+    ],
+  },
+  other: {
+    "google-site-verification": process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "",
   },
   robots: {
     index: true,
