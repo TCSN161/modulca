@@ -28,9 +28,9 @@ describe("ACCOUNT_TIERS", () => {
     expect(prices).toEqual([
       { id: "guest_free", price: null },
       { id: "free", price: null },
-      { id: "premium", price: 29 },
-      { id: "architect", price: 79 },
-      { id: "constructor", price: 149 },
+      { id: "premium", price: 19.99 },
+      { id: "architect", price: 49.99 },
+      { id: "constructor", price: 149.90 },
     ]);
   });
 
@@ -39,9 +39,9 @@ describe("ACCOUNT_TIERS", () => {
     expect(prices).toEqual([
       { id: "guest_free", price: null },
       { id: "free", price: null },
-      { id: "premium", price: 290 },
-      { id: "architect", price: 790 },
-      { id: "constructor", price: 1490 },
+      { id: "premium", price: 199 },
+      { id: "architect", price: 499 },
+      { id: "constructor", price: 1499 },
     ]);
   });
 

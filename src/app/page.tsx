@@ -325,7 +325,7 @@ export default function HomePage() {
                 },
                 {
                   name: "Premium",
-                  price: "\u20AC29",
+                  price: "\u20AC19.99",
                   period: "/month",
                   description: "Full design experience with all tools and export options.",
                   features: [
@@ -343,7 +343,7 @@ export default function HomePage() {
                 },
                 {
                   name: "Architect",
-                  price: "\u20AC79",
+                  price: "\u20AC49.99",
                   period: "/month",
                   description: "Professional toolkit for managing clients and projects.",
                   features: [
@@ -361,7 +361,7 @@ export default function HomePage() {
                 },
                 {
                   name: "Constructor",
-                  price: "\u20AC149",
+                  price: "\u20AC149.90",
                   period: "/month",
                   description: "Enterprise solution. Unlimited everything, white-label, API.",
                   features: [
