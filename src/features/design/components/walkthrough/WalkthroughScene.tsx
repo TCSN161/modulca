@@ -129,7 +129,6 @@ function MovementController({
   cameraPositionRef,
   wallBoxes,
 }: {
-  controlsRef: React.RefObject<any>;
   cameraPositionRef: React.MutableRefObject<THREE.Vector3>;
   wallBoxes: WallBox[];
 }) {
@@ -414,7 +413,7 @@ function SceneContent({
       })}
 
       <PointerLockControls ref={controlsRef} />
-      {!autoTour && <MovementController controlsRef={controlsRef} cameraPositionRef={cameraPositionRef} wallBoxes={wallBoxes} />}
+      {!autoTour && <MovementController cameraPositionRef={cameraPositionRef} wallBoxes={wallBoxes} />}
       <AutoTourController
         modules={modules}
         cameraPositionRef={cameraPositionRef}
