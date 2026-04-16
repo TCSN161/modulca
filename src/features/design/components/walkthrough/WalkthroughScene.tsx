@@ -318,6 +318,27 @@ function SceneContent({
   // Build collision boxes from wall configs (memoized)
   const wallBoxes = useMemo(() => buildWallBoxes(modules), [modules]);
 
+  /** Compute bounding box of all modules → center shadow frustum on building */
+  const sceneBounds = useMemo(() => {
+    if (modules.length === 0) {
+      return { centerX: 0, centerZ: 0, radius: 20 };
+    }
+    let minX = Infinity, maxX = -Infinity, minZ = Infinity, maxZ = -Infinity;
+    for (const m of modules) {
+      const x = m.col * MODULE_SIZE;
+      const z = m.row * MODULE_SIZE;
+      minX = Math.min(minX, x);
+      maxX = Math.max(maxX, x + MODULE_SIZE);
+      minZ = Math.min(minZ, z);
+      maxZ = Math.max(maxZ, z + MODULE_SIZE);
+    }
+    const centerX = (minX + maxX) / 2;
+    const centerZ = (minZ + maxZ) / 2;
+    // Radius covers full building + 10m margin for ground shadows
+    const radius = Math.max(maxX - minX, maxZ - minZ) / 2 + 10;
+    return { centerX, centerZ, radius };
+  }, [modules]);
+
   // Teleport
   useEffect(() => {
     if (!teleportTarget) return;
@@ -328,23 +349,40 @@ function SceneContent({
     onTeleportDone();
   }, [teleportTarget, camera, cameraPositionRef, onTeleportDone]);
 
+  // Sun position (offset from building center so shadows look natural)
+  const sunX = sceneBounds.centerX + 15;
+  const sunZ = sceneBounds.centerZ + 10;
+  const sunY = 25;
+  // Shadow camera target — building center
+  const shadowTargetRef = useRef<THREE.Object3D>(null);
+
   return (
     <>
+      {/* Shadow target — empty object at building center, referenced by directionalLight */}
+      <object3D ref={shadowTargetRef} position={[sceneBounds.centerX, 0, sceneBounds.centerZ]} />
+
       {/* Lighting — enhanced mode has richer, more realistic lighting */}
       <ambientLight intensity={enhanced ? 0.25 : 0.4} />
       <directionalLight
-        position={[15, 20, 10]}
+        position={[sunX, sunY, sunZ]}
+        target={shadowTargetRef.current ?? undefined}
         intensity={enhanced ? 1.4 : 1.0}
         castShadow
         shadow-mapSize-width={enhanced ? 4096 : 2048}
         shadow-mapSize-height={enhanced ? 4096 : 2048}
-        shadow-bias={-0.0001}
-        shadow-camera-left={-20}
-        shadow-camera-right={20}
-        shadow-camera-top={20}
-        shadow-camera-bottom={-20}
+        shadow-bias={-0.00008}
+        shadow-normalBias={0.04}
+        shadow-camera-near={1}
+        shadow-camera-far={sunY + sceneBounds.radius * 2 + 10}
+        shadow-camera-left={-sceneBounds.radius}
+        shadow-camera-right={sceneBounds.radius}
+        shadow-camera-top={sceneBounds.radius}
+        shadow-camera-bottom={-sceneBounds.radius}
       />
-      <directionalLight position={[-10, 15, -5]} intensity={enhanced ? 0.5 : 0.3} />
+      <directionalLight
+        position={[sceneBounds.centerX - 10, 15, sceneBounds.centerZ - 5]}
+        intensity={enhanced ? 0.5 : 0.3}
+      />
       {enhanced && (
         <>
           {/* Warm fill light from below for enhanced mode */}
@@ -354,7 +392,8 @@ function SceneContent({
         </>
       )}
 
-      {/* Per-module point lights */}
+      {/* Per-module point lights — no castShadow (directional sun handles shadows).
+          Multiple shadow-casting point lights cause visible shadow artifacts. */}
       {modules.map((mod) => (
         <pointLight
           key={`light-${mod.row}-${mod.col}`}
@@ -363,7 +402,6 @@ function SceneContent({
           distance={enhanced ? 7 : 5}
           decay={2}
           color={enhanced ? "#fff0d6" : "#fff5e6"}
-          castShadow={enhanced}
         />
       ))}
 
@@ -504,7 +542,7 @@ export default function WalkthroughScene({
 
   return (
     <Canvas
-      shadows
+      shadows={{ type: THREE.PCFSoftShadowMap, enabled: true }}
       camera={{ position: initialPos, fov: 70, near: 0.1, far: 200 }}
       style={{ background: bgColor, width: "100%", height: "100%" }}
       gl={{
