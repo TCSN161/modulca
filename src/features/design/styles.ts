@@ -120,7 +120,7 @@ export const STYLE_DIRECTIONS: StyleDirection[] = [
     heroImage: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=600&q=80",
     moodImages: [
       { url: "https://images.unsplash.com/photo-1600607687939-ce8a6c25118c?w=400&q=80", label: "Living Space" },
-      { url: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&q=80", label: "Detail" },
+      { url: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=400&q=80", label: "Detail" },
       { url: "https://images.unsplash.com/photo-1565538810643-b5bdb714032a?w=400&q=80", label: "Materials" },
       { url: "https://images.unsplash.com/photo-1600585154526-990dced4db0d?w=400&q=80", label: "Atmosphere" },
     ],

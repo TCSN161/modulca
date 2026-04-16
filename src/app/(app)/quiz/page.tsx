@@ -193,7 +193,7 @@ const SECTIONS: QuizSection[] = [
         id: "material-preference",
         text: "Which building material do you find most appealing?",
         options: [
-          { label: "Wood — warm, natural, versatile", value: "wood", image: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=400&h=300&fit=crop" },
+          { label: "Wood — warm, natural, versatile", value: "wood", image: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=400&h=300&fit=crop" },
           { label: "Concrete — bold, sculptural, modern", value: "concrete", image: "https://images.unsplash.com/photo-1481277542470-605612bd2d61?w=400&h=300&fit=crop" },
           { label: "Glass — transparent, light-filled", value: "glass", image: "https://images.unsplash.com/photo-1497366216548-37526070297c?w=400&h=300&fit=crop" },
           { label: "Stone — solid, timeless, grounded", value: "stone", image: "https://images.unsplash.com/photo-1600585152220-90363fe7e115?w=400&h=300&fit=crop" },

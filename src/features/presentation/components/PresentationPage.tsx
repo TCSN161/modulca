@@ -90,7 +90,7 @@ const DEFAULT_SLIDES: SlideConfig[] = [
 
 /** Texture background URLs for common materials (Unsplash) */
 const MATERIAL_TEXTURES: Record<string, string> = {
-  oak: "https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=200&h=200&fit=crop&q=60",
+  oak: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=200&h=200&fit=crop&q=60",
   walnut: "https://images.unsplash.com/photo-1588854337115-1c67d9247e4d?w=200&h=200&fit=crop&q=60",
   concrete: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?w=200&h=200&fit=crop&q=60",
   marble: "https://images.unsplash.com/photo-1618220179428-22790b461013?w=200&h=200&fit=crop&q=60",
