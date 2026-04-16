@@ -15,7 +15,8 @@
     "ops:check:json": "node scripts/ops-check.mjs --json",
     "ops:check:ci": "node scripts/ops-check.mjs --ci",
     "predeploy": "node scripts/pre-deploy.mjs",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "collision-check": "node scripts/collision-check.mjs"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",
