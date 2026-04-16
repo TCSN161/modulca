@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default function TermsPage() {
-  const lastUpdated = "April 16, 2026";
+  const lastUpdated = "April 17, 2026";
 
   return (
     <div className="min-h-screen bg-brand-bone-100">
@@ -26,6 +26,21 @@ export default function TermsPage() {
         <p className="text-sm text-brand-gray mb-8">Last updated: {lastUpdated}</p>
 
         <div className="space-y-8 text-sm text-brand-gray leading-relaxed">
+          <Section title="0. Provider Information">
+            <p>The ModulCA Platform is operated by:</p>
+            <ul className="list-disc pl-5 space-y-1 mt-2">
+              <li><strong>Legal entity:</strong> [COMPANY NAME] SRL <em className="text-brand-gray/70">(to be filled before public launch)</em></li>
+              <li><strong>Registered address:</strong> [STREET, Bucharest, Romania]</li>
+              <li><strong>Registration (ONRC):</strong> J[XX/XXXXX/YYYY]</li>
+              <li><strong>CUI / VAT:</strong> RO[XXXXXXXX]</li>
+              <li><strong>Email:</strong> <a href="mailto:contact@modulca.eu" className="text-brand-olive-700 underline">contact@modulca.eu</a></li>
+            </ul>
+            <p className="mt-2 text-xs">
+              This disclosure is provided in accordance with Romanian Law 365/2002 on e-commerce and
+              EU Directive 2000/31/EC.
+            </p>
+          </Section>
+
           <Section title="1. Acceptance of Terms">
             <p>
               By accessing or using ModulCA (&quot;the Platform&quot;), you agree to be bound by
@@ -54,17 +69,40 @@ export default function TermsPage() {
             </ul>
           </Section>
 
-          <Section title="4. Subscription Plans">
+          <Section title="4. Subscription Plans &amp; Billing">
             <p>
               ModulCA offers free and paid subscription tiers (Explorer, Premium, Architect, Constructor).
               Paid plans are billed monthly or yearly via Stripe.
             </p>
             <ul className="list-disc pl-5 space-y-1 mt-2">
-              <li>You may upgrade or downgrade your plan at any time</li>
-              <li>Downgrades take effect at the end of the current billing period</li>
-              <li>Refunds are handled on a case-by-case basis within 14 days of purchase</li>
-              <li>Prices are in EUR and exclude applicable taxes</li>
+              <li>You may upgrade or downgrade your plan at any time via the Customer Portal.</li>
+              <li>Downgrades take effect at the end of the current billing period.</li>
+              <li>Prices are displayed in EUR. VAT at the applicable Romanian / EU rate is added at checkout where legally required.</li>
+              <li>Subscriptions renew automatically until cancelled.</li>
             </ul>
+            <p className="mt-3">
+              <strong>Right of withdrawal (consumer purchases, EU Directive 2011/83).</strong> If you
+              are an EU consumer, you have the right to withdraw from a paid subscription within
+              <strong> 14 days</strong> of purchase without giving any reason. To exercise this right,
+              email{" "}
+              <a href="mailto:billing@modulca.eu" className="text-brand-olive-700 underline">billing@modulca.eu</a>
+              {" "}within 14 days. Refunds are issued within 14 days of receipt of your withdrawal
+              request using the original payment method.
+            </p>
+            <p className="mt-2">
+              <strong>Digital-service waiver.</strong> By starting to use paid features during the
+              14-day period (for example, generating AI renders, exporting drawings, or downloading
+              content), you expressly consent to immediate performance of the service and acknowledge
+              that you lose the right of withdrawal once the service has been fully performed, as
+              permitted under Article 16(m) of Directive 2011/83/EU.
+            </p>
+            <p className="mt-2">
+              <strong>Online dispute resolution.</strong> The EU Commission provides an online
+              dispute resolution platform at{" "}
+              <a href="https://ec.europa.eu/consumers/odr" target="_blank" rel="noopener noreferrer" className="text-brand-olive-700 underline">
+                ec.europa.eu/consumers/odr
+              </a>. We do not commit to using alternative dispute resolution bodies unless required by law.
+            </p>
           </Section>
 
           <Section title="5. Beta Bonus">
@@ -103,11 +141,16 @@ export default function TermsPage() {
             <p>You agree not to:</p>
             <ul className="list-disc pl-5 space-y-1 mt-1">
               <li>Use the Platform for any unlawful purpose</li>
-              <li>Attempt to reverse-engineer, scrape, or copy the Platform</li>
+              <li>Scrape, bulk-copy, or resell ModulCA content or designs</li>
               <li>Abuse AI generation features (excessive requests, harmful content)</li>
               <li>Share account credentials with unauthorized users</li>
               <li>Use automated tools to access the Platform without permission</li>
             </ul>
+            <p className="mt-2 text-xs">
+              Nothing in this clause restricts your rights to decompile or observe the software
+              for the purpose of interoperability to the extent permitted by Article 6 of Directive
+              2009/24/EC (EU Software Directive) or by mandatory local law.
+            </p>
           </Section>
 
           <Section title="9. Limitation of Liability">
@@ -123,7 +166,10 @@ export default function TermsPage() {
             </ul>
             <p className="mt-2">
               To the maximum extent permitted by law, our total liability is limited to the
-              amount you paid for the service in the 12 months preceding the claim.
+              amount you paid for the service in the 12 months preceding the claim. Nothing in
+              these Terms limits liability for fraud, gross negligence, death or personal injury
+              caused by negligence, or any other liability that cannot be limited under applicable
+              Romanian or EU consumer law.
             </p>
           </Section>
 
@@ -153,7 +199,7 @@ export default function TermsPage() {
 
       <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-8">
         <div className="max-w-3xl mx-auto px-4 flex items-center justify-between text-xs text-brand-gray">
-          <span>ModulCA Alfa 0.2</span>
+          <span>ModulCA Beta</span>
           <div className="flex gap-4">
             <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
             <Link href="/terms" className="hover:text-brand-olive-700 transition-colors font-semibold text-brand-olive-700">Terms</Link>

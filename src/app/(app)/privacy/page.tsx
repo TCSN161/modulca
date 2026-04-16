@@ -7,7 +7,7 @@ export const metadata: Metadata = {
 };
 
 export default function PrivacyPage() {
-  const lastUpdated = "April 16, 2026";
+  const lastUpdated = "April 17, 2026";
 
   return (
     <div className="min-h-screen bg-brand-bone-100">
@@ -26,13 +26,20 @@ export default function PrivacyPage() {
         <p className="text-sm text-brand-gray mb-8">Last updated: {lastUpdated}</p>
 
         <div className="space-y-8 text-sm text-brand-gray leading-relaxed">
-          <Section title="1. Who We Are">
+          <Section title="1. Who We Are (Data Controller)">
             <p>
               ModulCA (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a modular construction
-              design platform operated from Romania, EU. Our website is{" "}
-              <a href="https://www.modulca.eu" className="text-brand-olive-700 underline">www.modulca.eu</a>.
+              design platform operated by:
             </p>
-            <p>Contact: <a href="mailto:contact@modulca.eu" className="text-brand-olive-700 underline">contact@modulca.eu</a></p>
+            <ul className="list-disc pl-5 space-y-1 mt-2">
+              <li><strong>Legal entity:</strong> [COMPANY NAME] SRL <em className="text-brand-gray/70">(to be filled before public launch)</em></li>
+              <li><strong>Registered address:</strong> [STREET, Bucharest, Romania]</li>
+              <li><strong>Registration (ONRC):</strong> J[XX/XXXXX/YYYY]</li>
+              <li><strong>CUI / VAT:</strong> RO[XXXXXXXX]</li>
+              <li><strong>Website:</strong> <a href="https://www.modulca.eu" className="text-brand-olive-700 underline">www.modulca.eu</a></li>
+              <li><strong>Contact:</strong> <a href="mailto:contact@modulca.eu" className="text-brand-olive-700 underline">contact@modulca.eu</a></li>
+              <li><strong>Data protection requests:</strong> <a href="mailto:privacy@modulca.eu" className="text-brand-olive-700 underline">privacy@modulca.eu</a></li>
+            </ul>
           </Section>
 
           <Section title="2. Data We Collect">
@@ -64,34 +71,46 @@ export default function PrivacyPage() {
             </ul>
           </Section>
 
-          <Section title="5. Third-Party Services">
-            <p>We use the following services that may process your data:</p>
+          <Section title="5. Third-Party Services (Processors)">
+            <p>We use the following sub-processors that may process your data on our behalf:</p>
             <ul className="list-disc pl-5 space-y-1">
-              <li><strong>Supabase</strong> (EU region) — authentication and database</li>
-              <li><strong>Stripe</strong> — payment processing (PCI DSS compliant)</li>
-              <li><strong>Resend</strong> (EU region) — transactional emails</li>
-              <li><strong>Google Analytics</strong> — usage analytics (consent required, IP anonymization enabled)</li>
-              <li><strong>Microsoft Clarity</strong> — session recording and heatmaps (consent required)</li>
-              <li><strong>Vercel</strong> — hosting and edge network</li>
-              <li><strong>Google OAuth</strong> — optional sign-in (only email and name are accessed)</li>
+              <li><strong>Supabase</strong> (EU — Frankfurt) — authentication and database</li>
+              <li><strong>Stripe</strong> (EU &amp; US) — payment processing (PCI DSS compliant)</li>
+              <li><strong>Resend</strong> (EU — Ireland) — transactional emails</li>
+              <li><strong>Sentry</strong> (EU — Frankfurt) — error monitoring; error logs may contain your email address, IP and the URL you visited</li>
+              <li><strong>Vercel</strong> (EU &amp; US) — hosting, edge network, and <strong>Vercel Analytics</strong> (cookieless aggregate page views)</li>
+              <li><strong>Google Analytics 4</strong> (US) — usage analytics, <strong>consent required</strong>, IP anonymization enabled</li>
+              <li><strong>Microsoft Clarity</strong> (US) — session recording and heatmaps, <strong>consent required</strong></li>
+              <li><strong>Google OAuth</strong> (US) — optional sign-in (only email and name are accessed)</li>
+              <li><strong>OpenRouter / Pollinations / other AI providers</strong> (US &amp; EU) — anonymized prompts for AI consultant and render generation; we do not send your account email</li>
             </ul>
+            <p className="mt-2">
+              <strong>International transfers:</strong> transfers to the United States (Google, Stripe, Microsoft, Vercel, AI providers) are
+              protected by Standard Contractual Clauses (SCCs) under GDPR Article 46(2)(c), or by the
+              EU–U.S. Data Privacy Framework where the provider is certified.
+            </p>
           </Section>
 
           <Section title="6. Cookies">
             <p>
               We use a cookie consent banner. Analytics cookies (Google Analytics, Microsoft Clarity)
               are only loaded after you click &quot;Accept&quot;. Essential cookies for authentication
-              are always active. You can change your preference at any time by clearing your browser
-              data.
+              are always active. To withdraw your consent at any time, visit the cookie banner that
+              can be re-opened from the footer of our site (&quot;Cookie settings&quot;), or clear the
+              <code className="bg-brand-bone-200 px-1 rounded">modulca-analytics-consent</code> key
+              from your browser storage.
             </p>
           </Section>
 
           <Section title="7. Data Retention">
-            <p>
-              We retain your account and project data for as long as your account is active.
-              If you delete your account, we remove your personal data within 30 days.
-              Anonymized analytics data may be retained indefinitely.
-            </p>
+            <ul className="list-disc pl-5 space-y-1">
+              <li><strong>Account &amp; project data</strong> — for as long as your account is active; deleted within 30 days of account deletion.</li>
+              <li><strong>Inactive accounts</strong> — anonymized after 24 months of inactivity.</li>
+              <li><strong>Backups</strong> — rolling 30-day backup retention; deletion requests are honored in the live database immediately and purged from backups within 30 days.</li>
+              <li><strong>Billing records</strong> — retained for 10 years as required by Romanian tax law (Law 227/2015).</li>
+              <li><strong>Error logs (Sentry)</strong> — 90 days.</li>
+              <li><strong>Anonymized analytics</strong> — may be retained indefinitely (no personal data).</li>
+            </ul>
           </Section>
 
           <Section title="8. Your Rights (GDPR)">
@@ -106,8 +125,17 @@ export default function PrivacyPage() {
             </ul>
             <p className="mt-2">
               To exercise these rights, email us at{" "}
-              <a href="mailto:contact@modulca.eu" className="text-brand-olive-700 underline">contact@modulca.eu</a>.
+              <a href="mailto:privacy@modulca.eu" className="text-brand-olive-700 underline">privacy@modulca.eu</a>.
               We will respond within 30 days.
+            </p>
+            <p className="mt-2">
+              <strong>Right to lodge a complaint:</strong> If you believe we have not handled your
+              personal data properly, you have the right to file a complaint with the Romanian Data
+              Protection Authority{" "}
+              <a href="https://www.dataprotection.ro" target="_blank" rel="noopener noreferrer" className="text-brand-olive-700 underline">
+                ANSPDCP (www.dataprotection.ro)
+              </a>
+              , or with the supervisory authority in your country of residence.
             </p>
           </Section>
 
@@ -138,7 +166,7 @@ export default function PrivacyPage() {
 
       <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-8">
         <div className="max-w-3xl mx-auto px-4 flex items-center justify-between text-xs text-brand-gray">
-          <span>ModulCA Alfa 0.2</span>
+          <span>ModulCA Beta</span>
           <div className="flex gap-4">
             <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
             <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">Terms</Link>

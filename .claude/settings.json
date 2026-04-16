@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc --noEmit)",
+      "Bash(npx tsc --noEmit --incremental false)",
+      "Bash(./node_modules/.bin/tsc --noEmit)",
+      "Bash(node scripts/build-knowledge.mjs)",
+      "Bash(npx vitest run)",
+      "Bash(npx vitest run *)",
+      "Bash(npx vercel ls)",
+      "Bash(npx vercel ls *)",
+      "Bash(npx vercel logs *)",
+      "Bash(npx vercel inspect *)",
+      "Bash(npx vercel env ls)",
+      "Bash(npx vercel env ls *)",
+      "Bash(curl -sI *)",
+      "Bash(curl -s https://www.modulca.eu*)",
+      "Bash(curl -s https://modulca.eu*)",
+      "Bash(nslookup *)",
+      "Bash(dig *)",
+      "Bash(mkdir -p *)",
+      "mcp__ccd_session__mark_chapter",
+      "mcp__ccd_session__spawn_task"
+    ]
+  }
+}

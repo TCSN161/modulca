@@ -6,9 +6,9 @@ import { Resend } from "resend";
  * Free tier: 100 emails/day, 3000/month.
  * Set RESEND_API_KEY in .env.local to activate.
  *
- * Until a custom domain is verified in Resend, emails are sent
- * from "onboarding@resend.dev". After domain verification,
- * switch FROM_EMAIL to "noreply@modulca.eu".
+ * Domain modulca.eu is verified in Resend (Apr 2026).
+ * Emails are sent from "noreply@modulca.eu" by default.
+ * Override with RESEND_FROM_EMAIL env var if needed.
  */
 
 let resend: Resend | null = null;
@@ -22,8 +22,7 @@ function getResend(): Resend {
   return resend;
 }
 
-// Switch to "noreply@modulca.eu" after verifying domain in Resend
-const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "ModulCA <onboarding@resend.dev>";
+const FROM_EMAIL = process.env.RESEND_FROM_EMAIL || "ModulCA <noreply@modulca.eu>";
 
 export const isEmailConfigured = !!process.env.RESEND_API_KEY;
 
