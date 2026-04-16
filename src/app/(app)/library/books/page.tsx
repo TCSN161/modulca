@@ -165,7 +165,6 @@ export default function BooksPage() {
   }, [activeTab, search]);
 
   const freeBookCount = getFreeReadableBooks().length;
-  const paidBookCount = getPaidBooks().length;
   const totalBooks = getBooks().length;
 
   return (
