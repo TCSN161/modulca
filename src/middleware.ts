@@ -25,12 +25,18 @@ const PUBLIC_PATHS = [
   "/pricing",
   "/library",
   "/quiz",
+  "/privacy",
+  "/terms",
+  "/wizard",
 ];
 
 const PUBLIC_PREFIXES = [
   "/project/demo/",  // Demo flow is always public
   "/api/",           // API routes handle their own auth
   "/admin/",         // Admin tools (engine comparison, etc.)
+  "/blog/",          // Blog articles are public
+  "/library/",       // Knowledge library articles are public
+  "/portfolio/",     // Portfolio sub-pages are public
   "/_next/",         // Next.js internals
   "/models/",        // Static 3D models
   "/images/",        // Static images

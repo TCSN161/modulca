@@ -18,17 +18,21 @@ export default function NewProjectPage() {
     if (!name.trim()) return;
     setCreating(true);
 
-    const data: Record<string, unknown> = { preset: preset ?? undefined };
+    try {
+      const data: Record<string, unknown> = { preset: preset ?? undefined };
+      const result = await saveProject(userId ?? "demo", { name: name.trim(), data });
 
-    const result = await saveProject(userId ?? "demo", { name: name.trim(), data });
-
-    if (result) {
-      try {
-        localStorage.setItem("modulca-active-project", JSON.stringify({ id: result.id, name: result.name }));
-      } catch { /* */ }
-      router.push(`/project/${result.id}/land`);
+      if (result) {
+        try {
+          localStorage.setItem("modulca-active-project", JSON.stringify({ id: result.id, name: result.name }));
+        } catch { /* */ }
+        router.push(`/project/${result.id}/land`);
+      }
+    } catch (err) {
+      console.error("[NewProject] Failed to create:", err);
+    } finally {
+      setCreating(false);
     }
-    setCreating(false);
   };
 
   return (
