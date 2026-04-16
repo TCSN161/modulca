@@ -385,8 +385,8 @@ function checkBuildAndTest() {
   if (!JSON_OUT) console.log("\n\x1b[1m🔨 Build & Tests\x1b[0m");
 
   // TypeScript
-  const tscResult = run("./node_modules/.bin/tsc --noEmit 2>&1");
-  if (tscResult === "") {
+  const tscResult = run("npx tsc --noEmit 2>&1");
+  if (tscResult !== null && tscResult === "") {
     check("build", "TypeScript", "pass", "Zero errors");
   } else if (tscResult === null) {
     check("build", "TypeScript", "fail", "tsc command failed");
@@ -435,7 +435,7 @@ function checkGit() {
     check("git", "Working tree", "warn", `${lines} uncommitted change(s)`);
   }
 
-  const ahead = run("git rev-list --count origin/master..HEAD 2>/dev/null");
+  const ahead = run("git rev-list --count origin/master..HEAD 2>&1");
   if (ahead && parseInt(ahead) > 0) {
     check("git", "Unpushed commits", "warn", `${ahead} commit(s) not pushed`);
   } else if (ahead === "0") {
