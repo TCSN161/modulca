@@ -21,6 +21,8 @@ interface UseRenderEngineReturn {
   resetAiImage: () => void;
 }
 
+const isDev = process.env.NODE_ENV === "development";
+
 /** Build sanitized prompt with architectural context to avoid API false-positive content filters */
 function sanitizePrompt(prompt: string): string {
   const cleaned = prompt
@@ -68,7 +70,7 @@ export function useRenderEngine({
       if (dataUrl) {
         // Extract base64 from data URL (remove "data:image/png;base64," prefix)
         baseImage = dataUrl.replace(/^data:image\/\w+;base64,/, "");
-        console.log("[AI Render] Captured 3D scene for img2img, base64 length:", baseImage.length);
+        isDev && console.log("[AI Render] Captured 3D scene for img2img, base64 length:", baseImage.length);
       }
     }
 
@@ -89,7 +91,7 @@ export function useRenderEngine({
 
       if (baseImage) {
         // POST mode: send base image for img2img
-        console.log("[AI Render] Using POST (img2img) mode");
+        isDev && console.log("[AI Render] Using POST (img2img) mode");
         response = await fetch("/api/ai-render", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -108,7 +110,7 @@ export function useRenderEngine({
         // GET mode: text-to-image
         const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
         const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}&tier=${tier}&maxCostUsd=${maxCostUsd}`;
-        console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
+        isDev && console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
         response = await fetch(proxyUrl);
       }
 
@@ -146,7 +148,7 @@ export function useRenderEngine({
       }
 
       const blob = await response.blob();
-      console.log("[AI Render] Success! Size:", blob.size, "type:", blob.type);
+      isDev && console.log("[AI Render] Success! Size:", blob.size, "type:", blob.type);
 
       if (blob.size < 500) {
         setAiError("AI returned an empty image. Try a shorter prompt.");

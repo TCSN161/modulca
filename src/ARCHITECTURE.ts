@@ -91,14 +91,18 @@ export const SHARED = {
 // Tailwind 3.4 | Leaflet 1.9 + react-leaflet 5 | Konva 10.2 | @react-pdf/renderer 4.3
 // TypeScript 5 strict | Prisma 5.22 (not yet active) | NextAuth 5 beta (disabled)
 
-/* ── TODO: FeatureGate wiring (Phase 2E) ──────────────────── */
-// Priority gates to add next session:
-// 1. RenderPage: limit aiRendersPerMonth, renderResolution per tier
-// 2. TechnicalPage: gate permitTracker, drawingPresentation, exportPdf behind tier
-// 3. WalkthroughPage: gate autoTour, gaussian behind tier
-// 4. PresentationPage: gate presentationTemplates count, pdfPresentation, sharableLink
-// 5. MarketplacePage: gate marketplaceList behind tier
-// Pattern: wrap feature UI with <FeatureGate requires="featureKey">...</FeatureGate>
+/* ── FeatureGate wiring (Phase 2E) — DONE ────────────────── */
+// All priority gates are implemented:
+// ✅ RenderPage: aiRendersPerMonth quota + renderResolution tier lock
+// ✅ TechnicalPage: permitTracker, drawingPresentation, exportPdf
+// ✅ WalkthroughPage: autoTour (gaussian disabled pending GS3D integration)
+// ✅ PresentationPage: pdfPresentation, sharableLink
+// ✅ MarketplacePage: marketplaceList
+// ✅ ConfigurePage: furnitureOverrides
+// ✅ ProductsPage: partnerPricing, directPurchase
+// ✅ FinalizePage: pdfPresentation
+// ✅ ArchitectPage: projectCollaboration
+// Pattern: <FeatureGate requires="featureKey">...</FeatureGate>
 
 /* ── Naming Conventions ───────────────────────────────────── */
 // Components: PascalCase.tsx | Stores: camelCase store.ts | Types: camelCase types.ts

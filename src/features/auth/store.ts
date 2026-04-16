@@ -237,7 +237,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       console.error("[ModulCA] Google OAuth error:", error.message);
       set({ error: error.message });
     } else {
-      console.log("[ModulCA] Google OAuth redirect URL:", data?.url);
+      // Google OAuth redirect
       // If signInWithOAuth returned a URL but didn't auto-redirect, do it manually
       if (data?.url) {
         window.location.href = data.url;

@@ -4,7 +4,7 @@
  */
 export const appConfig = {
   name: process.env.NEXT_PUBLIC_APP_NAME || "ModulCA",
-  url: process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000",
+  url: process.env.NEXT_PUBLIC_APP_URL || "https://www.modulca.eu",
   supabase: {
     url: process.env.NEXT_PUBLIC_SUPABASE_URL || "",
     anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",

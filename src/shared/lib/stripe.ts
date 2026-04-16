@@ -90,10 +90,17 @@ export async function openCustomerPortal(customerId: string): Promise<void> {
 
     const data = await res.json();
 
+    if (data.error) {
+      console.error("[Stripe] Portal error:", data.error);
+      alert("Could not open subscription management. Please try again.");
+      return;
+    }
+
     if (data.url) {
       window.location.href = data.url;
     }
   } catch (err) {
     console.error("[Stripe] Portal error:", err);
+    alert("Could not connect to subscription service. Please try again.");
   }
 }

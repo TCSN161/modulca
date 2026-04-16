@@ -57,9 +57,15 @@ export default function DashboardPage() {
       setLoaded(true);
       return;
     }
-    const list = await listProjects(userId);
-    setProjects(list);
-    setLoaded(true);
+    try {
+      const list = await listProjects(userId);
+      setProjects(list);
+    } catch (err) {
+      console.error("[Dashboard] Failed to load projects:", err);
+      setProjects([]);
+    } finally {
+      setLoaded(true);
+    }
   }, [userId]);
 
   useEffect(() => {
@@ -71,11 +77,16 @@ export default function DashboardPage() {
   const handleDelete = async (id: string) => {
     if (deletingId) return;
     setDeletingId(id);
-    const ok = await deleteProject(userId ?? "", id);
-    if (ok) {
-      setProjects((prev) => prev.filter((p) => p.id !== id));
+    try {
+      const ok = await deleteProject(userId ?? "", id);
+      if (ok) {
+        setProjects((prev) => prev.filter((p) => p.id !== id));
+      }
+    } catch (err) {
+      console.error("[Dashboard] Delete failed:", err);
+    } finally {
+      setDeletingId(null);
     }
-    setDeletingId(null);
   };
 
   const handleLoad = (project: ProjectRecord) => {
@@ -87,7 +98,9 @@ export default function DashboardPage() {
   };
 
   const handleSignOut = async () => {
-    await signOut();
+    try {
+      await signOut();
+    } catch { /* signout best-effort */ }
     router.push("/");
   };
 
