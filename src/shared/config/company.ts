@@ -73,15 +73,28 @@ export const COMPANY = {
 
   /** Contact info (business-facing — NOT personal) */
   contact: {
-    // Business email — placeholder until Cloudflare Email Routing is set up.
-    // Resend already sends FROM @modulca.eu (domain verified).
-    email: "costin.telefon@gmail.com", // TODO: switch to contact@modulca.eu after DNS setup
+    /** Primary public business email — forwarded via Namecheap Email
+     *  Forwarding to uii.acgs.auto@gmail.com (the business automation inbox,
+     *  also used as the Namecheap registrant contact).
+     *  Resend sends FROM @modulca.eu (domain verified). */
+    email: "contact@modulca.eu",
+    /** Actual inbox where forwarded emails land (kept private — internal
+     *  reference only, used for validating setup). */
+    forwardDestination: "uii.acgs.auto@gmail.com",
     /** Registered ANAF/ONRC phone — NOT displayed publicly. Used only on
      *  invoices, Stripe business profile, and legal documents. */
     phone: "+40723599514",
     /** Whether phone is allowed on the public website (footer/contact) */
     phoneIsPublic: false,
     website: "https://www.modulca.eu",
+    /** Role-based aliases (all forward to the same business inbox) */
+    aliases: {
+      contact: "contact@modulca.eu",      // general business inquiries
+      hello: "hello@modulca.eu",          // marketing / partnerships
+      petria: "petria@modulca.eu",        // legal / DPO / administrator
+      billing: "billing@modulca.eu",      // invoices / Stripe support
+      support: "support@modulca.eu",      // customer support
+    },
   },
 
   /** Share capital — required on invoices for SRL in Romania */
