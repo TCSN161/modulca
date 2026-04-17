@@ -15,9 +15,10 @@ import { deepinfraEngine } from "./engines/deepinfra";
 import { fireworksEngine } from "./engines/fireworks";
 import { prodiaEngine } from "./engines/prodia";
 import { geminiEngine } from "./engines/gemini";
-import { novitaEngine } from "./engines/novita";
-import { wavespeedEngine } from "./engines/wavespeed";
-import { runwayEngine } from "./engines/runway";
+// Disabled until API keys are configured (see docs/AI_PROVIDERS.md):
+// import { novitaEngine } from "./engines/novita";
+// import { wavespeedEngine } from "./engines/wavespeed";
+// import { runwayEngine } from "./engines/runway";
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
 import { canUseEngine, recordSuccess, recordFailure } from "./engines/creditManager";
 import { logRender } from "./engines/renderLogger";
@@ -141,21 +142,10 @@ const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo; estimatedC
     info: { id: "gemini", label: "Google Imagen 3", description: "Free 500/day FOREVER. Best for architecture.", speed: "fast" },
     estimatedCostUsd: 0,
   },
-  novita: {
-    fn: novitaEngine,
-    info: { id: "novita", label: "Novita FLUX", description: "$0.0015/img. 200+ models available.", speed: "fast" },
-    estimatedCostUsd: 0.0015,
-  },
-  wavespeed: {
-    fn: wavespeedEngine,
-    info: { id: "wavespeed", label: "WaveSpeed Seedream", description: "$0.003/img. Best photorealistic img2img.", speed: "medium" },
-    estimatedCostUsd: 0.003,
-  },
-  runway: {
-    fn: runwayEngine,
-    info: { id: "runway", label: "Runway Gen-3", description: "$0.02/img. Cinematic quality, also does video.", speed: "medium" },
-    estimatedCostUsd: 0.02,
-  },
+  // Disabled until API keys are configured:
+  // novita:    needs NOVITA_API_KEY    ($0.0015/img)
+  // wavespeed: needs WAVESPEED_API_KEY (China provider, also gated by EU policy)
+  // runway:    needs RUNWAY_API_KEY    (primarily a video platform, overkill)
 };
 
 /** Default EU policy: no China providers, safe mode on */

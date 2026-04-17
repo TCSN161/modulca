@@ -54,6 +54,8 @@ export const pollinationsEngine: AiRenderEngine = async (
       const response = await fetch(url, {
         method: "GET",
         headers: { "User-Agent": "ModulCA/1.0" },
+        // 90s hard timeout prevents hanging on Pollinations' slow queue
+        signal: AbortSignal.timeout(90_000),
       });
 
       if (response.status === 429) {

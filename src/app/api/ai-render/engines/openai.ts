@@ -51,6 +51,7 @@ async function generateImage(
       Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
     },
+    signal: AbortSignal.timeout(90_000),
     body: JSON.stringify({
       model,
       prompt: `Interior design photograph: ${req.prompt.slice(0, 900)}`,
@@ -118,6 +119,7 @@ async function tryDalle3(
       Authorization: `Bearer ${API_KEY}`,
       "Content-Type": "application/json",
     },
+    signal: AbortSignal.timeout(90_000),
     body: JSON.stringify({
       model: "dall-e-3",
       prompt: req.prompt.slice(0, 1000),
