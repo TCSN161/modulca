@@ -1,0 +1,165 @@
+[
+  {
+    "name": "archicore.eu",
+    "tier": 1,
+    "purpose": "Umbrella tech (hidden)",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "neufertai.eu",
+    "tier": 1,
+    "purpose": "AI consultant brand",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "renderlab.eu",
+    "tier": 1,
+    "purpose": "AI render platform",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "modulca.com",
+    "tier": 1,
+    "purpose": "Defensive for ModulCA",
+    "estEur": 12,
+    "status": "taken",
+    "expiry": "2026-07-10T23:20:49Z",
+    "registrar": "HOSTINGER operations, UAB"
+  },
+  {
+    "name": "crisisready.eu",
+    "tier": 1,
+    "purpose": "Crisis mgmt platform",
+    "estEur": 11,
+    "status": "available"
+  },
+  {
+    "name": "archcore.eu",
+    "tier": "1b",
+    "purpose": "Backup: archicore",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "archgrid.eu",
+    "tier": "1b",
+    "purpose": "Backup: archicore",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "neufert-ai.eu",
+    "tier": "1b",
+    "purpose": "Backup: neufertai",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "archiai.eu",
+    "tier": "1b",
+    "purpose": "Backup: neufertai",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "arcrender.eu",
+    "tier": "1b",
+    "purpose": "Backup: renderlab",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "airender.eu",
+    "tier": "1b",
+    "purpose": "Backup: renderlab",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "rezilient.eu",
+    "tier": "1b",
+    "purpose": "Backup: crisisready",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "saferbuild.eu",
+    "tier": "1b",
+    "purpose": "Backup: crisisready",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "bunkere.eu",
+    "tier": 2,
+    "purpose": "Expansion EU for Bunkere",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "case-in-copaci.eu",
+    "tier": 2,
+    "purpose": "Expansion EU",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "modulca.ro",
+    "tier": 2,
+    "purpose": "RO variant of modulca",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "crisisready.ro",
+    "tier": 2,
+    "purpose": "RO variant crisis",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "uilabs.eu",
+    "tier": 2,
+    "purpose": "UIL brand (future)",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "neufertai.com",
+    "tier": 4,
+    "purpose": "Defensive",
+    "estEur": 12,
+    "status": "available"
+  },
+  {
+    "name": "modulca.net",
+    "tier": 4,
+    "purpose": "Defensive",
+    "estEur": 12,
+    "status": "available"
+  },
+  {
+    "name": "modulca.org",
+    "tier": 4,
+    "purpose": "Defensive",
+    "estEur": 10,
+    "status": "available"
+  },
+  {
+    "name": "bunkere.com",
+    "tier": 4,
+    "purpose": "Defensive",
+    "estEur": 12,
+    "status": "available"
+  },
+  {
+    "name": "padureata.eu",
+    "tier": 4,
+    "purpose": "Defensive",
+    "estEur": 10,
+    "status": "available"
+  }
+]

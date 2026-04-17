@@ -1,0 +1,154 @@
+[
+  {
+    "id": "cloudflare",
+    "role": "hero",
+    "pricePerImageUsd": 0.00011,
+    "freeQuotaAmount": 10000,
+    "freeExpiresAt": null,
+    "billingModel": "free-quota"
+  },
+  {
+    "id": "pollinations",
+    "role": "hero",
+    "pricePerImageUsd": 0,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "free-forever"
+  },
+  {
+    "id": "ai-horde",
+    "role": "hero",
+    "pricePerImageUsd": 0,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "free-forever"
+  },
+  {
+    "id": "gemini",
+    "role": "hero",
+    "pricePerImageUsd": 0.0025,
+    "freeQuotaAmount": 1500,
+    "freeExpiresAt": null,
+    "billingModel": "free-quota"
+  },
+  {
+    "id": "huggingface",
+    "role": "hero",
+    "pricePerImageUsd": 0.001,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "free-quota"
+  },
+  {
+    "id": "together",
+    "role": "hero",
+    "pricePerImageUsd": 0.00003,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": "2026-07-01",
+    "billingModel": "free-trial"
+  },
+  {
+    "id": "fal",
+    "role": "backup",
+    "pricePerImageUsd": 0.003,
+    "freeQuotaAmount": 5,
+    "freeExpiresAt": null,
+    "billingModel": "free-trial"
+  },
+  {
+    "id": "fireworks",
+    "role": "backup",
+    "pricePerImageUsd": 0.0014,
+    "freeQuotaAmount": 1,
+    "freeExpiresAt": null,
+    "billingModel": "free-trial"
+  },
+  {
+    "id": "replicate",
+    "role": "backup",
+    "pricePerImageUsd": 0.003,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "pay-per-image"
+  },
+  {
+    "id": "novita",
+    "role": "backup",
+    "pricePerImageUsd": 0.0015,
+    "freeQuotaAmount": 0.5,
+    "freeExpiresAt": null,
+    "billingModel": "free-trial"
+  },
+  {
+    "id": "wavespeed",
+    "role": "backup",
+    "pricePerImageUsd": 0.003,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "free-trial"
+  },
+  {
+    "id": "openai",
+    "role": "premium-only",
+    "pricePerImageUsd": 0.02,
+    "freeQuotaAmount": 5,
+    "freeExpiresAt": null,
+    "billingModel": "pay-per-image"
+  },
+  {
+    "id": "stability",
+    "role": "premium-only",
+    "pricePerImageUsd": 0.065,
+    "freeQuotaAmount": 25,
+    "freeExpiresAt": null,
+    "billingModel": "credit-top-up"
+  },
+  {
+    "id": "leonardo",
+    "role": "premium-only",
+    "pricePerImageUsd": 0.03,
+    "freeQuotaAmount": 150,
+    "freeExpiresAt": null,
+    "billingModel": "subscription"
+  },
+  {
+    "id": "blackforest",
+    "role": "premium-only",
+    "pricePerImageUsd": 0.003,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "credit-top-up"
+  },
+  {
+    "id": "runway",
+    "role": "premium-only",
+    "pricePerImageUsd": 0.02,
+    "freeQuotaAmount": 125,
+    "freeExpiresAt": null,
+    "billingModel": "subscription"
+  },
+  {
+    "id": "deepinfra",
+    "role": "premium-only",
+    "pricePerImageUsd": 0.015,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "pay-per-image"
+  },
+  {
+    "id": "segmind",
+    "role": "premium-only",
+    "pricePerImageUsd": 0.005,
+    "freeQuotaAmount": null,
+    "freeExpiresAt": null,
+    "billingModel": "credit-top-up"
+  },
+  {
+    "id": "prodia",
+    "role": "do-not-use",
+    "pricePerImageUsd": 0.002,
+    "freeQuotaAmount": 1000,
+    "freeExpiresAt": null,
+    "billingModel": "free-quota"
+  }
+]

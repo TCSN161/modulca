@@ -10,6 +10,9 @@
     "seed:projects": "node scripts/seed-demo-projects.mjs",
     "fetch:products": "node scripts/fetch-product-media.mjs",
     "fill:company": "node scripts/fill-company-info.mjs",
+    "engines:audit": "node scripts/engines-audit.mjs",
+    "engines:audit:save": "node scripts/engines-audit.mjs --save",
+    "engines:audit:json": "node scripts/engines-audit.mjs --json",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
@@ -26,7 +29,9 @@
     "env:sync": "node scripts/env-sync.mjs",
     "env:sync:dry": "node scripts/env-sync.mjs --dry",
     "stripe:go-live": "node scripts/stripe-go-live.mjs",
-    "stripe:go-live:dry": "node scripts/stripe-go-live.mjs --dry-run"
+    "stripe:go-live:dry": "node scripts/stripe-go-live.mjs --dry-run",
+    "domains:check": "node scripts/domain-check.mjs",
+    "domains:check:json": "node scripts/domain-check.mjs --json"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

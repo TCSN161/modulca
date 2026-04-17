@@ -14,6 +14,10 @@ import { blackforestEngine } from "../engines/blackforest";
 import { deepinfraEngine } from "../engines/deepinfra";
 import { fireworksEngine } from "../engines/fireworks";
 import { prodiaEngine } from "../engines/prodia";
+import { geminiEngine } from "../engines/gemini";
+import { novitaEngine } from "../engines/novita";
+import { wavespeedEngine } from "../engines/wavespeed";
+import { runwayEngine } from "../engines/runway";
 import type { AiRenderEngine, AiRenderRequest, PolicyFlags } from "../engines/types";
 
 import { devLog } from "@/shared/lib/devLog";
@@ -29,24 +33,33 @@ interface EngineEntry {
   maxWidth: number;
   maxHeight: number;
   freeQuota: string;
+  /** True if the engine can be tested at $0 cost (free-forever or current free quota) */
+  freeTier: boolean;
 }
 
 const ALL_ENGINES: EngineEntry[] = [
-  { id: "pollinations", label: "Pollinations AI", fn: pollinationsEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Unlimited forever" },
-  { id: "ai-horde", label: "AI Horde", fn: aiHordeEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 768, maxHeight: 768, freeQuota: "Unlimited (community GPUs)" },
-  { id: "together", label: "Together.ai", fn: togetherEngine, costPerImage: 0, capabilities: ["text2img", "img2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "Free 3 months" },
-  { id: "cloudflare", label: "Cloudflare AI", fn: cloudflareEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "10K neurons/day forever" },
-  { id: "huggingface", label: "Hugging Face", fn: huggingfaceEngine, costPerImage: 0.001, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Free tier monthly" },
-  { id: "fal", label: "fal.ai", fn: falEngine, costPerImage: 0.003, capabilities: ["text2img", "img2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "Free tier" },
-  { id: "fireworks", label: "Fireworks AI", fn: fireworksEngine, costPerImage: 0.0014, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "$5 credits" },
-  { id: "segmind", label: "Segmind", fn: segmindEngine, costPerImage: 0.005, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "Free signup credits" },
-  { id: "deepinfra", label: "DeepInfra", fn: deepinfraEngine, costPerImage: 0.015, capabilities: ["text2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "Free tier" },
-  { id: "replicate", label: "Replicate", fn: replicateEngine, costPerImage: 0.003, capabilities: ["text2img", "img2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Free tier" },
-  { id: "leonardo", label: "Leonardo.ai", fn: leonardoEngine, costPerImage: 0.03, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "$5 credits" },
-  { id: "blackforest", label: "Black Forest Labs", fn: blackforestEngine, costPerImage: 0.003, capabilities: ["text2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "Credit-based" },
-  { id: "stability", label: "Stability AI", fn: stabilityEngine, costPerImage: 0.04, capabilities: ["text2img", "img2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "25 credits" },
-  { id: "openai", label: "OpenAI GPT Image", fn: openaiEngine, costPerImage: 0.02, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "Existing key" },
-  { id: "prodia", label: "Prodia", fn: prodiaEngine, costPerImage: 0.002, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "1000 free calls" },
+  // ── FREE tier ── (costPerImage=0 OR has large free quota we can use safely)
+  { id: "pollinations", label: "Pollinations AI", fn: pollinationsEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Unlimited forever", freeTier: true },
+  { id: "ai-horde", label: "AI Horde", fn: aiHordeEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 768, maxHeight: 768, freeQuota: "Unlimited (community GPUs)", freeTier: true },
+  { id: "cloudflare", label: "Cloudflare AI", fn: cloudflareEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "10K neurons/day forever", freeTier: true },
+  { id: "gemini", label: "Google Gemini (Nano Banana)", fn: geminiEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "~1500 req/day free", freeTier: true },
+  { id: "together", label: "Together.ai (FLUX Schnell)", fn: togetherEngine, costPerImage: 0, capabilities: ["text2img", "img2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "Free FLUX Schnell (promo)", freeTier: true },
+  { id: "huggingface", label: "Hugging Face", fn: huggingfaceEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Free tier monthly", freeTier: true },
+
+  // ── PAID tier ── (real cost per image; testing consumes credits)
+  { id: "fal", label: "fal.ai", fn: falEngine, costPerImage: 0.003, capabilities: ["text2img", "img2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "$5 free credits (one-time)", freeTier: false },
+  { id: "fireworks", label: "Fireworks AI", fn: fireworksEngine, costPerImage: 0.0014, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "$1 free (one-time)", freeTier: false },
+  { id: "segmind", label: "Segmind", fn: segmindEngine, costPerImage: 0.005, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "Signup credits", freeTier: false },
+  { id: "deepinfra", label: "DeepInfra", fn: deepinfraEngine, costPerImage: 0.015, capabilities: ["text2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "DeepStart program", freeTier: false },
+  { id: "replicate", label: "Replicate", fn: replicateEngine, costPerImage: 0.003, capabilities: ["text2img", "img2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Small monthly allowance", freeTier: false },
+  { id: "leonardo", label: "Leonardo.ai", fn: leonardoEngine, costPerImage: 0.03, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "150 tokens/day", freeTier: false },
+  { id: "blackforest", label: "Black Forest Labs (FLUX)", fn: blackforestEngine, costPerImage: 0.003, capabilities: ["text2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "Credit-based", freeTier: false },
+  { id: "stability", label: "Stability AI", fn: stabilityEngine, costPerImage: 0.04, capabilities: ["text2img", "img2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "25 credits (one-time)", freeTier: false },
+  { id: "openai", label: "OpenAI GPT Image", fn: openaiEngine, costPerImage: 0.02, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "$5 credits", freeTier: false },
+  { id: "novita", label: "NovitaAI", fn: novitaEngine, costPerImage: 0.0015, capabilities: ["text2img"], maxWidth: 1280, maxHeight: 1280, freeQuota: "$0.50 trial (one-time)", freeTier: false },
+  { id: "wavespeed", label: "WaveSpeed (Seedream)", fn: wavespeedEngine, costPerImage: 0.003, capabilities: ["text2img", "img2img"], maxWidth: 2048, maxHeight: 2048, freeQuota: "Signup credits", freeTier: false },
+  { id: "runway", label: "Runway Gen-3", fn: runwayEngine, costPerImage: 0.02, capabilities: ["text2img"], maxWidth: 1920, maxHeight: 1080, freeQuota: "125 credits/mo", freeTier: false },
+  { id: "prodia", label: "Prodia", fn: prodiaEngine, costPerImage: 0.002, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "1000 free calls", freeTier: false },
 ];
 
 const DEFAULT_POLICY: PolicyFlags = {
@@ -69,10 +82,17 @@ export async function GET(req: NextRequest) {
   const height = Number(searchParams.get("height") || "288");
   const seed = searchParams.get("seed") || String(Date.now());
   const enginesParam = searchParams.get("engines"); // comma-separated filter
+  const tierFilter = (searchParams.get("tier") || "all").toLowerCase(); // "free" | "paid" | "all"
 
-  const selectedEngines = enginesParam
+  let selectedEngines = enginesParam
     ? ALL_ENGINES.filter((e) => enginesParam.split(",").includes(e.id))
     : ALL_ENGINES;
+
+  if (tierFilter === "free") {
+    selectedEngines = selectedEngines.filter((e) => e.freeTier);
+  } else if (tierFilter === "paid") {
+    selectedEngines = selectedEngines.filter((e) => !e.freeTier);
+  }
 
   const renderReq: AiRenderRequest = {
     prompt,

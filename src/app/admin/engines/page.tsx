@@ -62,6 +62,8 @@ export default function EngineComparisonPage() {
   const [loading, setLoading] = useState(false);
   const [results, setResults] = useState<CompareResponse | null>(null);
   const [selectedEngines, setSelectedEngines] = useState<string[]>([]);
+  /** Tier filter — "free" default protects from accidental credit spend during testing */
+  const [tierFilter, setTierFilter] = useState<"free" | "paid" | "all">("free");
   const [sortBy, setSortBy] = useState<"latency" | "cost" | "size">("latency");
   const [budget, setBudget] = useState<BudgetSummary | null>(null);
   const [showBudget, setShowBudget] = useState(false);
@@ -77,11 +79,14 @@ export default function EngineComparisonPage() {
     }
   }, []);
 
-  const allEngineIds = [
-    "pollinations", "ai-horde", "together", "cloudflare", "huggingface",
-    "fal", "fireworks", "segmind", "deepinfra", "replicate",
-    "leonardo", "blackforest", "stability", "openai", "prodia",
+  const freeEngineIds = [
+    "pollinations", "ai-horde", "cloudflare", "gemini", "together", "huggingface",
   ];
+  const paidEngineIds = [
+    "fal", "fireworks", "segmind", "deepinfra", "replicate", "leonardo",
+    "blackforest", "stability", "openai", "novita", "wavespeed", "runway", "prodia",
+  ];
+  const allEngineIds = [...freeEngineIds, ...paidEngineIds];
 
   const runComparison = useCallback(async () => {
     setLoading(true);
@@ -91,6 +96,7 @@ export default function EngineComparisonPage() {
         prompt,
         width: String(width),
         height: String(height),
+        tier: tierFilter,
       });
       if (selectedEngines.length > 0) {
         params.set("engines", selectedEngines.join(","));
@@ -103,7 +109,7 @@ export default function EngineComparisonPage() {
     } finally {
       setLoading(false);
     }
-  }, [prompt, width, height, selectedEngines]);
+  }, [prompt, width, height, selectedEngines, tierFilter]);
 
   const toggleEngine = (id: string) => {
     setSelectedEngines((prev) =>
@@ -112,10 +118,10 @@ export default function EngineComparisonPage() {
   };
 
   const selectAll = () => setSelectedEngines([]);
-  const selectFree = () =>
-    setSelectedEngines(["pollinations", "ai-horde", "together", "cloudflare", "huggingface"]);
+  const selectFreeOnly = () => setSelectedEngines(freeEngineIds);
+  const selectPaidOnly = () => setSelectedEngines(paidEngineIds);
   const selectImg2Img = () =>
-    setSelectedEngines(["together", "fal", "replicate", "stability"]);
+    setSelectedEngines(["together", "fal", "replicate", "stability", "wavespeed"]);
 
   const sortedResults = results?.engines
     ? [...results.engines].sort((a, b) => {
@@ -229,9 +235,39 @@ export default function EngineComparisonPage() {
             </select>
           </div>
 
+          <div style={{ display: "flex", flexDirection: "column", gap: "6px" }}>
+            <label style={{ fontSize: "11px", color: "#999", textTransform: "uppercase", letterSpacing: "0.05em" }}>
+              Budget lock
+            </label>
+            <div style={{ display: "flex", gap: "4px", padding: "3px", background: "#1a1a1a", border: "1px solid #333", borderRadius: "8px" }}>
+              <button
+                onClick={() => setTierFilter("free")}
+                title="Only engines that cost $0 per render (safe for testing)"
+                style={tierChipStyle(tierFilter === "free", "#14532d", "#86efac")}
+              >
+                Free ($0)
+              </button>
+              <button
+                onClick={() => setTierFilter("paid")}
+                title="Only paid engines — consumes real credits"
+                style={tierChipStyle(tierFilter === "paid", "#78350f", "#fcd34d")}
+              >
+                Paid 💰
+              </button>
+              <button
+                onClick={() => setTierFilter("all")}
+                title="All engines regardless of cost"
+                style={tierChipStyle(tierFilter === "all", "#1e3a8a", "#93c5fd")}
+              >
+                All
+              </button>
+            </div>
+          </div>
+
           <div style={{ display: "flex", gap: "6px" }}>
-            <button onClick={selectAll} style={chipStyle(selectedEngines.length === 0)}>All (14)</button>
-            <button onClick={selectFree} style={chipStyle(false)}>Free only</button>
+            <button onClick={selectAll} style={chipStyle(selectedEngines.length === 0)}>All ({allEngineIds.length})</button>
+            <button onClick={selectFreeOnly} style={chipStyle(false)}>Free only ({freeEngineIds.length})</button>
+            <button onClick={selectPaidOnly} style={chipStyle(false)}>Paid only ({paidEngineIds.length})</button>
             <button onClick={selectImg2Img} style={chipStyle(false)}>img2img</button>
           </div>
 
@@ -250,7 +286,13 @@ export default function EngineComparisonPage() {
               cursor: loading ? "wait" : "pointer",
             }}
           >
-            {loading ? "Running comparison..." : "Run Comparison"}
+            {loading
+              ? "Running comparison..."
+              : tierFilter === "free"
+                ? "Run Free Comparison ($0)"
+                : tierFilter === "paid"
+                  ? "Run Paid Comparison 💰"
+                  : "Run All Engines"}
           </button>
         </div>
 
@@ -411,5 +453,20 @@ function chipStyle(active: boolean): React.CSSProperties {
     background: active ? "#1e3a5f" : "#1a1a1a",
     color: active ? "#93c5fd" : "#888",
     cursor: "pointer",
+  };
+}
+
+/** Tier toggle button — used for the "Free / Paid / All" budget lock control. */
+function tierChipStyle(active: boolean, activeBg: string, activeFg: string): React.CSSProperties {
+  return {
+    padding: "5px 12px",
+    fontSize: "12px",
+    fontWeight: 600,
+    borderRadius: "5px",
+    border: "1px solid transparent",
+    background: active ? activeBg : "transparent",
+    color: active ? activeFg : "#888",
+    cursor: "pointer",
+    transition: "all 0.15s ease",
   };
 }
