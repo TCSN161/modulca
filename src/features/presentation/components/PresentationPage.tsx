@@ -16,6 +16,11 @@ import "@/features/design/components/technical/print.css";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
+// Extracted slide components (modular architecture — see slides/README.md)
+import CoverSlide from "./slides/CoverSlide";
+import DescriptionSlide from "./slides/DescriptionSlide";
+import VisionSlide from "./slides/VisionSlide";
+
 type PresentationTemplate = "minimal" | "bold" | "classic" | "luxury" | "architect";
 type SlideId =
   | "cover"
@@ -163,7 +168,7 @@ export default function PresentationPage() {
 
   const stats = getStats();
   const style = styleDirection ? getStyleDirection(styleDirection) : null;
-  const tmpl = TEMPLATES[template];
+  const tmpl = { id: template, ...TEMPLATES[template] };
   const finishInfo = FINISH_LEVELS.find((f) => f.id === finishLevel);
   const enabledSlides = slides.filter((s) => s.enabled);
 
@@ -391,109 +396,45 @@ export default function PresentationPage() {
           <div ref={previewRef} className="mx-auto" style={{ maxWidth: 900 }}>
             {/* Each slide is a card styled per template */}
             {(activeSlide === "cover" || typeof window !== "undefined" && window.matchMedia("print").matches) && slides.find((s) => s.id === "cover")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <div className="relative flex flex-col items-center justify-center min-h-[500px] text-center">
-                  {/* Hero render background */}
-                  {savedRenders.length > 0 && (
-                    <div className="absolute inset-0 rounded-xl overflow-hidden">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src={savedRenders[coverRenderIndex]?.imageUrl || savedRenders[0].imageUrl}
-                        alt="Hero render"
-                        className="h-full w-full object-cover"
-                      />
-                      <div className="absolute inset-0" style={{ background: `linear-gradient(to bottom, ${tmpl.bg}CC 0%, ${tmpl.bg}99 40%, ${tmpl.bg}DD 100%)` }} />
-                    </div>
-                  )}
-                  <div className="relative z-10">
-                    <div className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em]" style={{ color: tmpl.accent }}>
-                      ModulCA Project Presentation
-                    </div>
-                    <h1 className="text-4xl font-bold mb-4" style={{ color: tmpl.text }}>{projectName}</h1>
-                    {clientName && (
-                      <p className="text-lg mb-2" style={{ color: tmpl.text, opacity: 0.6 }}>Prepared for {clientName}</p>
-                    )}
-                    <p className="text-sm mb-8" style={{ color: tmpl.text, opacity: 0.4 }}>
-                      {new Date().toLocaleDateString("en-US", { year: "numeric", month: "long", day: "numeric" })}
-                    </p>
-                    <div className="flex items-center gap-6 text-xs" style={{ color: tmpl.text, opacity: 0.5 }}>
-                      <span>{modules.length} Modules</span>
-                      <span>{stats.totalArea}m{"\u00B2"} Total Area</span>
-                      <span>{style?.label || "Modern"} Style</span>
-                      <span>{finishInfo?.label || "Standard"} Finish</span>
-                    </div>
-                    <div className="mt-12 h-1 w-24 rounded mx-auto" style={{ backgroundColor: tmpl.accent }} />
-                  </div>
-                  {/* Render thumbnail picker */}
-                  {savedRenders.length > 1 && (
-                    <div className="relative z-10 mt-6 flex items-center gap-2">
-                      <span className="text-[9px] uppercase tracking-wider mr-2" style={{ color: tmpl.text, opacity: 0.4 }}>Cover image:</span>
-                      {savedRenders.map((render, i) => (
-                        <button
-                          key={render.id}
-                          onClick={() => setCoverRenderIndex(i)}
-                          className={`h-10 w-14 rounded-md overflow-hidden border-2 transition-all ${
-                            i === coverRenderIndex ? "border-current opacity-100 scale-105" : "border-transparent opacity-50 hover:opacity-80"
-                          }`}
-                          style={{ borderColor: i === coverRenderIndex ? tmpl.accent : "transparent" }}
-                        >
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={render.imageUrl} alt={render.label} className="h-full w-full object-cover" />
-                        </button>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </SlideCard>
+              <CoverSlide
+                template={tmpl}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+              />
             )}
 
             {activeSlide === "description" && slides.find((s) => s.id === "description")?.enabled && (() => {
-              // Auto-generate project description from data
               const roomBreakdown = Array.from(new Set(modules.map((m) => m.moduleType))).map((type) => {
                 const mt = MODULE_TYPES.find((m) => m.id === type);
                 const count = modules.filter((m) => m.moduleType === type).length;
                 return `${count} ${mt?.label || type}${count > 1 ? "s" : ""}`;
               });
-              const styleName = style?.label || "modern";
-              const totalArea = stats.totalArea;
-              const usableArea = stats.usableArea;
-              const finishName = finishInfo?.label || "Standard";
-
               return (
-                <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                  <SlideHeader accent={tmpl.accent} text={tmpl.text} number={2} title="Project Description" />
-                  <div className="mt-8 max-w-2xl mx-auto">
-                    <p className="text-base leading-relaxed mb-6" style={{ color: tmpl.text, opacity: 0.8 }}>
-                      This {styleName.toLowerCase()} modular residence comprises {modules.length} modules
-                      totaling {totalArea}m{"\u00B2"} of built area ({usableArea}m{"\u00B2"} usable),
-                      featuring {roomBreakdown.join(", ")}. Designed with a {finishName.toLowerCase()} finish
-                      level, the project prioritizes efficient space utilization through modular construction
-                      techniques.
-                    </p>
-                    <div className="grid grid-cols-2 gap-4 mt-8">
-                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Configuration</p>
-                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>{modules.length} Modules</p>
-                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{roomBreakdown.join(" + ")}</p>
-                      </div>
-                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Total Area</p>
-                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>{totalArea}m{"\u00B2"}</p>
-                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{usableArea}m{"\u00B2"} usable interior space</p>
-                      </div>
-                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Design Style</p>
-                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>{style?.label || "Modern"}</p>
-                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{style?.tagline || "Contemporary modular design"}</p>
-                      </div>
-                      <div className="rounded-xl p-4" style={{ backgroundColor: tmpl.accent + "15" }}>
-                        <p className="text-[10px] font-bold uppercase tracking-wider mb-1" style={{ color: tmpl.accent }}>Investment</p>
-                        <p className="text-2xl font-bold" style={{ color: tmpl.text }}>EUR {Math.round(stats.totalEstimate).toLocaleString()}</p>
-                        <p className="text-xs mt-1" style={{ color: tmpl.text, opacity: 0.5 }}>{finishName} finish | EUR {Math.round(stats.totalEstimate / totalArea)}/m{"\u00B2"}</p>
-                      </div>
-                    </div>
-                  </div>
-                </SlideCard>
+                <DescriptionSlide
+                  template={tmpl}
+                  slideNumber={2}
+                  projectName={projectName}
+                  clientName={clientName}
+                  moduleCount={modules.length}
+                  totalAreaSqm={stats.totalArea}
+                  usableAreaSqm={stats.usableArea}
+                  styleName={style?.label || "Modern"}
+                  finishName={finishInfo?.label || "Standard"}
+                  savedRenders={savedRenders}
+                  coverRenderIndex={coverRenderIndex}
+                  setCoverRenderIndex={setCoverRenderIndex}
+                  roomBreakdown={roomBreakdown}
+                  totalEstimateEur={stats.totalEstimate}
+                  styleTagline={style?.tagline}
+                />
               );
             })()}
 
@@ -613,54 +554,30 @@ export default function PresentationPage() {
               );
             })()}
 
-            {activeSlide === "vision" && slides.find((s) => s.id === "vision")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={4} title="Design Vision" />
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="md:col-span-2">
-                    <h3 className="text-xl font-bold mb-2" style={{ color: tmpl.text }}>{style?.label || "Modern Design"}</h3>
-                    <p className="text-sm leading-relaxed mb-6" style={{ color: tmpl.text, opacity: 0.6 }}>
-                      {style?.description || "A carefully curated design direction that balances aesthetics with functionality."}
-                    </p>
-                    {/* Color palette */}
-                    {style?.palette && (
-                      <div>
-                        <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: tmpl.text, opacity: 0.4 }}>Color Palette</p>
-                        <div className="flex gap-2">
-                          {style.palette.map((swatch, i) => (
-                            <div key={i} className="text-center">
-                              <div className="h-12 w-12 rounded-lg border border-gray-200 shadow-sm" style={{ backgroundColor: swatch.color }} />
-                              <span className="text-[8px] mt-1 block" style={{ color: tmpl.text, opacity: 0.4 }}>{swatch.label}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                  <div className="space-y-2">
-                    <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: tmpl.text, opacity: 0.4 }}>Mood Board</p>
-                    {moodboardPins.length > 0 ? (
-                      moodboardPins.slice(0, 4).map((pin, i) => (
-                        <div key={`pin-${i}`} className="rounded-lg overflow-hidden bg-gray-200 aspect-video">
-                          {/* eslint-disable-next-line @next/next/no-img-element */}
-                          <img src={pin.imageUrl} alt={pin.label || `Pin ${i + 1}`} className="h-full w-full object-cover" />
-                        </div>
-                      ))
-                    ) : style?.moodImages?.slice(0, 4).map((img, i) => (
-                      <div key={i} className="rounded-lg overflow-hidden bg-gray-200 aspect-video">
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={img.url} alt={img.label} className="h-full w-full object-cover" />
-                      </div>
-                    ))}
-                    {!moodboardPins.length && !style?.moodImages?.length && (
-                      <div className="rounded-lg bg-gray-100 aspect-video flex items-center justify-center">
-                        <p className="text-xs text-gray-400">Moodboard images from Step 4</p>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </SlideCard>
-            )}
+            {activeSlide === "vision" && slides.find((s) => s.id === "vision")?.enabled && (() => {
+              const moodImages = moodboardPins.length > 0
+                ? moodboardPins.map((pin) => ({ imageUrl: pin.imageUrl, label: pin.label }))
+                : (style?.moodImages || []).map((img) => ({ imageUrl: img.url, label: img.label }));
+              return (
+                <VisionSlide
+                  template={tmpl}
+                  slideNumber={4}
+                  projectName={projectName}
+                  clientName={clientName}
+                  moduleCount={modules.length}
+                  totalAreaSqm={stats.totalArea}
+                  usableAreaSqm={stats.usableArea}
+                  styleName={style?.label || "Modern Design"}
+                  finishName={finishInfo?.label || "Standard"}
+                  savedRenders={savedRenders}
+                  coverRenderIndex={coverRenderIndex}
+                  setCoverRenderIndex={setCoverRenderIndex}
+                  styleDescription={style?.description}
+                  palette={style?.palette || []}
+                  moodImages={moodImages}
+                />
+              );
+            })()}
 
             {activeSlide === "modules" && slides.find((s) => s.id === "modules")?.enabled && (() => {
               const MODS_PER_SLIDE = 4;

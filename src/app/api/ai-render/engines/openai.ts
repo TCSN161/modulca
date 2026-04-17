@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * OpenAI — GPT Image (premium quality)
  *
@@ -19,7 +20,7 @@ export const openaiEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[openai] No OPENAI_API_KEY set, skipping");
+    devLog("[openai] No OPENAI_API_KEY set, skipping");
     return null;
   }
 
@@ -27,7 +28,7 @@ export const openaiEngine: AiRenderEngine = async (
   try {
     if (req.baseImage) {
       // OpenAI supports image editing, but it's complex — fall back to text2img
-      console.log("[openai] img2img not supported, using text-to-image");
+      devLog("[openai] img2img not supported, using text-to-image");
     }
     return await generateImage(req, startMs);
   } catch (err) {
@@ -43,7 +44,7 @@ async function generateImage(
   // Use gpt-image-1 (best quality), fall back to dall-e-3
   const model = "gpt-image-1";
   const quality = req.tier === "architect" ? "high" : "medium";
-  console.log(`[openai] Using ${model} quality=${quality}`);
+  devLog(`[openai] Using ${model} quality=${quality}`);
 
   const response = await fetch(API_URL, {
     method: "POST",
@@ -67,7 +68,7 @@ async function generateImage(
 
     // If gpt-image-1 fails, try dall-e-3
     if (model === "gpt-image-1") {
-      console.log("[openai] Falling back to dall-e-3");
+      devLog("[openai] Falling back to dall-e-3");
       return tryDalle3(req, startMs);
     }
     return null;
@@ -111,7 +112,7 @@ async function tryDalle3(
   req: AiRenderRequest,
   startMs: number
 ): Promise<AiRenderResult | null> {
-  console.log("[openai] Using DALL-E 3");
+  devLog("[openai] Using DALL-E 3");
 
   const response = await fetch(API_URL, {
     method: "POST",

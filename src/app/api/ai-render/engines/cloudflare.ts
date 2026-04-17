@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Cloudflare Workers AI — Permanent free tier
  *
@@ -19,7 +20,7 @@ export const cloudflareEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!ACCOUNT_ID || !API_TOKEN) {
-    console.log("[cloudflare] No CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN set, skipping");
+    devLog("[cloudflare] No CLOUDFLARE_ACCOUNT_ID or CLOUDFLARE_API_TOKEN set, skipping");
     return null;
   }
 
@@ -38,7 +39,7 @@ async function generateImage(
 ): Promise<AiRenderResult | null> {
   // Use FLUX Schnell as primary (best quality in CF catalog)
   const model = "@cf/black-forest-labs/flux-1-schnell";
-  console.log("[cloudflare] Using FLUX 1 Schnell");
+  devLog("[cloudflare] Using FLUX 1 Schnell");
 
   const url = `https://api.cloudflare.com/client/v4/accounts/${ACCOUNT_ID}/ai/run/${model}`;
 

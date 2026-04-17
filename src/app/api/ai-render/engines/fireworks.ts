@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Fireworks AI — Best GDPR compliance
  *
@@ -18,7 +19,7 @@ export const fireworksEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[fireworks] No FIREWORKS_API_KEY set, skipping");
+    devLog("[fireworks] No FIREWORKS_API_KEY set, skipping");
     return null;
   }
 
@@ -36,7 +37,7 @@ async function generateImage(
   startMs: number
 ): Promise<AiRenderResult | null> {
   const model = "flux-1-schnell-fp8";
-  console.log(`[fireworks] Using ${model}`);
+  devLog(`[fireworks] Using ${model}`);
 
   const response = await fetch(`${API_URL}/${model}`, {
     method: "POST",
@@ -68,7 +69,7 @@ async function generateImage(
     const buffer = Buffer.from(await response.arrayBuffer());
     if (buffer.length < 500) return null;
 
-    console.log(`[fireworks] Success: ${buffer.length} bytes`);
+    devLog(`[fireworks] Success: ${buffer.length} bytes`);
     return {
       buffer,
       contentType: contentType || "image/png",

@@ -6,7 +6,19 @@
  * free of conditional prop-drilling.
  */
 
-import type { PresentationTemplate } from "../../templates";
+/**
+ * SlideTemplate — the minimum theme tokens every slide needs.
+ * Compatible with both the local TEMPLATES object in PresentationPage.tsx
+ * and the richer PresentationTemplate from ../../templates/index.ts.
+ * Keeping this slim avoids coupling all slides to a single canonical type.
+ */
+export interface SlideTemplate {
+  accent: string;
+  bg: string;
+  text: string;
+  label?: string;
+  description?: string;
+}
 
 export type SlideId =
   | "cover"
@@ -48,7 +60,7 @@ export const DEFAULT_SLIDES: SlideConfig[] = [
  * it reads via destructuring, so unused fields are free.
  */
 export interface SlideContext {
-  template: PresentationTemplate;
+  template: SlideTemplate;
   projectName: string;
   clientName: string;
   moduleCount: number;

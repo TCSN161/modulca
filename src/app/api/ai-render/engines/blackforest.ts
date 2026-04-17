@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Black Forest Labs (BFL) — Source of all FLUX models
  *
@@ -23,7 +24,7 @@ export const blackforestEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[blackforest] No BFL_API_KEY set, skipping");
+    devLog("[blackforest] No BFL_API_KEY set, skipping");
     return null;
   }
 
@@ -43,7 +44,7 @@ async function generateImage(
   // Use FLUX 1.1 Pro for best quality, or Schnell for speed
   const isPremium = req.tier === "premium" || req.tier === "architect";
   const model = isPremium ? "flux-pro-1.1" : "flux-schnell";
-  console.log(`[blackforest] Using ${model}`);
+  devLog(`[blackforest] Using ${model}`);
 
   // Step 1: Submit generation request (with connect timeout)
   const controller = new AbortController();
@@ -81,7 +82,7 @@ async function generateImage(
     return null;
   }
 
-  console.log(`[blackforest] Task submitted: ${taskId}, polling...`);
+  devLog(`[blackforest] Task submitted: ${taskId}, polling...`);
 
   // Step 2: Poll for result
   const deadline = Date.now() + TIMEOUT_MS;
@@ -98,7 +99,7 @@ async function generateImage(
 
     if (result.status === "Ready" && result.result?.sample) {
       const imageUrl = result.result.sample;
-      console.log("[blackforest] Image ready, downloading...");
+      devLog("[blackforest] Image ready, downloading...");
 
       const imgRes = await fetch(imageUrl);
       if (!imgRes.ok) return null;
@@ -106,7 +107,7 @@ async function generateImage(
       const buffer = Buffer.from(await imgRes.arrayBuffer());
       if (buffer.length < 500) return null;
 
-      console.log(`[blackforest] Success: ${buffer.length} bytes`);
+      devLog(`[blackforest] Success: ${buffer.length} bytes`);
       return {
         buffer,
         contentType: "image/png",

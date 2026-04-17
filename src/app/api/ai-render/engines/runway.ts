@@ -14,6 +14,7 @@
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 const API_KEY = process.env.RUNWAY_API_KEY || "";
 const API_URL = "https://api.dev.runwayml.com/v1/text_to_image";
 const STATUS_URL_BASE = "https://api.dev.runwayml.com/v1/tasks";
@@ -57,13 +58,13 @@ export const runwayEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[runway] No RUNWAY_API_KEY set, skipping");
+    devLog("[runway] No RUNWAY_API_KEY set, skipping");
     return null;
   }
 
   const startMs = Date.now();
   try {
-    console.log("[runway] Submitting Gen-3 task...");
+    devLog("[runway] Submitting Gen-3 task...");
 
     const submit = await fetch(API_URL, {
       method: "POST",

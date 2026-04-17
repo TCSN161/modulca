@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * DeepInfra — Fast FLUX inference
  *
@@ -18,7 +19,7 @@ export const deepinfraEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[deepinfra] No DEEPINFRA_API_KEY set, skipping");
+    devLog("[deepinfra] No DEEPINFRA_API_KEY set, skipping");
     return null;
   }
 
@@ -36,7 +37,7 @@ async function generateImage(
   startMs: number
 ): Promise<AiRenderResult | null> {
   const model = "black-forest-labs/FLUX-1-schnell";
-  console.log(`[deepinfra] Using ${model}`);
+  devLog(`[deepinfra] Using ${model}`);
 
   const response = await fetch(`${API_URL}/${model}`, {
     method: "POST",

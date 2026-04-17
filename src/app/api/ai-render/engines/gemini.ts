@@ -11,6 +11,7 @@
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 const API_KEY = process.env.GEMINI_API_KEY || "";
 const MODEL = "imagen-3.0-generate-002";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:predict`;
@@ -29,13 +30,13 @@ export const geminiEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[gemini] No GEMINI_API_KEY set, skipping");
+    devLog("[gemini] No GEMINI_API_KEY set, skipping");
     return null;
   }
 
   const startMs = Date.now();
   try {
-    console.log("[gemini] Generating with Imagen 3...");
+    devLog("[gemini] Generating with Imagen 3...");
 
     const response = await fetch(`${API_URL}?key=${API_KEY}`, {
       method: "POST",

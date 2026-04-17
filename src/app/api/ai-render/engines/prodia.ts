@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Prodia Pro — Meta-gateway to 30+ AI image models
  *
@@ -83,7 +84,7 @@ export const prodiaEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[prodia] No PRODIA_API_KEY set, skipping");
+    devLog("[prodia] No PRODIA_API_KEY set, skipping");
     return null;
   }
 
@@ -96,10 +97,10 @@ export const prodiaEngine: AiRenderEngine = async (
 
     // Try models in priority order (best for tier first, fallback to cheaper)
     for (const model of models) {
-      console.log(`[prodia] Trying ${model.label} (${model.type})`);
+      devLog(`[prodia] Trying ${model.label} (${model.type})`);
       const result = await submitJob(req, model, hasBaseImage, startMs);
       if (result) return result;
-      console.log(`[prodia] ${model.label} failed, trying next...`);
+      devLog(`[prodia] ${model.label} failed, trying next...`);
     }
 
     return null;
@@ -251,10 +252,10 @@ async function submitJob(
   let imageResult: { buffer: Buffer; contentType: string } | null;
 
   if (job.state?.current === "completed") {
-    console.log(`[prodia] ${model.label} completed inline: ${job.id}`);
+    devLog(`[prodia] ${model.label} completed inline: ${job.id}`);
     imageResult = await downloadImage(job.id);
   } else {
-    console.log(`[prodia] ${model.label} queued: ${job.id}`);
+    devLog(`[prodia] ${model.label} queued: ${job.id}`);
     imageResult = await pollAndDownload(job.id);
   }
 
@@ -289,7 +290,7 @@ async function downloadImage(
   if (buffer.length < 500) return null;
 
   const contentType = imgRes.headers.get("content-type") || "image/png";
-  console.log(`[prodia] Downloaded: ${buffer.length} bytes`);
+  devLog(`[prodia] Downloaded: ${buffer.length} bytes`);
   return { buffer, contentType };
 }
 

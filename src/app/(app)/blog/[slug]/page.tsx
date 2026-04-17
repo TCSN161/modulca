@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { getArticle, getAllSlugs } from "@/features/blog/articles";
+import { articleSchema, breadcrumbListSchema, jsonLdScript, SITE_URL } from "@/shared/lib/schema";
 
 interface Props {
   params: Promise<{ slug: string }>;
@@ -15,15 +16,33 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const article = getArticle(slug);
   if (!article) return {};
+  const ogUrl = `/og?title=${encodeURIComponent(article.title)}&subtitle=${encodeURIComponent("ModulCA Blog")}`;
+  const pageUrl = `${SITE_URL}/blog/${slug}`;
   return {
     title: article.title,
     description: article.excerpt,
+    alternates: { canonical: pageUrl },
     openGraph: {
       title: article.title,
       description: article.excerpt,
       type: "article",
+      url: pageUrl,
       publishedTime: article.date,
       authors: [article.author],
+      images: [
+        {
+          url: ogUrl,
+          width: 1200,
+          height: 630,
+          alt: article.title,
+        },
+      ],
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: article.title,
+      description: article.excerpt,
+      images: [ogUrl],
     },
   };
 }
@@ -34,22 +53,31 @@ export default async function BlogArticlePage({ params }: Props) {
   if (!article) notFound();
 
   /* JSON-LD structured data for SEO */
-  const jsonLd = {
-    "@context": "https://schema.org",
-    "@type": "Article",
-    headline: article.title,
+  const pageUrl = `${SITE_URL}/blog/${slug}`;
+  const ogImage = `${SITE_URL}/og?title=${encodeURIComponent(article.title)}&subtitle=${encodeURIComponent("ModulCA Blog")}`;
+  const jsonLd = articleSchema({
+    title: article.title,
     description: article.excerpt,
+    url: pageUrl,
+    imageUrl: ogImage,
     datePublished: article.date,
-    author: { "@type": "Organization", name: article.author, url: "https://modulca.eu" },
-    publisher: { "@type": "Organization", name: "ModulCA", url: "https://modulca.eu" },
-    mainEntityOfPage: `https://modulca.eu/blog/${slug}`,
-  };
+    authorName: article.author,
+  });
+  const breadcrumbs = breadcrumbListSchema([
+    { name: "Home", url: SITE_URL },
+    { name: "Blog", url: `${SITE_URL}/blog` },
+    { name: article.title, url: pageUrl },
+  ]);
 
   return (
     <div className="min-h-screen bg-white">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(breadcrumbs) }}
       />
       {/* Header */}
       <header className="border-b border-gray-200 bg-white">

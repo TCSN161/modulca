@@ -121,9 +121,10 @@ export default function HomePage() {
                 in Minutes
               </h1>
               <p className="mb-8 max-w-md text-base text-brand-gray leading-relaxed sm:text-lg">
-                Scale your vision with our precision 3&times;3m module system.
-                From remote cabins to suburban estates, build with architectural
-                integrity and sustainable speed.
+                The first end-to-end platform for modular wooden homes in Romania
+                and the Netherlands. Design with our 3&times;3m module system, get
+                AI renders, technical drawings, and cost estimates &mdash; then
+                connect with certified builders.
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
@@ -153,10 +154,10 @@ export default function HomePage() {
         <section className="border-y border-brand-bone-300/60 bg-brand-bone-100 py-8">
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 sm:grid-cols-4 sm:gap-12">
             {[
-              { value: "13", label: "DESIGN STEPS" },
-              { value: "8", label: "MODULE TYPES" },
-              { value: "8", label: "DESIGN STYLES" },
-              { value: "100%", label: "SUSTAINABLE TIMBER" },
+              { value: "19", label: "AI ENGINES" },
+              { value: "212", label: "KNOWLEDGE ARTICLES" },
+              { value: "100%", label: "EU-HOSTED • GDPR" },
+              { value: "<90", label: "DAYS TO MOVE-IN" },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl font-bold tracking-heading text-brand-charcoal sm:text-3xl md:text-4xl">
@@ -167,6 +168,24 @@ export default function HomePage() {
                 </div>
               </div>
             ))}
+          </div>
+        </section>
+
+        {/* ---- Trust bar: EU / GDPR / Regulation-ready ---- */}
+        <section className="border-b border-brand-bone-300/60 bg-white/40 py-6">
+          <div className="mx-auto max-w-5xl px-4">
+            <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-widest text-brand-gray">
+              Built for the European market
+            </p>
+            <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-brand-gray md:text-sm">
+              <span>🇷🇴 Romanian permits (DTAC, C.U.)</span>
+              <span className="opacity-40">•</span>
+              <span>🇳🇱 Dutch Omgevingswet / BBL</span>
+              <span className="opacity-40">•</span>
+              <span>🇪🇺 Eurocode structural standards</span>
+              <span className="opacity-40">•</span>
+              <span>EU-hosted infrastructure</span>
+            </div>
           </div>
         </section>
 

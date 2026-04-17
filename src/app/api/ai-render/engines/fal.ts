@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * fal.ai — Fastest inference, all 4 capabilities
  *
@@ -20,7 +21,7 @@ export const falEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[fal] No FAL_API_KEY set, skipping");
+    devLog("[fal] No FAL_API_KEY set, skipping");
     return null;
   }
 
@@ -40,7 +41,7 @@ async function tryText2Img(
   req: AiRenderRequest,
   startMs: number
 ): Promise<AiRenderResult | null> {
-  console.log("[fal] Using FLUX Schnell (text-to-image)");
+  devLog("[fal] Using FLUX Schnell (text-to-image)");
 
   const response = await fetch(`${FAL_API}/fal-ai/flux/schnell`, {
     method: "POST",
@@ -93,7 +94,7 @@ async function tryImg2Img(
   req: AiRenderRequest,
   startMs: number
 ): Promise<AiRenderResult | null> {
-  console.log("[fal] Using FLUX Kontext Pro (img2img)");
+  devLog("[fal] Using FLUX Kontext Pro (img2img)");
 
   const imageDataUri = `data:image/png;base64,${req.baseImage}`;
 

@@ -16,6 +16,7 @@ import { fireworksEngine } from "../engines/fireworks";
 import { prodiaEngine } from "../engines/prodia";
 import type { AiRenderEngine, AiRenderRequest, PolicyFlags } from "../engines/types";
 
+import { devLog } from "@/shared/lib/devLog";
 export const dynamic = "force-dynamic";
 export const maxDuration = 120; // Allow up to 2 min for all engines
 
@@ -82,7 +83,7 @@ export async function GET(req: NextRequest) {
     policyFlags: DEFAULT_POLICY,
   };
 
-  console.log(`[compare] Testing ${selectedEngines.length} engines: "${prompt.slice(0, 60)}..." ${width}x${height}`);
+  devLog(`[compare] Testing ${selectedEngines.length} engines: "${prompt.slice(0, 60)}..." ${width}x${height}`);
 
   // Run all engines in parallel with individual timeouts
   const results = await Promise.allSettled(

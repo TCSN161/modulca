@@ -12,6 +12,7 @@
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 4000;
 
@@ -43,14 +44,14 @@ export const pollinationsEngine: AiRenderEngine = async (
 
   for (let attempt = 0; attempt < MAX_RETRIES; attempt++) {
     if (attempt > 0) {
-      console.log(
+      devLog(
         `[pollinations] Retry ${attempt + 1}/${MAX_RETRIES} after ${RETRY_DELAY_MS}ms...`
       );
       await new Promise((r) => setTimeout(r, RETRY_DELAY_MS));
     }
 
     try {
-      console.log(`[pollinations] Attempt ${attempt + 1}: ${url.slice(0, 100)}...`);
+      devLog(`[pollinations] Attempt ${attempt + 1}: ${url.slice(0, 100)}...`);
       const response = await fetch(url, {
         method: "GET",
         headers: { "User-Agent": "ModulCA/1.0" },
@@ -59,7 +60,7 @@ export const pollinationsEngine: AiRenderEngine = async (
       });
 
       if (response.status === 429) {
-        console.log("[pollinations] Rate limited (429), will retry...");
+        devLog("[pollinations] Rate limited (429), will retry...");
         continue;
       }
 
@@ -77,7 +78,7 @@ export const pollinationsEngine: AiRenderEngine = async (
         return null;
       }
 
-      console.log(`[pollinations] Success: ${buffer.length} bytes`);
+      devLog(`[pollinations] Success: ${buffer.length} bytes`);
       return {
         buffer,
         contentType: blob.type || "image/jpeg",
@@ -91,6 +92,6 @@ export const pollinationsEngine: AiRenderEngine = async (
     }
   }
 
-  console.log("[pollinations] All retries exhausted");
+  devLog("[pollinations] All retries exhausted");
   return null;
 };

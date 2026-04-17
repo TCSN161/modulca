@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Replicate — Largest model ecosystem
  *
@@ -20,7 +21,7 @@ export const replicateEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_TOKEN) {
-    console.log("[replicate] No REPLICATE_API_TOKEN set, skipping");
+    devLog("[replicate] No REPLICATE_API_TOKEN set, skipping");
     return null;
   }
 
@@ -40,7 +41,7 @@ async function tryFlux(
   req: AiRenderRequest,
   startMs: number
 ): Promise<AiRenderResult | null> {
-  console.log("[replicate] Using FLUX Schnell (text-to-image)");
+  devLog("[replicate] Using FLUX Schnell (text-to-image)");
 
   const response = await fetch(API_URL, {
     method: "POST",
@@ -75,7 +76,7 @@ async function tryControlNet(
   req: AiRenderRequest,
   startMs: number
 ): Promise<AiRenderResult | null> {
-  console.log("[replicate] Using ControlNet (img2img with structure)");
+  devLog("[replicate] Using ControlNet (img2img with structure)");
 
   const imageDataUri = `data:image/png;base64,${req.baseImage}`;
 
@@ -157,7 +158,7 @@ async function downloadImage(
   const buffer = Buffer.from(await imgRes.arrayBuffer());
   if (buffer.length < 500) return null;
 
-  console.log(`[replicate] Success: ${buffer.length} bytes`);
+  devLog(`[replicate] Success: ${buffer.length} bytes`);
   return {
     buffer,
     contentType: "image/png",

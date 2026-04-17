@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Hugging Face Inference API — Open source models
  *
@@ -17,7 +18,7 @@ export const huggingfaceEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_TOKEN) {
-    console.log("[huggingface] No HUGGINGFACE_API_TOKEN set, skipping");
+    devLog("[huggingface] No HUGGINGFACE_API_TOKEN set, skipping");
     return null;
   }
 
@@ -36,7 +37,7 @@ async function generateImage(
 ): Promise<AiRenderResult | null> {
   // Use FLUX.1-schnell for speed, fall back to SDXL-base if unavailable
   const model = "black-forest-labs/FLUX.1-schnell";
-  console.log(`[huggingface] Using ${model}`);
+  devLog(`[huggingface] Using ${model}`);
 
   const url = `https://router.huggingface.co/hf-inference/models/${model}`;
 
@@ -59,7 +60,7 @@ async function generateImage(
 
   // Model may be loading (503)
   if (response.status === 503) {
-    console.log("[huggingface] Model is loading, skipping");
+    devLog("[huggingface] Model is loading, skipping");
     return null;
   }
 
@@ -76,7 +77,7 @@ async function generateImage(
     return null;
   }
 
-  console.log(`[huggingface] Success: ${buffer.length} bytes`);
+  devLog(`[huggingface] Success: ${buffer.length} bytes`);
   return {
     buffer,
     contentType: "image/png",

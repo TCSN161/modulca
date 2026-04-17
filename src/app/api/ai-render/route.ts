@@ -15,6 +15,7 @@ import { deepinfraEngine } from "./engines/deepinfra";
 import { fireworksEngine } from "./engines/fireworks";
 import { prodiaEngine } from "./engines/prodia";
 import { geminiEngine } from "./engines/gemini";
+import { devLog } from "@/shared/lib/devLog";
 // Disabled until API keys are configured (see docs/AI_PROVIDERS.md):
 // import { novitaEngine } from "./engines/novita";
 // import { wavespeedEngine } from "./engines/wavespeed";
@@ -258,7 +259,7 @@ async function tryEngines(
     const cacheKey = makeCacheKey(renderReq.prompt, renderReq.width, renderReq.height, engineParam);
     const cached = await getCachedRender(cacheKey);
     if (cached) {
-      console.log(`[ai-render] Cache HIT for "${renderReq.prompt.slice(0, 40)}..." engine=${cached.engineId}`);
+      devLog(`[ai-render] Cache HIT for "${renderReq.prompt.slice(0, 40)}..." engine=${cached.engineId}`);
       logRender({
         prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
         seed: renderReq.seed, mode, tier, engine_id: cached.engineId,
@@ -313,25 +314,25 @@ async function tryEngines(
   if (engineParam && ENGINES[engineParam]) {
     const eng = ENGINES[engineParam];
     if (eng.estimatedCostUsd > maxCostUsd) {
-      console.log(`[ai-render] Engine "${engineParam}" exceeds cost ceiling ($${eng.estimatedCostUsd} > $${maxCostUsd}), skipping to fallback`);
+      devLog(`[ai-render] Engine "${engineParam}" exceeds cost ceiling ($${eng.estimatedCostUsd} > $${maxCostUsd}), skipping to fallback`);
     } else if (!canUseEngine(engineParam)) {
-      console.log(`[ai-render] Engine "${engineParam}" has no credits remaining, skipping to fallback`);
+      devLog(`[ai-render] Engine "${engineParam}" has no credits remaining, skipping to fallback`);
     } else {
-      console.log(`[ai-render] Using engine: ${engineParam}`);
+      devLog(`[ai-render] Using engine: ${engineParam}`);
       const result = await eng.fn(renderReq);
       if (result) {
         if (isContentFilterImage(result)) {
           console.warn(`[ai-render] Engine "${engineParam}" returned content-filter image (${result.buffer.length} bytes), falling back...`);
           onFailure(engineParam, "content-filter-image");
         } else {
-          console.log(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
+          devLog(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
           await onSuccess(engineParam, result);
           return imageResponse(result);
         }
       } else {
         onFailure(engineParam, "no-result");
       }
-      console.log(`[ai-render] Engine "${engineParam}" failed, falling back to others...`);
+      devLog(`[ai-render] Engine "${engineParam}" failed, falling back to others...`);
     }
   }
 
@@ -341,14 +342,14 @@ async function tryEngines(
     const engine = ENGINES[engineId];
     if (!engine) continue;
     if (engine.estimatedCostUsd > maxCostUsd) {
-      console.log(`[ai-render] Skipping "${engineId}" — over cost ceiling ($${engine.estimatedCostUsd} > $${maxCostUsd})`);
+      devLog(`[ai-render] Skipping "${engineId}" — over cost ceiling ($${engine.estimatedCostUsd} > $${maxCostUsd})`);
       continue;
     }
     if (!canUseEngine(engineId)) {
-      console.log(`[ai-render] Skipping "${engineId}" — no credits or disabled`);
+      devLog(`[ai-render] Skipping "${engineId}" — no credits or disabled`);
       continue;
     }
-    console.log(`[ai-render] Trying engine: ${engineId}`);
+    devLog(`[ai-render] Trying engine: ${engineId}`);
     const result = await engine.fn(renderReq);
     if (result) {
       if (isContentFilterImage(result)) {
@@ -356,12 +357,12 @@ async function tryEngines(
         onFailure(engineId, "content-filter-image");
         continue;
       }
-      console.log(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
+      devLog(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
       await onSuccess(engineId, result);
       return imageResponse(result);
     }
     onFailure(engineId, "no-result");
-    console.log(`[ai-render] Engine "${engineId}" failed, trying next...`);
+    devLog(`[ai-render] Engine "${engineId}" failed, trying next...`);
   }
 
   return NextResponse.json(
@@ -392,7 +393,7 @@ export async function GET(req: NextRequest) {
       policyFlags: DEFAULT_POLICY,
     };
 
-    console.log(
+    devLog(
       `[ai-render] GET: "${prompt.slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} tier=${tier} maxCost=$${maxCost}`
     );
 
@@ -453,7 +454,7 @@ export async function POST(req: NextRequest) {
       policyFlags: DEFAULT_POLICY,
     };
 
-    console.log(
+    devLog(
       `[ai-render] POST: "${String(prompt).slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} img2img=${!!baseImage} maxCost=$${maxCostUsd}`
     );
 

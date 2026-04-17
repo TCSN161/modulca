@@ -12,6 +12,7 @@
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 const API_KEY = process.env.WAVESPEED_API_KEY || "";
 const BASE_URL = "https://api.wavespeed.ai/api/v3";
 
@@ -46,7 +47,7 @@ export const wavespeedEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[wavespeed] No WAVESPEED_API_KEY set, skipping");
+    devLog("[wavespeed] No WAVESPEED_API_KEY set, skipping");
     return null;
   }
 
@@ -54,7 +55,7 @@ export const wavespeedEngine: AiRenderEngine = async (
   try {
     const isImg2Img = !!req.baseImage;
     const model = isImg2Img ? IMG2IMG_MODEL : TXT2IMG_MODEL;
-    console.log(`[wavespeed] Using ${model}...`);
+    devLog(`[wavespeed] Using ${model}...`);
 
     const payload: Record<string, unknown> = {
       prompt: req.prompt.slice(0, 2000),

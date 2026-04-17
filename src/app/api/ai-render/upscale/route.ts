@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prodiaUpscale, prodiaRemoveBackground } from "../engines/prodia";
 
+import { devLog } from "@/shared/lib/devLog";
 export const dynamic = "force-dynamic";
 
 /**
@@ -29,7 +30,7 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Image too small" }, { status: 400 });
     }
 
-    console.log(`[upscale] Processing ${mode}, input: ${imageBuffer.length} bytes`);
+    devLog(`[upscale] Processing ${mode}, input: ${imageBuffer.length} bytes`);
 
     let result: { buffer: Buffer; contentType: string } | null = null;
 
@@ -46,7 +47,7 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    console.log(`[upscale] Success: ${result.buffer.length} bytes`);
+    devLog(`[upscale] Success: ${result.buffer.length} bytes`);
 
     return new NextResponse(new Uint8Array(result.buffer), {
       status: 200,

@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Segmind — Cheapest upscaling + image generation
  *
@@ -17,7 +18,7 @@ export const segmindEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[segmind] No SEGMIND_API_KEY set, skipping");
+    devLog("[segmind] No SEGMIND_API_KEY set, skipping");
     return null;
   }
 
@@ -35,7 +36,7 @@ async function generateImage(
   startMs: number
 ): Promise<AiRenderResult | null> {
   // Use SDXL 1.0 for text2img (cheapest reliable model)
-  console.log("[segmind] Using SDXL 1.0");
+  devLog("[segmind] Using SDXL 1.0");
 
   const response = await fetch(`${API_BASE}/sdxl1.0-txt2img`, {
     method: "POST",
@@ -68,7 +69,7 @@ async function generateImage(
     const buffer = Buffer.from(await response.arrayBuffer());
     if (buffer.length < 500) return null;
 
-    console.log(`[segmind] Success: ${buffer.length} bytes`);
+    devLog(`[segmind] Success: ${buffer.length} bytes`);
     return {
       buffer,
       contentType: contentType || "image/png",

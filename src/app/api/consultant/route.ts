@@ -6,6 +6,7 @@ import type { KBDocumentMeta } from "@/knowledge/_types";
 import { searchBooks, BOOK_REGISTRY } from "@/knowledge/15-books/_registry";
 import { getTierConfig as getAuthTierConfig, type AccountTier } from "@/features/auth/types";
 
+import { devLog } from "@/shared/lib/devLog";
 export const dynamic = "force-dynamic";
 
 /**
@@ -546,7 +547,7 @@ export async function POST(req: NextRequest) {
     if (cacheKey) {
       const cached = getCachedResponse(cacheKey);
       if (cached) {
-        console.log(`[consultant] Cache hit for "${question.slice(0, 50)}..."`);
+        devLog(`[consultant] Cache hit for "${question.slice(0, 50)}..."`);
         return NextResponse.json({
           reply: cached.reply,
           provider: cached.provider,
@@ -592,12 +593,12 @@ export async function POST(req: NextRequest) {
       // Skip providers that need a missing API key
       const apiKey = provider.getKey ? provider.getKey() : provider.keyEnv ? process.env[provider.keyEnv] : undefined;
       if ((provider.keyEnv || provider.getKey) && !apiKey) {
-        console.log(`[consultant] ${provider.id}: no API key, skipping`);
+        devLog(`[consultant] ${provider.id}: no API key, skipping`);
         continue;
       }
 
       try {
-        console.log(`[consultant] Trying ${provider.id} (${tier || "free"} tier)...`);
+        devLog(`[consultant] Trying ${provider.id} (${tier || "free"} tier)...`);
         const response = await fetch(provider.url, {
           method: "POST",
           headers: provider.buildHeaders(apiKey),
@@ -621,7 +622,7 @@ export async function POST(req: NextRequest) {
         }
 
         if (reply && reply.trim()) {
-          console.log(`[consultant] ${provider.id} success (${reply.length} chars)`);
+          devLog(`[consultant] ${provider.id} success (${reply.length} chars)`);
           const trimmedReply = reply.trim();
 
           // Cache single-turn responses
@@ -650,7 +651,7 @@ export async function POST(req: NextRequest) {
 
     // All cloud providers failed — use local knowledge base (133 articles)
     const localReply = await getLocalAnswer(question);
-    console.log("[consultant] All cloud providers failed, using local KB");
+    devLog("[consultant] All cloud providers failed, using local KB");
     return NextResponse.json({ reply: localReply, provider: "local-kb", model: "keyword-match", tier: tier || "free", articlesUsed });
   } catch (error) {
     console.error("Consultant API error:", error);

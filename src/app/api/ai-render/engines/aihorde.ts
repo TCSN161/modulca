@@ -8,6 +8,7 @@
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 function sanitizeForContentFilter(prompt: string): string {
   return prompt
     .replace(/\bbedroom\b/gi, "sleeping quarters")
@@ -35,7 +36,7 @@ export const aiHordeEngine: AiRenderEngine = async (
   const startMs = Date.now();
   try {
     // 1. Submit async generation job
-    console.log("[ai-horde] Submitting job...");
+    devLog("[ai-horde] Submitting job...");
     const submitRes = await fetch(`${HORDE_API}/generate/async`, {
       method: "POST",
       headers: {
@@ -63,7 +64,7 @@ export const aiHordeEngine: AiRenderEngine = async (
     }
 
     const { id } = (await submitRes.json()) as { id: string };
-    console.log(`[ai-horde] Job submitted: ${id}`);
+    devLog(`[ai-horde] Job submitted: ${id}`);
 
     // 2. Poll for completion
     const deadline = Date.now() + TIMEOUT_MS;
@@ -86,14 +87,14 @@ export const aiHordeEngine: AiRenderEngine = async (
 
       if (status.done && status.generations?.[0]?.img) {
         const imgUrl = status.generations[0].img;
-        console.log("[ai-horde] Image ready, downloading...");
+        devLog("[ai-horde] Image ready, downloading...");
 
         const imgRes = await fetch(imgUrl);
         if (!imgRes.ok) return null;
 
         const blob = await imgRes.blob();
         const buffer = Buffer.from(await blob.arrayBuffer());
-        console.log(`[ai-horde] Success: ${buffer.length} bytes`);
+        devLog(`[ai-horde] Success: ${buffer.length} bytes`);
         return {
           buffer,
           contentType: blob.type || "image/webp",
@@ -104,7 +105,7 @@ export const aiHordeEngine: AiRenderEngine = async (
       }
     }
 
-    console.log("[ai-horde] Timed out after 120s");
+    devLog("[ai-horde] Timed out after 120s");
     return null;
   } catch (err) {
     console.error("[ai-horde] Error:", err);

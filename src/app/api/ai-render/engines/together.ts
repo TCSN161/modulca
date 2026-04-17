@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Together.ai — FLUX.1 [schnell] (free unlimited for 3 months)
  *
@@ -17,7 +18,7 @@ export const togetherEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[together] No TOGETHER_API_KEY set, skipping");
+    devLog("[together] No TOGETHER_API_KEY set, skipping");
     return null;
   }
 
@@ -44,7 +45,7 @@ export const togetherEngine: AiRenderEngine = async (
 async function trySchnell(
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> {
-  console.log("[together] Using FLUX.1 schnell (free text-to-image)");
+  devLog("[together] Using FLUX.1 schnell (free text-to-image)");
 
   const response = await fetch(API_URL, {
     method: "POST",
@@ -90,7 +91,7 @@ async function trySchnell(
 async function tryKontext(
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> {
-  console.log("[together] Using FLUX Kontext (img2img editing)");
+  devLog("[together] Using FLUX Kontext (img2img editing)");
 
   // Kontext expects a data URI for the image
   const imageUrl = `data:image/png;base64,${req.baseImage}`;

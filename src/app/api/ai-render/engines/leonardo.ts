@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Leonardo.ai — Creative Engine API
  *
@@ -17,7 +18,7 @@ export const leonardoEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[leonardo] No LEONARDO_API_KEY set, skipping");
+    devLog("[leonardo] No LEONARDO_API_KEY set, skipping");
     return null;
   }
 
@@ -38,7 +39,7 @@ export const leonardoEngine: AiRenderEngine = async (
 async function generateImage(
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> {
-  console.log("[leonardo] Submitting generation job...");
+  devLog("[leonardo] Submitting generation job...");
 
   // Step 1: Submit generation request
   const genResponse = await fetch(GENERATE_URL, {
@@ -79,7 +80,7 @@ async function generateImage(
     return null;
   }
 
-  console.log(`[leonardo] Job submitted: ${generationId}, polling...`);
+  devLog(`[leonardo] Job submitted: ${generationId}, polling...`);
 
   // Step 2: Poll for completion (max 120 seconds)
   const pollUrl = `${GENERATE_URL}/${generationId}`;
@@ -109,7 +110,7 @@ async function generateImage(
       }
 
       const imageUrl = images[0].url;
-      console.log("[leonardo] Image ready, downloading...");
+      devLog("[leonardo] Image ready, downloading...");
 
       // Step 3: Download the image
       const imgResponse = await fetch(imageUrl);

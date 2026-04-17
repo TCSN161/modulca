@@ -10,6 +10,7 @@
 
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 const API_KEY = process.env.NOVITA_API_KEY || "";
 const API_URL = "https://api.novita.ai/v3/async/txt2img";
 const STATUS_URL = "https://api.novita.ai/v3/async/task-result";
@@ -43,13 +44,13 @@ export const novitaEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[novita] No NOVITA_API_KEY set, skipping");
+    devLog("[novita] No NOVITA_API_KEY set, skipping");
     return null;
   }
 
   const startMs = Date.now();
   try {
-    console.log("[novita] Submitting async task...");
+    devLog("[novita] Submitting async task...");
 
     const submit = await fetch(API_URL, {
       method: "POST",

@@ -1,5 +1,6 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
+import { devLog } from "@/shared/lib/devLog";
 /**
  * Stability AI — Control/Structure endpoint
  *
@@ -22,7 +23,7 @@ export const stabilityEngine: AiRenderEngine = async (
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> => {
   if (!API_KEY) {
-    console.log("[stability] No STABILITY_API_KEY set, skipping");
+    devLog("[stability] No STABILITY_API_KEY set, skipping");
     return null;
   }
 
@@ -48,7 +49,7 @@ export const stabilityEngine: AiRenderEngine = async (
 async function tryStructure(
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> {
-  console.log("[stability] Using Control/Structure (img2img) mode");
+  devLog("[stability] Using Control/Structure (img2img) mode");
 
   // Convert base64 to a Blob for multipart upload
   const imageBuffer = Buffer.from(req.baseImage!, "base64");
@@ -97,7 +98,7 @@ async function tryStructure(
 async function tryText2Img(
   req: AiRenderRequest
 ): Promise<AiRenderResult | null> {
-  console.log("[stability] Using text-to-image mode (no base image)");
+  devLog("[stability] Using text-to-image mode (no base image)");
 
   const formData = new FormData();
   formData.append("prompt", req.prompt.slice(0, 500));

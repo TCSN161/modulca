@@ -59,7 +59,18 @@ export const metadata: Metadata = {
   publisher: "ModulCA",
   category: "Technology",
   metadataBase: new URL(SITE_URL),
-  alternates: { canonical: SITE_URL },
+  alternates: {
+    canonical: SITE_URL,
+    // hreflang hints — today all three map to the same EN content.
+    // When RO/NL translations ship, swap these to language-specific paths
+    // (e.g. /ro, /nl) without touching individual pages.
+    languages: {
+      "en": SITE_URL,
+      "en-RO": SITE_URL,
+      "en-NL": SITE_URL,
+      "x-default": SITE_URL,
+    },
+  },
   formatDetection: { telephone: false, email: false, address: false },
   openGraph: {
     type: "website",
