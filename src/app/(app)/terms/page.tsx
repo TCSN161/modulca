@@ -29,10 +29,10 @@ export default function TermsPage() {
           <Section title="0. Provider Information">
             <p>The ModulCA Platform is operated by:</p>
             <ul className="list-disc pl-5 space-y-1 mt-2">
-              <li><strong>Legal entity:</strong> [COMPANY NAME] SRL <em className="text-brand-gray/70">(to be filled before public launch)</em></li>
-              <li><strong>Registered address:</strong> [STREET, Bucharest, Romania]</li>
-              <li><strong>Registration (ONRC):</strong> J[XX/XXXXX/YYYY]</li>
-              <li><strong>CUI / VAT:</strong> RO[XXXXXXXX]</li>
+              <li><strong>Legal entity:</strong> ATELIER DE PROIECTARE MCA S.R.L. </li>
+              <li><strong>Registered address:</strong> Str. Lacul Plopului nr. 10, Sector 5, București, 051735, România</li>
+              <li><strong>Registration (ONRC):</strong> J40/14760/2015</li>
+              <li><strong>CUI / VAT:</strong> 35294600</li>
               <li><strong>Email:</strong> <a href="mailto:contact@modulca.eu" className="text-brand-olive-700 underline">contact@modulca.eu</a></li>
             </ul>
             <p className="mt-2 text-xs">

@@ -58,3 +58,4 @@ Thumbs.db
 .next-build.log
 test-results/
 playwright-report/
+.env.local.tmp*

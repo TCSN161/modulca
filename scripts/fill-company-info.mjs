@@ -23,6 +23,8 @@
  *
  * Safe to run multiple times — uses explicit placeholder strings as markers
  * and will only replace if the placeholder is still present.
+ *
+ * See docs/COMPANY_INFO.md for the single source of truth for these values.
  */
 
 import { readFileSync, writeFileSync } from "node:fs";
