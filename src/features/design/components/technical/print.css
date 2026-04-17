@@ -1,0 +1,149 @@
+/* ──────────────────────────────────────────────────────────────
+   Print styles — Technical Drawings (Step 9) & Presentation (Step 14)
+   Only applies when the user prints (Ctrl+P). Does not affect screen.
+   ────────────────────────────────────────────────────────────── */
+
+@media print {
+  /* Page setup — A3 landscape is default for plans/sections/elevations */
+  @page {
+    size: A3 landscape;
+    margin: 10mm;
+  }
+
+  /* Wall & foundation details print better on A4 landscape */
+  @page detail {
+    size: A4 landscape;
+    margin: 8mm;
+  }
+
+  /* Global print resets */
+  html,
+  body {
+    background: #ffffff !important;
+    color: #000000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* Hide scrollbars on every scrollable region */
+  *::-webkit-scrollbar {
+    display: none !important;
+  }
+  * {
+    scrollbar-width: none !important;
+    -ms-overflow-style: none !important;
+  }
+
+  /* ─── Technical Drawings page ─── */
+  .print-technical-root {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+  }
+
+  /* Hide chrome: top nav, step nav, sidebars, module bar, mobile FABs, zoom controls */
+  .print-technical-root > header,
+  .print-technical-root > div > div:first-of-type, /* module selector bar */
+  .print-technical-root aside,
+  .print-technical-root .print-hide,
+  .print-technical-root [role="dialog"],
+  body > nav,
+  body .fixed {
+    display: none !important;
+  }
+
+  /* Unfurl the main content container */
+  .print-technical-root > div {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+
+  .print-technical-root main {
+    flex: none !important;
+    overflow: visible !important;
+    background: #ffffff !important;
+    background-image: none !important;
+    padding: 0 !important;
+  }
+
+  .print-technical-root main > div {
+    padding: 0 !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+  }
+
+  /* Drawing wrapper — neutralize on-screen zoom transform & decoration */
+  .print-drawing-wrapper {
+    transform: none !important;
+    box-shadow: none !important;
+    border: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    page-break-after: always;
+    break-after: page;
+  }
+  .print-drawing-wrapper:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* Inline SVG must scale to the page without distortion */
+  .print-drawing-wrapper svg {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+    max-height: 95vh;
+    display: block;
+  }
+
+  /* ─── Presentation page ─── */
+  .print-presentation-root {
+    background: #ffffff !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .print-presentation-root > div {
+    display: block !important;
+    height: auto !important;
+    overflow: visible !important;
+  }
+  .print-presentation-root main {
+    overflow: visible !important;
+    padding: 0 !important;
+  }
+
+  /* Each slide = its own printed page, sized to A4 landscape */
+  [data-slide="true"] {
+    page-break-after: always;
+    break-after: page;
+    margin: 0 !important;
+    padding: 12mm !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-height: auto !important;
+    aspect-ratio: auto !important;
+  }
+  [data-slide="true"]:last-child {
+    page-break-after: auto;
+    break-after: auto;
+  }
+
+  /* Images inside slides must fit on the page */
+  [data-slide="true"] img {
+    max-width: 100% !important;
+    max-height: 160mm !important;
+    object-fit: contain !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+
+  /* Hide any leftover floating controls, mobile footers, modals */
+  .print-hide,
+  [data-print-hide="true"] {
+    display: none !important;
+  }
+}

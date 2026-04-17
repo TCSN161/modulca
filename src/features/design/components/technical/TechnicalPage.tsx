@@ -22,6 +22,7 @@ import DrawingPresentation from "./DrawingPresentation";
 import FeatureGate from "@/shared/components/FeatureGate";
 import MobileStepFooter from "../shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import "./print.css";
 
 
 const DRAWING_TYPES = [
@@ -138,7 +139,7 @@ export default function TechnicalPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col bg-gray-50 print-technical-root">
       {/* ── Top Nav ── */}
       <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6">
         <Link href="/" className="flex items-center gap-2">
@@ -393,7 +394,7 @@ export default function TechnicalPage() {
           >
             <div
               ref={drawingRef}
-              className="bg-white shadow-xl rounded-sm border border-gray-200"
+              className="bg-white shadow-xl rounded-sm border border-gray-200 print-drawing-wrapper"
               style={{
                 transform: `scale(${zoom / 100})`,
                 transformOrigin: "center center",
@@ -412,7 +413,7 @@ export default function TechnicalPage() {
           </div>
 
           {/* Zoom controls overlay */}
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-lg bg-white/90 px-3 py-2 shadow-md border border-gray-200 backdrop-blur-sm">
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-2 rounded-lg bg-white/90 px-3 py-2 shadow-md border border-gray-200 backdrop-blur-sm print-hide">
             <button
               onClick={() => setZoom((z) => Math.max(25, z - 25))}
               className="rounded px-2 py-1 text-sm font-medium text-gray-600 hover:bg-gray-100"
@@ -659,7 +660,7 @@ export default function TechnicalPage() {
       </div>
 
       {/* Mobile FABs — visible only on small screens */}
-      <div className="fixed bottom-4 right-4 flex flex-col gap-2 md:hidden z-40">
+      <div className="fixed bottom-4 right-4 flex flex-col gap-2 md:hidden z-40 print-hide">
         <button
           onClick={() => setMobilePanel(mobilePanel === "drawings" ? "none" : "drawings")}
           className="h-12 w-12 rounded-full bg-brand-teal-800 text-white shadow-lg flex items-center justify-center"
@@ -680,7 +681,7 @@ export default function TechnicalPage() {
 
       {/* Mobile slide-over panels */}
       {mobilePanel !== "none" && (
-        <div className="fixed inset-0 z-50 md:hidden">
+        <div className="fixed inset-0 z-50 md:hidden print-hide">
           <div className="absolute inset-0 bg-black/20" onClick={() => setMobilePanel("none")} />
           <div className="absolute inset-y-0 right-0 w-80 max-w-[85vw] bg-white shadow-xl overflow-y-auto p-4">
             <button

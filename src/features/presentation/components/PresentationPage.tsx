@@ -12,6 +12,7 @@ import FeatureGate from "@/shared/components/FeatureGate";
 import { useAuthStore } from "@/features/auth/store";
 import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import "@/features/design/components/technical/print.css";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 
@@ -228,7 +229,7 @@ export default function PresentationPage() {
   }
 
   return (
-    <div className="flex h-screen flex-col bg-gray-50">
+    <div className="flex h-screen flex-col bg-gray-50 print-presentation-root">
       {/* Top Nav */}
       <header className="flex h-14 items-center justify-between border-b border-gray-200 bg-white px-3 md:px-6 print:hidden">
         <Link href="/" className="flex items-center gap-2">
