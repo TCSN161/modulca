@@ -28,6 +28,8 @@ const PUBLIC_PATHS = [
   "/privacy",
   "/terms",
   "/wizard",
+  "/faq",
+  "/press",
 ];
 
 const PUBLIC_PREFIXES = [
@@ -40,6 +42,7 @@ const PUBLIC_PREFIXES = [
   "/_next/",         // Next.js internals
   "/models/",        // Static 3D models
   "/images/",        // Static images
+  "/og",             // Dynamic OG image route (must be accessible for social previews)
 ];
 
 export function middleware(request: NextRequest) {

@@ -2,6 +2,7 @@ import Link from "next/link";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import MobileNav from "./MobileNav";
 import Footer from "@/features/shared/components/Footer";
+import { softwareAppSchema, jsonLdScript } from "@/shared/lib/schema";
 
 /**
  * ModulCA Landing Page — "Digital Arboretum" Theme
@@ -63,35 +64,14 @@ function IconPlay() {
   );
 }
 
-const jsonLd = {
-  "@context": "https://schema.org",
-  "@type": "SoftwareApplication",
-  name: "ModulCA",
-  url: "https://www.modulca.eu",
-  applicationCategory: "DesignApplication",
-  operatingSystem: "Web",
-  description:
-    "AI-powered modular construction platform. Place 3×3m modules on your land, visualize in 3D, get AI renders, technical drawings, cost estimates, and connect with certified builders.",
-  offers: {
-    "@type": "AggregateOffer",
-    lowPrice: "0",
-    highPrice: "149",
-    priceCurrency: "EUR",
-    offerCount: 4,
-  },
-  creator: {
-    "@type": "Organization",
-    name: "ModulCA",
-    url: "https://www.modulca.eu",
-  },
-};
+const jsonLd = softwareAppSchema();
 
 export default function HomePage() {
   return (
     <div className="flex min-h-screen flex-col bg-brand-bone-100">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdScript(jsonLd) }}
       />
       {/* ---- Navigation ---- */}
       <nav className="sticky top-0 z-50 border-b border-brand-bone-300/60 bg-brand-bone-100/80 backdrop-blur-md">

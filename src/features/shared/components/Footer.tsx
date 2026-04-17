@@ -14,8 +14,9 @@ const FOOTER_LINKS = [
     heading: "Company",
     links: [
       { label: "Pricing", href: "/pricing" },
-      { label: "About Us", href: "/about" },
       { label: "Blog", href: "/blog" },
+      { label: "FAQ", href: "/faq" },
+      { label: "Press & Investors", href: "/press" },
       { label: "Contact", href: "mailto:contact@modulca.eu" },
     ],
   },

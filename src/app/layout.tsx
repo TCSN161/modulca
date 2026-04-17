@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Manrope, Inter } from "next/font/google";
 import { AuthHydrator } from "@/features/auth/components/AuthHydrator";
 import { Analytics } from "@/shared/components/Analytics";
+import { organizationSchema, websiteSchema, jsonLdScript } from "@/shared/lib/schema";
 import "./globals.css";
 
 const manrope = Manrope({
@@ -113,6 +114,18 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
+      <head>
+        {/* Organization + WebSite Schema.org — emitted on every page for
+            Google's knowledge panel + sitelinks searchbox */}
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(organizationSchema()) }}
+        />
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: jsonLdScript(websiteSchema()) }}
+        />
+      </head>
       <body className="min-h-screen bg-brand-bone-100 font-sans text-brand-charcoal antialiased">
         <AuthHydrator />
         {children}
