@@ -1,0 +1,181 @@
+{
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong",
+    "retry": "Try again",
+    "cancel": "Cancel",
+    "save": "Save",
+    "delete": "Delete",
+    "edit": "Edit",
+    "close": "Close",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "continue": "Continue",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "signOut": "Sign out",
+    "yes": "Yes",
+    "no": "No",
+    "required": "Required",
+    "optional": "Optional"
+  },
+  "nav": {
+    "home": "Home",
+    "pricing": "Pricing",
+    "library": "Library",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "faq": "FAQ",
+    "dashboard": "Dashboard",
+    "account": "Account",
+    "contact": "Contact",
+    "about": "About"
+  },
+  "footer": {
+    "beta": "ModulCA Beta",
+    "tagline": "AI-powered modular home design",
+    "companyInfo": "A product of MCA SRL, Romania",
+    "legal": {
+      "title": "Legal",
+      "terms": "Terms of Service",
+      "privacy": "Privacy Policy",
+      "cookies": "Cookie Policy",
+      "gdpr": "Your Data (GDPR)"
+    },
+    "product": {
+      "title": "Product",
+      "features": "Features",
+      "pricing": "Pricing",
+      "library": "Knowledge Library",
+      "portfolio": "Portfolio",
+      "blog": "Blog"
+    },
+    "company": {
+      "title": "Company",
+      "about": "About",
+      "press": "Press",
+      "contact": "Contact",
+      "partners": "Partners"
+    },
+    "network": "Part of the Archicore network",
+    "allRights": "All rights reserved",
+    "madeIn": "Made in Romania"
+  },
+  "home": {
+    "hero": {
+      "title": "Design Your Modular Home in Minutes",
+      "subtitle": "AI-powered platform — place 3×3m modules on your land, visualize in 3D, get permit-ready drawings. Start free.",
+      "ctaPrimary": "Start designing — free",
+      "ctaSecondary": "Watch 2-min demo"
+    },
+    "benefits": {
+      "title": "Why ModulCA",
+      "fast": {
+        "title": "Fast",
+        "description": "From blank canvas to permit-ready design in under 1 hour."
+      },
+      "ai": {
+        "title": "AI-powered",
+        "description": "15 AI render engines, Neufert-based consultant, intelligent suggestions."
+      },
+      "compliant": {
+        "title": "EU-compliant",
+        "description": "Built-in regulatory checks for Romania, Netherlands, Germany, France, Belgium."
+      }
+    },
+    "cta": {
+      "final": "Start your modular home design today — 3 months Premium free during beta."
+    }
+  },
+  "pricing": {
+    "title": "Simple, transparent pricing",
+    "subtitle": "Start free. Upgrade when you need more.",
+    "beta": {
+      "banner": "Beta bonus: 3 months Premium free for all new accounts"
+    },
+    "billing": {
+      "monthly": "Monthly",
+      "yearly": "Yearly",
+      "saveBadge": "Save ~17%"
+    },
+    "tier": {
+      "free": "Explorer",
+      "premium": "Premium",
+      "architect": "Architect",
+      "constructor": "Constructor"
+    },
+    "cta": {
+      "current": "Current plan",
+      "upgrade": "Upgrade",
+      "getStarted": "Get started",
+      "contactSales": "Contact sales"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Sign in to ModulCA",
+      "email": "Email",
+      "password": "Password",
+      "submit": "Sign in",
+      "orGoogle": "or continue with Google",
+      "forgotPassword": "Forgot password?",
+      "noAccount": "Don't have an account?",
+      "createAccount": "Create one"
+    },
+    "signUp": {
+      "title": "Create your ModulCA account",
+      "email": "Email",
+      "name": "Full name (optional)",
+      "password": "Password",
+      "passwordHint": "At least 8 characters",
+      "submit": "Create account",
+      "hasAccount": "Already have an account?",
+      "disclosure": "By signing up you agree to our Terms and Privacy Policy. You can download or delete your data at any time."
+    },
+    "errors": {
+      "invalidCredentials": "Invalid email or password",
+      "emailInUse": "This email is already registered",
+      "weakPassword": "Password is too weak",
+      "networkError": "Network error — please try again"
+    }
+  },
+  "account": {
+    "title": "Account & Privacy",
+    "email": "Email",
+    "plan": "Current plan",
+    "userId": "User ID",
+    "export": {
+      "title": "Download Your Data",
+      "description": "Under GDPR Article 15 and 20, you have the right to receive all personal data we hold about you in a structured, machine-readable format (JSON).",
+      "button": "Download my data (JSON)",
+      "preparing": "Preparing...",
+      "success": "Your data has been downloaded."
+    },
+    "delete": {
+      "title": "Delete Account",
+      "description": "Under GDPR Article 17, you have the right to request deletion. We offer a 30-day grace period after which data is permanently erased.",
+      "button": "Delete my account",
+      "confirm": "Are you sure? This will cancel subscriptions and sign you out from all devices.",
+      "confirmButton": "Yes, delete my account",
+      "deleting": "Deleting...",
+      "success": "Account scheduled for deletion. You have 30 days to restore by contacting privacy@modulca.eu. Signing out now..."
+    }
+  },
+  "cookies": {
+    "banner": {
+      "title": "We value your privacy",
+      "description": "We use essential cookies for core functionality. With your consent, we also use analytics cookies to improve the platform.",
+      "accept": "Accept all",
+      "reject": "Reject",
+      "customize": "Customize",
+      "learnMore": "Read cookie policy"
+    }
+  },
+  "language": {
+    "switcher": {
+      "label": "Language",
+      "tooltip": "Change language"
+    }
+  }
+}

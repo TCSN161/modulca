@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Manrope, Inter } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import { AuthHydrator } from "@/features/auth/components/AuthHydrator";
 import { Analytics } from "@/shared/components/Analytics";
 import { organizationSchema, websiteSchema, jsonLdScript } from "@/shared/lib/schema";
@@ -118,13 +120,17 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  // Locale resolved by next-intl from cookie / Accept-Language / domain
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="en" className={`${manrope.variable} ${inter.variable}`}>
+    <html lang={locale} className={`${manrope.variable} ${inter.variable}`}>
       <head>
         {/* Organization + WebSite Schema.org — emitted on every page for
             Google's knowledge panel + sitelinks searchbox */}
@@ -138,9 +144,11 @@ export default function RootLayout({
         />
       </head>
       <body className="min-h-screen bg-brand-bone-100 font-sans text-brand-charcoal antialiased">
-        <AuthHydrator />
-        {children}
-        <Analytics />
+        <NextIntlClientProvider messages={messages} locale={locale}>
+          <AuthHydrator />
+          {children}
+          <Analytics />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

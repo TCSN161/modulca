@@ -39,7 +39,7 @@
 | 16 | **Nominatim (OSM)** | Geocoding | Address strings | EU (volunteer) | ✅ | 2026-04-18 | No DPA needed (public service) |
 | 17 | **HuggingFace** | AI render (free tier) | Design prompt text | US | 🟠 | 2026-04-18 | Verify SCCs |
 | 18 | **GitHub** (Actions, CI) | Build infrastructure | Source code, CI logs | US | 🟡 | 2026-04-18 | GitHub DPA via Microsoft — verify |
-| 19 | **Google Fonts** | Font delivery | IP (when fetching fonts) | US | 🟡 | 2026-04-18 | Consider self-hosting fonts to eliminate |
+| 19 | ~~**Google Fonts**~~ ✅ Self-hosted | Font delivery at build-time only | None at runtime | Our origin | ✅ | 2026-04-18 | `next/font/google` auto self-hosts — fonts served from `/_next/static/media/` on our domain, zero runtime calls to Google |
 
 ---
 

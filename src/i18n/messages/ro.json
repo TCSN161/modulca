@@ -1,0 +1,181 @@
+{
+  "common": {
+    "loading": "Se încarcă...",
+    "error": "A apărut o eroare",
+    "retry": "Încearcă din nou",
+    "cancel": "Anulează",
+    "save": "Salvează",
+    "delete": "Șterge",
+    "edit": "Editează",
+    "close": "Închide",
+    "confirm": "Confirmă",
+    "back": "Înapoi",
+    "next": "Înainte",
+    "continue": "Continuă",
+    "signIn": "Autentificare",
+    "signUp": "Creează cont",
+    "signOut": "Deconectare",
+    "yes": "Da",
+    "no": "Nu",
+    "required": "Obligatoriu",
+    "optional": "Opțional"
+  },
+  "nav": {
+    "home": "Acasă",
+    "pricing": "Prețuri",
+    "library": "Bibliotecă",
+    "portfolio": "Portofoliu",
+    "blog": "Blog",
+    "faq": "Întrebări frecvente",
+    "dashboard": "Panou de control",
+    "account": "Cont",
+    "contact": "Contact",
+    "about": "Despre"
+  },
+  "footer": {
+    "beta": "ModulCA Beta",
+    "tagline": "Design pentru case modulare cu AI",
+    "companyInfo": "Un produs al MCA SRL, România",
+    "legal": {
+      "title": "Legal",
+      "terms": "Termeni și condiții",
+      "privacy": "Politica de confidențialitate",
+      "cookies": "Politica cookie-uri",
+      "gdpr": "Datele tale (GDPR)"
+    },
+    "product": {
+      "title": "Produs",
+      "features": "Funcționalități",
+      "pricing": "Prețuri",
+      "library": "Bibliotecă de cunoștințe",
+      "portfolio": "Portofoliu",
+      "blog": "Blog"
+    },
+    "company": {
+      "title": "Companie",
+      "about": "Despre noi",
+      "press": "Presă",
+      "contact": "Contact",
+      "partners": "Parteneri"
+    },
+    "network": "Parte din rețeaua Archicore",
+    "allRights": "Toate drepturile rezervate",
+    "madeIn": "Făcut în România"
+  },
+  "home": {
+    "hero": {
+      "title": "Designează-ți casa modulară în câteva minute",
+      "subtitle": "Platformă AI — poziționezi module de 3×3m pe teren, vizualizezi în 3D, obții planuri gata de autorizație. Gratuit la start.",
+      "ctaPrimary": "Începe designul — gratuit",
+      "ctaSecondary": "Vezi demo 2 minute"
+    },
+    "benefits": {
+      "title": "De ce ModulCA",
+      "fast": {
+        "title": "Rapid",
+        "description": "De la pagina albă la design gata pentru autorizație în sub 1 oră."
+      },
+      "ai": {
+        "title": "Putere AI",
+        "description": "15 motoare AI de randare, consultant bazat pe standardul Neufert, sugestii inteligente."
+      },
+      "compliant": {
+        "title": "Conform UE",
+        "description": "Verificări integrate pentru reglementările din România, Olanda, Germania, Franța, Belgia."
+      }
+    },
+    "cta": {
+      "final": "Începe designul casei tale modulare astăzi — 3 luni Premium gratuit în perioada beta."
+    }
+  },
+  "pricing": {
+    "title": "Prețuri simple și transparente",
+    "subtitle": "Începe gratuit. Faci upgrade când ai nevoie de mai mult.",
+    "beta": {
+      "banner": "Bonus beta: 3 luni Premium gratuit pentru toate conturile noi"
+    },
+    "billing": {
+      "monthly": "Lunar",
+      "yearly": "Anual",
+      "saveBadge": "Economisești ~17%"
+    },
+    "tier": {
+      "free": "Explorer",
+      "premium": "Premium",
+      "architect": "Arhitect",
+      "constructor": "Constructor"
+    },
+    "cta": {
+      "current": "Planul curent",
+      "upgrade": "Upgrade",
+      "getStarted": "Începe",
+      "contactSales": "Contactează vânzări"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Autentificare în ModulCA",
+      "email": "Email",
+      "password": "Parolă",
+      "submit": "Autentificare",
+      "orGoogle": "sau continuă cu Google",
+      "forgotPassword": "Ai uitat parola?",
+      "noAccount": "Nu ai cont?",
+      "createAccount": "Creează unul"
+    },
+    "signUp": {
+      "title": "Creează contul tău ModulCA",
+      "email": "Email",
+      "name": "Nume complet (opțional)",
+      "password": "Parolă",
+      "passwordHint": "Minim 8 caractere",
+      "submit": "Creează cont",
+      "hasAccount": "Ai deja cont?",
+      "disclosure": "Prin crearea contului ești de acord cu Termenii și Politica de confidențialitate. Îți poți descărca sau șterge datele oricând."
+    },
+    "errors": {
+      "invalidCredentials": "Email sau parolă incorectă",
+      "emailInUse": "Acest email este deja înregistrat",
+      "weakPassword": "Parola este prea slabă",
+      "networkError": "Eroare de rețea — încearcă din nou"
+    }
+  },
+  "account": {
+    "title": "Cont și confidențialitate",
+    "email": "Email",
+    "plan": "Planul curent",
+    "userId": "ID utilizator",
+    "export": {
+      "title": "Descarcă datele tale",
+      "description": "Conform GDPR Articolul 15 și 20, ai dreptul să primești toate datele personale pe care le deținem despre tine în format structurat, citibil de computer (JSON).",
+      "button": "Descarcă datele mele (JSON)",
+      "preparing": "Se pregătește...",
+      "success": "Datele tale au fost descărcate."
+    },
+    "delete": {
+      "title": "Șterge contul",
+      "description": "Conform GDPR Articolul 17, ai dreptul să soliciți ștergerea. Oferim o perioadă de grație de 30 de zile, după care datele sunt șterse permanent.",
+      "button": "Șterge contul meu",
+      "confirm": "Ești sigur? Asta va anula abonamentele și te va deconecta de pe toate dispozitivele.",
+      "confirmButton": "Da, șterge contul meu",
+      "deleting": "Se șterge...",
+      "success": "Cont programat pentru ștergere. Ai 30 de zile să-l restaurezi contactând privacy@modulca.eu. Te deconectăm acum..."
+    }
+  },
+  "cookies": {
+    "banner": {
+      "title": "Apreciem confidențialitatea ta",
+      "description": "Folosim cookie-uri esențiale pentru funcționalitatea de bază. Cu acordul tău, folosim și cookie-uri de analiză pentru a îmbunătăți platforma.",
+      "accept": "Acceptă toate",
+      "reject": "Refuză",
+      "customize": "Personalizează",
+      "learnMore": "Citește politica cookie-uri"
+    }
+  },
+  "language": {
+    "switcher": {
+      "label": "Limbă",
+      "tooltip": "Schimbă limba"
+    }
+  }
+}

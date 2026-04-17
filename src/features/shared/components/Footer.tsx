@@ -1,36 +1,18 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import LanguageSwitcher from "./LanguageSwitcher";
 
-const FOOTER_LINKS = [
-  {
-    heading: "Platform",
-    links: [
-      { label: "Design Your Home", href: "/project/new" },
-      { label: "AI Consultant", href: "/project/demo/consultant" },
-      { label: "Knowledge Library", href: "/library" },
-      { label: "Architectural Quiz", href: "/quiz" },
-    ],
-  },
-  {
-    heading: "Company",
-    links: [
-      { label: "Pricing", href: "/pricing" },
-      { label: "Blog", href: "/blog" },
-      { label: "FAQ", href: "/faq" },
-      { label: "Press & Investors", href: "/press" },
-      { label: "Contact", href: "mailto:contact@modulca.eu" },
-    ],
-  },
-  {
-    heading: "Legal",
-    links: [
-      { label: "Privacy Policy", href: "/privacy" },
-      { label: "Terms of Service", href: "/terms" },
-      { label: "Cookie Policy", href: "/cookies" },
-    ],
-  },
-];
-
+/**
+ * Footer — fully i18n-ready.
+ * Labels come from next-intl messages (locale-aware).
+ * Hrefs are locale-agnostic (same URL structure).
+ *
+ * To translate: edit src/i18n/messages/<locale>.json → footer.*
+ */
 export default function Footer() {
+  const t = useTranslations("footer");
+  const tNav = useTranslations("nav");
+
   return (
     <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-10">
       <div className="mx-auto max-w-5xl px-4">
@@ -42,49 +24,115 @@ export default function Footer() {
               Modul<span className="text-brand-amber-500">CA</span>
             </Link>
             <p className="mt-2 text-xs text-brand-gray leading-relaxed">
-              Modular wooden homes designed with AI. 3x3m modules, infinite possibilities.
+              {t("tagline")}
+            </p>
+            <p className="mt-1 text-[10px] text-brand-gray/80">
+              {t("companyInfo")}
             </p>
           </div>
 
-          {/* Link columns */}
-          {FOOTER_LINKS.map((col) => (
-            <div key={col.heading}>
-              <h4 className="text-[10px] font-bold uppercase tracking-label text-brand-gray mb-3">
-                {col.heading}
-              </h4>
-              <ul className="space-y-2">
-                {col.links.map((link) => (
-                  <li key={link.label}>
-                    {link.href.startsWith("mailto:") ? (
-                      <a
-                        href={link.href}
-                        className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors"
-                      >
-                        {link.label}
-                      </a>
-                    ) : (
-                      <Link
-                        href={link.href}
-                        className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors"
-                      >
-                        {link.label}
-                      </Link>
-                    )}
-                  </li>
-                ))}
-              </ul>
-            </div>
-          ))}
+          {/* Product */}
+          <div>
+            <h4 className="text-[10px] font-bold uppercase tracking-label text-brand-gray mb-3">
+              {t("product.title")}
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/project/new" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("product.features")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/pricing" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("product.pricing")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/library" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("product.library")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/portfolio" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("product.portfolio")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/blog" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("product.blog")}
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          {/* Company */}
+          <div>
+            <h4 className="text-[10px] font-bold uppercase tracking-label text-brand-gray mb-3">
+              {t("company.title")}
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/press" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("company.press")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/faq" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {tNav("faq")}
+                </Link>
+              </li>
+              <li>
+                <a
+                  href="mailto:contact@modulca.eu"
+                  className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors"
+                >
+                  {t("company.contact")}
+                </a>
+              </li>
+            </ul>
+          </div>
+
+          {/* Legal */}
+          <div>
+            <h4 className="text-[10px] font-bold uppercase tracking-label text-brand-gray mb-3">
+              {t("legal.title")}
+            </h4>
+            <ul className="space-y-2">
+              <li>
+                <Link href="/privacy" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("legal.privacy")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/terms" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("legal.terms")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/cookies" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("legal.cookies")}
+                </Link>
+              </li>
+              <li>
+                <Link href="/dashboard/account" className="text-xs text-brand-gray hover:text-brand-charcoal transition-colors">
+                  {t("legal.gdpr")}
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
         {/* Bottom bar */}
-        <div className="mt-8 pt-6 border-t border-brand-bone-300/40 flex flex-col items-center justify-between gap-2 sm:flex-row">
-          <p className="text-xs text-brand-gray">
-            &copy; {new Date().getFullYear()} ModulCA. Built for sustainability.
-          </p>
-          <p className="text-[10px] text-brand-gray/60">
-            modulca.eu &mdash; Romania &amp; Europe
-          </p>
+        <div className="mt-8 pt-6 border-t border-brand-bone-300/40 flex flex-col items-start justify-between gap-3 sm:flex-row sm:items-center">
+          <div>
+            <p className="text-xs text-brand-gray">
+              &copy; {new Date().getFullYear()} ModulCA. {t("allRights")}.
+            </p>
+            <p className="text-[10px] text-brand-gray/60 mt-1">
+              {t("madeIn")} &mdash; {t("network")}
+            </p>
+          </div>
+          <LanguageSwitcher variant="inline" />
         </div>
       </div>
     </footer>

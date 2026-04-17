@@ -2,6 +2,10 @@ const { withSentryConfig } = require("@sentry/nextjs");
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
+const createNextIntlPlugin = require("next-intl/plugin");
+
+// Point to our request config; uses cookie + Accept-Language + domain for locale detection
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
@@ -45,7 +49,7 @@ const nextConfig = {
 // Only wrap with Sentry if DSN is configured
 const sentryEnabled = !!process.env.NEXT_PUBLIC_SENTRY_DSN;
 
-const finalConfig = withBundleAnalyzer(nextConfig);
+const finalConfig = withNextIntl(withBundleAnalyzer(nextConfig));
 
 module.exports = sentryEnabled
   ? withSentryConfig(finalConfig, {

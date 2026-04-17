@@ -1,0 +1,181 @@
+{
+  "common": {
+    "loading": "Laden...",
+    "error": "Er is iets misgegaan",
+    "retry": "Opnieuw proberen",
+    "cancel": "Annuleren",
+    "save": "Opslaan",
+    "delete": "Verwijderen",
+    "edit": "Bewerken",
+    "close": "Sluiten",
+    "confirm": "Bevestigen",
+    "back": "Terug",
+    "next": "Volgende",
+    "continue": "Doorgaan",
+    "signIn": "Inloggen",
+    "signUp": "Account aanmaken",
+    "signOut": "Uitloggen",
+    "yes": "Ja",
+    "no": "Nee",
+    "required": "Verplicht",
+    "optional": "Optioneel"
+  },
+  "nav": {
+    "home": "Home",
+    "pricing": "Prijzen",
+    "library": "Bibliotheek",
+    "portfolio": "Portfolio",
+    "blog": "Blog",
+    "faq": "Veelgestelde vragen",
+    "dashboard": "Dashboard",
+    "account": "Account",
+    "contact": "Contact",
+    "about": "Over ons"
+  },
+  "footer": {
+    "beta": "ModulCA Beta",
+    "tagline": "AI-gedreven modulair huisontwerp",
+    "companyInfo": "Een product van MCA SRL, Roemenië",
+    "legal": {
+      "title": "Juridisch",
+      "terms": "Algemene voorwaarden",
+      "privacy": "Privacybeleid",
+      "cookies": "Cookiebeleid",
+      "gdpr": "Jouw gegevens (AVG)"
+    },
+    "product": {
+      "title": "Product",
+      "features": "Functies",
+      "pricing": "Prijzen",
+      "library": "Kennisbibliotheek",
+      "portfolio": "Portfolio",
+      "blog": "Blog"
+    },
+    "company": {
+      "title": "Bedrijf",
+      "about": "Over ons",
+      "press": "Pers",
+      "contact": "Contact",
+      "partners": "Partners"
+    },
+    "network": "Onderdeel van het Archicore-netwerk",
+    "allRights": "Alle rechten voorbehouden",
+    "madeIn": "Gemaakt in Roemenië"
+  },
+  "home": {
+    "hero": {
+      "title": "Ontwerp je modulaire huis in enkele minuten",
+      "subtitle": "AI-platform — plaats 3×3m modules op je grond, visualiseer in 3D, krijg vergunning-klare tekeningen. Gratis starten.",
+      "ctaPrimary": "Begin met ontwerpen — gratis",
+      "ctaSecondary": "Bekijk 2-min demo"
+    },
+    "benefits": {
+      "title": "Waarom ModulCA",
+      "fast": {
+        "title": "Snel",
+        "description": "Van leeg canvas naar vergunning-klaar ontwerp in minder dan 1 uur."
+      },
+      "ai": {
+        "title": "AI-kracht",
+        "description": "15 AI-render engines, Neufert-gebaseerde consultant, intelligente suggesties."
+      },
+      "compliant": {
+        "title": "EU-conform",
+        "description": "Ingebouwde regelgeving voor Roemenië, Nederland, Duitsland, Frankrijk, België."
+      }
+    },
+    "cta": {
+      "final": "Start vandaag met het ontwerpen van je modulaire huis — 3 maanden Premium gratis tijdens de bèta."
+    }
+  },
+  "pricing": {
+    "title": "Eenvoudige, transparante prijzen",
+    "subtitle": "Start gratis. Upgrade wanneer je meer nodig hebt.",
+    "beta": {
+      "banner": "Bètabonus: 3 maanden Premium gratis voor alle nieuwe accounts"
+    },
+    "billing": {
+      "monthly": "Maandelijks",
+      "yearly": "Jaarlijks",
+      "saveBadge": "Bespaar ~17%"
+    },
+    "tier": {
+      "free": "Explorer",
+      "premium": "Premium",
+      "architect": "Architect",
+      "constructor": "Constructor"
+    },
+    "cta": {
+      "current": "Huidige abonnement",
+      "upgrade": "Upgrade",
+      "getStarted": "Begin nu",
+      "contactSales": "Contact sales"
+    }
+  },
+  "auth": {
+    "signIn": {
+      "title": "Inloggen bij ModulCA",
+      "email": "E-mail",
+      "password": "Wachtwoord",
+      "submit": "Inloggen",
+      "orGoogle": "of ga verder met Google",
+      "forgotPassword": "Wachtwoord vergeten?",
+      "noAccount": "Nog geen account?",
+      "createAccount": "Maak er een"
+    },
+    "signUp": {
+      "title": "Maak je ModulCA-account aan",
+      "email": "E-mail",
+      "name": "Volledige naam (optioneel)",
+      "password": "Wachtwoord",
+      "passwordHint": "Minimaal 8 tekens",
+      "submit": "Account aanmaken",
+      "hasAccount": "Heb je al een account?",
+      "disclosure": "Door een account aan te maken ga je akkoord met onze Voorwaarden en Privacybeleid. Je kunt je gegevens op elk moment downloaden of verwijderen."
+    },
+    "errors": {
+      "invalidCredentials": "Ongeldig e-mailadres of wachtwoord",
+      "emailInUse": "Dit e-mailadres is al geregistreerd",
+      "weakPassword": "Wachtwoord is te zwak",
+      "networkError": "Netwerkfout — probeer opnieuw"
+    }
+  },
+  "account": {
+    "title": "Account & privacy",
+    "email": "E-mail",
+    "plan": "Huidig abonnement",
+    "userId": "Gebruikers-ID",
+    "export": {
+      "title": "Download je gegevens",
+      "description": "Onder AVG artikel 15 en 20 heb je het recht om alle persoonsgegevens die wij over jou bewaren in een gestructureerd, machine-leesbaar formaat (JSON) te ontvangen.",
+      "button": "Download mijn gegevens (JSON)",
+      "preparing": "Voorbereiden...",
+      "success": "Je gegevens zijn gedownload."
+    },
+    "delete": {
+      "title": "Account verwijderen",
+      "description": "Onder AVG artikel 17 heb je het recht om verwijdering te verzoeken. We bieden een respijtperiode van 30 dagen, waarna gegevens permanent worden gewist.",
+      "button": "Verwijder mijn account",
+      "confirm": "Weet je het zeker? Dit annuleert abonnementen en logt je uit op alle apparaten.",
+      "confirmButton": "Ja, verwijder mijn account",
+      "deleting": "Verwijderen...",
+      "success": "Account gepland voor verwijdering. Je hebt 30 dagen om te herstellen via privacy@modulca.eu. Je wordt nu uitgelogd..."
+    }
+  },
+  "cookies": {
+    "banner": {
+      "title": "Wij waarderen je privacy",
+      "description": "Wij gebruiken essentiële cookies voor kernfunctionaliteit. Met jouw toestemming gebruiken we ook analyse-cookies om het platform te verbeteren.",
+      "accept": "Alles accepteren",
+      "reject": "Weigeren",
+      "customize": "Aanpassen",
+      "learnMore": "Lees cookiebeleid"
+    }
+  },
+  "language": {
+    "switcher": {
+      "label": "Taal",
+      "tooltip": "Taal wijzigen"
+    }
+  }
+}
