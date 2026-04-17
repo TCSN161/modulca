@@ -276,12 +276,31 @@ Doar **font unic cross-brand** ca element de consistency subtle. Tot restul e pe
 | Domeniu | Status | Preț est./an | Scop |
 |---|---|---|---|
 | `archicore.eu` | ✅ LIBER | €10 | Umbrella tech (hidden initial) |
-| `neufertai.eu` | ✅ LIBER | €10 | NeufertAI brand |
+| `neufertai.eu` | ✅ LIBER | €10 | NeufertAI brand (vezi risc Neufert §8 bis) |
 | `renderlab.eu` | ✅ LIBER | €10 | RenderLab brand |
 | `crisisready.eu` | ✅ LIBER | €11 | CrisisReady brand |
-| `modulca.com` | 🔴 LUAT | €12 | **Expiră 2026-07-10** — set reminder pt drop-catch |
+| `modulca.com` | 🔴 LUAT | €12 | **Expiră 2026-07-10** — reminder drop-catch 2026-07-05 |
 
 **Total imediat: €41/an pentru 4 domenii libere. Plus reminder pentru modulca.com.**
+
+#### 🎯 Decizie finală domenii (user confirm 2026-04-17)
+
+| Categorie | Domeniu | Cost |
+|---|---|---|
+| Tier 1 critical | archicore.eu + neufertai.eu + renderlab.eu + crisisready.eu | €41 |
+| Neufert safety backup (brand diferit, fără risc) | archiai.eu | €10 |
+| Defensive minim | neufertai.com + modulca.net | €24 |
+| Expansion EU | bunkere.eu + **treehouse.eu** | €20 |
+| **TOTAL CORE (decis)** | **9 domenii** | **€95/an** |
+
+**Mai târziu (by need):**
+- `baumhaus.de` (~€15 cu admin-C proxy) — pentru localizare Germania când intrăm acolo
+- `neufert.ai` (€85) — opțional premium, amânat până vedem tracțiune NeufertAI
+- `modulca.com` drop-catch 2026-07-10
+
+**Decizii brand specifice:**
+- **Treehouse vertical** = `treehouse.eu` (EN singular, pan-EU brand). `baumhaus.de` e pentru localizare DE când e nevoie, nu brand principal.
+- **NeufertAI**: procedăm cu brand-ul dar avem `archiai.eu` ca safety net (brand complet diferit) dacă Neufert-Stiftung obiectează.
 
 #### 🟡 Tier 2 — Expansion (cumpără 30-90 zile sau când e nevoie, ~€50/an)
 
@@ -738,6 +757,24 @@ Registru de decizii arhitecturale cheie, cu rationale. Format: decizie + data + 
 - **Decizie**: Crisis management integrat în TOATE platformele + ca vertical dedicat (crisisready.eu + UII research lead)
 - **Alternative evaluate**: Doar bunkere.ro | Nu includem
 - **Rationale**: Expertiza founder + ONG credibility + grant-uri EU masive disponibile. Moat competițional real.
+
+### DL-009: Treehouse brand pan-EU
+- **Data**: 2026-04-17
+- **Decizie**: `treehouse.eu` (singular) ca brand pan-EU. `baumhaus.de` rezervat pentru localizare Germania când e cazul (nu brand principal).
+- **Alternative evaluate**: treehaus.eu (mix DE+EN, kitsch), baumhaus.eu (prea specific DE), canopy.eu (brandable dar non-descriptiv), treehouses.eu (plural, feels listing)
+- **Rationale**: Pattern consistent cu ecosistem (modulca invenție + bunkere cuvânt + treehouse cuvânt EN descriptiv). Singular = brand mai puternic. Universal EN funcționează pan-EU. Strategia DE curată via baumhaus.de ulterior (ca Amazon: global + locale).
+
+### DL-010: Neufert trademark risk — managed, not avoided
+- **Data**: 2026-04-17
+- **Decizie**: Procedăm cu `NeufertAI` ca brand primar. Rezervăm `archiai.eu` (brand complet diferit, fără risc) ca safety net pentru pivot rapid dacă Neufert-Stiftung obiectează. Nu investim marketing heavy în Germania cu numele NeufertAI până când consultăm IP lawyer specialist Namensrecht.
+- **Alternative evaluate**: ArchiAI only (pierdem recognition), Contact proactiv Stiftung (bun dar nu urgent), Ignore risc (naiv)
+- **Rationale**: Research (2026-04-17): Neufert-Stiftung activă din 2001 dar fără enforcement public vizibil. Fără trademark public detectat. Risc MEDIU-ÎNALT specific DE (Namensrecht §12 BGB), LOW-MEDIUM EU. Dual-branding = opționalitate la cost €10 extra.
+
+### DL-011: Dashboard + Continuous Audit ca spec activă
+- **Data**: 2026-04-17
+- **Decizie**: Documentăm acum spec-ul pentru `admin.archicore.eu` Dashboard + sistemul de audituri continue (daily/weekly/monthly). Build-ul începe în Faza 1 (post beta-launch).
+- **Alternative evaluate**: Build immediate (distrage de la beta-launch), defer indefinite (pierdere vizibilitate operațională)
+- **Rationale**: User a cerut explicit. Spec scris acum = nu pierdem viziunea. Build început la Faza 1 = nu distragem launch ModulCA. Audituri manuale (cum facem azi) = baseline pentru când dashboard-ul preia automat.
 
 ---
 

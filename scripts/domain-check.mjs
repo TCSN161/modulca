@@ -78,6 +78,13 @@ const DOMAINS = [
   { name: "neufert.ai",         tier: "ai", purpose: ".ai for NeufertAI",      estEur: 85 },
   { name: "render.ai",          tier: "ai", purpose: ".ai for RenderLab",      estEur: 85 },
   { name: "crisis.ai",          tier: "ai", purpose: ".ai for CrisisReady",    estEur: 85 },
+
+  // Additional treehouse checks (singular .eu + DE market)
+  { name: "treehouse.eu",       tier: "th2", purpose: "Treehouse singular EN", estEur: 10 },
+  { name: "treehouse.com",      tier: "th2", purpose: "Treehouse .com",        estEur: 12 },
+  { name: "baumhaus.de",        tier: "th2", purpose: "Germany-specific",      estEur: 10 },
+  { name: "inthetrees.eu",      tier: "th2", purpose: "Brandable EN",          estEur: 10 },
+  { name: "treelife.eu",        tier: "th2", purpose: "Brandable EN",          estEur: 10 },
 ];
 
 /* ── RDAP check ──────────────────────────────────────────────── */
