@@ -162,45 +162,118 @@ const DEFAULT_POLICY: PolicyFlags = {
  * Cost ceiling in tryEngines() auto-skips engines over per-image budget.
  */
 
-/** guest_free / free tier: only free engines */
+/**
+ * Fallback chains — optimized 2026-04-17 using real production latency data
+ * from scripts/test-live-engines.mjs.
+ *
+ * Ordering principle: expected quality → fast fallback → slow fallback.
+ * Prodia (113s) and ai-horde (110s) are placed last — used only when
+ * everything else is depleted.
+ */
+
+/**
+ * guest_free / free tier — all $0/img.
+ * Order by real latency: cloudflare (3s) → pollinations (5s) → huggingface (9s)
+ * → gemini/together/ai-horde (slower but robust).
+ */
 const FALLBACK_FREE = [
-  "together", "cloudflare", "huggingface",             // free with API key
-  "pollinations", "ai-horde",                          // free, no key needed
+  "cloudflare",     // 3s — fastest free, FLUX Schnell
+  "pollinations",   // 5s — no auth needed, reliable
+  "huggingface",    // 9s — open-source SDXL/FLUX
+  "gemini",         // 51s — Google quality, 500 req/day
+  "together",       // 49s — FLUX Schnell free tier
+  "ai-horde",       // 110s — last resort, volunteer GPUs
 ];
 
-/** premium tier: best quality first, then cheaper fallbacks */
+/**
+ * premium tier — best quality, balanced cost.
+ * openai (2s) is fastest AND highest quality, so it leads.
+ * Fall back to cheaper/free when cost budget hits ceiling.
+ */
 const FALLBACK_PREMIUM = [
-  "blackforest", "fal", "together", "fireworks",       // best EU + fast
-  "cloudflare", "huggingface", "prodia", "replicate",  // free/cheap
-  "deepinfra", "segmind", "leonardo",                  // mid-tier
-  "openai",                                            // premium
-  "ai-horde", "pollinations",                          // always-available
+  "openai",         // 2s, $0.02 — fastest premium, great quality
+  "cloudflare",     // 3s, $0 — free speed boost
+  "leonardo",       // 17s, $0.03 — photorealistic alchemy
+  "blackforest",    // 43s, $0.003 — FLUX Pro creators (EU/GDPR)
+  "fireworks",      // 54s, $0.0014 — EU rep, SOC 2
+  "fal",            // 52s, $0.003 — fast FLUX Kontext
+  "gemini",         // 51s, $0 — free Google fallback
+  "together",       // 49s, $0 — free FLUX Schnell
+  "replicate",      // 53s, $0.003 — big model ecosystem
+  "deepinfra",      // 51s, $0.015 — FLUX inference
+  "segmind",        // 52s, $0.005 — SDXL + upscale
+  "huggingface",    // 9s, $0 — quick free fallback
+  "pollinations",   // 5s, $0 — always on
+  "ai-horde",       // 110s, $0 — last resort
 ];
 
-/** architect tier: premium quality, no cost restriction */
+/**
+ * architect tier — max quality, no cost ceiling.
+ * Prioritize specialized engines (stability for img2img, runway for
+ * cinematic, blackforest for FLUX Pro).
+ */
 const FALLBACK_ARCHITECT = [
-  "blackforest", "openai", "stability", "leonardo",    // premium quality
-  "fal", "together", "fireworks", "replicate",         // fast + versatile
-  "prodia", "deepinfra", "cloudflare", "huggingface", "segmind", // mid-tier
-  "ai-horde", "pollinations",                          // always-available
+  "openai",         // 2s, $0.02 — instant premium quality
+  "stability",      // 52s, $0.065 — best img2img with 3D base
+  "blackforest",    // 43s, $0.003 — FLUX Pro authors
+  "runway",         // 39s, $0.02 — cinematic Gen-3
+  "leonardo",       // 17s, $0.03 — photoreal alchemy
+  "fal",            // 52s, $0.003 — fast FLUX Kontext
+  "fireworks",      // 54s, $0.0014 — EU/GDPR compliant
+  "wavespeed",      // 62s, $0.003 — Seedream edit for img2img
+  "replicate",      // 53s, $0.003 — huge model ecosystem
+  "deepinfra",      // 51s, $0.015 — FLUX serverless
+  "gemini",         // 51s, $0 — free Google quality
+  "together",       // 49s, $0 — free FLUX
+  "novita",         // 60s, $0.0015 — 200+ models
+  "segmind",        // 52s, $0.005 — SDXL + upscale
+  "cloudflare",     // 3s, $0 — fast free backup
+  "huggingface",    // 9s, $0
+  "pollinations",   // 5s, $0
+  "ai-horde",       // 110s, $0 — last resort
 ];
 
-/** Default text2img: balanced free → cheap → mid → premium */
+/** Default text2img when tier unspecified — balanced cost/speed */
 const FALLBACK_ORDER = [
-  "together", "fal", "cloudflare", "blackforest",     // free / near-free (BFL = EU)
-  "huggingface", "fireworks", "prodia",                // free/cheap
-  "segmind", "deepinfra", "replicate", "leonardo",     // low-cost / mid
-  "openai",                                            // premium
-  "ai-horde", "pollinations",                          // always-available fallback
+  "cloudflare",     // 3s, $0
+  "openai",         // 2s, $0.02 — fast premium
+  "gemini",         // 51s, $0
+  "together",       // 49s, $0
+  "blackforest",    // 43s, $0.003
+  "fireworks",      // 54s, $0.0014
+  "fal",            // 52s, $0.003
+  "huggingface",    // 9s, $0
+  "replicate",      // 53s, $0.003
+  "deepinfra",      // 51s, $0.015
+  "segmind",        // 52s, $0.005
+  "leonardo",       // 17s, $0.03
+  "pollinations",   // 5s, $0
+  "ai-horde",       // 110s, $0
 ];
 
-/** img2img: structure-preserving engines first */
+/**
+ * img2img — structure-preserving engines first, then text2img fallback.
+ * Stability and WaveSpeed Seedream-Edit are the only true img2img engines
+ * that respect the input 3D composition. Others will ignore baseImage.
+ */
 const IMG2IMG_FALLBACK = [
-  "stability", "fal", "together", "replicate",         // img2img capable
-  "blackforest", "cloudflare", "fireworks",             // text2img fallback (EU-friendly)
-  "huggingface", "segmind", "deepinfra", "leonardo",    // mid-tier fallback
-  "openai",                                             // premium fallback
-  "ai-horde", "pollinations",                           // last resort
+  "stability",      // 52s, $0.065 — specialist img2img
+  "wavespeed",      // 62s, $0.003 — Seedream edit
+  "fal",            // 52s, $0.003 — Flux Kontext img2img
+  "replicate",      // 53s, $0.003 — ControlNet + SDXL
+  "blackforest",    // 43s, $0.003 — FLUX (text2img mode)
+  "runway",         // 39s, $0.02 — cinematic fallback
+  "openai",         // 2s, $0.02 — premium text2img fallback
+  "fireworks",      // 54s, $0.0014 — EU/GDPR
+  "deepinfra",      // 51s, $0.015
+  "leonardo",       // 17s, $0.03
+  "segmind",        // 52s, $0.005
+  "gemini",         // 51s, $0 — free text2img fallback
+  "together",       // 49s, $0
+  "cloudflare",     // 3s, $0
+  "huggingface",    // 9s, $0
+  "pollinations",   // 5s, $0
+  "ai-horde",       // 110s, $0 — last resort
 ];
 
 /** Get the best fallback chain for a tier + mode combination */
