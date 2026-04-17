@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useCallback } from "react";
+import EngineBillingBar from "@/features/admin/EngineBillingBar";
 
 interface EngineResult {
   engineId: string;
@@ -367,6 +368,9 @@ export default function EngineComparisonPage() {
                   Free: {r.freeQuota}
                 </div>
               </div>
+
+              {/* Billing metadata strip — role, renewal, top-up, cost/img */}
+              <EngineBillingBar engineId={r.engineId} />
             </div>
           ))}
         </div>
