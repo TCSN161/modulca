@@ -55,12 +55,13 @@ export const COMPANY = {
     label: "Activități de arhitectură",
   },
 
-  /** Legal representative / administrator */
+  /** Legal representative / administrator (confirmed by owner 2026-04-17) */
   administrator: {
-    // TODO: confirm full name — bank doc shows "MURARU PETRIA"
     surname: "MURARU",
     name: "PETRIA",
     role: "Administrator",
+    /** Full name as it must appear on Stripe, invoices, and legal docs */
+    fullName: "MURARU PETRIA",
   },
 
   /** Bank account for invoicing */
@@ -97,11 +98,12 @@ export const COMPANY = {
     },
   },
 
-  /** Share capital — required on invoices for SRL in Romania */
-  // TODO: user to confirm exact amount (1 RON if still from SRL-D, or 200 RON minimum if converted)
+  /** Share capital — confirmed by owner 2026-04-17 */
   shareCapital: {
     amount: 200,
     currency: "RON",
+    /** Formatted string for invoices and legal docs */
+    formatted: "200 RON",
   },
 
   /** ANAF / data sources last verified */
