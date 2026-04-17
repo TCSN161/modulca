@@ -65,6 +65,19 @@ const DOMAINS = [
   { name: "nested.eu",          tier: "th", purpose: "Brandable — nested living", estEur: 10 },
   { name: "arborhaus.eu",       tier: "th", purpose: "Arbor + haus",           estEur: 10 },
   { name: "canopyhaus.eu",      tier: "th", purpose: "Canopy + haus",          estEur: 10 },
+
+  // Authentic German for "treehouse" = Baumhaus
+  { name: "baumhaus.eu",        tier: "th", purpose: "Baumhaus (auth. DE)",    estEur: 10 },
+  { name: "baumhaus.ro",        tier: "th", purpose: "Baumhaus RO",            estEur: 12 },
+  { name: "das-baumhaus.eu",    tier: "th", purpose: "'The Treehouse' DE",     estEur: 10 },
+  { name: "neo-baumhaus.eu",    tier: "th", purpose: "Modern Baumhaus",        estEur: 10 },
+  { name: "mein-baumhaus.eu",   tier: "th", purpose: "'My Treehouse' DE",      estEur: 10 },
+
+  // .ai TLD options for AI brands (expensive ~$80-100/an)
+  { name: "archi.ai",           tier: "ai", purpose: ".ai premium TLD",        estEur: 85 },
+  { name: "neufert.ai",         tier: "ai", purpose: ".ai for NeufertAI",      estEur: 85 },
+  { name: "render.ai",          tier: "ai", purpose: ".ai for RenderLab",      estEur: 85 },
+  { name: "crisis.ai",          tier: "ai", purpose: ".ai for CrisisReady",    estEur: 85 },
 ];
 
 /* ── RDAP check ──────────────────────────────────────────────── */

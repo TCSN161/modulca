@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import EngineBillingBar from "@/features/admin/EngineBillingBar";
+import PublishButton from "@/features/gallery/components/PublishButton";
 
 interface EngineResult {
   engineId: string;
@@ -409,6 +410,20 @@ export default function EngineComparisonPage() {
                 <div style={{ fontSize: "11px", color: "#666", marginTop: "4px" }}>
                   Free: {r.freeQuota}
                 </div>
+
+                {/* Publish to gallery — admin only, available after successful render */}
+                {r.status === "success" && r.image && (
+                  <div style={{ marginTop: "8px" }}>
+                    <PublishButton
+                      imageDataUrl={r.image}
+                      engineId={r.engineId}
+                      isAdmin
+                      promptExcerpt={prompt}
+                      latencyMs={r.latencyMs}
+                      size="sm"
+                    />
+                  </div>
+                )}
               </div>
 
               {/* Billing metadata strip — role, renewal, top-up, cost/img */}

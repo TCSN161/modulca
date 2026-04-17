@@ -561,23 +561,6 @@ export default function RenderPage() {
                   >
                     {"🎨 Save to Presentation"}
                   </button>
-
-                  {/* Publish to public gallery — opt-in, contributes to the public /gallery */}
-                  {aiImageUrl && (
-                    <div className="pt-2 border-t border-gray-100">
-                      <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">
-                        Share with community
-                      </p>
-                      <PublishWrapper
-                        aiImageUrl={aiImageUrl}
-                        engineId={aiUsedEngine || "unknown"}
-                        promptExcerpt={aiPrompt || ""}
-                        roomType={currentMod?.moduleType}
-                        styleDirection={styleDirection || undefined}
-                      />
-                    </div>
-                  )}
-
                   {/* Upscale & Remove BG buttons — premium features */}
                   <div className="pt-2 border-t border-gray-100 space-y-2">
                     <p className="text-[10px] font-bold text-gray-400 uppercase">Enhance</p>
@@ -1030,69 +1013,5 @@ export default function RenderPage() {
       </div>
       <MobileStepFooter activeStep={7} />
     </div>
-  );
-}
-
-/**
- * PublishWrapper — converts an AI image URL (or blob URL) to a data URL
- * required by /api/renders/publish, then delegates to PublishButton.
- * Kept inline because it's specific to the render-step integration.
- */
-function PublishWrapper(props: {
-  aiImageUrl: string;
-  engineId: string;
-  promptExcerpt: string;
-  roomType?: string;
-  styleDirection?: string;
-}) {
-  const [dataUrl, setDataUrl] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
-
-  useEffect(() => {
-    let cancelled = false;
-    setLoading(true);
-    // Convert URL → data URL (PublishButton needs base64 payload)
-    fetch(props.aiImageUrl)
-      .then((r) => r.blob())
-      .then((blob) => {
-        return new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onloadend = () => resolve(reader.result as string);
-          reader.onerror = () => reject(reader.error);
-          reader.readAsDataURL(blob);
-        });
-      })
-      .then((url) => {
-        if (!cancelled) setDataUrl(url);
-      })
-      .catch(() => {
-        /* ignore — PublishButton will show disabled state */
-      })
-      .finally(() => {
-        if (!cancelled) setLoading(false);
-      });
-    return () => {
-      cancelled = true;
-    };
-  }, [props.aiImageUrl]);
-
-  if (loading || !dataUrl) {
-    return (
-      <p className="text-[10px] text-gray-400 italic">
-        {loading ? "Preparing image..." : "Image unavailable"}
-      </p>
-    );
-  }
-
-  return (
-    <PublishButton
-      imageDataUrl={dataUrl}
-      engineId={props.engineId}
-      promptExcerpt={props.promptExcerpt}
-      roomType={props.roomType}
-      styleDirection={props.styleDirection}
-      showPrice
-      size="sm"
-    />
   );
 }
