@@ -22,6 +22,36 @@ npm run collision-check               # scan for hotspot files & conflicts
 - If you detect another session edited your target file in the last hour, STOP and ask the user
 - NEVER run `git push --force` — this can destroy another session's work
 
+**⚠️ CRITICAL: Always commit with EXPLICIT file paths, never bare `git commit`**
+
+Why: The git index is shared across parallel sessions. A bare `git commit`
+picks up everything staged — including files another session was preparing.
+This caused commit `ebae1cc` to mislabel 39 files as "test: cleanup test file".
+See `docs/GIT_HISTORY_NOTES.md` for the full story.
+
+```bash
+# ❌ WRONG — absorbs other sessions' staged files:
+git add . && git commit -m "..."
+git add -A && git commit -m "..."
+git commit -a -m "..."
+git commit -m "..."              # if anything is staged, this is dangerous
+
+# ✅ CORRECT — commits only the files you explicitly name:
+git add src/specific-file.ts
+git commit src/specific-file.ts -m "..."
+
+# ✅ CORRECT — multiple specific files:
+git add src/a.ts src/b.ts
+git commit src/a.ts src/b.ts docs/c.md -m "..."
+
+# ✅ OK for session isolation: check status FIRST, then add only yours:
+git status                                 # review what's already staged
+git restore --staged unrelated-file        # unstage anything not yours
+git add my-files... && git commit -m "..."
+```
+
+Before every commit: **run `git status` and confirm every file listed is yours.**
+
 **At the END of every session:**
 ```bash
 npm run typecheck                     # verify clean
