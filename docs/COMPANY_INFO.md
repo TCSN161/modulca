@@ -21,7 +21,7 @@
 | EUID | **ROANRC.J40/14760/2015** |
 | Incorporation date | **2015-12-04** |
 | Status | Activă |
-| Share capital | 200 RON *(to confirm — may be 1 RON if originally SRL-D)* |
+| Share capital | **200 RON** (confirmed) |
 | CAEN code | **7111** — Activități de arhitectură |
 | VAT status | **Not VAT-registered** (art. 310 Cod Fiscal) |
 
@@ -174,7 +174,7 @@ npm run fill:company
 
 ## 9. 🆘 Still Open / Future Work
 
-- [ ] **Confirm share capital** — 200 RON vs 1 RON (depends on original SRL-D status)
+- [x] ~~Confirm share capital~~ — 200 RON (confirmed 2026-04-17)
 - [ ] **Set up email forwards** for billing@, support@, petria@ → real mailbox
 - [ ] **Stripe business account verification** — upload CUI certificate + ID
 - [ ] **Update Stripe from TEST to LIVE mode** — after account verified
@@ -182,6 +182,7 @@ npm run fill:company
 - [ ] **Shareholders' agreement** — if accepting investment
 - [ ] **Privacy Impact Assessment (DPIA)** — for AI render + consultant features
 - [ ] **Terms of Use for AI outputs** — watermarking, user responsibility clause
+- [ ] **Monitor turnover** — 300K RON/year = mandatory VAT registration trigger
 
 ---
 
