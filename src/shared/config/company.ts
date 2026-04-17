@@ -73,9 +73,14 @@ export const COMPANY = {
 
   /** Contact info (business-facing — NOT personal) */
   contact: {
-    // TODO: user to provide business email + phone
-    email: "contact@modulca.eu",
-    phone: "", // fill in when available
+    // Business email — placeholder until Cloudflare Email Routing is set up.
+    // Resend already sends FROM @modulca.eu (domain verified).
+    email: "costin.telefon@gmail.com", // TODO: switch to contact@modulca.eu after DNS setup
+    /** Registered ANAF/ONRC phone — NOT displayed publicly. Used only on
+     *  invoices, Stripe business profile, and legal documents. */
+    phone: "+40723599514",
+    /** Whether phone is allowed on the public website (footer/contact) */
+    phoneIsPublic: false,
     website: "https://www.modulca.eu",
   },
 
