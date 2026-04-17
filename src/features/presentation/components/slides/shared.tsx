@@ -1,9 +1,54 @@
 /**
- * Shared slide primitives — SlideCard wrapper and SlideHeader.
+ * Shared slide primitives — SlideCard wrapper, SlideHeader, and row helpers.
  * Kept small and dependency-free so any slide file can import them cheaply.
  */
 
 import type { ReactNode } from "react";
+
+/** Two-column label:value row used on site/detail slides */
+export function DetailRow({
+  label,
+  value,
+  text,
+}: {
+  label: string;
+  value: string;
+  text: string;
+}) {
+  return (
+    <div className="flex justify-between text-sm">
+      <span style={{ color: text, opacity: 0.5 }}>{label}</span>
+      <span className="font-medium" style={{ color: text }}>
+        {value}
+      </span>
+    </div>
+  );
+}
+
+/** Cost line item; pass `green` for discounts */
+export function CostRow({
+  label,
+  value,
+  text,
+  green,
+}: {
+  label: string;
+  value: string;
+  text: string;
+  green?: boolean;
+}) {
+  return (
+    <div className="flex justify-between text-sm">
+      <span style={{ color: text, opacity: 0.6 }}>{label}</span>
+      <span
+        className={`font-medium ${green ? "text-green-600" : ""}`}
+        style={green ? {} : { color: text }}
+      >
+        {value}
+      </span>
+    </div>
+  );
+}
 
 /**
  * SlideCard — the themed container every slide renders into.

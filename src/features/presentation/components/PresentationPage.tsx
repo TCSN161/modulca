@@ -4,9 +4,8 @@ import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react"
 import Link from "next/link";
 import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
-import { MODULE_TYPES, FINISH_LEVELS, MODULE_EXTERIOR_SIZE, MODULE_EXTERIOR_AREA, MODULE_INTERIOR_AREA } from "@/shared/types";
+import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getStyleDirection } from "@/features/design/styles";
-import { getPreset, getPresetsForType, FLOOR_MATERIALS, WALL_MATERIALS } from "@/features/design/layouts";
 import StepNav from "@/features/design/components/shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
 import { useAuthStore } from "@/features/auth/store";
@@ -20,6 +19,13 @@ const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
 import CoverSlide from "./slides/CoverSlide";
 import DescriptionSlide from "./slides/DescriptionSlide";
 import VisionSlide from "./slides/VisionSlide";
+import SiteSlide from "./slides/SiteSlide";
+import FloorplanSlide from "./slides/FloorplanSlide";
+import ModulesSlide from "./slides/ModulesSlide";
+import RendersSlide from "./slides/RendersSlide";
+import MaterialsSlide from "./slides/MaterialsSlide";
+import ProductsSlide from "./slides/ProductsSlide";
+import CostSlide from "./slides/CostSlide";
 
 type PresentationTemplate = "minimal" | "bold" | "classic" | "luxury" | "architect";
 type SlideId =
@@ -439,120 +445,44 @@ export default function PresentationPage() {
             })()}
 
             {activeSlide === "site" && slides.find((s) => s.id === "site")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={2} title="Site Plan" />
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
-                  {/* SVG Site Plan — shows modules on terrain */}
-                  <div className="rounded-xl overflow-hidden bg-emerald-50 border border-emerald-200 aspect-video flex items-center justify-center p-4">
-                    {modules.length > 0 ? (
-                      <SitePlanSvg modules={modules} accent={tmpl.accent} />
-                    ) : (
-                      <p className="text-sm text-gray-400">No modules placed yet</p>
-                    )}
-                  </div>
-                  <div className="space-y-4">
-                    <DetailRow label="Location" value={mapCenter.lat !== 44.4268 ? `${mapCenter.lat.toFixed(4)}, ${mapCenter.lng.toFixed(4)}` : "Romania (default)"} text={tmpl.text} />
-                    <DetailRow label="Terrain Area" value={polygon.length > 2 ? `~${Math.round(polygon.length * 50)} m\u00B2 (estimated)` : `~${stats.totalArea * 4} m\u00B2 (auto-sized)`} text={tmpl.text} />
-                    <DetailRow label="Grid Configuration" value={`${modules.length} module${modules.length !== 1 ? "s" : ""} placed`} text={tmpl.text} />
-                    <DetailRow label="Grid Rotation" value={`${gridRotation}\u00B0`} text={tmpl.text} />
-                    <DetailRow label="Total Built Area" value={`${stats.totalArea} m\u00B2`} text={tmpl.text} />
-                    <DetailRow label="Usable Area" value={`${stats.usableArea} m\u00B2`} text={tmpl.text} />
-                    <DetailRow label="Building Footprint" value={`${Math.ceil(Math.sqrt(stats.totalArea))} \u00D7 ${Math.ceil(Math.sqrt(stats.totalArea))} m approx.`} text={tmpl.text} />
-                  </div>
-                </div>
-              </SlideCard>
+              <SiteSlide
+                template={tmpl}
+                slideNumber={2}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+                modules={modules}
+                mapCenter={mapCenter}
+                polygonCount={polygon.length}
+                gridRotation={gridRotation}
+              />
             )}
 
-            {activeSlide === "floorplan" && slides.find((s) => s.id === "floorplan")?.enabled && (() => {
-              // Build grid from gridCells (includes empty cells for context) + modules for placed data
-              const activeCells = gridCells.filter((c) => c.moduleType !== null);
-              const cellsToRender = activeCells.length > 0 ? activeCells : modules.map((m) => ({ row: m.row, col: m.col, moduleType: m.moduleType }));
-              const allRows = cellsToRender.map((c) => c.row);
-              const allCols = cellsToRender.map((c) => c.col);
-              const minRow = Math.min(...allRows);
-              const maxRow = Math.max(...allRows);
-              const minCol = Math.min(...allCols);
-              const maxCol = Math.max(...allCols);
-              const numCols = maxCol - minCol + 1;
-              const numRows = maxRow - minRow + 1;
-              const cellLookup = new Map(cellsToRender.map((c) => [`${c.row},${c.col}`, c.moduleType]));
-              // Also create a module label lookup
-              const labelLookup = new Map(modules.map((m) => [`${m.row},${m.col}`, m.label]));
-
-              // Build grid positions including empty cells for the bounding box
-              const gridPositions: { row: number; col: number; moduleType: string | null }[] = [];
-              for (let r = minRow; r <= maxRow; r++) {
-                for (let c = minCol; c <= maxCol; c++) {
-                  const key = `${r},${c}`;
-                  gridPositions.push({ row: r, col: c, moduleType: cellLookup.get(key) ?? null });
-                }
-              }
-
-              return (
-                <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                  <SlideHeader accent={tmpl.accent} text={tmpl.text} number={3} title="Floor Plan" />
-                  <div className="mt-4 text-center">
-                    <p className="text-xs mb-1" style={{ color: tmpl.text, opacity: 0.4 }}>
-                      {numCols * MODULE_EXTERIOR_SIZE}m x {numRows * MODULE_EXTERIOR_SIZE}m footprint | {modules.length * MODULE_EXTERIOR_AREA}m{"\u00B2"} total | {modules.length * MODULE_INTERIOR_AREA}m{"\u00B2"} usable
-                    </p>
-                  </div>
-                  <div className="mt-4 flex justify-center overflow-x-auto">
-                    <div className="grid gap-1" style={{
-                      gridTemplateColumns: `repeat(${numCols}, minmax(60px, 80px))`,
-                    }}>
-                      {gridPositions.map(({ row, col, moduleType }) => {
-                        const mt = moduleType ? MODULE_TYPES.find((m) => m.id === moduleType) : null;
-                        const label = labelLookup.get(`${row},${col}`);
-                        if (!moduleType) {
-                          // Empty grid cell — show as faint placeholder
-                          return (
-                            <div
-                              key={`${row}-${col}`}
-                              className="rounded-lg border border-dashed p-2 text-center"
-                              style={{
-                                gridColumn: col - minCol + 1,
-                                gridRow: row - minRow + 1,
-                                borderColor: tmpl.text + "15",
-                              }}
-                            >
-                              <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.15 }}>empty</div>
-                            </div>
-                          );
-                        }
-                        return (
-                          <div
-                            key={`${row}-${col}`}
-                            className="rounded-lg border p-2 text-center"
-                            style={{
-                              gridColumn: col - minCol + 1,
-                              gridRow: row - minRow + 1,
-                              backgroundColor: mt?.color + "30",
-                              borderColor: mt?.color || "#ccc",
-                            }}
-                          >
-                            <div className="text-[9px] font-bold" style={{ color: tmpl.text }}>{label || moduleType}</div>
-                            <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.5 }}>{mt?.label}</div>
-                            <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.4 }}>{MODULE_EXTERIOR_SIZE}m x {MODULE_EXTERIOR_SIZE}m</div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div className="mt-6 flex justify-center gap-4">
-                    {Array.from(new Set(modules.map((m) => m.moduleType))).map((type) => {
-                      const mt = MODULE_TYPES.find((m) => m.id === type);
-                      const count = modules.filter((m) => m.moduleType === type).length;
-                      return (
-                        <div key={type} className="flex items-center gap-2 text-xs" style={{ color: tmpl.text }}>
-                          <div className="h-3 w-3 rounded" style={{ backgroundColor: mt?.color }} />
-                          <span>{mt?.label} x{count} ({count * MODULE_EXTERIOR_AREA}m{"\u00B2"})</span>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </SlideCard>
-              );
-            })()}
+            {activeSlide === "floorplan" && slides.find((s) => s.id === "floorplan")?.enabled && (
+              <FloorplanSlide
+                template={tmpl}
+                slideNumber={3}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+                gridCells={gridCells}
+                modules={modules}
+              />
+            )}
 
             {activeSlide === "vision" && slides.find((s) => s.id === "vision")?.enabled && (() => {
               const moodImages = moodboardPins.length > 0
@@ -579,221 +509,98 @@ export default function PresentationPage() {
               );
             })()}
 
-            {activeSlide === "modules" && slides.find((s) => s.id === "modules")?.enabled && (() => {
-              const MODS_PER_SLIDE = 4;
-              const pages: typeof modules[] = [];
-              for (let i = 0; i < modules.length; i += MODS_PER_SLIDE) {
-                pages.push(modules.slice(i, i + MODS_PER_SLIDE));
-              }
-              return pages.map((pageMods, pageIdx) => (
-                <SlideCard key={`modules-${pageIdx}`} bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                  <SlideHeader accent={tmpl.accent} text={tmpl.text} number={5 + pageIdx} title={pages.length > 1 ? `Module Details (${pageIdx + 1}/${pages.length})` : "Module Details"} />
-                  <div className="mt-6 space-y-4">
-                    {pageMods.map((mod) => {
-                      const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
-                      const preset = getPreset(mod.moduleType, mod.layoutPreset)
-                        || getPresetsForType(mod.moduleType)[0];
-                      const floor = FLOOR_MATERIALS.find((f) => f.id === mod.floorFinish);
-                      const wall = WALL_MATERIALS.find((w) => w.id === mod.wallColor);
-                      return (
-                        <div key={`${mod.row}-${mod.col}`} className="rounded-xl p-4" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
-                          <div className="flex items-center gap-3 mb-3">
-                            <div className="h-5 w-5 rounded" style={{ backgroundColor: mt?.color }} />
-                            <h4 className="text-sm font-bold" style={{ color: tmpl.text }}>{mod.label}</h4>
-                            <span className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>{mt?.label} | {preset?.label}</span>
-                          </div>
-                          <div className="grid grid-cols-4 gap-4 text-xs">
-                            <div>
-                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Floor</span>
-                              <div className="flex items-center gap-1 mt-1">
-                                <div className="h-3 w-3 rounded border" style={{ backgroundColor: floor?.color }} />
-                                <span style={{ color: tmpl.text }}>{floor?.label}</span>
-                              </div>
-                            </div>
-                            <div>
-                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Walls</span>
-                              <div className="flex items-center gap-1 mt-1">
-                                <div className="h-3 w-3 rounded border" style={{ backgroundColor: wall?.color }} />
-                                <span style={{ color: tmpl.text }}>{wall?.label}</span>
-                              </div>
-                            </div>
-                            <div>
-                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Furniture</span>
-                              <span className="block mt-1" style={{ color: tmpl.text }}>{preset?.furniture.length || 0} pieces</span>
-                            </div>
-                            <div>
-                              <span style={{ color: tmpl.text, opacity: 0.4 }}>Area</span>
-                              <span className="block mt-1" style={{ color: tmpl.text }}>9m2 (7m2 usable)</span>
-                            </div>
-                          </div>
-                        </div>
-                      );
-                    })}
-                  </div>
-                </SlideCard>
-              ));
-            })()}
+            {activeSlide === "modules" && slides.find((s) => s.id === "modules")?.enabled && (
+              <ModulesSlide
+                template={tmpl}
+                slideNumber={5}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+                modules={modules}
+              />
+            )}
 
             {activeSlide === "renders" && slides.find((s) => s.id === "renders")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={6} title="AI Renders" />
-                {savedRenders.length > 0 ? (
-                  <div className="mt-6 grid grid-cols-2 gap-4">
-                    {savedRenders.map((render) => (
-                      <div key={render.id} className="rounded-xl overflow-hidden border" style={{ borderColor: tmpl.text + "20" }}>
-                        {/* eslint-disable-next-line @next/next/no-img-element */}
-                        <img src={render.imageUrl} alt={render.label} className="w-full aspect-video object-cover" />
-                        <div className="p-3">
-                          <p className="text-xs font-medium" style={{ color: tmpl.text }}>{render.label}</p>
-                          {render.description && (
-                            <p className="text-[10px] leading-relaxed mt-1" style={{ color: tmpl.text, opacity: 0.6 }}>{render.description}</p>
-                          )}
-                          <div className="flex items-center gap-2 mt-1">
-                            <p className="text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Engine: {render.engine}</p>
-                            {render.resolution && (
-                              <p className="text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>{render.resolution}</p>
-                            )}
-                            {render.mode && (
-                              <span className="text-[9px] px-1.5 py-0.5 rounded-full" style={{ backgroundColor: tmpl.accent + "20", color: tmpl.accent }}>
-                                {render.mode === "img2img" ? "3D+AI" : "AI"}
-                              </span>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <div className="mt-6 text-center">
-                    <div className="rounded-xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center mb-4">
-                      <p className="text-sm text-gray-500">Save renders from Step 7 to see them here</p>
-                    </div>
-                    <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
-                      Use the &quot;Save to Presentation&quot; button in the Render step
-                    </p>
-                  </div>
-                )}
-                {savedRenders.length > 6 && (
-                  <p className="text-[10px] mt-2 text-center" style={{ color: tmpl.text, opacity: 0.3 }}>
-                    {savedRenders.length} renders saved
-                  </p>
-                )}
-              </SlideCard>
+              <RendersSlide
+                template={tmpl}
+                slideNumber={6}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+                renders={savedRenders}
+              />
             )}
 
             {activeSlide === "materials" && slides.find((s) => s.id === "materials")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={7} title="Materials & Finishes" />
-                <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: tmpl.text, opacity: 0.4 }}>Floor Materials</p>
-                    <div className="space-y-2">
-                      {Array.from(new Set(modules.map((m) => m.floorFinish))).map((floorId) => {
-                        const floor = FLOOR_MATERIALS.find((f) => f.id === floorId);
-                        const count = modules.filter((m) => m.floorFinish === floorId).length;
-                        const textureUrl = MATERIAL_TEXTURES[floorId];
-                        return (
-                          <div key={floorId} className="flex items-center gap-3 rounded-lg p-2" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
-                            <div className="h-10 w-10 rounded-lg border overflow-hidden flex-shrink-0" style={{ backgroundColor: floor?.color }}>
-                              {textureUrl && (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={textureUrl} alt={floor?.label || floorId} className="h-full w-full object-cover" />
-                              )}
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium" style={{ color: tmpl.text }}>{floor?.label}</span>
-                              <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Used in {count} module{count > 1 ? "s" : ""}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                  <div>
-                    <p className="text-[10px] font-bold uppercase tracking-wider mb-3" style={{ color: tmpl.text, opacity: 0.4 }}>Wall Finishes</p>
-                    <div className="space-y-2">
-                      {Array.from(new Set(modules.map((m) => m.wallColor))).map((wallId) => {
-                        const wall = WALL_MATERIALS.find((w) => w.id === wallId);
-                        const count = modules.filter((m) => m.wallColor === wallId).length;
-                        const textureUrl = MATERIAL_TEXTURES[wallId];
-                        return (
-                          <div key={wallId} className="flex items-center gap-3 rounded-lg p-2" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
-                            <div className="h-10 w-10 rounded-lg border overflow-hidden flex-shrink-0" style={{ backgroundColor: wall?.color }}>
-                              {textureUrl && (
-                                // eslint-disable-next-line @next/next/no-img-element
-                                <img src={textureUrl} alt={wall?.label || wallId} className="h-full w-full object-cover" />
-                              )}
-                            </div>
-                            <div>
-                              <span className="text-xs font-medium" style={{ color: tmpl.text }}>{wall?.label}</span>
-                              <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Used in {count} module{count > 1 ? "s" : ""}</span>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-                </div>
-                <div className="mt-6">
-                  <p className="text-[10px] font-bold uppercase tracking-wider mb-2" style={{ color: tmpl.text, opacity: 0.4 }}>Finish Level</p>
-                  <div className="inline-block rounded-lg px-4 py-2" style={{ backgroundColor: tmpl.accent + "20" }}>
-                    <span className="text-sm font-bold" style={{ color: tmpl.accent }}>{finishInfo?.label || "Standard"}</span>
-                  </div>
-                </div>
-              </SlideCard>
+              <MaterialsSlide
+                template={tmpl}
+                slideNumber={7}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+                modules={modules}
+                textures={MATERIAL_TEXTURES}
+              />
             )}
 
             {activeSlide === "products" && slides.find((s) => s.id === "products")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={8} title="Selected Products" />
-                {products.length > 0 ? (
-                  <div className="mt-6">
-                    <div className="space-y-2">
-                      {products.map((p) => (
-                        <div key={p.id} className="flex items-center justify-between rounded-lg p-3" style={{ backgroundColor: tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8" }}>
-                          <div>
-                            <span className="text-sm font-medium" style={{ color: tmpl.text }}>{p.name}</span>
-                            <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>Qty: {p.quantity} × EUR{p.price}</span>
-                          </div>
-                          <span className="text-sm font-bold" style={{ color: tmpl.accent }}>EUR{(p.quantity * p.price).toLocaleString()}</span>
-                        </div>
-                      ))}
-                    </div>
-                    <div className="mt-4 pt-3 border-t flex justify-between" style={{ borderColor: tmpl.text + "20" }}>
-                      <span className="text-sm font-bold" style={{ color: tmpl.text }}>Products Total</span>
-                      <span className="text-sm font-bold" style={{ color: tmpl.accent }}>
-                        EUR{products.reduce((sum, p) => sum + p.quantity * p.price, 0).toLocaleString()}
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="mt-6 text-center py-12">
-                    <p className="text-sm" style={{ color: tmpl.text, opacity: 0.4 }}>No products selected yet. Add products in Step 11 (Products).</p>
-                  </div>
-                )}
-              </SlideCard>
+              <ProductsSlide
+                template={tmpl}
+                slideNumber={8}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+                products={products}
+              />
             )}
 
             {activeSlide === "cost" && slides.find((s) => s.id === "cost")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={9} title="Cost Summary" />
-                <div className="mt-8 max-w-md mx-auto space-y-3">
-                  <CostRow label={`Module cost (${finishInfo?.label || "Standard"})`} value={`EUR${stats.moduleCost.toLocaleString()}`} text={tmpl.text} />
-                  {stats.sharedWallDiscount > 0 && (
-                    <CostRow label="Shared wall discount" value={`-EUR${stats.sharedWallDiscount.toLocaleString()}`} text={tmpl.text} green />
-                  )}
-                  <CostRow label="Design fee (8%)" value={`EUR${stats.designFee.toLocaleString()}`} text={tmpl.text} />
-                  <div className="border-t pt-3 mt-3" style={{ borderColor: tmpl.text + "20" }}>
-                    <div className="flex justify-between">
-                      <span className="text-lg font-bold" style={{ color: tmpl.text }}>Total Estimate</span>
-                      <span className="text-lg font-bold" style={{ color: tmpl.accent }}>EUR{stats.totalEstimate.toLocaleString()}</span>
-                    </div>
-                  </div>
-                  <p className="text-[10px] text-center mt-4" style={{ color: tmpl.text, opacity: 0.3 }}>
-                    * Estimate based on {finishInfo?.label || "Standard"} finish level. Final price may vary based on local conditions and builder quotes.
-                  </p>
-                </div>
-              </SlideCard>
+              <CostSlide
+                template={tmpl}
+                slideNumber={9}
+                projectName={projectName}
+                clientName={clientName}
+                moduleCount={modules.length}
+                totalAreaSqm={stats.totalArea}
+                usableAreaSqm={stats.usableArea}
+                styleName={style?.label || "Modern"}
+                finishName={finishInfo?.label || "Standard"}
+                savedRenders={savedRenders}
+                coverRenderIndex={coverRenderIndex}
+                setCoverRenderIndex={setCoverRenderIndex}
+                moduleCost={stats.moduleCost}
+                sharedWallDiscount={stats.sharedWallDiscount}
+                designFee={stats.designFee}
+                totalEstimateEur={stats.totalEstimate}
+              />
             )}
 
             {activeSlide === "next" && slides.find((s) => s.id === "next")?.enabled && (
@@ -909,74 +716,5 @@ function SlideHeader({ accent, text, number, title }: { accent: string; text: st
   );
 }
 
-function DetailRow({ label, value, text }: { label: string; value: string; text: string }) {
-  return (
-    <div className="flex justify-between text-sm">
-      <span style={{ color: text, opacity: 0.5 }}>{label}</span>
-      <span className="font-medium" style={{ color: text }}>{value}</span>
-    </div>
-  );
-}
-
-function CostRow({ label, value, text, green }: { label: string; value: string; text: string; green?: boolean }) {
-  return (
-    <div className="flex justify-between text-sm">
-      <span style={{ color: text, opacity: 0.6 }}>{label}</span>
-      <span className={`font-medium ${green ? "text-green-600" : ""}`} style={green ? {} : { color: text }}>{value}</span>
-    </div>
-  );
-}
-
-/** SVG site plan showing module layout on a terrain outline */
-function SitePlanSvg({ modules, accent }: { modules: { row: number; col: number; moduleType: string; label: string }[]; accent: string }) {
-  if (modules.length === 0) return null;
-  const minR = Math.min(...modules.map((m) => m.row));
-  const maxR = Math.max(...modules.map((m) => m.row));
-  const minC = Math.min(...modules.map((m) => m.col));
-  const maxC = Math.max(...modules.map((m) => m.col));
-  const cols = maxC - minC + 1;
-  const rows = maxR - minR + 1;
-  const cellPx = 40;
-  const pad = 60; // terrain padding around building
-  const svgW = cols * cellPx + pad * 2;
-  const svgH = rows * cellPx + pad * 2;
-
-  return (
-    <svg viewBox={`0 0 ${svgW} ${svgH}`} className="w-full h-full" style={{ maxHeight: 200 }}>
-      {/* Terrain outline — slightly larger than building */}
-      <rect
-        x={12} y={12}
-        width={svgW - 24} height={svgH - 24}
-        rx={6}
-        fill="#d1fae5" stroke="#6ee7b7" strokeWidth={1.5} strokeDasharray="6,3"
-      />
-      {/* Terrain label */}
-      <text x={svgW / 2} y={24} textAnchor="middle" fontSize={8} fill="#065f46" fontFamily="sans-serif">TERRAIN BOUNDARY</text>
-      {/* North arrow */}
-      <text x={svgW - 20} y={28} fontSize={10} fill="#065f46" fontFamily="sans-serif" fontWeight="bold">N</text>
-      <line x1={svgW - 17} y1={30} x2={svgW - 17} y2={40} stroke="#065f46" strokeWidth={1} markerEnd="" />
-      {/* Module cells */}
-      {modules.map((mod) => {
-        const mt = MODULE_TYPES.find((m) => m.id === mod.moduleType);
-        const x = pad + (mod.col - minC) * cellPx;
-        const y = pad + (mod.row - minR) * cellPx;
-        return (
-          <g key={`${mod.row}-${mod.col}`}>
-            <rect x={x + 1} y={y + 1} width={cellPx - 2} height={cellPx - 2} rx={3}
-              fill={mt?.color || "#ccc"} fillOpacity={0.7} stroke={accent} strokeWidth={1.5} />
-            <text x={x + cellPx / 2} y={y + cellPx / 2 - 3} textAnchor="middle" fontSize={7} fill="#1a1a1a" fontWeight="bold" fontFamily="sans-serif">
-              {mod.label}
-            </text>
-            <text x={x + cellPx / 2} y={y + cellPx / 2 + 7} textAnchor="middle" fontSize={5} fill="#555" fontFamily="sans-serif">
-              3x3m
-            </text>
-          </g>
-        );
-      })}
-      {/* Dimension line */}
-      <text x={pad + (cols * cellPx) / 2} y={svgH - 10} textAnchor="middle" fontSize={7} fill="#555" fontFamily="sans-serif">
-        {(cols * 3).toFixed(0)}m x {(rows * 3).toFixed(0)}m footprint
-      </text>
-    </svg>
-  );
-}
+// DetailRow, CostRow → moved to ./slides/shared.tsx
+// SitePlanSvg → moved to ./slides/SitePlanSvg.tsx

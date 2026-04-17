@@ -41,19 +41,23 @@ const MySlide = lazy(() => import("./slides/MySlide"));
 
 ## Extraction Status
 
-| Slide | Status | Reason / Blocker |
+| Slide | Status | Notes |
 |---|---|---|
-| Cover | ✅ Extracted | Simple, mostly text + hero image |
-| Description | 🟡 Inline | Auto-generates from modules — needs `useSlideData` hook first |
-| Site | 🟡 Inline | Depends on `useLandStore` |
-| Floorplan | 🟡 Inline | Custom SVG renderer, depends on modules state |
-| Vision | 🟡 Inline | Depends on `styleDirection` + moodboard URLs |
-| Modules | 🟡 Inline | Per-module renderer, depends on `getPreset`, `FLOOR_MATERIALS` etc |
-| Renders | 🟡 Inline | Depends on `savedRenders` localStorage state |
-| Materials | 🟡 Inline | Texture lookup from `MATERIAL_TEXTURES` |
-| Products | 🟡 Inline | Depends on localStorage product selection |
-| Cost | 🟡 Inline | Uses `computeCost` helpers from design module |
-| Next Steps | ✅ Extracted | Pure presentational, no state deps |
+| Cover | ✅ Extracted + integrated | — |
+| Description | ✅ Extracted + integrated | — |
+| Site | ✅ Extracted + integrated | `SitePlanSvg.tsx` also extracted |
+| Floorplan | ✅ Extracted + integrated | Custom grid renderer |
+| Vision | ✅ Extracted + integrated | — |
+| Modules | ✅ Extracted + integrated | Paginated 4/slide |
+| Renders | ✅ Extracted + integrated | — |
+| Materials | ✅ Extracted + integrated | Floor + wall textures |
+| Products | ✅ Extracted + integrated | — |
+| Cost | ✅ Extracted + integrated | — |
+| Next Steps | ✅ Extracted (NOT integrated) | Inline version has editable `nextSteps` state — kept as-is |
+
+**All 10 slide types extracted.** PresentationPage.tsx reduced from 1064 → 720 lines.
+Next Steps slide kept inline because it exposes editable text inputs and uses local state.
+An alternative extracted version (`NextStepsSlide.tsx`) is available for future iterations.
 
 ## Extraction Plan (for future sessions)
 
