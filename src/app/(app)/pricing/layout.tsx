@@ -10,10 +10,20 @@ export const metadata: Metadata = {
       "Flexible pricing for modular home design. Start free, upgrade when you need more.",
     images: [
       {
-        url: "/og?title=Choose+Your+Plan&subtitle=Start+free.+Upgrade+when+you+need+more+power.",
+        url: "/og?title=Pricing+Plans&subtitle=Choose+your+modular+design+tier",
         width: 1200,
         height: 630,
+        alt: "ModulCA Pricing Plans",
       },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Pricing Plans — ModulCA",
+    description:
+      "Flexible pricing for modular home design. Start free, upgrade when you need more.",
+    images: [
+      "/og?title=Pricing+Plans&subtitle=Choose+your+modular+design+tier",
     ],
   },
 };

@@ -10,10 +10,20 @@ export const metadata: Metadata = {
       "Real modular homes built with our 3×3m grid system. Studios, cabins, family homes, and more.",
     images: [
       {
-        url: "/og?title=Built+with+ModulCA&subtitle=Real+modular+homes+designed+on+our+platform",
+        url: "/og?title=Portfolio&subtitle=See+what+others+built+with+ModulCA",
         width: 1200,
         height: 630,
+        alt: "ModulCA Portfolio",
       },
+    ],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Portfolio — Built with ModulCA",
+    description:
+      "Real modular homes built with our 3×3m grid system.",
+    images: [
+      "/og?title=Portfolio&subtitle=See+what+others+built+with+ModulCA",
     ],
   },
 };
