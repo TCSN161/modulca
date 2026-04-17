@@ -7,12 +7,18 @@ import { useAuthStore } from "@/features/auth/store";
 import { listProjects, deleteProject, type ProjectRecord } from "@/features/auth/projectService";
 import { getTierConfig } from "@/features/auth/types";
 import { openCustomerPortal } from "@/shared/lib/stripe";
+import { BUILDING_PRESETS } from "@/shared/types";
 
-/* Sample templates shown when user has no projects */
+/**
+ * Curated showcase templates for the dashboard — mapped to real BUILDING_PRESETS
+ * so that clicking one pre-selects the template on /project/new via URL params.
+ * Each entry's `presetId` MUST match a preset id in BUILDING_PRESETS for the
+ * carry-over to work. If missing, the template becomes a plain link (safe fallback).
+ */
 const TEMPLATES = [
-  { name: "Eco-Lodge Module", desc: "Solar-ready, 45sqm", gradient: "from-emerald-800 to-emerald-600", modules: 5 },
-  { name: "Urban Studio Loft", desc: "Compact living, 27sqm", gradient: "from-slate-700 to-slate-500", modules: 3 },
-  { name: "Family Courtyard", desc: "U-shape, 108sqm", gradient: "from-amber-800 to-amber-600", modules: 12 },
+  { presetId: "house-family",  name: "Family House",  desc: "9 modules — spacious living", gradient: "from-emerald-800 to-emerald-600" },
+  { presetId: "studio-loft",   name: "Loft Studio",   desc: "3 modules — compact living",  gradient: "from-slate-700 to-slate-500" },
+  { presetId: "house-l-shape", name: "L-Shape Villa", desc: "9 modules — courtyard style", gradient: "from-amber-800 to-amber-600" },
 ];
 
 export default function DashboardPage() {
@@ -240,23 +246,30 @@ export default function DashboardPage() {
               </button>
             </div>
             <div className="flex gap-3 overflow-x-auto scrollbar-none pb-1 -mx-1 px-1">
-              {TEMPLATES.map((t) => (
-                <Link
-                  key={t.name}
-                  href="/project/new"
-                  className="flex-shrink-0 w-64 rounded-[16px] overflow-hidden shadow-card hover:shadow-subtle transition-all group"
-                >
-                  <div className={`h-36 bg-gradient-to-br ${t.gradient} relative p-4 flex flex-col justify-end`}>
-                    <div className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                      <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                      </svg>
+              {TEMPLATES.map((t) => {
+                // Verify preset exists; fall back to plain /project/new if not found (safe)
+                const presetExists = BUILDING_PRESETS.some((bp) => bp.id === t.presetId);
+                const href = presetExists
+                  ? `/project/new?preset=${encodeURIComponent(t.presetId)}&name=${encodeURIComponent(t.name)}`
+                  : "/project/new";
+                return (
+                  <Link
+                    key={t.name}
+                    href={href}
+                    className="flex-shrink-0 w-64 rounded-[16px] overflow-hidden shadow-card hover:shadow-subtle transition-all group"
+                  >
+                    <div className={`h-36 bg-gradient-to-br ${t.gradient} relative p-4 flex flex-col justify-end`}>
+                      <div className="absolute top-3 right-3 h-8 w-8 rounded-full bg-white/20 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
+                        <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+                        </svg>
+                      </div>
+                      <h3 className="text-sm font-bold text-white">{t.name}</h3>
+                      <p className="text-xs text-white/70">{t.desc}</p>
                     </div>
-                    <h3 className="text-sm font-bold text-white">{t.name}</h3>
-                    <p className="text-xs text-white/70">{t.desc}</p>
-                  </div>
-                </Link>
-              ))}
+                  </Link>
+                );
+              })}
             </div>
           </div>
 
