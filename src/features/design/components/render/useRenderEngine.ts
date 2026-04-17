@@ -86,6 +86,11 @@ export function useRenderEngine({
       setAiElapsed(Math.floor((Date.now() - start) / 1000));
     }, 1000);
 
+    // 90-second timeout — abort request if no response, prevents infinite loading UX
+    const AI_TIMEOUT_MS = 90_000;
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), AI_TIMEOUT_MS);
+
     try {
       let response: Response;
 
@@ -105,13 +110,14 @@ export function useRenderEngine({
             tier,
             maxCostUsd,
           }),
+          signal: controller.signal,
         });
       } else {
         // GET mode: text-to-image
         const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
         const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}&tier=${tier}&maxCostUsd=${maxCostUsd}`;
         isDev && console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
-        response = await fetch(proxyUrl);
+        response = await fetch(proxyUrl, { signal: controller.signal });
       }
 
       if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
@@ -164,8 +170,14 @@ export function useRenderEngine({
     } catch (err) {
       if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
       console.error("[AI Render] Error:", err);
-      setAiError("Network error. Please try again.");
+      if (err instanceof Error && err.name === "AbortError") {
+        setAiError("AI generation timed out after 90 seconds. The engine may be overloaded — please try again or use a simpler prompt.");
+      } else {
+        setAiError("Network error. Please try again.");
+      }
       setAiLoading(false);
+    } finally {
+      clearTimeout(timeoutId);
     }
   }, [renderResolution, aiEngine, useSceneAsBase, captureRef]);
 

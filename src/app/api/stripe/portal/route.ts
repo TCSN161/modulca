@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import * as Sentry from "@sentry/nextjs";
+import { getAuthenticatedUserId } from "@/shared/lib/api-auth";
+import { getSupabaseServer } from "@/shared/lib/supabase-server";
 
 export const dynamic = "force-dynamic";
 
@@ -14,17 +16,49 @@ function getStripe() {
  * POST /api/stripe/portal
  * Creates a Stripe Customer Portal session for managing subscriptions.
  *
- * Body: { customerId: string }
+ * Auth: requires authenticated Supabase session.
+ * Ownership: verifies the `customerId` belongs to the authenticated user
+ *            via profiles.stripe_customer_id, preventing cross-account access.
+ *
+ * Body (optional): { customerId?: string } — ignored unless it matches user's actual Stripe ID
  * Returns: { url: string } — the Portal URL
  */
 export async function POST(req: NextRequest) {
-  try {
-    const { customerId } = await req.json();
+  // Authenticate
+  const userId = await getAuthenticatedUserId(req);
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Authentication required" },
+      { status: 401 }
+    );
+  }
 
+  try {
+    // Look up the user's Stripe customer ID from their profile — never trust client-supplied
+    const sb = getSupabaseServer();
+    if (!sb) {
+      return NextResponse.json(
+        { error: "Supabase not configured" },
+        { status: 503 }
+      );
+    }
+
+    const { data: profile, error: profileErr } = await sb
+      .from("profiles")
+      .select("stripe_customer_id")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (profileErr) {
+      Sentry.captureException(profileErr, { tags: { source: "stripe-portal" } });
+      return NextResponse.json({ error: "Profile lookup failed" }, { status: 500 });
+    }
+
+    const customerId = (profile as { stripe_customer_id?: string } | null)?.stripe_customer_id;
     if (!customerId) {
       return NextResponse.json(
-        { error: "Missing customerId" },
-        { status: 400 }
+        { error: "No Stripe customer record — upgrade to a paid plan first" },
+        { status: 404 }
       );
     }
 

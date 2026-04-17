@@ -53,11 +53,18 @@ export function captureMessage(
 
 /**
  * Set user context for error reports.
- * Call after authentication to attach user info to Sentry events.
+ * GDPR: we only send `id` to Sentry (for correlation).
+ * Email is explicitly stripped via beforeSend hook in sentry.client.config.ts,
+ * but we also avoid sending it here to minimize PII in transit.
+ *
  * Pass null to clear.
  */
 export function setUser(user: { id: string; email?: string } | null): void {
-  if (isSentryConfigured) {
-    Sentry.setUser(user);
+  if (!isSentryConfigured) return;
+  if (user === null) {
+    Sentry.setUser(null);
+    return;
   }
+  // Intentionally omit email — id is sufficient for correlation
+  Sentry.setUser({ id: user.id });
 }

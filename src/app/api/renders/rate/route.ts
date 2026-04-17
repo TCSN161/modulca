@@ -2,14 +2,15 @@
  * POST /api/renders/rate
  *
  * Records a 1-5 star rating. Requires authenticated user.
- * Guests hitting this endpoint are sent back a 401 so the UI can
- * redirect them to /register?redirect=/g/{slug}.
+ * User ID is extracted from the verified Supabase session — NEVER trusted from
+ * the request body (prevents rating spoofing).
  *
- * Body: { slug: string, stars: 1-5, userId: string, isOwner?: boolean }
+ * Body: { slug: string, stars: 1-5 }
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getAuthenticatedUserId } from "@/shared/lib/api-auth";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -22,14 +23,19 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
   }
 
+  // Authenticate — extract user ID from verified session, never from body
+  const userId = await getAuthenticatedUserId(req);
+  if (!userId) {
+    return NextResponse.json({ error: "Authentication required" }, { status: 401 });
+  }
+
   const body = (await req.json().catch(() => ({}))) as {
     slug?: string;
     stars?: number;
-    userId?: string;
   };
 
-  if (!body.slug || !body.userId) {
-    return NextResponse.json({ error: "slug and userId required" }, { status: 400 });
+  if (!body.slug) {
+    return NextResponse.json({ error: "slug required" }, { status: 400 });
   }
   const stars = Math.round(Number(body.stars) || 0);
   if (stars < 1 || stars > 5) {
@@ -52,7 +58,7 @@ export async function POST(req: NextRequest) {
   }
 
   // Self-rating counts at 0.5 weight (user can rate own but score diluted)
-  const isOwner = render.user_id === body.userId;
+  const isOwner = render.user_id === userId;
   const weight = isOwner ? 0.5 : 1.0;
 
   // Upsert the rating (unique index on render_id + user_id prevents duplicates)
@@ -60,7 +66,7 @@ export async function POST(req: NextRequest) {
     .from("render_ratings")
     .select("id, stars, weight")
     .eq("render_id", render.id)
-    .eq("user_id", body.userId)
+    .eq("user_id", userId)
     .maybeSingle();
 
   if (existing) {
@@ -84,7 +90,7 @@ export async function POST(req: NextRequest) {
     // New rating
     await sb.from("render_ratings").insert({
       render_id: render.id,
-      user_id: body.userId,
+      user_id: userId,
       stars,
       weight,
     });

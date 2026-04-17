@@ -5,13 +5,16 @@
  * the authenticated user's projects table. The user can then open the
  * project in the designer and continue editing.
  *
- * Auth: requires a valid Supabase session (cookie-based).
+ * Auth: requires a valid Supabase session. User ID is extracted from the
+ * verified session — NEVER trusted from the request body.
+ *
  * Body: { slug: string, name?: string }
  * Returns: { projectId: string }
  */
 
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { getAuthenticatedUserId } from "@/shared/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -26,18 +29,23 @@ export async function POST(req: NextRequest) {
     );
   }
 
+  // Authenticate — extract user ID from verified session, never from body
+  const userId = await getAuthenticatedUserId(req);
+  if (!userId) {
+    return NextResponse.json(
+      { error: "Authentication required — please sign in" },
+      { status: 401 }
+    );
+  }
+
   try {
     const body = (await req.json().catch(() => ({}))) as {
       slug?: string;
       name?: string;
-      userId?: string;
     };
 
     if (!body.slug) {
       return NextResponse.json({ error: "Missing slug" }, { status: 400 });
-    }
-    if (!body.userId) {
-      return NextResponse.json({ error: "Missing userId — please sign in" }, { status: 401 });
     }
 
     const sb = createClient(SUPABASE_URL, SERVICE_KEY, {
@@ -64,7 +72,7 @@ export async function POST(req: NextRequest) {
     const { data: inserted, error: insertErr } = await sb
       .from("projects")
       .insert({
-        user_id: body.userId,
+        user_id: userId,
         name: projectName,
         data: featured.design_data,
       })

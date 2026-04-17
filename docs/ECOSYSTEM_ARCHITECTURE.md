@@ -322,11 +322,12 @@ Doar **font unic cross-brand** ca element de consistency subtle. Tot restul e pe
 | `bunkere.com` | ✅ LIBER | €12 | Defensive |
 | `padureata.eu` | ✅ LIBER | €10 | Extension Pădureața |
 
-#### 📝 Domenii deja deținute (cost ongoing ~€77/an)
+#### 📝 Domenii deja deținute (cost ongoing ~€87/an)
 
 | Domeniu | Cost renewal | Notes |
 |---|---|---|
 | `modulca.eu` | €10 | Flagship, active |
+| `modulca.nl` | €10 | Owned — activation for NL expansion (Faza 2+) |
 | `bunkere.ro` | €12 | Held, dormant |
 | `case-in-copaci.ro` | €15 | Held, dormant |
 | `padureata.ro` | €12 | Held, potential repurpose (forest/wellness) |
