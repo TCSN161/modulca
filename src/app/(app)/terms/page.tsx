@@ -123,6 +123,18 @@ export default function TermsPage() {
               We do not claim ownership over your designs and will not use them for marketing
               without your explicit written consent.
             </p>
+            <p className="mt-3">
+              <strong>AI-generated renders and the public gallery.</strong> Images produced by
+              the AI render pipeline are not protected by classical copyright under EU law because
+              they lack a sufficient human creative input. If you choose to publish a render to
+              our public gallery (via the &quot;Share publicly&quot; checkbox at save time), you
+              grant ModulCA a non-exclusive, perpetual, royalty-free license to display the image
+              alongside visible attribution (QR code or watermark linking back to ModulCA).
+              Commercial reuse by third parties without preserving this attribution is not
+              permitted. You may withdraw a render from the public gallery at any time by
+              emailing{" "}
+              <a href="mailto:privacy@modulca.eu" className="text-brand-olive-700 underline">privacy@modulca.eu</a>.
+            </p>
           </Section>
 
           <Section title="7. AI-Generated Content">

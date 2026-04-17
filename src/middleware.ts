@@ -30,6 +30,7 @@ const PUBLIC_PATHS = [
   "/wizard",
   "/faq",
   "/press",
+  "/gallery",
 ];
 
 const PUBLIC_PREFIXES = [
@@ -39,6 +40,8 @@ const PUBLIC_PREFIXES = [
   "/blog/",          // Blog articles are public
   "/library/",       // Knowledge library articles are public
   "/portfolio/",     // Portfolio sub-pages are public
+  "/gallery/",       // Gallery sub-pages (hall-of-fame, etc.)
+  "/g/",             // Individual render landing pages (QR watermark targets)
   "/_next/",         // Next.js internals
   "/models/",        // Static 3D models
   "/images/",        // Static images
