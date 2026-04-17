@@ -10,6 +10,19 @@ const nextConfig = {
   ...(isGitHubPages ? { output: "export", basePath: "/modulca", assetPrefix: "/modulca/" } : {}),
   reactStrictMode: true,
   turbopack: {},
+  // Modular imports — only pulls in the icons/components actually used,
+  // drastically reducing bundle size for these libraries.
+  experimental: {
+    optimizePackageImports: [
+      "lucide-react",
+      "@react-three/drei",
+      "@react-three/fiber",
+      "@react-three/postprocessing",
+      "@react-pdf/renderer",
+      "date-fns",
+      "recharts",
+    ],
+  },
   images: {
     unoptimized: isGitHubPages, // only disable optimization for static export
     remotePatterns: [
