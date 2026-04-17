@@ -1081,6 +1081,46 @@ export const PORTFOLIO_IMAGES: ImageAsset[] = [
 ];
 
 /* ═══════════════════════════════════════════════════════════════
+   LOCAL PRODUCT IMAGE OVERRIDES
+   ═══════════════════════════════════════════════════════════════
+   Maps product IDs to locally-hosted brand-attributed images
+   downloaded by scripts/fetch-product-media.mjs.
+   When a mapping exists, the local path overrides the Unsplash URL.
+   ═══════════════════════════════════════════════════════════════ */
+
+const LOCAL_IMAGE_OVERRIDES: Record<string, string> = {
+  "fin-01": "/images/products/fin-01-oak-flooring.jpg",
+  "fin-02": "/images/products/fin-02-gypsum-wall.jpg",
+  "fin-04": "/images/products/fin-04-triple-window.jpg",
+  "fin-05": "/images/products/fin-05-interior-door.jpg",
+  "fin-06": "/images/products/fin-06-mineral-wool.jpg",
+  "fin-08": "/images/products/fin-08-porcelain-tiles.jpg",
+  "fin-10": "/images/products/fin-10-subway-tiles.jpg",
+  "fin-11": "/images/products/fin-11-exterior-door.jpg",
+  "fin-12": "/images/products/fin-12-countertop.jpg",
+  "fur-01": "/images/products/fur-01-sofa.jpg",
+  "fur-02": "/images/products/fur-02-rug.jpg",
+  "fur-05": "/images/products/fur-05-shelving.jpg",
+  "fur-06": "/images/products/fur-06-pendant.jpg",
+  "fur-07": "/images/products/fur-07-mirror.jpg",
+  "fur-08": "/images/products/fur-08-dining-chair.jpg",
+  "plm-01": "/images/products/plm-01-bathtub.jpg",
+  "plm-02": "/images/products/plm-02-faucet.jpg",
+  "plm-03": "/images/products/plm-03-sink.jpg",
+  "plm-04": "/images/products/plm-04-toilet.jpg",
+  "plm-05": "/images/products/plm-05-shower.jpg",
+};
+
+/** Apply local image overrides to the catalog — called once at module load */
+for (const product of PRODUCT_CATALOG) {
+  const override = LOCAL_IMAGE_OVERRIDES[product.id];
+  if (override) {
+    product.image.url = override;
+    product.image.source = "local";
+  }
+}
+
+/* ═══════════════════════════════════════════════════════════════
    HELPER FUNCTIONS
    ═══════════════════════════════════════════════════════════════ */
 

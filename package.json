@@ -7,6 +7,8 @@
     "prebuild": "node scripts/build-knowledge.mjs",
     "build": "node --max-old-space-size=4096 node_modules/next/dist/bin/next build --webpack",
     "build:kb": "node scripts/build-knowledge.mjs",
+    "seed:projects": "node scripts/seed-demo-projects.mjs",
+    "fetch:products": "node scripts/fetch-product-media.mjs",
     "start": "next start",
     "lint": "eslint",
     "test": "vitest",
@@ -16,7 +18,11 @@
     "ops:check:ci": "node scripts/ops-check.mjs --ci",
     "predeploy": "node scripts/pre-deploy.mjs",
     "typecheck": "tsc --noEmit",
-    "collision-check": "node scripts/collision-check.mjs"
+    "collision-check": "node scripts/collision-check.mjs",
+    "env:sync": "node scripts/env-sync.mjs",
+    "env:sync:dry": "node scripts/env-sync.mjs --dry",
+    "stripe:go-live": "node scripts/stripe-go-live.mjs",
+    "stripe:go-live:dry": "node scripts/stripe-go-live.mjs --dry-run"
   },
   "dependencies": {
     "@auth/prisma-adapter": "^2.11.1",

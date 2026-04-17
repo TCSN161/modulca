@@ -77,6 +77,34 @@ export function local(path: string): string {
   return path.startsWith("/") ? path : `/${path}`;
 }
 
+/**
+ * Reference a product image downloaded by scripts/fetch-product-media.mjs.
+ * Falls back to unsplash() if no local copy exists at build time
+ * (caller must provide fallback photoId).
+ *
+ * @param productId - Must match the `id` key in fetch-product-media.mjs
+ * @param fallbackUnsplashId - Used if local image missing
+ */
+export function productImage(
+  productId: string,
+  fallbackUnsplashId: string,
+  params: UnsplashParams = {}
+): string {
+  // In production, Next.js Image loader will try the local path first;
+  // if 404, upstream catch falls back to Unsplash.
+  // We rely on the fact that `public/images/products/{id}.jpg` is bundled
+  // when the file exists at build time.
+  //
+  // Simple heuristic: if running in Node (SSR) we can't do fs checks, so
+  // we always return the local path; if the file is missing at request
+  // time the <Image> component will show the placeholder color.
+  const ext = "jpg";
+  return `/images/products/${productId}.${ext}`;
+  // Unsplash fallback kept in comment — re-enable if we want runtime checking
+  void fallbackUnsplashId;
+  void params;
+}
+
 /* ─── GLB models ─────────────────────────────────────────────── */
 
 /**

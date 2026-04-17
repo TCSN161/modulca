@@ -1,0 +1,126 @@
+{
+  "lastUpdated": "2026-04-17T01:12:11.440Z",
+  "license": "Mixed — see individual attributions. Pexels/Pixabay images are CC0 (free for commercial use, attribution appreciated but not required).",
+  "products": [
+    {
+      "id": "fin-01-oak-flooring",
+      "file": "fin-01-oak-flooring.jpg",
+      "brand": "Barlinek",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-02-gypsum-wall",
+      "file": "fin-02-gypsum-wall.jpg",
+      "brand": "Knauf",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-04-triple-window",
+      "file": "fin-04-triple-window.jpg",
+      "brand": "Rehau",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-05-interior-door",
+      "file": "fin-05-interior-door.jpg",
+      "brand": "Porta Doors",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-06-mineral-wool",
+      "file": "fin-06-mineral-wool.jpg",
+      "brand": "Rockwool",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-08-porcelain-tiles",
+      "file": "fin-08-porcelain-tiles.jpg",
+      "brand": "Marazzi",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-10-subway-tiles",
+      "file": "fin-10-subway-tiles.jpg",
+      "brand": "Cersanit",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-11-exterior-door",
+      "file": "fin-11-exterior-door.jpg",
+      "brand": "Porta Doors",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fin-12-countertop",
+      "file": "fin-12-countertop.jpg",
+      "brand": "Egger",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fur-01-sofa",
+      "file": "fur-01-sofa.jpg",
+      "brand": "Noo.ma",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fur-02-rug",
+      "file": "fur-02-rug.jpg",
+      "brand": "Benuta",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fur-05-shelving",
+      "file": "fur-05-shelving.jpg",
+      "brand": "String Furniture",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fur-06-pendant",
+      "file": "fur-06-pendant.jpg",
+      "brand": "Generic Pendant",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fur-07-mirror",
+      "file": "fur-07-mirror.jpg",
+      "brand": "Generic Mirror",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "fur-08-dining-chair",
+      "file": "fur-08-dining-chair.jpg",
+      "brand": "Zuiver",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "plm-01-bathtub",
+      "file": "plm-01-bathtub.jpg",
+      "brand": "Ravak",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "plm-02-faucet",
+      "file": "plm-02-faucet.jpg",
+      "brand": "Grohe",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "plm-03-sink",
+      "file": "plm-03-sink.jpg",
+      "brand": "Cersanit",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "plm-04-toilet",
+      "file": "plm-04-toilet.jpg",
+      "brand": "Cersanit",
+      "attribution": "Photo: Pexels / Public Domain"
+    },
+    {
+      "id": "plm-05-shower",
+      "file": "plm-05-shower.jpg",
+      "brand": "Grohe",
+      "attribution": "Photo: Pexels / Public Domain"
+    }
+  ]
+}

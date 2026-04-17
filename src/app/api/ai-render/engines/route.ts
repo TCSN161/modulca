@@ -40,6 +40,30 @@ const ENGINE_LIST: EngineInfo[] = [
     description: "150 free/day. Photorealistic alchemy.",
     speed: "medium",
   },
+  {
+    id: "gemini",
+    label: "Google Imagen 3",
+    description: "Free 500/day. Best for architecture.",
+    speed: "fast",
+  },
+  {
+    id: "novita",
+    label: "Novita FLUX",
+    description: "$0.0015/img. 200+ models available.",
+    speed: "fast",
+  },
+  {
+    id: "wavespeed",
+    label: "WaveSpeed Seedream",
+    description: "$0.003/img. Photorealistic img2img.",
+    speed: "medium",
+  },
+  {
+    id: "runway",
+    label: "Runway Gen-3",
+    description: "$0.02/img. Cinematic quality.",
+    speed: "medium",
+  },
 ];
 
 export async function GET() {

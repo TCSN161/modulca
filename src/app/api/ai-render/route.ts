@@ -14,6 +14,10 @@ import { blackforestEngine } from "./engines/blackforest";
 import { deepinfraEngine } from "./engines/deepinfra";
 import { fireworksEngine } from "./engines/fireworks";
 import { prodiaEngine } from "./engines/prodia";
+import { geminiEngine } from "./engines/gemini";
+import { novitaEngine } from "./engines/novita";
+import { wavespeedEngine } from "./engines/wavespeed";
+import { runwayEngine } from "./engines/runway";
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
 import { canUseEngine, recordSuccess, recordFailure } from "./engines/creditManager";
 import { logRender } from "./engines/renderLogger";
@@ -129,6 +133,28 @@ const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo; estimatedC
     fn: prodiaEngine,
     info: { id: "prodia", label: "Prodia", description: "Ultra-fast ($0.002/img). 1000 free calls, no card needed.", speed: "fast" },
     estimatedCostUsd: 0.002,
+  },
+
+  /* ── NEW engines (April 2026) ── */
+  gemini: {
+    fn: geminiEngine,
+    info: { id: "gemini", label: "Google Imagen 3", description: "Free 500/day FOREVER. Best for architecture.", speed: "fast" },
+    estimatedCostUsd: 0,
+  },
+  novita: {
+    fn: novitaEngine,
+    info: { id: "novita", label: "Novita FLUX", description: "$0.0015/img. 200+ models available.", speed: "fast" },
+    estimatedCostUsd: 0.0015,
+  },
+  wavespeed: {
+    fn: wavespeedEngine,
+    info: { id: "wavespeed", label: "WaveSpeed Seedream", description: "$0.003/img. Best photorealistic img2img.", speed: "medium" },
+    estimatedCostUsd: 0.003,
+  },
+  runway: {
+    fn: runwayEngine,
+    info: { id: "runway", label: "Runway Gen-3", description: "$0.02/img. Cinematic quality, also does video.", speed: "medium" },
+    estimatedCostUsd: 0.02,
   },
 };
 

@@ -41,6 +41,8 @@ export interface AiRenderResult {
   costUsd?: number;
   /** Generation latency in milliseconds */
   latencyMs?: number;
+  /** The prompt used (echoed back for logging/audit) */
+  prompt?: string;
 }
 
 /**

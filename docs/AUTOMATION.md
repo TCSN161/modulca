@@ -1,72 +1,79 @@
 # ModulCA Automation Playbook
 
-> Last updated: 2026-04-16
+> Last updated: 2026-04-17
 
 ## Current Status (What's Automated)
 
 | System | Status | How |
 |--------|--------|-----|
 | TypeScript check | ✅ | `npm run typecheck` / CI |
-| Tests (129) | ✅ | `npm run test:run` / CI |
+| Tests (147) | ✅ | `npm run test:run` / CI |
 | Production build | ✅ | `npm run build` / CI |
 | Ops health check | ✅ | `npm run ops:check` |
 | Pre-deploy gate | ✅ | `npm run predeploy` |
 | CI pipeline | ✅ | `.github/workflows/ci.yml` |
 | Cloud save/load | ✅ | CloudSyncProvider auto-sync |
-| Error boundaries | ✅ | Per-step + project-level |
+| Error boundaries | ✅ | Per-step + project-level + Sentry wired |
 | Stripe webhooks | ✅ | Auto tier sync on pay/cancel |
 | Email templates | ✅ | Welcome, upgrade, cancel, payment failed |
 | Env validation | ✅ | `/api/health` + env-check.ts |
 | RLS policies | ✅ | Migration 004 |
 | localStorage migration | ✅ | Auto on first auth |
+| **Env drift detection + sync** | ✅ | `npm run env:sync` (diffs .env.local ↔ Vercel prod) |
+| **Stripe test→live cutover** | ✅ | `npm run stripe:go-live` (one command) |
+| **Sentry user context** | ✅ | Auto-attached on signIn/loadSession, cleared on signOut |
 
-## What Needs Human Action (One-Time)
+## Remaining Human Actions
 
-### 1. Stripe: Test → Live Mode
-**Why**: Currently sk_test_* — real payments need sk_live_*
-**Steps**:
-1. Go to https://dashboard.stripe.com/settings/integration
-2. Toggle to "Live mode"
-3. Copy live keys (sk_live_*, pk_live_*)
-4. Update in Vercel env vars AND .env.local
-5. Recreate products/prices in live mode (or they transfer automatically)
-6. Update webhook endpoint URL to use live secret
-7. Run `npm run ops:check` to verify
+### 🔴 Stripe Bank Verification (Only Remaining Blocker)
+**Why**: Stripe account needs a verified IBAN to activate live mode. This is the ONE thing that cannot be automated — the bank & Stripe both require a human.
 
-**Can we automate?** Partially — Stripe CLI can create products/prices via API.
-Script could be written to migrate test prices to live.
+**Steps** (tomorrow morning):
+1. Call your bank to confirm IBAN is active and can receive SEPA payouts
+2. Go to https://dashboard.stripe.com/settings/payouts
+3. Enter IBAN, submit verification
+4. Wait for Stripe to confirm (usually instant, max 2 business days)
+5. When `charges_enabled=true` in Stripe dashboard, run:
+   ```bash
+   STRIPE_LIVE_SECRET=sk_live_xxx STRIPE_LIVE_PUBLISHABLE=pk_live_xxx \
+     npm run stripe:go-live
+   ```
+   This script does everything in one shot:
+   - Validates the live keys work
+   - Creates Products (Premium/Architect/Constructor) in live mode
+   - Creates 6 Prices (monthly + yearly per tier) at correct EUR amounts
+   - Creates the webhook endpoint at https://modulca.eu/api/stripe/webhook and captures signing secret
+   - Backs up test keys to `.env.local.test.bak`
+   - Updates `.env.local` with live values
+   - Syncs all changes to Vercel production via CLI
+   - Triggers a production deploy
+6. Run `npm run ops:check` to verify "Stripe mode: LIVE"
 
-### 2. Sentry DSN
-**Why**: Error monitoring for production
-**Steps**:
-1. Go to https://sentry.io or create account
-2. Create project "modulca-web" (Next.js)
-3. Copy DSN string
-4. Add as `NEXT_PUBLIC_SENTRY_DSN` in Vercel + .env.local
-5. Sentry SDK is already installed and configured
+**Dry-run first**: `npm run stripe:go-live:dry` validates keys & shows what would change, without writing anything.
 
-**Can we automate?** Yes — Sentry has an API. Could script project creation.
+### ✅ Done (previously manual, now automated where possible)
+- Sentry DSN — set in .env.local + Vercel (script-assisted via `env:sync`)
+- Vercel env variables — sync via `npm run env:sync` (idempotent; shows diff, asks confirmation)
+- Resend domain + FROM — verified; templates live
+- Google OAuth — enabled in Supabase
+- Knowledge Library — 82+ articles auto-indexed at build time
 
-### 3. Vercel Environment Variables Sync
-**Why**: Production env vars need to match .env.local
-**Steps**:
-1. Go to https://vercel.com/[project]/settings/environment-variables
-2. Add all variables from .env.local (use Production scope)
-3. Or use: `vercel env pull` / `vercel env add`
+## New Automations (Added 2026-04-17)
 
-**Can we automate?** YES — Vercel CLI:
-```bash
-# Install: npm i -g vercel
-# Login: vercel login
-# Sync: vercel env add VARIABLE_NAME production < value.txt
-```
-Future: Script to sync all env vars from .env.local to Vercel automatically.
+### `npm run env:sync` — Env Drift Correction
+Diffs `.env.local` against `vercel env pull`, shows a colored diff, asks for confirmation, then applies only the differences. Skips vars that should differ (`NEXT_PUBLIC_APP_URL`, `NEXTAUTH_URL`, `DATABASE_URL`). Masks values in the diff so secrets don't hit the terminal history.
 
-### 4. Google OAuth (Already Done!)
-**Status**: ✅ Enabled in Supabase — confirmed by ops check.
+- `npm run env:sync:dry` — see diff, don't write
+- `npm run env:sync -- --yes` — auto-apply without confirmation
+- `npm run env:sync -- --env=preview` — target preview env instead of production
 
-### 5. Custom Domain Email (Already Done!)
-**Status**: ✅ modulca.eu verified in Resend — confirmed by ops check.
+**Caught a real bug on first run**: Vercel had a stray tab character prefixing `NEXT_PUBLIC_STRIPE_PRICE_CONSTRUCTOR_MONTHLY`, which would have broken Constructor checkout in production. Fixed in seconds.
+
+### `npm run stripe:go-live` — Test→Live Cutover
+Single command when Stripe account activates. Validates keys, creates live products/prices, sets up webhook, writes `.env.local`, syncs Vercel, deploys. See Stripe section above.
+
+### Sentry user context (automatic)
+Via `src/shared/lib/monitoring.ts` + auth store integration. When any error is captured in production, it's tagged with the user's ID and email automatically. No code changes needed at call sites — `captureException(err)` or unhandled errors via error boundaries both carry user context.
 
 ## Automation Layers (Future-Proof Architecture)
 
