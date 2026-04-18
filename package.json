@@ -31,6 +31,9 @@
     "env:sync:dry": "node scripts/env-sync.mjs --dry",
     "stripe:go-live": "node scripts/stripe-go-live.mjs",
     "stripe:go-live:dry": "node scripts/stripe-go-live.mjs --dry-run",
+    "db:analyze": "node scripts/supabase-query-analyzer.mjs",
+    "db:analyze:json": "node scripts/supabase-query-analyzer.mjs --json",
+    "db:analyze:reset": "node scripts/supabase-query-analyzer.mjs --reset",
     "domains:check": "node scripts/domain-check.mjs",
     "domains:check:json": "node scripts/domain-check.mjs --json"
   },
