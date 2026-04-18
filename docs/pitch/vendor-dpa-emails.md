@@ -6,9 +6,9 @@
 - Legal name: **ATELIER DE PROIECTARE MCA S.R.L.** (short: MCA SRL)
 - VAT: **RO35294600**
 - Registered address: **Str. Lacul Plopului nr. 10, Sector 5, București, România**
-- Contact: Costin (founder), costin@modulca.ro
-- Website: https://modulca.ro
-- Data Protection point of contact: dpo@modulca.ro (alias → founder until DPO appointed)
+- Contact: Costin (founder), costin@modulca.eu
+- Website: https://modulca.eu
+- Data Protection point of contact: privacy@modulca.eu (alias → founder until DPO appointed)
 
 **Where to save signed DPAs:**
 `docs/legal/dpa/` (create subfolder if missing). Naming convention: `DPA-<vendor>-<YYYY-MM-DD>.pdf` — e.g., `DPA-supabase-2026-04-18.pdf`. Also log into `docs/legal/subprocessors.md` (vendor, date signed, contract expiry, scope).
@@ -58,8 +58,8 @@ Company details for the DPA:
   - Supabase organization / project ref: [INSERT ORG SLUG + PROJECT REF]
   - Plan: [Pro / Team]
   - Signatory: Costin [LAST NAME], Founder / Administrator
-  - Email for contract: costin@modulca.ro
-  - DPO / privacy contact: dpo@modulca.ro
+  - Email for contract: costin@modulca.eu
+  - DPO / privacy contact: privacy@modulca.eu
 
 We are launching public beta on 1 May 2026 and need the executed DPA
 on file before that date for GDPR Article 28 compliance. Please also
@@ -69,7 +69,7 @@ mechanism for any processing outside the EEA (we understand SCCs apply).
 Thank you,
 Costin
 Founder, MCA SRL
-https://modulca.ro
+https://modulca.eu
 ```
 
 **Expected back:** Countersigned PDF of the Supabase DPA + link to current sub-processor list. Some plans only require click-through acceptance — screenshot the confirmation.
@@ -93,10 +93,10 @@ https://modulca.ro
 | VAT | RO35294600 |
 | Address line 1 | Str. Lacul Plopului nr. 10 |
 | City / Sector | București, Sector 5 |
-| Postal code | [lookup — typically 051704 for that street] |
+| Postal code | 051735 |
 | Signatory full name | Costin [LAST NAME] |
 | Signatory title | Founder / Administrator |
-| Signatory email | costin@modulca.ro |
+| Signatory email | costin@modulca.eu |
 | DPA effective date | Today |
 
 No email needed. If the wizard breaks: support@stripe.com with subject `DPA signing blocked — Stripe account acct_XXX`.
@@ -114,7 +114,7 @@ No email needed. If the wizard breaks: support@stripe.com with subject `DPA sign
 - **Also cc:** legal@resend.com if they reply
 
 **Subject line:**
-`DPA request — MCA SRL (Resend account costin@modulca.ro)`
+`DPA request — MCA SRL (Resend account costin@modulca.eu)`
 
 **Email body (copy-paste):**
 
@@ -131,10 +131,10 @@ Company details for the DPA:
   - VAT / CUI: RO35294600
   - Registered office: Str. Lacul Plopului nr. 10, Sector 5,
     Bucuresti, Romania
-  - Resend account email: costin@modulca.ro
-  - Product / sending domain: modulca.ro
+  - Resend account email: costin@modulca.eu
+  - Product / sending domain: modulca.eu
   - Signatory: Costin [LAST NAME], Founder / Administrator
-  - DPO / privacy contact: dpo@modulca.ro
+  - DPO / privacy contact: privacy@modulca.eu
 
 Could you please send:
   1. The countersigned DPA (or the standard DPA we can sign and
@@ -149,7 +149,7 @@ before go-live.
 Thank you,
 Costin
 Founder, MCA SRL
-https://modulca.ro
+https://modulca.eu
 ```
 
 **Expected back:** PDF DPA (either their template for you to sign, or a pre-countersigned version). Sub-processor list usually linked from https://resend.com/legal/dpa.
@@ -173,7 +173,7 @@ https://modulca.ro
 | Address | Str. Lacul Plopului nr. 10, Sector 5, București, Romania |
 | VAT | RO35294600 |
 | Signatory | Costin [LAST NAME], Founder |
-| Signatory email | costin@modulca.ro |
+| Signatory email | costin@modulca.eu |
 
 If not available on your current plan, email: compliance@sentry.io with subject `DPA request — MCA SRL (Sentry org [ORG-SLUG])` and reuse the Resend email body above, swapping "Resend" → "Sentry".
 
@@ -201,7 +201,7 @@ If not available on your current plan, email: compliance@sentry.io with subject 
 | VAT | RO35294600 |
 | Signatory name | Costin [LAST NAME] |
 | Signatory title | Founder / Administrator |
-| Signatory email | costin@modulca.ro |
+| Signatory email | costin@modulca.eu |
 
 Notes on the Vercel DPA: it references Standard Contractual Clauses (SCCs) module 2 (controller → processor). You do not need to separately sign SCCs — they are incorporated by reference. Accept "Yes" when asked.
 
@@ -234,7 +234,7 @@ Notes on the Vercel DPA: it references Standard Contractual Clauses (SCCs) modul
 ```
 Hello,
 
-We use Microsoft Clarity on our production SaaS (modulca.ro) and
+We use Microsoft Clarity on our production SaaS (modulca.eu) and
 would like written confirmation that our usage is covered by the
 Microsoft Products and Services Data Protection Addendum
 (https://www.microsoft.com/licensing/docs/view/Microsoft-Products-and-Services-DPA).
@@ -243,7 +243,7 @@ Controller details:
   - Legal name: ATELIER DE PROIECTARE MCA S.R.L.
   - VAT: RO35294600
   - Address: Str. Lacul Plopului nr. 10, Sector 5, Bucuresti, Romania
-  - Microsoft account / tenant email: costin@modulca.ro
+  - Microsoft account / tenant email: costin@modulca.eu
 
 Please confirm:
   1. The Microsoft Products and Services DPA applies to Clarity
@@ -269,8 +269,8 @@ Once all 6 DPAs are in hand:
 
 - [ ] All PDFs saved to `docs/legal/dpa/` with correct filenames
 - [ ] `docs/legal/subprocessors.md` updated with vendor, scope, location, transfer mechanism, DPA date
-- [ ] Public-facing sub-processor list on `modulca.ro/subprocesori` kept in sync
-- [ ] Privacy policy (`modulca.ro/privacy`) lists all 6 under "Sub-processors / Data recipients"
+- [ ] Public-facing sub-processor list on `modulca.eu/subprocesori` kept in sync
+- [ ] Privacy policy (`modulca.eu/privacy`) lists all 6 under "Sub-processors / Data recipients"
 - [ ] Cookie banner vendor list reflects Clarity + Sentry + Stripe
 - [ ] Added reminder to refresh list every 6 months (each vendor may add new sub-processors)
 - [ ] Internal record-of-processing (ROPA) under GDPR Art. 30 updated

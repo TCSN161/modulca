@@ -13,7 +13,7 @@
 ```
 [FOUNDER_FIRST_NAME]   = Costin
 [FOUNDER_LAST_NAME]    = [FILL IN]
-[FOUNDER_EMAIL]        = costin@modulca.ro
+[FOUNDER_EMAIL]        = costin@modulca.eu
 [FOUNDER_LINKEDIN]     = [FILL IN URL]
 [COMPANY_LEGAL_NAME]   = ATELIER DE PROIECTARE MCA S.R.L.
 [COMPANY_SHORT_NAME]   = MCA SRL
@@ -21,7 +21,7 @@
 [COMPANY_ADDRESS]      = Str. Lacul Plopului nr. 10, Sector 5, Bucuresti, Romania
 [COMPANY_COUNTRY]      = Romania
 [COMPANY_INCORP_YEAR]  = 2015 (pivoted to SaaS in 2025)
-[COMPANY_WEBSITE]      = https://modulca.ro
+[COMPANY_WEBSITE]      = https://modulca.eu
 [EMPLOYEES]            = 1 FTE (founder) + [N] contractors
 [REVENUE]              = Pre-revenue (public beta launch: 1 May 2026)
 [FUNDING_RAISED]       = Bootstrapped / [ADD if any grants]
@@ -97,7 +97,7 @@ Microsoft Founders Hub → Supabase → Vercel → Figma → Together.ai → Ant
 |---|---|
 | Company legal name | ATELIER DE PROIECTARE MCA S.R.L. |
 | DBA / product name | ModulCA |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Country of incorporation | Romania |
 | Incorporation date | 2015 (SaaS pivot 2025) |
 | Stage | Pre-seed / public beta |
@@ -126,7 +126,7 @@ Microsoft Founders Hub → Supabase → Vercel → Figma → Together.ai → Ant
 | Field | Answer |
 |---|---|
 | Legal company name | ATELIER DE PROIECTARE MCA S.R.L. |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Country | Romania |
 | Founded | 2015 (SaaS pivot 2025) |
 | Business stage | Pre-seed |
@@ -153,7 +153,7 @@ Microsoft Founders Hub → Supabase → Vercel → Figma → Together.ai → Ant
 | Field | Answer |
 |---|---|
 | Company name | ATELIER DE PROIECTARE MCA S.R.L. (ModulCA) |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Country | Romania |
 | Stage | Pre-seed / beta launch |
 | Funding stage | Bootstrapped |
@@ -181,7 +181,7 @@ Microsoft Founders Hub → Supabase → Vercel → Figma → Together.ai → Ant
 | Field | Answer |
 |---|---|
 | Company | MCA SRL / ModulCA |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Country | Romania |
 | Stage | Public beta (1 May 2026) |
 | Description | [Use "Short description"] |
@@ -209,7 +209,7 @@ Body: [Short pitch + "Use of credits" + traction bullets + polite ask for $10k�
 | Field | Answer |
 |---|---|
 | Company | ATELIER DE PROIECTARE MCA S.R.L. (ModulCA) |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Country | Romania |
 | Stage | Pre-seed, public beta 1 May 2026 |
 | Current OpenAI usage | GPT-4o-mini for step-by-step guidance; GPT-4o for architect-level reviews; text-embedding-3-large for 229-article RAG index; planning o1 for regulatory/permit reasoning. |
@@ -233,7 +233,7 @@ Body: [Short pitch + "Use of credits" + traction bullets + polite ask for $10k�
 | Field | Answer |
 |---|---|
 | Company | MCA SRL (ModulCA) |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Country | Romania |
 | Current Claude usage | Claude Sonnet 4.7 for RAG-based architecture consultant (229 articles); prompt caching enabled; planning Opus for regulatory-permit reasoning. |
 | Why Claude | Long-context strength (we feed entire regulatory code sections), strong instruction-following for structured 14-step workflow, and the safety posture matches the stakes of building-permit advice. |
@@ -256,7 +256,7 @@ Body: [Short pitch + "Use of credits" + traction bullets + polite ask for $10k�
 | Field | Answer |
 |---|---|
 | Company | MCA SRL (ModulCA) |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Vercel team slug | [FILL IN] |
 | Framework | Next.js 16 + React 19 |
 | Current plan | [Hobby / Pro] |
@@ -282,7 +282,7 @@ Body: [Short pitch + "Use of credits" + traction bullets + polite ask for $10k�
 | Field | Answer |
 |---|---|
 | Company | MCA SRL (ModulCA) |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Supabase project ref | [FILL IN] |
 | Current plan | [Pro] |
 | Stage | Pre-seed, public beta 1 May 2026 |
@@ -307,7 +307,7 @@ Body: [Short pitch + "Use of credits" + traction bullets + polite ask for $10k�
 | Field | Answer |
 |---|---|
 | Company | MCA SRL (trading as ModulCA) |
-| Website | https://modulca.ro |
+| Website | https://modulca.eu |
 | Company founded | **SaaS pivot: 2025** (legal entity from 2015; product is <1 year old) |
 | Stage | Pre-seed, public beta launching 1 May 2026 |
 | Funding raised | <$100k (bootstrapped) |
@@ -357,19 +357,19 @@ Product one-liner:
 "ModulCA is the first end-to-end AI SaaS taking a buyer from empty
 land to permitted modular home in 14 guided steps."
 
-Happy to share the deck. Website: https://modulca.ro
+Happy to share the deck. Website: https://modulca.eu
 
 Thank you,
 Costin [LAST NAME]
 Founder, MCA SRL
-costin@modulca.ro
+costin@modulca.eu
 ```
 
 **Enroll in Stripe Climate in parallel:**
 1. Go to https://dashboard.stripe.com/climate.
 2. Choose contribution level: 0.5% (recommended starting level for pre-revenue).
 3. Download member badge asset for footer + receipts.
-4. Add "Stripe Climate member" to `modulca.ro/about` and investor deck.
+4. Add "Stripe Climate member" to `modulca.eu/about` and investor deck.
 
 ---
 
