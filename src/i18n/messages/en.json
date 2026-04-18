@@ -80,6 +80,81 @@
       "ctaHowItWorks": "See How It Works",
       "ctaSecondary": "Watch 2-min demo"
     },
+    "stats": {
+      "aiEngines": "AI ENGINES",
+      "articles": "KNOWLEDGE ARTICLES",
+      "gdpr": "EU-HOSTED • GDPR",
+      "days": "DAYS TO MOVE-IN"
+    },
+    "trust": {
+      "heading": "Built for the European market",
+      "romania": "Romanian permits (DTAC, C.U.)",
+      "netherlands": "Dutch Omgevingswet / BBL",
+      "eurocode": "Eurocode structural standards",
+      "euHosted": "EU-hosted infrastructure"
+    },
+    "features": {
+      "label": "Platform Core",
+      "title": "The Architect's Toolkit",
+      "subtitle": "Advanced simulation meets intuitive spatial planning for the modern builder.",
+      "land": {
+        "title": "Interactive Land Designer",
+        "description": "Import topographic data and simulate sun paths to optimize your home's placement."
+      },
+      "modular": {
+        "title": "Modular Layout System",
+        "description": "Drag and drop 3x3m modules. Smart-connect technology ensures structural feasibility."
+      },
+      "visualization": {
+        "title": "Real-time Visualization",
+        "description": "Experience your design in photorealistic 3D rendering as you build, in any lighting condition."
+      }
+    },
+    "howItWorks": {
+      "title": "From Blueprint to Reality",
+      "subtitle": "A streamlined three-step journey to your perfect modular dwelling.",
+      "step1": {
+        "title": "Choose Your Land",
+        "description": "Upload coordinates or select from our verified eco-partnerships globally."
+      },
+      "step2": {
+        "title": "Design & Visualize",
+        "description": "Utilize our module catalog to craft layouts that breathe with the environment."
+      },
+      "step3": {
+        "title": "Build & Connect",
+        "description": "We handle manufacturing and local assembly in under 90 days from approval."
+      },
+      "tryFlow": "Try the Full 13-Step Flow"
+    },
+    "pricingTeaser": {
+      "label": "Plans",
+      "title": "Simple, Transparent Pricing",
+      "subtitle": "Start free, upgrade when you need more. No hidden fees.",
+      "betaPromo": "Beta Promo — Sign up free and get",
+      "betaPromoBold": "3 months of Premium access",
+      "betaPromoEnd": "included."
+    },
+    "finalCta": {
+      "heading": "Ready to evolve your living space?",
+      "launch": "Launch Designer",
+      "schedule": "Schedule Consultation"
+    },
+    "forBuilders": {
+      "label": "Partners",
+      "title": "For Builders & Architects",
+      "description": "Join our network of certified modular builders. Receive qualified leads, manage client projects, and grow your business with our professional tools.",
+      "features": {
+        "dashboard": "Client project dashboard",
+        "whiteLabel": "White-label presentations",
+        "export": "Technical drawing export (DWG)",
+        "permits": "Building permit management",
+        "team": "Team collaboration tools",
+        "support": "Priority support channel"
+      },
+      "seeDemo": "See a Demo Project",
+      "applyBuilder": "Apply as Builder"
+    },
     "benefits": {
       "title": "Why ModulCA",
       "fast": {
@@ -97,6 +172,77 @@
     },
     "cta": {
       "final": "Start your modular home design today — 3 months Premium free during beta."
+    }
+  },
+  "legal": {
+    "common": {
+      "lastUpdated": "Last updated:",
+      "lastUpdatedDate": "April 17, 2026",
+      "home": "Home",
+      "privacy": "Privacy",
+      "terms": "Terms",
+      "cookies": "Cookies",
+      "beta": "ModulCA Beta"
+    },
+    "cookies": {
+      "metaTitle": "Cookie Policy",
+      "metaDescription": "ModulCA cookie policy — detailed list of cookies we use, purpose, duration, and your consent options.",
+      "title": "Cookie Policy",
+      "table": {
+        "cookie": "Cookie",
+        "source": "Source",
+        "purpose": "Purpose",
+        "duration": "Duration"
+      },
+      "sections": {
+        "whatAre": { "title": "1. What Are Cookies?" },
+        "choices": { "title": "2. Your Choices" },
+        "essential": { "title": "3. Essential Cookies (Always Active)" },
+        "analytics": { "title": "4. Analytics Cookies (Opt-In)" },
+        "cookieless": { "title": "5. Cookieless Analytics (Always On, No PII)" },
+        "localStorage": { "title": "6. localStorage (Technical, Not Cookies)" },
+        "thirdParty": { "title": "7. Third-Party Processors" },
+        "dnt": { "title": "8. Do Not Track (DNT)" },
+        "questions": { "title": "9. Questions or Concerns" }
+      }
+    },
+    "privacy": {
+      "metaTitle": "Privacy Policy",
+      "metaDescription": "ModulCA privacy policy — how we collect, use, and protect your data.",
+      "title": "Privacy Policy",
+      "sections": {
+        "controller": { "title": "1. Who We Are (Data Controller)" },
+        "dataCollected": { "title": "2. Data We Collect" },
+        "dataUse": { "title": "3. How We Use Your Data" },
+        "legalBasis": { "title": "4. Legal Basis (GDPR)" },
+        "processors": { "title": "5. Third-Party Services (Processors)" },
+        "cookies": { "title": "6. Cookies" },
+        "retention": { "title": "7. Data Retention" },
+        "rights": { "title": "8. Your Rights (GDPR)" },
+        "security": { "title": "9. Data Security" },
+        "children": { "title": "10. Children" },
+        "changes": { "title": "11. Changes to This Policy" }
+      }
+    },
+    "terms": {
+      "metaTitle": "Terms of Service",
+      "metaDescription": "ModulCA terms of service — rules and conditions for using the platform.",
+      "title": "Terms of Service",
+      "sections": {
+        "provider": { "title": "0. Provider Information" },
+        "acceptance": { "title": "1. Acceptance of Terms" },
+        "description": { "title": "2. Description of Service" },
+        "accounts": { "title": "3. User Accounts" },
+        "billing": { "title": "4. Subscription Plans & Billing" },
+        "betaBonus": { "title": "5. Beta Bonus" },
+        "content": { "title": "6. Your Content" },
+        "ai": { "title": "7. AI-Generated Content" },
+        "acceptableUse": { "title": "8. Acceptable Use" },
+        "liability": { "title": "9. Limitation of Liability" },
+        "termination": { "title": "10. Termination" },
+        "law": { "title": "11. Governing Law" },
+        "contact": { "title": "12. Contact" }
+      }
     }
   },
   "pricing": {

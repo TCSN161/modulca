@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Cookie Policy",
-  description: "ModulCA cookie policy — detailed list of cookies we use, purpose, duration, and your consent options.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("legal.cookies");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
 export default function CookiesPage() {
-  const lastUpdated = "April 17, 2026";
+  const t = useTranslations("legal.cookies");
+  const tCommon = useTranslations("legal.common");
+  const lastUpdated = tCommon("lastUpdatedDate");
 
   return (
     <div className="min-h-screen bg-brand-bone-100">
@@ -16,18 +23,18 @@ export default function CookiesPage() {
           Modul<span className="text-brand-olive-700">CA</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm text-brand-gray">
-          <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
-          <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">Privacy</Link>
-          <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">Terms</Link>
+          <Link href="/" className="hover:text-brand-olive-700 transition-colors">{tCommon("home")}</Link>
+          <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">{tCommon("privacy")}</Link>
+          <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">{tCommon("terms")}</Link>
         </nav>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 md:px-8 py-12">
-        <h1 className="text-2xl font-bold text-brand-charcoal mb-2">Cookie Policy</h1>
-        <p className="text-sm text-brand-gray mb-8">Last updated: {lastUpdated}</p>
+        <h1 className="text-2xl font-bold text-brand-charcoal mb-2">{t("title")}</h1>
+        <p className="text-sm text-brand-gray mb-8">{tCommon("lastUpdated")} {lastUpdated}</p>
 
         <div className="space-y-8 text-sm text-brand-gray leading-relaxed">
-          <Section title="1. What Are Cookies?">
+          <Section title={t("sections.whatAre.title")}>
             <p>
               Cookies are small text files stored on your device when you visit a website. They
               help websites remember your preferences, keep you signed in, and measure how the
@@ -36,7 +43,7 @@ export default function CookiesPage() {
             </p>
           </Section>
 
-          <Section title="2. Your Choices">
+          <Section title={t("sections.choices.title")}>
             <p>
               On your first visit, a cookie banner asks for your consent to non-essential cookies
               (analytics, session replay). You can:
@@ -48,7 +55,7 @@ export default function CookiesPage() {
             </ul>
           </Section>
 
-          <Section title="3. Essential Cookies (Always Active)">
+          <Section title={t("sections.essential.title")}>
             <p>
               These cookies are required for core functionality. They do <strong>not</strong> require
               consent under GDPR / ePrivacy Directive.
@@ -57,10 +64,10 @@ export default function CookiesPage() {
               <table className="w-full border-collapse text-xs">
                 <thead className="bg-brand-bone-200">
                   <tr>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Cookie</th>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Source</th>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Purpose</th>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Duration</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.cookie")}</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.source")}</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.purpose")}</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.duration")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -87,7 +94,7 @@ export default function CookiesPage() {
             </div>
           </Section>
 
-          <Section title="4. Analytics Cookies (Opt-In)">
+          <Section title={t("sections.analytics.title")}>
             <p>
               Loaded <strong>only</strong> after you accept the consent banner. Used to understand
               aggregate usage patterns and improve the platform. You can decline without losing any
@@ -97,10 +104,10 @@ export default function CookiesPage() {
               <table className="w-full border-collapse text-xs">
                 <thead className="bg-brand-bone-200">
                   <tr>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Cookie</th>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Source</th>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Purpose</th>
-                    <th className="text-left p-2 border border-brand-bone-300/60">Duration</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.cookie")}</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.source")}</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.purpose")}</th>
+                    <th className="text-left p-2 border border-brand-bone-300/60">{t("table.duration")}</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -121,7 +128,7 @@ export default function CookiesPage() {
             </div>
           </Section>
 
-          <Section title="5. Cookieless Analytics (Always On, No PII)">
+          <Section title={t("sections.cookieless.title")}>
             <p>
               We use privacy-friendly analytics that do <strong>not</strong> set cookies or track
               individuals. These are allowed under ePrivacy Directive without consent.
@@ -132,7 +139,7 @@ export default function CookiesPage() {
             </ul>
           </Section>
 
-          <Section title="6. localStorage (Technical, Not Cookies)">
+          <Section title={t("sections.localStorage.title")}>
             <p>
               Some data is stored directly in your browser&apos;s localStorage instead of cookies.
               These do not leave your device except when syncing with the cloud (when authenticated).
@@ -149,7 +156,7 @@ export default function CookiesPage() {
             </p>
           </Section>
 
-          <Section title="7. Third-Party Processors">
+          <Section title={t("sections.thirdParty.title")}>
             <p>
               Some cookies are set by our data processors (Stripe for payments, Supabase for auth).
               These processors have their own privacy and cookie policies:
@@ -162,7 +169,7 @@ export default function CookiesPage() {
             </ul>
           </Section>
 
-          <Section title="8. Do Not Track (DNT)">
+          <Section title={t("sections.dnt.title")}>
             <p>
               We respect browser-level &quot;Do Not Track&quot; signals. If your browser sends DNT,
               we automatically treat you as having declined non-essential cookies, regardless of
@@ -170,7 +177,7 @@ export default function CookiesPage() {
             </p>
           </Section>
 
-          <Section title="9. Questions or Concerns">
+          <Section title={t("sections.questions.title")}>
             <p>
               Contact our privacy team at{" "}
               <a href="mailto:privacy@modulca.eu" className="text-brand-olive-700 underline">privacy@modulca.eu</a>.
@@ -183,12 +190,12 @@ export default function CookiesPage() {
 
       <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-8">
         <div className="max-w-3xl mx-auto px-4 flex items-center justify-between text-xs text-brand-gray">
-          <span>ModulCA Beta</span>
+          <span>{tCommon("beta")}</span>
           <div className="flex gap-4">
-            <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
-            <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">Terms</Link>
-            <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">Privacy</Link>
-            <Link href="/cookies" className="hover:text-brand-olive-700 transition-colors font-semibold text-brand-olive-700">Cookies</Link>
+            <Link href="/" className="hover:text-brand-olive-700 transition-colors">{tCommon("home")}</Link>
+            <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">{tCommon("terms")}</Link>
+            <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">{tCommon("privacy")}</Link>
+            <Link href="/cookies" className="hover:text-brand-olive-700 transition-colors font-semibold text-brand-olive-700">{tCommon("cookies")}</Link>
           </div>
         </div>
       </footer>

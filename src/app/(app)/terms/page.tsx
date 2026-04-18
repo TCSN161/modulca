@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Terms of Service",
-  description: "ModulCA terms of service — rules and conditions for using the platform.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("legal.terms");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
 export default function TermsPage() {
-  const lastUpdated = "April 17, 2026";
+  const t = useTranslations("legal.terms");
+  const tCommon = useTranslations("legal.common");
+  const lastUpdated = tCommon("lastUpdatedDate");
 
   return (
     <div className="min-h-screen bg-brand-bone-100">
@@ -16,17 +23,17 @@ export default function TermsPage() {
           Modul<span className="text-brand-olive-700">CA</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm text-brand-gray">
-          <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
-          <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">Privacy</Link>
+          <Link href="/" className="hover:text-brand-olive-700 transition-colors">{tCommon("home")}</Link>
+          <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">{tCommon("privacy")}</Link>
         </nav>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 md:px-8 py-12">
-        <h1 className="text-2xl font-bold text-brand-charcoal mb-2">Terms of Service</h1>
-        <p className="text-sm text-brand-gray mb-8">Last updated: {lastUpdated}</p>
+        <h1 className="text-2xl font-bold text-brand-charcoal mb-2">{t("title")}</h1>
+        <p className="text-sm text-brand-gray mb-8">{tCommon("lastUpdated")} {lastUpdated}</p>
 
         <div className="space-y-8 text-sm text-brand-gray leading-relaxed">
-          <Section title="0. Provider Information">
+          <Section title={t("sections.provider.title")}>
             <p>The ModulCA Platform is operated by:</p>
             <ul className="list-disc pl-5 space-y-1 mt-2">
               <li><strong>Legal entity:</strong> ATELIER DE PROIECTARE MCA S.R.L. </li>
@@ -41,14 +48,14 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="1. Acceptance of Terms">
+          <Section title={t("sections.acceptance.title")}>
             <p>
               By accessing or using ModulCA (&quot;the Platform&quot;), you agree to be bound by
               these Terms of Service. If you do not agree, please do not use the Platform.
             </p>
           </Section>
 
-          <Section title="2. Description of Service">
+          <Section title={t("sections.description.title")}>
             <p>
               ModulCA is an AI-powered modular construction design platform that allows users to
               design modular homes using a 3x3m grid system, generate visualizations, technical
@@ -60,7 +67,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="3. User Accounts">
+          <Section title={t("sections.accounts.title")}>
             <ul className="list-disc pl-5 space-y-1">
               <li>You must provide accurate information when creating an account</li>
               <li>You are responsible for maintaining the security of your account credentials</li>
@@ -69,7 +76,7 @@ export default function TermsPage() {
             </ul>
           </Section>
 
-          <Section title="4. Subscription Plans &amp; Billing">
+          <Section title={t("sections.billing.title")}>
             <p>
               ModulCA offers free and paid subscription tiers (Explorer, Premium, Architect, Constructor).
               Paid plans are billed monthly or yearly via Stripe.
@@ -105,7 +112,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="5. Beta Bonus">
+          <Section title={t("sections.betaBonus.title")}>
             <p>
               During the beta phase, new free accounts receive 3 months of Premium-level features
               at no cost. After the beta bonus expires, you may upgrade to a paid plan or continue
@@ -113,7 +120,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="6. Your Content">
+          <Section title={t("sections.content.title")}>
             <p>
               You retain ownership of all designs, configurations, and project data you create
               on ModulCA. By using the Platform, you grant us a limited license to store and
@@ -137,7 +144,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="7. AI-Generated Content">
+          <Section title={t("sections.ai.title")}>
             <p>
               ModulCA uses AI services to generate renders, recommendations, and architectural
               analysis. AI-generated content is provided &quot;as is&quot; and should not be
@@ -149,7 +156,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="8. Acceptable Use">
+          <Section title={t("sections.acceptableUse.title")}>
             <p>You agree not to:</p>
             <ul className="list-disc pl-5 space-y-1 mt-1">
               <li>Use the Platform for any unlawful purpose</li>
@@ -165,7 +172,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="9. Limitation of Liability">
+          <Section title={t("sections.liability.title")}>
             <p>
               ModulCA is a design tool, not a construction or engineering service. We are not
               responsible for:
@@ -185,7 +192,7 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="10. Termination">
+          <Section title={t("sections.termination.title")}>
             <p>
               We may suspend or terminate your account if you violate these terms. You may
               delete your account at any time by contacting us. Upon termination, your
@@ -193,14 +200,14 @@ export default function TermsPage() {
             </p>
           </Section>
 
-          <Section title="11. Governing Law">
+          <Section title={t("sections.law.title")}>
             <p>
               These terms are governed by the laws of Romania and the European Union.
               Any disputes will be resolved in the courts of Romania.
             </p>
           </Section>
 
-          <Section title="12. Contact">
+          <Section title={t("sections.contact.title")}>
             <p>
               For questions about these terms, contact us at{" "}
               <a href="mailto:contact@modulca.eu" className="text-brand-olive-700 underline">contact@modulca.eu</a>.
@@ -211,11 +218,11 @@ export default function TermsPage() {
 
       <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-8">
         <div className="max-w-3xl mx-auto px-4 flex items-center justify-between text-xs text-brand-gray">
-          <span>ModulCA Beta</span>
+          <span>{tCommon("beta")}</span>
           <div className="flex gap-4">
-            <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
-            <Link href="/terms" className="hover:text-brand-olive-700 transition-colors font-semibold text-brand-olive-700">Terms</Link>
-            <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">Privacy</Link>
+            <Link href="/" className="hover:text-brand-olive-700 transition-colors">{tCommon("home")}</Link>
+            <Link href="/terms" className="hover:text-brand-olive-700 transition-colors font-semibold text-brand-olive-700">{tCommon("terms")}</Link>
+            <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors">{tCommon("privacy")}</Link>
           </div>
         </div>
       </footer>

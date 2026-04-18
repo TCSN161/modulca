@@ -1,7 +1,14 @@
 import Link from "next/link";
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import { getArticle, getAllSlugs } from "@/features/blog/articles";
+import { getLocale } from "next-intl/server";
+import {
+  getLocalizedArticle,
+  getAllLocalizedSlugs,
+  LANGUAGE_BADGE,
+} from "@/features/blog/locale";
+import { ArticleLanguageSwitcher } from "@/features/blog/ArticleLanguageSwitcher";
+import type { Locale } from "@/i18n/config";
 import { articleSchema, breadcrumbListSchema, jsonLdScript, SITE_URL } from "@/shared/lib/schema";
 
 interface Props {
@@ -9,12 +16,13 @@ interface Props {
 }
 
 export async function generateStaticParams() {
-  return getAllSlugs().map((slug) => ({ slug }));
+  return getAllLocalizedSlugs().map((slug) => ({ slug }));
 }
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const locale = (await getLocale()) as Locale;
+  const article = getLocalizedArticle(slug, locale);
   if (!article) return {};
   const ogUrl = `/og?title=${encodeURIComponent(article.title)}&subtitle=${encodeURIComponent("ModulCA Blog")}`;
   const pageUrl = `${SITE_URL}/blog/${slug}`;
@@ -29,6 +37,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: pageUrl,
       publishedTime: article.date,
       authors: [article.author],
+      locale: article.language,
       images: [
         {
           url: ogUrl,
@@ -49,8 +58,13 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function BlogArticlePage({ params }: Props) {
   const { slug } = await params;
-  const article = getArticle(slug);
+  const locale = (await getLocale()) as Locale;
+  const article = getLocalizedArticle(slug, locale);
   if (!article) notFound();
+
+  const dateLocale =
+    article.language === "ro" ? "ro-RO" : article.language === "nl" ? "nl-NL" : "en-US";
+  const badge = LANGUAGE_BADGE[article.language];
 
   /* JSON-LD structured data for SEO */
   const pageUrl = `${SITE_URL}/blog/${slug}`;
@@ -91,12 +105,12 @@ export default async function BlogArticlePage({ params }: Props) {
         </div>
       </header>
 
-      <article className="mx-auto max-w-3xl px-4 py-12">
+      <article lang={article.language} className="mx-auto max-w-3xl px-4 py-12">
         {/* Meta */}
         <div className="mb-6">
           <div className="flex items-center gap-3 mb-3">
             <span className="text-xs text-gray-400">
-              {new Date(article.date).toLocaleDateString("en-US", {
+              {new Date(article.date).toLocaleDateString(dateLocale, {
                 year: "numeric",
                 month: "long",
                 day: "numeric",
@@ -106,7 +120,22 @@ export default async function BlogArticlePage({ params }: Props) {
             <span className="text-xs text-gray-400">{article.readMinutes} min read</span>
             <span className="text-xs text-gray-300">&middot;</span>
             <span className="text-xs text-gray-400">{article.author}</span>
+            <span
+              className="ml-auto inline-flex items-center gap-1 rounded-full border border-gray-200 bg-gray-50 px-2 py-0.5 text-[10px] font-semibold uppercase text-gray-500"
+              title={badge.title}
+              aria-label={`Language: ${badge.title}`}
+            >
+              <span aria-hidden="true">{badge.flag}</span>
+              <span>{badge.label}</span>
+            </span>
           </div>
+
+          {/* Language switcher: shown only if a translation of this slug
+              exists in another language. Clicking sets the locale cookie and
+              reloads the same /blog/[slug] URL, letting the server re-resolve
+              the article in the chosen language. */}
+          <ArticleLanguageSwitcher available={article.availableIn} />
+
           <h1 className="text-3xl font-bold text-brand-teal-800 leading-tight mb-3">
             {article.title}
           </h1>

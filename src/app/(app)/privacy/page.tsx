@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 
-export const metadata: Metadata = {
-  title: "Privacy Policy",
-  description: "ModulCA privacy policy — how we collect, use, and protect your data.",
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("legal.privacy");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
 
 export default function PrivacyPage() {
-  const lastUpdated = "April 17, 2026";
+  const t = useTranslations("legal.privacy");
+  const tCommon = useTranslations("legal.common");
+  const lastUpdated = tCommon("lastUpdatedDate");
 
   return (
     <div className="min-h-screen bg-brand-bone-100">
@@ -16,17 +23,17 @@ export default function PrivacyPage() {
           Modul<span className="text-brand-olive-700">CA</span>
         </Link>
         <nav className="flex items-center gap-4 text-sm text-brand-gray">
-          <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
-          <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">Terms</Link>
+          <Link href="/" className="hover:text-brand-olive-700 transition-colors">{tCommon("home")}</Link>
+          <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">{tCommon("terms")}</Link>
         </nav>
       </header>
 
       <main className="max-w-3xl mx-auto px-4 md:px-8 py-12">
-        <h1 className="text-2xl font-bold text-brand-charcoal mb-2">Privacy Policy</h1>
-        <p className="text-sm text-brand-gray mb-8">Last updated: {lastUpdated}</p>
+        <h1 className="text-2xl font-bold text-brand-charcoal mb-2">{t("title")}</h1>
+        <p className="text-sm text-brand-gray mb-8">{tCommon("lastUpdated")} {lastUpdated}</p>
 
         <div className="space-y-8 text-sm text-brand-gray leading-relaxed">
-          <Section title="1. Who We Are (Data Controller)">
+          <Section title={t("sections.controller.title")}>
             <p>
               ModulCA (&quot;we&quot;, &quot;us&quot;, &quot;our&quot;) is a modular construction
               design platform operated by:
@@ -42,7 +49,7 @@ export default function PrivacyPage() {
             </ul>
           </Section>
 
-          <Section title="2. Data We Collect">
+          <Section title={t("sections.dataCollected.title")}>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Account data</strong> — email address, name (when you register or sign in with Google)</li>
               <li><strong>Project data</strong> — module layouts, configurations, style choices, and design preferences you create</li>
@@ -52,7 +59,7 @@ export default function PrivacyPage() {
             </ul>
           </Section>
 
-          <Section title="3. How We Use Your Data">
+          <Section title={t("sections.dataUse.title")}>
             <ul className="list-disc pl-5 space-y-1">
               <li>Provide and improve the ModulCA design platform</li>
               <li>Process subscriptions and payments via Stripe</li>
@@ -63,7 +70,7 @@ export default function PrivacyPage() {
             <p className="mt-2">We do <strong>not</strong> sell your personal data to third parties.</p>
           </Section>
 
-          <Section title="4. Legal Basis (GDPR)">
+          <Section title={t("sections.legalBasis.title")}>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Contract</strong> — processing necessary to provide the service you signed up for</li>
               <li><strong>Consent</strong> — analytics cookies (you can accept or decline via our cookie banner)</li>
@@ -71,7 +78,7 @@ export default function PrivacyPage() {
             </ul>
           </Section>
 
-          <Section title="5. Third-Party Services (Processors)">
+          <Section title={t("sections.processors.title")}>
             <p>We use the following sub-processors that may process your data on our behalf:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Supabase</strong> (EU — Frankfurt) — authentication and database</li>
@@ -91,7 +98,7 @@ export default function PrivacyPage() {
             </p>
           </Section>
 
-          <Section title="6. Cookies">
+          <Section title={t("sections.cookies.title")}>
             <p>
               We use a cookie consent banner. Analytics cookies (Google Analytics, Microsoft Clarity)
               are only loaded after you click &quot;Accept&quot;. Essential cookies for authentication
@@ -102,7 +109,7 @@ export default function PrivacyPage() {
             </p>
           </Section>
 
-          <Section title="7. Data Retention">
+          <Section title={t("sections.retention.title")}>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Account &amp; project data</strong> — for as long as your account is active; deleted within 30 days of account deletion.</li>
               <li><strong>Inactive accounts</strong> — anonymized after 24 months of inactivity.</li>
@@ -113,7 +120,7 @@ export default function PrivacyPage() {
             </ul>
           </Section>
 
-          <Section title="8. Your Rights (GDPR)">
+          <Section title={t("sections.rights.title")}>
             <p>As an EU resident, you have the right to:</p>
             <ul className="list-disc pl-5 space-y-1">
               <li><strong>Access</strong> — request a copy of your personal data</li>
@@ -139,7 +146,7 @@ export default function PrivacyPage() {
             </p>
           </Section>
 
-          <Section title="9. Data Security">
+          <Section title={t("sections.security.title")}>
             <p>
               We use industry-standard security measures including encrypted connections (HTTPS),
               secure authentication (Supabase Auth), and PCI-compliant payment processing (Stripe).
@@ -147,14 +154,14 @@ export default function PrivacyPage() {
             </p>
           </Section>
 
-          <Section title="10. Children">
+          <Section title={t("sections.children.title")}>
             <p>
               ModulCA is not intended for users under 16 years of age.
               We do not knowingly collect data from children.
             </p>
           </Section>
 
-          <Section title="11. Changes to This Policy">
+          <Section title={t("sections.changes.title")}>
             <p>
               We may update this privacy policy from time to time. Material changes will be
               communicated via email or a notice on the platform. The &quot;last updated&quot;
@@ -166,11 +173,11 @@ export default function PrivacyPage() {
 
       <footer className="border-t border-brand-bone-300/60 bg-brand-bone-100 py-8">
         <div className="max-w-3xl mx-auto px-4 flex items-center justify-between text-xs text-brand-gray">
-          <span>ModulCA Beta</span>
+          <span>{tCommon("beta")}</span>
           <div className="flex gap-4">
-            <Link href="/" className="hover:text-brand-olive-700 transition-colors">Home</Link>
-            <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">Terms</Link>
-            <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors font-semibold text-brand-olive-700">Privacy</Link>
+            <Link href="/" className="hover:text-brand-olive-700 transition-colors">{tCommon("home")}</Link>
+            <Link href="/terms" className="hover:text-brand-olive-700 transition-colors">{tCommon("terms")}</Link>
+            <Link href="/privacy" className="hover:text-brand-olive-700 transition-colors font-semibold text-brand-olive-700">{tCommon("privacy")}</Link>
           </div>
         </div>
       </footer>

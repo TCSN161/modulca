@@ -154,10 +154,10 @@ export default function HomePage() {
         <section className="border-y border-brand-bone-300/60 bg-brand-bone-100 py-8">
           <div className="mx-auto grid max-w-5xl grid-cols-2 gap-6 px-4 sm:grid-cols-4 sm:gap-12">
             {[
-              { value: "19", label: "AI ENGINES" },
-              { value: "212", label: "KNOWLEDGE ARTICLES" },
-              { value: "100%", label: "EU-HOSTED • GDPR" },
-              { value: "<90", label: "DAYS TO MOVE-IN" },
+              { value: "19", label: tHome("stats.aiEngines") },
+              { value: "212", label: tHome("stats.articles") },
+              { value: "100%", label: tHome("stats.gdpr") },
+              { value: "<90", label: tHome("stats.days") },
             ].map((stat) => (
               <div key={stat.label} className="text-center">
                 <div className="text-2xl font-bold tracking-heading text-brand-charcoal sm:text-3xl md:text-4xl">
@@ -175,16 +175,16 @@ export default function HomePage() {
         <section className="border-b border-brand-bone-300/60 bg-white/40 py-6">
           <div className="mx-auto max-w-5xl px-4">
             <p className="mb-3 text-center text-[10px] font-bold uppercase tracking-widest text-brand-gray">
-              Built for the European market
+              {tHome("trust.heading")}
             </p>
             <div className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2 text-xs text-brand-gray md:text-sm">
-              <span>🇷🇴 Romanian permits (DTAC, C.U.)</span>
+              <span>🇷🇴 {tHome("trust.romania")}</span>
               <span className="opacity-40">•</span>
-              <span>🇳🇱 Dutch Omgevingswet / BBL</span>
+              <span>🇳🇱 {tHome("trust.netherlands")}</span>
               <span className="opacity-40">•</span>
-              <span>🇪🇺 Eurocode structural standards</span>
+              <span>🇪🇺 {tHome("trust.eurocode")}</span>
               <span className="opacity-40">•</span>
-              <span>EU-hosted infrastructure</span>
+              <span>{tHome("trust.euHosted")}</span>
             </div>
           </div>
         </section>
@@ -194,31 +194,31 @@ export default function HomePage() {
           <div className="mx-auto max-w-6xl">
             <div className="mb-14 grid gap-6 lg:grid-cols-2 lg:items-end">
               <div>
-                <p className="label-caps mb-3">Platform Core</p>
+                <p className="label-caps mb-3">{tHome("features.label")}</p>
                 <h2 className="text-3xl font-bold tracking-heading text-brand-charcoal sm:text-4xl">
-                  The Architect&apos;s Toolkit
+                  {tHome("features.title")}
                 </h2>
               </div>
               <p className="text-base text-brand-gray leading-relaxed lg:text-right">
-                Advanced simulation meets intuitive spatial planning for the modern builder.
+                {tHome("features.subtitle")}
               </p>
             </div>
             <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
               {[
                 {
                   icon: <IconMountain />,
-                  title: "Interactive Land Designer",
-                  desc: "Import topographic data and simulate sun paths to optimize your home\u2019s placement.",
+                  title: tHome("features.land.title"),
+                  desc: tHome("features.land.description"),
                 },
                 {
                   icon: <IconGrid />,
-                  title: "Modular Layout System",
-                  desc: "Drag and drop 3x3m modules. Smart-connect technology ensures structural feasibility.",
+                  title: tHome("features.modular.title"),
+                  desc: tHome("features.modular.description"),
                 },
                 {
                   icon: <IconEye />,
-                  title: "Real-time Visualization",
-                  desc: "Experience your design in photorealistic 3D rendering as you build, in any lighting condition.",
+                  title: tHome("features.visualization.title"),
+                  desc: tHome("features.visualization.description"),
                 },
               ].map((f) => (
                 <div
@@ -240,30 +240,30 @@ export default function HomePage() {
         <section id="how-it-works" className="bg-brand-bone-200 px-4 py-20 sm:py-24">
           <div className="mx-auto max-w-5xl text-center">
             <h2 className="mb-3 text-3xl font-bold tracking-heading text-brand-charcoal sm:text-4xl">
-              From Blueprint to Reality
+              {tHome("howItWorks.title")}
             </h2>
             <p className="mx-auto mb-14 max-w-xl text-base text-brand-gray">
-              A streamlined three-step journey to your perfect modular dwelling.
+              {tHome("howItWorks.subtitle")}
             </p>
             <div className="grid gap-8 sm:grid-cols-3">
               {[
                 {
                   icon: <IconPin />,
                   step: "01",
-                  title: "Choose Your Land",
-                  desc: "Upload coordinates or select from our verified eco-partnerships globally.",
+                  title: tHome("howItWorks.step1.title"),
+                  desc: tHome("howItWorks.step1.description"),
                 },
                 {
                   icon: <IconLayers />,
                   step: "02",
-                  title: "Design & Visualize",
-                  desc: "Utilize our module catalog to craft layouts that breathe with the environment.",
+                  title: tHome("howItWorks.step2.title"),
+                  desc: tHome("howItWorks.step2.description"),
                 },
                 {
                   icon: <IconBox />,
                   step: "03",
-                  title: "Build & Connect",
-                  desc: "We handle manufacturing and local assembly in under 90 days from approval.",
+                  title: tHome("howItWorks.step3.title"),
+                  desc: tHome("howItWorks.step3.description"),
                 },
               ].map((item) => (
                 <div key={item.step} className="flex flex-col items-center">
@@ -279,7 +279,7 @@ export default function HomePage() {
             </div>
             <div className="mt-12">
               <Link href="/project/new" className="btn-primary px-8 py-3 text-sm">
-                Try the Full 13-Step Flow
+                {tHome("howItWorks.tryFlow")}
               </Link>
             </div>
           </div>
@@ -288,18 +288,18 @@ export default function HomePage() {
         {/* ---- Pricing ---- */}
         <section id="pricing" className="px-4 py-20 sm:py-24">
           <div className="mx-auto max-w-6xl">
-            <p className="label-caps mb-3 text-center">Plans</p>
+            <p className="label-caps mb-3 text-center">{tHome("pricingTeaser.label")}</p>
             <h2 className="mb-3 text-center text-3xl font-bold tracking-heading text-brand-charcoal sm:text-4xl">
-              Simple, Transparent Pricing
+              {tHome("pricingTeaser.title")}
             </h2>
             <p className="mx-auto mb-4 max-w-xl text-center text-brand-gray">
-              Start free, upgrade when you need more. No hidden fees.
+              {tHome("pricingTeaser.subtitle")}
             </p>
             {/* Beta promo banner */}
             <div className="mx-auto mb-14 max-w-xl rounded-[12px] border border-brand-olive-200 bg-brand-olive-50 px-5 py-3 text-center">
               <p className="text-sm font-semibold text-brand-olive-700">
                 <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-brand-olive-500 animate-pulse" />
-                Beta Promo &mdash; Sign up free and get <strong>3 months of Premium access</strong> included.
+                {tHome("pricingTeaser.betaPromo")} <strong>{tHome("pricingTeaser.betaPromoBold")}</strong> {tHome("pricingTeaser.betaPromoEnd")}
               </p>
             </div>
             <div className="grid gap-5 pt-2 sm:grid-cols-2 lg:grid-cols-4">
@@ -434,20 +434,20 @@ export default function HomePage() {
             </div>
             <div className="relative px-5 sm:px-8 py-16 text-center sm:py-20">
               <h2 className="mb-6 text-2xl font-bold tracking-heading text-white sm:text-3xl md:text-4xl">
-                Ready to evolve your living space?
+                {tHome("finalCta.heading")}
               </h2>
               <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
                 <Link
                   href="/project/new"
                   className="rounded-[12px] bg-white px-8 py-3.5 text-sm font-bold text-brand-charcoal transition-colors hover:bg-brand-bone-200 shadow-subtle"
                 >
-                  Launch Designer
+                  {tHome("finalCta.launch")}
                 </Link>
                 <Link
                   href="#for-builders"
                   className="rounded-[12px] border border-white/40 bg-brand-olive-700 px-8 py-3.5 text-sm font-bold text-white transition-colors hover:bg-brand-olive-800"
                 >
-                  Schedule Consultation
+                  {tHome("finalCta.schedule")}
                 </Link>
               </div>
             </div>
@@ -457,22 +457,21 @@ export default function HomePage() {
         {/* ---- For Builders ---- */}
         <section id="for-builders" className="px-4 py-20 sm:py-24">
           <div className="mx-auto max-w-4xl text-center">
-            <p className="label-caps mb-3">Partners</p>
+            <p className="label-caps mb-3">{tHome("forBuilders.label")}</p>
             <h2 className="mb-4 text-3xl font-bold tracking-heading text-brand-charcoal sm:text-4xl">
-              For Builders &amp; Architects
+              {tHome("forBuilders.title")}
             </h2>
             <p className="mx-auto mb-8 max-w-2xl text-brand-gray">
-              Join our network of certified modular builders. Receive qualified leads,
-              manage client projects, and grow your business with our professional tools.
+              {tHome("forBuilders.description")}
             </p>
             <div className="mx-auto mb-10 grid max-w-2xl gap-3 text-left sm:grid-cols-2">
               {[
-                "Client project dashboard",
-                "White-label presentations",
-                "Technical drawing export (DWG)",
-                "Building permit management",
-                "Team collaboration tools",
-                "Priority support channel",
+                tHome("forBuilders.features.dashboard"),
+                tHome("forBuilders.features.whiteLabel"),
+                tHome("forBuilders.features.export"),
+                tHome("forBuilders.features.permits"),
+                tHome("forBuilders.features.team"),
+                tHome("forBuilders.features.support"),
               ].map((f) => (
                 <div key={f} className="flex items-center gap-2 text-sm text-brand-gray">
                   <span className="text-brand-olive-500">&#10003;</span> {f}
@@ -481,10 +480,10 @@ export default function HomePage() {
             </div>
             <div className="flex flex-col items-center gap-4 sm:flex-row sm:justify-center">
               <Link href="/project/demo/choose" className="btn-primary px-8 py-3 text-sm">
-                See a Demo Project
+                {tHome("forBuilders.seeDemo")}
               </Link>
               <Link href="/register" className="btn-secondary px-8 py-3 text-sm">
-                Apply as Builder
+                {tHome("forBuilders.applyBuilder")}
               </Link>
             </div>
           </div>

@@ -80,6 +80,81 @@
       "ctaHowItWorks": "Vezi cum funcționează",
       "ctaSecondary": "Vezi demo 2 minute"
     },
+    "stats": {
+      "aiEngines": "MOTOARE AI",
+      "articles": "ARTICOLE DE CUNOȘTINȚE",
+      "gdpr": "GĂZDUIT ÎN UE • GDPR",
+      "days": "ZILE PÂNĂ LA MUTARE"
+    },
+    "trust": {
+      "heading": "Construit pentru piața europeană",
+      "romania": "Autorizații românești (DTAC, C.U.)",
+      "netherlands": "Omgevingswet / BBL (Olanda)",
+      "eurocode": "Standarde structurale Eurocode",
+      "euHosted": "Infrastructură găzduită în UE"
+    },
+    "features": {
+      "label": "Nucleul platformei",
+      "title": "Kitul arhitectului",
+      "subtitle": "Simulare avansată combinată cu planificare spațială intuitivă pentru constructorul modern.",
+      "land": {
+        "title": "Designer interactiv de teren",
+        "description": "Importă date topografice și simulează traiectoria soarelui pentru a optimiza amplasarea casei tale."
+      },
+      "modular": {
+        "title": "Sistem modular de planificare",
+        "description": "Glisează și plasează module de 3×3m. Tehnologia de conectare inteligentă asigură fezabilitatea structurală."
+      },
+      "visualization": {
+        "title": "Vizualizare în timp real",
+        "description": "Experimentează designul în 3D fotorealist în timp ce construiești, în orice condiție de lumină."
+      }
+    },
+    "howItWorks": {
+      "title": "De la plan la realitate",
+      "subtitle": "O călătorie simplificată în trei pași către locuința modulară perfectă.",
+      "step1": {
+        "title": "Alege-ți terenul",
+        "description": "Încarcă coordonate sau selectează dintre parteneriatele noastre eco verificate la nivel global."
+      },
+      "step2": {
+        "title": "Designează și vizualizează",
+        "description": "Folosește catalogul nostru de module pentru a crea layout-uri care respiră în armonie cu mediul."
+      },
+      "step3": {
+        "title": "Construiește și conectează",
+        "description": "Ne ocupăm de producție și asamblarea locală în mai puțin de 90 de zile de la aprobare."
+      },
+      "tryFlow": "Încearcă fluxul complet în 13 pași"
+    },
+    "pricingTeaser": {
+      "label": "Planuri",
+      "title": "Prețuri simple și transparente",
+      "subtitle": "Începe gratuit, treci la un plan superior când ai nevoie de mai mult. Fără taxe ascunse.",
+      "betaPromo": "Promoție Beta — Creează cont gratuit și primești",
+      "betaPromoBold": "3 luni de acces Premium",
+      "betaPromoEnd": "incluse."
+    },
+    "finalCta": {
+      "heading": "Ești gata să-ți transformi spațiul de locuit?",
+      "launch": "Lansează designerul",
+      "schedule": "Programează consultanță"
+    },
+    "forBuilders": {
+      "label": "Parteneri",
+      "title": "Pentru constructori și arhitecți",
+      "description": "Alătură-te rețelei noastre de constructori modulari certificați. Primește lead-uri calificate, gestionează proiectele clienților și dezvoltă-ți afacerea cu instrumentele noastre profesionale.",
+      "features": {
+        "dashboard": "Panou pentru proiectele clienților",
+        "whiteLabel": "Prezentări white-label",
+        "export": "Export desene tehnice (DWG)",
+        "permits": "Gestionarea autorizațiilor de construcție",
+        "team": "Instrumente de colaborare în echipă",
+        "support": "Canal de suport prioritar"
+      },
+      "seeDemo": "Vezi un proiect demo",
+      "applyBuilder": "Aplică drept constructor"
+    },
     "benefits": {
       "title": "De ce ModulCA",
       "fast": {
@@ -97,6 +172,77 @@
     },
     "cta": {
       "final": "Începe designul casei tale modulare astăzi — 3 luni Premium gratuit în perioada beta."
+    }
+  },
+  "legal": {
+    "common": {
+      "lastUpdated": "Ultima actualizare:",
+      "lastUpdatedDate": "17 aprilie 2026",
+      "home": "Acasă",
+      "privacy": "Confidențialitate",
+      "terms": "Termeni",
+      "cookies": "Cookie-uri",
+      "beta": "ModulCA Beta"
+    },
+    "cookies": {
+      "metaTitle": "Politica de cookie-uri",
+      "metaDescription": "Politica ModulCA privind cookie-urile — lista detaliată a cookie-urilor folosite, scopul, durata și opțiunile tale de consimțământ.",
+      "title": "Politica de cookie-uri",
+      "table": {
+        "cookie": "Cookie",
+        "source": "Sursă",
+        "purpose": "Scop",
+        "duration": "Durată"
+      },
+      "sections": {
+        "whatAre": { "title": "1. Ce sunt cookie-urile?" },
+        "choices": { "title": "2. Opțiunile tale" },
+        "essential": { "title": "3. Cookie-uri esențiale (întotdeauna active)" },
+        "analytics": { "title": "4. Cookie-uri de analiză (opt-in)" },
+        "cookieless": { "title": "5. Analiză fără cookie-uri (fără date personale)" },
+        "localStorage": { "title": "6. localStorage (tehnic, nu cookie-uri)" },
+        "thirdParty": { "title": "7. Procesatori terți" },
+        "dnt": { "title": "8. Do Not Track (DNT)" },
+        "questions": { "title": "9. Întrebări sau preocupări" }
+      }
+    },
+    "privacy": {
+      "metaTitle": "Politica de confidențialitate",
+      "metaDescription": "Politica de confidențialitate ModulCA — cum colectăm, folosim și protejăm datele tale.",
+      "title": "Politica de confidențialitate",
+      "sections": {
+        "controller": { "title": "1. Cine suntem (operator de date)" },
+        "dataCollected": { "title": "2. Ce date colectăm" },
+        "dataUse": { "title": "3. Cum folosim datele tale" },
+        "legalBasis": { "title": "4. Temei legal (GDPR)" },
+        "processors": { "title": "5. Servicii terțe (procesatori)" },
+        "cookies": { "title": "6. Cookie-uri" },
+        "retention": { "title": "7. Păstrarea datelor" },
+        "rights": { "title": "8. Drepturile tale (GDPR)" },
+        "security": { "title": "9. Securitatea datelor" },
+        "children": { "title": "10. Copii" },
+        "changes": { "title": "11. Modificări ale acestei politici" }
+      }
+    },
+    "terms": {
+      "metaTitle": "Termeni și condiții",
+      "metaDescription": "Termenii și condițiile ModulCA — regulile și condițiile de utilizare a platformei.",
+      "title": "Termeni și condiții",
+      "sections": {
+        "provider": { "title": "0. Informații despre furnizor" },
+        "acceptance": { "title": "1. Acceptarea termenilor" },
+        "description": { "title": "2. Descrierea serviciului" },
+        "accounts": { "title": "3. Conturile utilizatorilor" },
+        "billing": { "title": "4. Planuri de abonament și facturare" },
+        "betaBonus": { "title": "5. Bonus Beta" },
+        "content": { "title": "6. Conținutul tău" },
+        "ai": { "title": "7. Conținut generat de AI" },
+        "acceptableUse": { "title": "8. Utilizare acceptabilă" },
+        "liability": { "title": "9. Limitarea răspunderii" },
+        "termination": { "title": "10. Încetare" },
+        "law": { "title": "11. Legea aplicabilă" },
+        "contact": { "title": "12. Contact" }
+      }
     }
   },
   "pricing": {

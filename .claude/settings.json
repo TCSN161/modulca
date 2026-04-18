@@ -54,7 +54,18 @@
       "Bash(git commit -F:*)",
       "Bash(git push origin master)",
       "Bash(git push origin claude/*)",
-      "Bash(git pull --rebase*)"
+      "Bash(git pull --rebase*)",
+      "Bash(node -e*)",
+      "Bash(cd /c/Users/Costin/Documents/modulca*)",
+      "Bash(cd /c/Users/Costin/Documents/modulca && *)",
+      "Bash(ls*)",
+      "Bash(pwd*)",
+      "Bash(echo*)",
+      "Bash(which*)",
+      "Bash(wc*)",
+      "Bash(stat*)",
+      "Bash(true*)",
+      "Bash(cat /c/Users/Costin/Documents/modulca/*)"
     ],
     "deny": [
       "Bash(git push --force*)",

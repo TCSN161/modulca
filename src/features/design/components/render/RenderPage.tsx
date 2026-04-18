@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback } from "react";
+import { useEffect, useState, useRef, useCallback, useMemo } from "react";
 import Link from "next/link";
 import dynamic from "next/dynamic";
 import { useDesignStore, type SavedRender } from "../../store";
@@ -26,12 +26,17 @@ const CombinedScene3D = dynamic(() => import("../visualize/CombinedScene3D"), { 
 
 export default function RenderPage() {
   const projectId = useProjectId();
-  const { gridCells, gridRotation } = useLandStore();
-  const {
-    modules, selectedModule, setSelectedModule,
-    setModulesFromGrid, styleDirection, finishLevel, getStats,
-    loadFromLocalStorage,
-  } = useDesignStore();
+  const gridCells = useLandStore((s) => s.gridCells);
+  const gridRotation = useLandStore((s) => s.gridRotation);
+  // Granular selectors — each subscribes to one slice, avoiding whole-store re-renders
+  const modules = useDesignStore((s) => s.modules);
+  const selectedModule = useDesignStore((s) => s.selectedModule);
+  const setSelectedModule = useDesignStore((s) => s.setSelectedModule);
+  const setModulesFromGrid = useDesignStore((s) => s.setModulesFromGrid);
+  const styleDirection = useDesignStore((s) => s.styleDirection);
+  const finishLevel = useDesignStore((s) => s.finishLevel);
+  const getStats = useDesignStore((s) => s.getStats);
+  const loadFromLocalStorage = useDesignStore((s) => s.loadFromLocalStorage);
 
   const { saved, handleSave } = useSaveDesign();
   const [viewMode, setViewMode] = useState<ViewMode>("single");
@@ -64,17 +69,17 @@ export default function RenderPage() {
 
   // Tier-based render limits
   const userTier = useAuthStore((s) => s.userTier);
-  const tierConfig = getTierConfig(userTier);
+  const tierConfig = useMemo(() => getTierConfig(userTier), [userTier]);
   const maxRendersPerMonth = tierConfig.features.aiRendersPerMonth;
   const tierResolution = tierConfig.features.renderResolution;
   /** Check if a resolution is locked for the current tier */
-  const isResLocked = (res: string) => {
+  const isResLocked = useCallback((res: string) => {
     if (tierResolution === "4k") return false;
     if (tierResolution === "hd") return false;
     // SD tier: only draft + standard allowed
     if (tierResolution === "sd" && res === "high") return true;
     return false;
-  };
+  }, [tierResolution]);
 
   // Monthly render quota — server-side via auth store (Supabase + localStorage fallback)
   const monthlyRenderCount = useAuthStore((s) => s.monthlyRenderCount);
@@ -114,21 +119,47 @@ export default function RenderPage() {
     setRenderedImage(null);
   }, [lighting, camera, selectedModule]);
 
-  const currentMod = selectedModule
-    ? modules.find((m) => m.row === selectedModule.row && m.col === selectedModule.col)
-    : null;
+  const currentMod = useMemo(
+    () => (selectedModule
+      ? modules.find((m) => m.row === selectedModule.row && m.col === selectedModule.col) ?? null
+      : null),
+    [selectedModule, modules],
+  );
 
-  const style = styleDirection ? getStyleDirection(styleDirection) : null;
-  const preset = currentMod
-    ? getPreset(currentMod.moduleType, currentMod.layoutPreset)
-      || getPresetsForType(currentMod.moduleType)[0]
-    : null;
-  const moduleType = currentMod ? MODULE_TYPES.find((mt) => mt.id === currentMod.moduleType) : null;
-  const floorMat = currentMod ? FLOOR_MATERIALS.find((f) => f.id === currentMod.floorFinish) : null;
-  const wallMat = currentMod ? WALL_MATERIALS.find((w) => w.id === currentMod.wallColor) : null;
-  const stats = getStats();
+  const style = useMemo(
+    () => (styleDirection ? getStyleDirection(styleDirection) : null),
+    [styleDirection],
+  );
+  const preset = useMemo(
+    () => (currentMod
+      ? getPreset(currentMod.moduleType, currentMod.layoutPreset)
+        || getPresetsForType(currentMod.moduleType)[0]
+      : null),
+    [currentMod],
+  );
+  const moduleType = useMemo(
+    () => (currentMod ? MODULE_TYPES.find((mt) => mt.id === currentMod.moduleType) : null),
+    [currentMod],
+  );
+  const floorMat = useMemo(
+    () => (currentMod ? FLOOR_MATERIALS.find((f) => f.id === currentMod.floorFinish) : null),
+    [currentMod],
+  );
+  const wallMat = useMemo(
+    () => (currentMod ? WALL_MATERIALS.find((w) => w.id === currentMod.wallColor) : null),
+    [currentMod],
+  );
+  // getStats is a zustand getter reading fresh state; recompute when inputs change
+  const stats = useMemo(
+    () => getStats(),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [getStats, modules, finishLevel],
+  );
 
-  const pins = STYLE_PINS[styleDirection || "scandinavian"] || STYLE_PINS.scandinavian;
+  const pins = useMemo(
+    () => STYLE_PINS[styleDirection || "scandinavian"] || STYLE_PINS.scandinavian,
+    [styleDirection],
+  );
 
   // Build default AI prompt from module data
   useEffect(() => {
@@ -195,7 +226,7 @@ export default function RenderPage() {
     resetAiImage();
   }, [aiPrompt, resetAiImage]);
 
-  const handleGenerateRender = () => {
+  const handleGenerateRender = useCallback(() => {
     setIsRendering(true);
     // Give Three.js a moment to render the frame
     setTimeout(() => {
@@ -203,7 +234,7 @@ export default function RenderPage() {
       if (img) setRenderedImage(img);
       setIsRendering(false);
     }, 500);
-  };
+  }, []);
 
   const handleTogglePin = useCallback((label: string) => {
     setSavedPins((prev) => {

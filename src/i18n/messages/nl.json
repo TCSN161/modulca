@@ -80,6 +80,81 @@
       "ctaHowItWorks": "Zie hoe het werkt",
       "ctaSecondary": "Bekijk 2-min demo"
     },
+    "stats": {
+      "aiEngines": "AI-ENGINES",
+      "articles": "KENNISARTIKELEN",
+      "gdpr": "EU-GEHOST • AVG",
+      "days": "DAGEN TOT VERHUIZING"
+    },
+    "trust": {
+      "heading": "Gebouwd voor de Europese markt",
+      "romania": "Roemeense vergunningen (DTAC, C.U.)",
+      "netherlands": "Nederlandse Omgevingswet / BBL",
+      "eurocode": "Eurocode constructienormen",
+      "euHosted": "EU-gehoste infrastructuur"
+    },
+    "features": {
+      "label": "Platformkern",
+      "title": "De toolkit van de architect",
+      "subtitle": "Geavanceerde simulatie ontmoet intuïtieve ruimtelijke planning voor de moderne bouwer.",
+      "land": {
+        "title": "Interactieve terreinontwerper",
+        "description": "Importeer topografische data en simuleer zonsbanen om de plaatsing van je huis te optimaliseren."
+      },
+      "modular": {
+        "title": "Modulair indelingssysteem",
+        "description": "Sleep en plaats modules van 3×3m. Slimme verbindingstechnologie garandeert constructieve haalbaarheid."
+      },
+      "visualization": {
+        "title": "Realtime visualisatie",
+        "description": "Ervaar je ontwerp in fotorealistische 3D-rendering terwijl je bouwt, in elke lichtconditie."
+      }
+    },
+    "howItWorks": {
+      "title": "Van blauwdruk naar realiteit",
+      "subtitle": "Een gestroomlijnde reis in drie stappen naar je perfecte modulaire woning.",
+      "step1": {
+        "title": "Kies je terrein",
+        "description": "Upload coördinaten of kies uit onze wereldwijd geverifieerde eco-partnerschappen."
+      },
+      "step2": {
+        "title": "Ontwerp en visualiseer",
+        "description": "Gebruik onze modulecatalogus om indelingen te maken die in harmonie ademen met de omgeving."
+      },
+      "step3": {
+        "title": "Bouw en verbind",
+        "description": "Wij regelen productie en lokale assemblage binnen 90 dagen na goedkeuring."
+      },
+      "tryFlow": "Probeer de volledige 13-stappen-flow"
+    },
+    "pricingTeaser": {
+      "label": "Abonnementen",
+      "title": "Eenvoudige, transparante prijzen",
+      "subtitle": "Start gratis, upgrade wanneer je meer nodig hebt. Geen verborgen kosten.",
+      "betaPromo": "Bèta-promo — Meld je gratis aan en ontvang",
+      "betaPromoBold": "3 maanden Premium-toegang",
+      "betaPromoEnd": "inbegrepen."
+    },
+    "finalCta": {
+      "heading": "Klaar om je leefruimte te laten evolueren?",
+      "launch": "Start de designer",
+      "schedule": "Plan een consultatie"
+    },
+    "forBuilders": {
+      "label": "Partners",
+      "title": "Voor bouwers en architecten",
+      "description": "Sluit je aan bij ons netwerk van gecertificeerde modulaire bouwers. Ontvang gekwalificeerde leads, beheer klantprojecten en groei je bedrijf met onze professionele tools.",
+      "features": {
+        "dashboard": "Klantprojectendashboard",
+        "whiteLabel": "White-label presentaties",
+        "export": "Export van technische tekeningen (DWG)",
+        "permits": "Beheer van bouwvergunningen",
+        "team": "Samenwerkingstools voor teams",
+        "support": "Prioriteit supportkanaal"
+      },
+      "seeDemo": "Bekijk een demoproject",
+      "applyBuilder": "Aanmelden als bouwer"
+    },
     "benefits": {
       "title": "Waarom ModulCA",
       "fast": {
@@ -97,6 +172,77 @@
     },
     "cta": {
       "final": "Start vandaag met het ontwerpen van je modulaire huis — 3 maanden Premium gratis tijdens de bèta."
+    }
+  },
+  "legal": {
+    "common": {
+      "lastUpdated": "Laatst bijgewerkt:",
+      "lastUpdatedDate": "17 april 2026",
+      "home": "Home",
+      "privacy": "Privacy",
+      "terms": "Voorwaarden",
+      "cookies": "Cookies",
+      "beta": "ModulCA Beta"
+    },
+    "cookies": {
+      "metaTitle": "Cookiebeleid",
+      "metaDescription": "ModulCA-cookiebeleid — gedetailleerde lijst van cookies die wij gebruiken, doel, duur en jouw toestemmingsopties.",
+      "title": "Cookiebeleid",
+      "table": {
+        "cookie": "Cookie",
+        "source": "Bron",
+        "purpose": "Doel",
+        "duration": "Duur"
+      },
+      "sections": {
+        "whatAre": { "title": "1. Wat zijn cookies?" },
+        "choices": { "title": "2. Jouw keuzes" },
+        "essential": { "title": "3. Essentiële cookies (altijd actief)" },
+        "analytics": { "title": "4. Analysecookies (opt-in)" },
+        "cookieless": { "title": "5. Cookieloze analyse (altijd aan, geen persoonsgegevens)" },
+        "localStorage": { "title": "6. localStorage (technisch, geen cookies)" },
+        "thirdParty": { "title": "7. Externe verwerkers" },
+        "dnt": { "title": "8. Do Not Track (DNT)" },
+        "questions": { "title": "9. Vragen of zorgen" }
+      }
+    },
+    "privacy": {
+      "metaTitle": "Privacybeleid",
+      "metaDescription": "ModulCA-privacybeleid — hoe wij je gegevens verzamelen, gebruiken en beschermen.",
+      "title": "Privacybeleid",
+      "sections": {
+        "controller": { "title": "1. Wie wij zijn (verwerkingsverantwoordelijke)" },
+        "dataCollected": { "title": "2. Welke gegevens wij verzamelen" },
+        "dataUse": { "title": "3. Hoe wij je gegevens gebruiken" },
+        "legalBasis": { "title": "4. Rechtsgrond (AVG)" },
+        "processors": { "title": "5. Externe diensten (verwerkers)" },
+        "cookies": { "title": "6. Cookies" },
+        "retention": { "title": "7. Gegevensbewaring" },
+        "rights": { "title": "8. Jouw rechten (AVG)" },
+        "security": { "title": "9. Gegevensbeveiliging" },
+        "children": { "title": "10. Kinderen" },
+        "changes": { "title": "11. Wijzigingen in dit beleid" }
+      }
+    },
+    "terms": {
+      "metaTitle": "Algemene voorwaarden",
+      "metaDescription": "ModulCA-voorwaarden — regels en voorwaarden voor het gebruik van het platform.",
+      "title": "Algemene voorwaarden",
+      "sections": {
+        "provider": { "title": "0. Informatie over de aanbieder" },
+        "acceptance": { "title": "1. Aanvaarding van de voorwaarden" },
+        "description": { "title": "2. Beschrijving van de dienst" },
+        "accounts": { "title": "3. Gebruikersaccounts" },
+        "billing": { "title": "4. Abonnementen en facturatie" },
+        "betaBonus": { "title": "5. Bètabonus" },
+        "content": { "title": "6. Jouw inhoud" },
+        "ai": { "title": "7. AI-gegenereerde inhoud" },
+        "acceptableUse": { "title": "8. Acceptabel gebruik" },
+        "liability": { "title": "9. Beperking van aansprakelijkheid" },
+        "termination": { "title": "10. Beëindiging" },
+        "law": { "title": "11. Toepasselijk recht" },
+        "contact": { "title": "12. Contact" }
+      }
     }
   },
   "pricing": {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { memo, useEffect, useMemo } from "react";
 import { Canvas, useThree } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import type { ModuleConfig } from "../../store";
@@ -42,19 +42,31 @@ function CanvasCapture({ onReady }: { onReady: (capture: () => string | null) =>
   return null;
 }
 
-function SceneContent({ module, lighting, showPlants, showPeople }: {
+const SceneContent = memo(function SceneContent({ module, lighting, showPlants, showPeople }: {
   module: ModuleConfig;
   lighting: LightingMode;
   showPlants: boolean;
   showPeople: boolean;
 }) {
-  const lc = LIGHTING_CONFIGS[lighting];
-  const preset = getPreset(module.moduleType, module.layoutPreset)
-    || getPresetsForType(module.moduleType)[0];
+  const lc = useMemo(() => LIGHTING_CONFIGS[lighting], [lighting]);
+  const preset = useMemo(
+    () => getPreset(module.moduleType, module.layoutPreset)
+      || getPresetsForType(module.moduleType)[0],
+    [module.moduleType, module.layoutPreset],
+  );
   const furniture = preset?.furniture || [];
-  const floorColor = FLOOR_MATERIALS.find((f) => f.id === module.floorFinish)?.color || "#D4A76A";
-  const wallColor = WALL_MATERIALS.find((w) => w.id === module.wallColor)?.color || "#F0EDE5";
+  const floorColor = useMemo(
+    () => FLOOR_MATERIALS.find((f) => f.id === module.floorFinish)?.color || "#D4A76A",
+    [module.floorFinish],
+  );
+  const wallColor = useMemo(
+    () => WALL_MATERIALS.find((w) => w.id === module.wallColor)?.color || "#F0EDE5",
+    [module.wallColor],
+  );
+  const effectiveThickness = useMemo(() => getEffectiveThickness(module), [module]);
   const overrides = module.furnitureOverrides?.[module.layoutPreset] ?? {};
+  const pointLightIntensity = lighting === "night" ? 0.8 : 0.3;
+  const pointLightColor = lighting === "night" ? "#ffcc88" : "#fff";
 
   return (
     <>
@@ -65,8 +77,8 @@ function SceneContent({ module, lighting, showPlants, showPeople }: {
         intensity={lc.sun}
         color={lc.sunColor}
         castShadow
-        shadow-mapSize-width={2048}
-        shadow-mapSize-height={2048}
+        shadow-mapSize-width={1024}
+        shadow-mapSize-height={1024}
         shadow-camera-near={0.1}
         shadow-camera-far={30}
         shadow-camera-left={-5}
@@ -75,11 +87,11 @@ function SceneContent({ module, lighting, showPlants, showPeople }: {
         shadow-camera-bottom={-5}
       />
       <directionalLight position={[-3, 5, -2]} intensity={lc.sun * 0.2} color={lc.sunColor} />
-      <pointLight position={[MODULE_SIZE / 2, WALL_HEIGHT - 0.3, MODULE_SIZE / 2]} intensity={lighting === "night" ? 0.8 : 0.3} color={lighting === "night" ? "#ffcc88" : "#fff"} />
+      <pointLight position={[MODULE_SIZE / 2, WALL_HEIGHT - 0.3, MODULE_SIZE / 2]} intensity={pointLightIntensity} color={pointLightColor} />
 
       <group position={[-MODULE_SIZE / 2, 0, -MODULE_SIZE / 2]}>
         <ModuleFloor color={floorColor} />
-        <ModuleWalls wallConfigs={module.wallConfigs} wallColor={wallColor} wallThickness={getEffectiveThickness(module)} />
+        <ModuleWalls wallConfigs={module.wallConfigs} wallColor={wallColor} wallThickness={effectiveThickness} />
         <ModuleCeiling />
 
         {furniture.map((item) => (
@@ -162,7 +174,7 @@ function SceneContent({ module, lighting, showPlants, showPeople }: {
       />
     </>
   );
-}
+});
 
 export interface RenderScene3DProps {
   module: ModuleConfig;
@@ -173,13 +185,16 @@ export interface RenderScene3DProps {
   onReady?: (capture: () => string | null) => void;
 }
 
-export default function RenderScene3D({ module, lighting, camera, showPlants, showPeople = false, onReady }: RenderScene3DProps) {
-  const camPos = CAMERA_POSITIONS[camera];
+function RenderScene3D({ module, lighting, camera, showPlants, showPeople = false, onReady }: RenderScene3DProps) {
+  const cameraProps = useMemo(
+    () => ({ position: CAMERA_POSITIONS[camera], fov: camera === "detail" ? 50 : 35, near: 0.1, far: 100 }),
+    [camera],
+  );
   return (
     <Canvas
       shadows
       gl={{ preserveDrawingBuffer: true }}
-      camera={{ position: camPos, fov: camera === "detail" ? 50 : 35, near: 0.1, far: 100 }}
+      camera={cameraProps}
       style={{ width: "100%", height: "100%" }}
     >
       {onReady && <CanvasCapture onReady={onReady} />}
@@ -187,3 +202,5 @@ export default function RenderScene3D({ module, lighting, camera, showPlants, sh
     </Canvas>
   );
 }
+
+export default memo(RenderScene3D);
