@@ -6,7 +6,7 @@
 - Legal name: **ATELIER DE PROIECTARE MCA S.R.L.** (short: MCA SRL)
 - VAT: **RO35294600**
 - Registered address: **Str. Lacul Plopului nr. 10, Sector 5, București, România**
-- Contact: Costin (founder), costin@modulca.eu
+- Contact: Costin Muraru (Founder & CEO), costin@modulca.eu
 - Website: https://modulca.eu
 - Data Protection point of contact: privacy@modulca.eu (alias → founder until DPO appointed)
 
@@ -57,7 +57,7 @@ Company details for the DPA:
     Bucuresti, Romania
   - Supabase organization / project ref: [INSERT ORG SLUG + PROJECT REF]
   - Plan: [Pro / Team]
-  - Signatory: Costin [LAST NAME], Founder / Administrator
+  - Signatory: Costin Muraru, Founder & CEO
   - Email for contract: costin@modulca.eu
   - DPO / privacy contact: privacy@modulca.eu
 
@@ -94,8 +94,8 @@ https://modulca.eu
 | Address line 1 | Str. Lacul Plopului nr. 10 |
 | City / Sector | București, Sector 5 |
 | Postal code | 051735 |
-| Signatory full name | Costin [LAST NAME] |
-| Signatory title | Founder / Administrator |
+| Signatory full name | Costin Muraru |
+| Signatory title | Founder & CEO |
 | Signatory email | costin@modulca.eu |
 | DPA effective date | Today |
 
@@ -133,7 +133,7 @@ Company details for the DPA:
     Bucuresti, Romania
   - Resend account email: costin@modulca.eu
   - Product / sending domain: modulca.eu
-  - Signatory: Costin [LAST NAME], Founder / Administrator
+  - Signatory: Costin Muraru, Founder & CEO
   - DPO / privacy contact: privacy@modulca.eu
 
 Could you please send:
@@ -172,7 +172,7 @@ https://modulca.eu
 | Company legal name | ATELIER DE PROIECTARE MCA S.R.L. |
 | Address | Str. Lacul Plopului nr. 10, Sector 5, București, Romania |
 | VAT | RO35294600 |
-| Signatory | Costin [LAST NAME], Founder |
+| Signatory | Costin Muraru, Founder & CEO |
 | Signatory email | costin@modulca.eu |
 
 If not available on your current plan, email: compliance@sentry.io with subject `DPA request — MCA SRL (Sentry org [ORG-SLUG])` and reuse the Resend email body above, swapping "Resend" → "Sentry".
@@ -199,8 +199,8 @@ If not available on your current plan, email: compliance@sentry.io with subject 
 | Business address | Str. Lacul Plopului nr. 10, Sector 5, București, Romania |
 | Country | Romania |
 | VAT | RO35294600 |
-| Signatory name | Costin [LAST NAME] |
-| Signatory title | Founder / Administrator |
+| Signatory name | Costin Muraru |
+| Signatory title | Founder & CEO |
 | Signatory email | costin@modulca.eu |
 
 Notes on the Vercel DPA: it references Standard Contractual Clauses (SCCs) module 2 (controller → processor). You do not need to separately sign SCCs — they are incorporated by reference. Accept "Yes" when asked.
