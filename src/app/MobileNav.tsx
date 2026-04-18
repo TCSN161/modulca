@@ -2,18 +2,20 @@
 
 import { useState } from "react";
 import Link from "next/link";
-
-const NAV_LINKS = [
-  { href: "#features", label: "Features" },
-  { href: "#how-it-works", label: "How It Works" },
-  { href: "#pricing", label: "Pricing" },
-  { href: "#for-builders", label: "For Builders" },
-  { href: "/portfolio", label: "Portfolio", isLink: true },
-  { href: "/blog", label: "Blog", isLink: true },
-];
+import { useTranslations } from "next-intl";
 
 export default function MobileNav() {
   const [open, setOpen] = useState(false);
+  const tNav = useTranslations("nav");
+
+  const NAV_LINKS = [
+    { href: "#features", label: tNav("features") },
+    { href: "#how-it-works", label: tNav("howItWorks") },
+    { href: "#pricing", label: tNav("pricing") },
+    { href: "#for-builders", label: tNav("forBuilders") },
+    { href: "/portfolio", label: tNav("portfolio"), isLink: true },
+    { href: "/blog", label: tNav("blog"), isLink: true },
+  ];
 
   return (
     <div className="md:hidden">
@@ -21,7 +23,7 @@ export default function MobileNav() {
       <button
         onClick={() => setOpen(!open)}
         className="flex h-11 w-11 items-center justify-center rounded-lg text-brand-charcoal hover:bg-brand-bone-200 transition-colors"
-        aria-label="Toggle menu"
+        aria-label={tNav("toggleMenu")}
       >
         {open ? (
           <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -65,7 +67,7 @@ export default function MobileNav() {
                 onClick={() => setOpen(false)}
                 className="block w-full rounded-lg bg-brand-olive-700 px-4 py-2.5 text-center text-sm font-bold text-white hover:bg-brand-olive-800 transition-colors"
               >
-                Start Designing — Free
+                {tNav("startDesigning")}
               </Link>
             </div>
           </div>

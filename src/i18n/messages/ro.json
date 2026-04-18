@@ -33,7 +33,9 @@
     "about": "Despre",
     "features": "Funcționalități",
     "howItWorks": "Cum funcționează",
-    "forBuilders": "Pentru constructori"
+    "forBuilders": "Pentru constructori",
+    "toggleMenu": "Deschide meniul",
+    "startDesigning": "Începe designul — gratuit"
   },
   "footer": {
     "beta": "ModulCA Beta",
@@ -98,48 +100,202 @@
     }
   },
   "pricing": {
-    "title": "Prețuri simple și transparente",
-    "subtitle": "Începe gratuit. Faci upgrade când ai nevoie de mai mult.",
+    "title": "Alege planul tău",
+    "subtitle": "Începe gratuit. Treci la un plan superior când ai nevoie de mai multă putere.",
     "beta": {
-      "banner": "Bonus beta: 3 luni Premium gratuit pentru toate conturile noi"
+      "banner": "Bonus beta: 3 luni Premium gratuit pentru toate conturile noi",
+      "active": "Bonus Beta activ",
+      "daysLeft": "Ai funcții Premium gratuit încă {days} zile!",
+      "bonusTitle": "Bonus Beta — 3 luni Premium gratuit",
+      "bonusDescription": "Toate conturile gratuite noi primesc funcții de nivel Premium timp de 3 luni pe durata fazei beta. Designează cu randări HD, toate desenele tehnice, export PDF și multe altele — complet gratuit. După 3 luni, alegi să faci upgrade sau să continui cu planul Explorer."
     },
     "billing": {
       "monthly": "Lunar",
       "yearly": "Anual",
-      "saveBadge": "Economisești ~17%"
+      "saveBadge": "Economisești 17%",
+      "perMonth": "/lună",
+      "billedYearly": "Facturat €{price}/an",
+      "free": "Gratuit"
     },
     "tier": {
-      "free": "Explorer",
-      "premium": "Premium",
-      "architect": "Arhitect",
-      "constructor": "Constructor"
+      "free": {
+        "label": "Explorer",
+        "description": "Designează-ți prima casă modulară gratuit. Upgrade oricând."
+      },
+      "premium": {
+        "label": "Premium",
+        "description": "Experiență completă de design. Tot ce ai nevoie ca să îți planifici casa modulară."
+      },
+      "architect": {
+        "label": "Arhitect",
+        "description": "Kit profesional. Gestionează clienți, proiecte și colaborează."
+      },
+      "constructor": {
+        "label": "Constructor",
+        "description": "Soluție enterprise. Proiecte nelimitate, white-label, suport dedicat."
+      }
+    },
+    "badge": {
+      "mostPopular": "Cel mai popular",
+      "enterprise": "Enterprise",
+      "betaActive": "Beta activ"
     },
     "cta": {
       "current": "Planul curent",
+      "activeBeta": "Activ (Beta)",
+      "startFree": "Începe gratuit",
+      "redirecting": "Se redirecționează...",
+      "getConstructor": "Alege Constructor",
+      "contactCustom": "Contactează-ne pentru preț personalizat",
+      "upgradeTo": "Upgrade la {tier}",
+      "getTier": "Alege {tier}",
       "upgrade": "Upgrade",
       "getStarted": "Începe",
-      "contactSales": "Contactează vânzări"
+      "contactSales": "Contactează vânzări",
+      "demoMode": "Mod demo — upgrade instant, fără plată"
+    },
+    "features": {
+      "free": {
+        "0": "Până la 6 module per proiect",
+        "1": "5 randări AI/lună (SD)",
+        "2": "Planuri de etaj + secțiuni",
+        "3": "Tur 3D",
+        "4": "Bază de cunoștințe (123 articole gratuite)",
+        "5": "Consultant AI (de bază, 1 țară)",
+        "6": "2 proiecte salvate",
+        "7": "3 luni bonus beta Premium"
+      },
+      "premium": {
+        "0": "Până la 12 module per proiect",
+        "1": "50 randări AI/lună (HD)",
+        "2": "Toate cele 6 tipuri de desene + export PDF",
+        "3": "Tur automat + tracker autorizații",
+        "4": "Bibliotecă completă (180 articole)",
+        "5": "Consultant AI (GPT-4o, 3 țări)",
+        "6": "Catalog de produse cu prețuri reale",
+        "7": "10 proiecte + linkuri partajabile",
+        "8": "Suport pe email"
+      },
+      "architect": {
+        "0": "Până la 50 module, dimensiuni custom",
+        "1": "200 randări AI/lună (4K)",
+        "2": "Export DWG/DXF pentru CAD",
+        "3": "Bibliotecă completă + reglementări din toate țările",
+        "4": "Consultant AI (Claude, context profund)",
+        "5": "Colaborare în echipă (5 membri)",
+        "6": "Dashboard pentru clienți + analytics",
+        "7": "Proiecte nelimitate",
+        "8": "Mod VR + suport prioritar"
+      },
+      "constructor": {
+        "0": "Până la 200 module per proiect",
+        "1": "Randări AI nelimitate (4K)",
+        "2": "Bibliotecă completă + context AI nelimitat",
+        "3": "Branding white-label",
+        "4": "Membri de echipă nelimitați",
+        "5": "Analytics avansate + API",
+        "6": "Proiecte nelimitate",
+        "7": "Manager de cont dedicat"
+      }
+    },
+    "compare": {
+      "title": "Comparație detaliată a funcțiilor",
+      "feature": "Funcție",
+      "unlimited": "Nelimitat",
+      "category": {
+        "design": "Design",
+        "visualization": "Vizualizare",
+        "technical": "Tehnic",
+        "knowledgeAi": "Cunoștințe și AI",
+        "presentation": "Prezentare",
+        "professional": "Profesional"
+      },
+      "row": {
+        "maxModules": "Module maxime per proiect",
+        "allModuleTypes": "Toate tipurile de module",
+        "customModuleDimensions": "Dimensiuni custom pentru module",
+        "maxTerrainSize": "Suprafață maximă teren (m²)",
+        "importCadastralData": "Import date cadastrale",
+        "aiRendersPerMonth": "Randări AI pe lună",
+        "renderResolution": "Rezoluție randare",
+        "walkthrough": "Tur 3D",
+        "autoTour": "Tur automat",
+        "vrMode": "Mod VR",
+        "allDrawingTypes": "Toate tipurile de desene",
+        "drawingPresentation": "Prezentare desene",
+        "permitTracker": "Tracker autorizații",
+        "exportPdf": "Export PDF",
+        "exportDwg": "Export DWG/DXF",
+        "knowledgeArticlesFull": "Conținut complet articole",
+        "knowledgeProArticles": "Articole pro (reglementări)",
+        "knowledgeRegions": "Reglementări pe țări",
+        "aiConsultantTier": "Calitate consultant AI",
+        "aiConsultantHistory": "Adâncime istoric chat AI",
+        "presentationTemplates": "Șabloane de prezentare",
+        "pdfPresentation": "Export album PDF",
+        "sharableLink": "Link partajabil",
+        "maxProjects": "Proiecte maxime",
+        "projectCollaboration": "Colaborare în echipă",
+        "clientDashboard": "Dashboard clienți",
+        "analytics": "Analytics",
+        "whiteLabel": "Branding white-label"
+      }
+    },
+    "faq": {
+      "title": "Întrebări?",
+      "q1": {
+        "question": "Pot schimba planul oricând?",
+        "answer": "Da. Poți face upgrade sau downgrade oricând. Modificările intră în vigoare imediat."
+      },
+      "q2": {
+        "question": "Ce este Bonusul Beta?",
+        "answer": "Conturile gratuite noi primesc 3 luni de funcții Premium pe durata fazei beta. Nu ai nevoie de card. După 3 luni, poți face upgrade sau poți continua cu Explorer."
+      },
+      "q3": {
+        "question": "Ce metode de plată acceptați?",
+        "answer": "Carduri de credit/debit prin Stripe. Facturare disponibilă pentru planurile Arhitect și Constructor."
+      },
+      "q4": {
+        "question": "Ce este planul Constructor?",
+        "answer": "Soluție enterprise pentru firme de construcții. Proiecte nelimitate, branding white-label, suport dedicat. Prețuri personalizate disponibile pentru echipe mari."
+      }
     }
   },
   "auth": {
     "signIn": {
       "title": "Autentificare în ModulCA",
+      "welcomeBack": "Bine ai revenit",
+      "subtitle": "Autentifică-te pentru a-ți accesa proiectele.",
       "email": "Email",
       "password": "Parolă",
+      "passwordPlaceholder": "Parola ta",
       "submit": "Autentificare",
+      "submitting": "Te rugăm să aștepți...",
       "orGoogle": "sau continuă cu Google",
+      "continueWithGoogle": "Continuă cu Google",
+      "or": "sau",
       "forgotPassword": "Ai uitat parola?",
       "noAccount": "Nu ai cont?",
-      "createAccount": "Creează unul"
+      "createAccount": "Creează unul",
+      "signUpFree": "Creează cont gratuit",
+      "skipDemo": "Sari peste — încearcă demo-ul fără cont",
+      "demoNotice": "Mod demo — conturile sunt stocate local în browserul tău."
     },
     "signUp": {
       "title": "Creează contul tău ModulCA",
+      "heading": "Creează-ți contul",
+      "subtitle": "Începe să îți designezi casa modulară gratuit.",
       "email": "Email",
       "name": "Nume complet (opțional)",
+      "fullName": "Nume complet",
+      "namePlaceholder": "Numele tău",
+      "emailPlaceholder": "tu@exemplu.com",
       "password": "Parolă",
       "passwordHint": "Minim 8 caractere",
+      "passwordPlaceholder": "Minim 6 caractere",
       "submit": "Creează cont",
       "hasAccount": "Ai deja cont?",
+      "signInLink": "Autentifică-te",
       "disclosure": "Prin crearea contului ești de acord cu Termenii și Politica de confidențialitate. Îți poți descărca sau șterge datele oricând."
     },
     "errors": {
@@ -147,28 +303,53 @@
       "emailInUse": "Acest email este deja înregistrat",
       "weakPassword": "Parola este prea slabă",
       "networkError": "Eroare de rețea — încearcă din nou"
+    },
+    "nav": {
+      "login": "Autentificare",
+      "tryFreeDemo": "Încearcă demo gratuit",
+      "dashboard": "Panou de control",
+      "userFallback": "Utilizator"
     }
   },
   "account": {
     "title": "Cont și confidențialitate",
+    "headerBack": "← Panou de control",
+    "headerLabel": "Setări cont",
+    "yourAccount": "Contul tău",
     "email": "Email",
     "plan": "Planul curent",
     "userId": "ID utilizator",
+    "signInRequired": "Autentificare necesară",
+    "signInRequiredDesc": "Trebuie să fii autentificat pentru a accesa setările contului.",
     "export": {
       "title": "Descarcă datele tale",
-      "description": "Conform GDPR Articolul 15 și 20, ai dreptul să primești toate datele personale pe care le deținem despre tine în format structurat, citibil de computer (JSON).",
+      "description": "Conform GDPR Articolul 15 și 20, ai dreptul să primești toate datele personale pe care le deținem despre tine în format structurat, citibil de computer (JSON). Exportul include profilul, proiectele și randările tale.",
       "button": "Descarcă datele mele (JSON)",
       "preparing": "Se pregătește...",
-      "success": "Datele tale au fost descărcate."
+      "success": "Datele tale au fost descărcate.",
+      "failed": "Exportul a eșuat"
     },
     "delete": {
       "title": "Șterge contul",
-      "description": "Conform GDPR Articolul 17, ai dreptul să soliciți ștergerea. Oferim o perioadă de grație de 30 de zile, după care datele sunt șterse permanent.",
+      "descriptionPart1": "Conform GDPR Articolul 17, ai dreptul să soliciți ștergerea contului și a datelor personale. Oferim o ",
+      "gracePeriod": "perioadă de grație de 30 de zile",
+      "descriptionPart2": " după care datele sunt șterse permanent. În perioada de grație, îți poți restaura contul trimițând un email la ",
+      "billingNote": "Notă: înregistrările de facturare sunt păstrate de Stripe conform legislației fiscale române (10 ani), dar nu mai sunt asociate contului tău după ștergere.",
       "button": "Șterge contul meu",
       "confirm": "Ești sigur? Asta va anula abonamentele și te va deconecta de pe toate dispozitivele.",
       "confirmButton": "Da, șterge contul meu",
+      "cancelButton": "Anulează",
       "deleting": "Se șterge...",
-      "success": "Cont programat pentru ștergere. Ai 30 de zile să-l restaurezi contactând privacy@modulca.eu. Te deconectăm acum..."
+      "success": "Cont programat pentru ștergere. Ai 30 de zile să-l restaurezi contactând privacy@modulca.eu. Te deconectăm acum...",
+      "failed": "Ștergerea a eșuat",
+      "noSession": "Nicio sesiune activă"
+    },
+    "privacyLinks": {
+      "intro": "Consultă ",
+      "privacyPolicy": "Politica de confidențialitate",
+      "and": " și ",
+      "cookiePolicy": "Politica cookie-uri",
+      "outro": " pentru detalii complete."
     }
   },
   "cookies": {

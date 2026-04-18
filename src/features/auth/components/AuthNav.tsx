@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useAuthStore } from "../store";
 
 /**
@@ -9,6 +10,7 @@ import { useAuthStore } from "../store";
  */
 export function AuthNav() {
   const { isAuthenticated, userName, userAvatar, userEmail } = useAuthStore();
+  const t = useTranslations("auth.nav");
 
   if (!isAuthenticated) {
     return (
@@ -17,19 +19,19 @@ export function AuthNav() {
           href="/login"
           className="text-sm font-medium text-brand-gray transition-colors hover:text-brand-charcoal"
         >
-          Log in
+          {t("login")}
         </Link>
         <Link
           href="/project/demo/choose"
           className="rounded-[12px] bg-brand-olive-700 px-5 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-olive-800"
         >
-          Try Free Demo
+          {t("tryFreeDemo")}
         </Link>
       </div>
     );
   }
 
-  const displayName = userName ?? userEmail?.split("@")[0] ?? "User";
+  const displayName = userName ?? userEmail?.split("@")[0] ?? t("userFallback");
   const initials = displayName.slice(0, 2).toUpperCase();
 
   return (
@@ -38,7 +40,7 @@ export function AuthNav() {
         href="/dashboard"
         className="text-sm font-medium text-brand-gray transition-colors hover:text-brand-charcoal"
       >
-        Dashboard
+        {t("dashboard")}
       </Link>
       <Link
         href="/dashboard"

@@ -33,7 +33,9 @@
     "about": "About",
     "features": "Features",
     "howItWorks": "How It Works",
-    "forBuilders": "For Builders"
+    "forBuilders": "For Builders",
+    "toggleMenu": "Toggle menu",
+    "startDesigning": "Start Designing — Free"
   },
   "footer": {
     "beta": "ModulCA Beta",
@@ -98,48 +100,202 @@
     }
   },
   "pricing": {
-    "title": "Simple, transparent pricing",
-    "subtitle": "Start free. Upgrade when you need more.",
+    "title": "Choose Your Plan",
+    "subtitle": "Start free. Upgrade when you need more power.",
     "beta": {
-      "banner": "Beta bonus: 3 months Premium free for all new accounts"
+      "banner": "Beta bonus: 3 months Premium free for all new accounts",
+      "active": "Beta Bonus Active",
+      "daysLeft": "You have Premium features free for {days} more days!",
+      "bonusTitle": "Beta Bonus — 3 Months Free Premium",
+      "bonusDescription": "All new free accounts get Premium-level features for 3 months during our beta phase. Design with HD renders, all drawings, PDF export, and more — completely free. After 3 months, choose to upgrade or continue with the Explorer plan."
     },
     "billing": {
       "monthly": "Monthly",
       "yearly": "Yearly",
-      "saveBadge": "Save ~17%"
+      "saveBadge": "Save 17%",
+      "perMonth": "/month",
+      "billedYearly": "Billed €{price}/year",
+      "free": "Free"
     },
     "tier": {
-      "free": "Explorer",
-      "premium": "Premium",
-      "architect": "Architect",
-      "constructor": "Constructor"
+      "free": {
+        "label": "Explorer",
+        "description": "Design your first modular home for free. Upgrade anytime."
+      },
+      "premium": {
+        "label": "Premium",
+        "description": "Full design experience. Everything to plan your modular home."
+      },
+      "architect": {
+        "label": "Architect",
+        "description": "Professional toolkit. Manage clients, projects, and collaborate."
+      },
+      "constructor": {
+        "label": "Constructor",
+        "description": "Enterprise solution. Unlimited projects, white-label, dedicated support."
+      }
+    },
+    "badge": {
+      "mostPopular": "Most Popular",
+      "enterprise": "Enterprise",
+      "betaActive": "Beta Active"
     },
     "cta": {
-      "current": "Current plan",
+      "current": "Current Plan",
+      "activeBeta": "Active (Beta)",
+      "startFree": "Start Free",
+      "redirecting": "Redirecting...",
+      "getConstructor": "Get Constructor",
+      "contactCustom": "Contact for Custom Pricing",
+      "upgradeTo": "Upgrade to {tier}",
+      "getTier": "Get {tier}",
       "upgrade": "Upgrade",
       "getStarted": "Get started",
-      "contactSales": "Contact sales"
+      "contactSales": "Contact sales",
+      "demoMode": "Demo mode — instant upgrade, no payment"
+    },
+    "features": {
+      "free": {
+        "0": "Up to 6 modules per project",
+        "1": "5 AI renders/month (SD)",
+        "2": "Floor plan + section drawings",
+        "3": "3D walkthrough",
+        "4": "Knowledge base (123 free articles)",
+        "5": "AI consultant (basic, 1 country)",
+        "6": "2 saved projects",
+        "7": "3-month Premium beta bonus"
+      },
+      "premium": {
+        "0": "Up to 12 modules per project",
+        "1": "50 AI renders/month (HD)",
+        "2": "All 6 drawing types + PDF export",
+        "3": "Auto-tour + permit tracker",
+        "4": "Full knowledge library (180 articles)",
+        "5": "AI consultant (GPT-4o, 3 countries)",
+        "6": "Product catalog with real pricing",
+        "7": "10 projects + sharable links",
+        "8": "Email support"
+      },
+      "architect": {
+        "0": "Up to 50 modules, custom sizes",
+        "1": "200 AI renders/month (4K)",
+        "2": "DWG/DXF export for CAD",
+        "3": "Full library + all country regulations",
+        "4": "AI consultant (Claude, deep context)",
+        "5": "Team collaboration (5 members)",
+        "6": "Client dashboard + analytics",
+        "7": "Unlimited projects",
+        "8": "VR mode + priority support"
+      },
+      "constructor": {
+        "0": "Up to 200 modules per project",
+        "1": "Unlimited AI renders (4K)",
+        "2": "Full library + unlimited AI context",
+        "3": "White-label branding",
+        "4": "Unlimited team members",
+        "5": "Advanced analytics + API",
+        "6": "Unlimited projects",
+        "7": "Dedicated account manager"
+      }
+    },
+    "compare": {
+      "title": "Detailed Feature Comparison",
+      "feature": "Feature",
+      "unlimited": "Unlimited",
+      "category": {
+        "design": "Design",
+        "visualization": "Visualization",
+        "technical": "Technical",
+        "knowledgeAi": "Knowledge & AI",
+        "presentation": "Presentation",
+        "professional": "Professional"
+      },
+      "row": {
+        "maxModules": "Max modules per project",
+        "allModuleTypes": "All module types",
+        "customModuleDimensions": "Custom module dimensions",
+        "maxTerrainSize": "Max terrain size (m²)",
+        "importCadastralData": "Cadastral data import",
+        "aiRendersPerMonth": "AI renders per month",
+        "renderResolution": "Render resolution",
+        "walkthrough": "3D Walkthrough",
+        "autoTour": "Auto-tour",
+        "vrMode": "VR mode",
+        "allDrawingTypes": "All drawing types",
+        "drawingPresentation": "Drawing presentation",
+        "permitTracker": "Permit tracker",
+        "exportPdf": "PDF export",
+        "exportDwg": "DWG/DXF export",
+        "knowledgeArticlesFull": "Full article content",
+        "knowledgeProArticles": "Pro-only articles (regulations)",
+        "knowledgeRegions": "Country regulations",
+        "aiConsultantTier": "AI consultant quality",
+        "aiConsultantHistory": "AI chat history depth",
+        "presentationTemplates": "Presentation templates",
+        "pdfPresentation": "PDF book export",
+        "sharableLink": "Sharable link",
+        "maxProjects": "Max projects",
+        "projectCollaboration": "Team collaboration",
+        "clientDashboard": "Client dashboard",
+        "analytics": "Analytics",
+        "whiteLabel": "White-label branding"
+      }
+    },
+    "faq": {
+      "title": "Questions?",
+      "q1": {
+        "question": "Can I switch plans anytime?",
+        "answer": "Yes. Upgrade or downgrade at any time. Changes take effect immediately."
+      },
+      "q2": {
+        "question": "What's the Beta Bonus?",
+        "answer": "New free accounts get 3 months of Premium features during our beta phase. No credit card needed. After 3 months, you can upgrade or continue with Explorer."
+      },
+      "q3": {
+        "question": "What payment methods do you accept?",
+        "answer": "Credit/debit cards via Stripe. Invoicing available for Architect and Constructor tiers."
+      },
+      "q4": {
+        "question": "What's the Constructor plan?",
+        "answer": "Enterprise solution for construction companies. Unlimited projects, white-label branding, dedicated support. Custom pricing available for larger teams."
+      }
     }
   },
   "auth": {
     "signIn": {
       "title": "Sign in to ModulCA",
+      "welcomeBack": "Welcome back",
+      "subtitle": "Sign in to access your projects.",
       "email": "Email",
       "password": "Password",
-      "submit": "Sign in",
+      "passwordPlaceholder": "Your password",
+      "submit": "Sign In",
+      "submitting": "Please wait...",
       "orGoogle": "or continue with Google",
+      "continueWithGoogle": "Continue with Google",
+      "or": "or",
       "forgotPassword": "Forgot password?",
       "noAccount": "Don't have an account?",
-      "createAccount": "Create one"
+      "createAccount": "Create one",
+      "signUpFree": "Sign up free",
+      "skipDemo": "Skip — try the demo without an account",
+      "demoNotice": "Demo mode — accounts are stored locally in your browser."
     },
     "signUp": {
       "title": "Create your ModulCA account",
+      "heading": "Create your account",
+      "subtitle": "Start designing your modular home for free.",
       "email": "Email",
       "name": "Full name (optional)",
+      "fullName": "Full name",
+      "namePlaceholder": "Your name",
+      "emailPlaceholder": "you@example.com",
       "password": "Password",
       "passwordHint": "At least 8 characters",
-      "submit": "Create account",
+      "passwordPlaceholder": "Min. 6 characters",
+      "submit": "Create Account",
       "hasAccount": "Already have an account?",
+      "signInLink": "Sign in",
       "disclosure": "By signing up you agree to our Terms and Privacy Policy. You can download or delete your data at any time."
     },
     "errors": {
@@ -147,28 +303,53 @@
       "emailInUse": "This email is already registered",
       "weakPassword": "Password is too weak",
       "networkError": "Network error — please try again"
+    },
+    "nav": {
+      "login": "Log in",
+      "tryFreeDemo": "Try Free Demo",
+      "dashboard": "Dashboard",
+      "userFallback": "User"
     }
   },
   "account": {
     "title": "Account & Privacy",
+    "headerBack": "← Dashboard",
+    "headerLabel": "Account Settings",
+    "yourAccount": "Your Account",
     "email": "Email",
     "plan": "Current plan",
     "userId": "User ID",
+    "signInRequired": "Sign in required",
+    "signInRequiredDesc": "You must be signed in to access your account settings.",
     "export": {
       "title": "Download Your Data",
-      "description": "Under GDPR Article 15 and 20, you have the right to receive all personal data we hold about you in a structured, machine-readable format (JSON).",
+      "description": "Under GDPR Article 15 and 20, you have the right to receive all personal data we hold about you in a structured, machine-readable format (JSON). The export includes your profile, projects, and renders.",
       "button": "Download my data (JSON)",
       "preparing": "Preparing...",
-      "success": "Your data has been downloaded."
+      "success": "Your data has been downloaded.",
+      "failed": "Export failed"
     },
     "delete": {
       "title": "Delete Account",
-      "description": "Under GDPR Article 17, you have the right to request deletion. We offer a 30-day grace period after which data is permanently erased.",
+      "descriptionPart1": "Under GDPR Article 17, you have the right to request deletion of your account and personal data. We offer a ",
+      "gracePeriod": "30-day grace period",
+      "descriptionPart2": " after which data is permanently erased. During the grace period, you can restore your account by emailing ",
+      "billingNote": "Note: billing records are retained by Stripe per Romanian tax law (10 years) but are not linked to your account after deletion.",
       "button": "Delete my account",
       "confirm": "Are you sure? This will cancel subscriptions and sign you out from all devices.",
       "confirmButton": "Yes, delete my account",
+      "cancelButton": "Cancel",
       "deleting": "Deleting...",
-      "success": "Account scheduled for deletion. You have 30 days to restore by contacting privacy@modulca.eu. Signing out now..."
+      "success": "Account scheduled for deletion. You have 30 days to restore by contacting privacy@modulca.eu. Signing out now...",
+      "failed": "Deletion failed",
+      "noSession": "No active session"
+    },
+    "privacyLinks": {
+      "intro": "See our ",
+      "privacyPolicy": "Privacy Policy",
+      "and": " and ",
+      "cookiePolicy": "Cookie Policy",
+      "outro": " for full details."
     }
   },
   "cookies": {

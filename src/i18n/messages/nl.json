@@ -33,7 +33,9 @@
     "about": "Over ons",
     "features": "Functies",
     "howItWorks": "Hoe het werkt",
-    "forBuilders": "Voor bouwers"
+    "forBuilders": "Voor bouwers",
+    "toggleMenu": "Menu openen",
+    "startDesigning": "Begin met ontwerpen — gratis"
   },
   "footer": {
     "beta": "ModulCA Beta",
@@ -98,48 +100,202 @@
     }
   },
   "pricing": {
-    "title": "Eenvoudige, transparante prijzen",
-    "subtitle": "Start gratis. Upgrade wanneer je meer nodig hebt.",
+    "title": "Kies je abonnement",
+    "subtitle": "Start gratis. Upgrade wanneer je meer kracht nodig hebt.",
     "beta": {
-      "banner": "Bètabonus: 3 maanden Premium gratis voor alle nieuwe accounts"
+      "banner": "Bètabonus: 3 maanden Premium gratis voor alle nieuwe accounts",
+      "active": "Bètabonus actief",
+      "daysLeft": "Je hebt nog {days} dagen gratis Premium-functies!",
+      "bonusTitle": "Bètabonus — 3 maanden gratis Premium",
+      "bonusDescription": "Alle nieuwe gratis accounts krijgen 3 maanden lang Premium-functies tijdens onze bètafase. Ontwerp met HD-renders, alle tekeningen, PDF-export en meer — volledig gratis. Na 3 maanden kies je om te upgraden of door te gaan met het Explorer-abonnement."
     },
     "billing": {
       "monthly": "Maandelijks",
       "yearly": "Jaarlijks",
-      "saveBadge": "Bespaar ~17%"
+      "saveBadge": "Bespaar 17%",
+      "perMonth": "/maand",
+      "billedYearly": "Gefactureerd €{price}/jaar",
+      "free": "Gratis"
     },
     "tier": {
-      "free": "Explorer",
-      "premium": "Premium",
-      "architect": "Architect",
-      "constructor": "Constructor"
+      "free": {
+        "label": "Explorer",
+        "description": "Ontwerp je eerste modulaire huis gratis. Upgrade wanneer je wilt."
+      },
+      "premium": {
+        "label": "Premium",
+        "description": "Volledige ontwerpervaring. Alles om je modulaire huis te plannen."
+      },
+      "architect": {
+        "label": "Architect",
+        "description": "Professionele toolkit. Beheer klanten, projecten en werk samen."
+      },
+      "constructor": {
+        "label": "Constructor",
+        "description": "Enterprise-oplossing. Onbeperkte projecten, white-label, dedicated support."
+      }
+    },
+    "badge": {
+      "mostPopular": "Populairst",
+      "enterprise": "Enterprise",
+      "betaActive": "Bèta actief"
     },
     "cta": {
-      "current": "Huidige abonnement",
+      "current": "Huidig abonnement",
+      "activeBeta": "Actief (bèta)",
+      "startFree": "Start gratis",
+      "redirecting": "Doorverwijzen...",
+      "getConstructor": "Kies Constructor",
+      "contactCustom": "Neem contact op voor maatwerk",
+      "upgradeTo": "Upgrade naar {tier}",
+      "getTier": "Kies {tier}",
       "upgrade": "Upgrade",
       "getStarted": "Begin nu",
-      "contactSales": "Contact sales"
+      "contactSales": "Contact sales",
+      "demoMode": "Demo-modus — directe upgrade, geen betaling"
+    },
+    "features": {
+      "free": {
+        "0": "Tot 6 modules per project",
+        "1": "5 AI-renders/maand (SD)",
+        "2": "Plattegrond + doorsneden",
+        "3": "3D-rondleiding",
+        "4": "Kennisbank (123 gratis artikelen)",
+        "5": "AI-consultant (basis, 1 land)",
+        "6": "2 opgeslagen projecten",
+        "7": "3 maanden bètabonus Premium"
+      },
+      "premium": {
+        "0": "Tot 12 modules per project",
+        "1": "50 AI-renders/maand (HD)",
+        "2": "Alle 6 tekeningtypes + PDF-export",
+        "3": "Auto-tour + vergunningstracker",
+        "4": "Volledige kennisbibliotheek (180 artikelen)",
+        "5": "AI-consultant (GPT-4o, 3 landen)",
+        "6": "Productcatalogus met echte prijzen",
+        "7": "10 projecten + deelbare links",
+        "8": "E-mailsupport"
+      },
+      "architect": {
+        "0": "Tot 50 modules, aangepaste maten",
+        "1": "200 AI-renders/maand (4K)",
+        "2": "DWG/DXF-export voor CAD",
+        "3": "Volledige bibliotheek + alle landenregels",
+        "4": "AI-consultant (Claude, diepe context)",
+        "5": "Teamsamenwerking (5 leden)",
+        "6": "Klantendashboard + analytics",
+        "7": "Onbeperkte projecten",
+        "8": "VR-modus + prioriteitssupport"
+      },
+      "constructor": {
+        "0": "Tot 200 modules per project",
+        "1": "Onbeperkte AI-renders (4K)",
+        "2": "Volledige bibliotheek + onbeperkte AI-context",
+        "3": "White-label branding",
+        "4": "Onbeperkte teamleden",
+        "5": "Geavanceerde analytics + API",
+        "6": "Onbeperkte projecten",
+        "7": "Toegewijde accountmanager"
+      }
+    },
+    "compare": {
+      "title": "Gedetailleerde functievergelijking",
+      "feature": "Functie",
+      "unlimited": "Onbeperkt",
+      "category": {
+        "design": "Ontwerp",
+        "visualization": "Visualisatie",
+        "technical": "Technisch",
+        "knowledgeAi": "Kennis & AI",
+        "presentation": "Presentatie",
+        "professional": "Professioneel"
+      },
+      "row": {
+        "maxModules": "Max. modules per project",
+        "allModuleTypes": "Alle moduletypes",
+        "customModuleDimensions": "Aangepaste moduleafmetingen",
+        "maxTerrainSize": "Max. terreingrootte (m²)",
+        "importCadastralData": "Kadastrale data-import",
+        "aiRendersPerMonth": "AI-renders per maand",
+        "renderResolution": "Renderresolutie",
+        "walkthrough": "3D-rondleiding",
+        "autoTour": "Auto-tour",
+        "vrMode": "VR-modus",
+        "allDrawingTypes": "Alle tekeningtypes",
+        "drawingPresentation": "Tekeningpresentatie",
+        "permitTracker": "Vergunningstracker",
+        "exportPdf": "PDF-export",
+        "exportDwg": "DWG/DXF-export",
+        "knowledgeArticlesFull": "Volledige artikelinhoud",
+        "knowledgeProArticles": "Pro-artikelen (regelgeving)",
+        "knowledgeRegions": "Landenregelgeving",
+        "aiConsultantTier": "Kwaliteit AI-consultant",
+        "aiConsultantHistory": "Diepte AI-chatgeschiedenis",
+        "presentationTemplates": "Presentatiesjablonen",
+        "pdfPresentation": "PDF-boekexport",
+        "sharableLink": "Deelbare link",
+        "maxProjects": "Max. projecten",
+        "projectCollaboration": "Teamsamenwerking",
+        "clientDashboard": "Klantendashboard",
+        "analytics": "Analytics",
+        "whiteLabel": "White-label branding"
+      }
+    },
+    "faq": {
+      "title": "Vragen?",
+      "q1": {
+        "question": "Kan ik op elk moment van abonnement wisselen?",
+        "answer": "Ja. Upgrade of downgrade op elk moment. Wijzigingen gaan direct in."
+      },
+      "q2": {
+        "question": "Wat is de Bètabonus?",
+        "answer": "Nieuwe gratis accounts krijgen 3 maanden Premium-functies tijdens onze bètafase. Geen creditcard nodig. Na 3 maanden kun je upgraden of doorgaan met Explorer."
+      },
+      "q3": {
+        "question": "Welke betaalmethoden accepteren jullie?",
+        "answer": "Credit- en debitcards via Stripe. Facturering beschikbaar voor Architect- en Constructor-abonnementen."
+      },
+      "q4": {
+        "question": "Wat is het Constructor-abonnement?",
+        "answer": "Enterprise-oplossing voor bouwbedrijven. Onbeperkte projecten, white-label branding, dedicated support. Maatwerkprijzen beschikbaar voor grotere teams."
+      }
     }
   },
   "auth": {
     "signIn": {
       "title": "Inloggen bij ModulCA",
+      "welcomeBack": "Welkom terug",
+      "subtitle": "Log in om toegang te krijgen tot je projecten.",
       "email": "E-mail",
       "password": "Wachtwoord",
+      "passwordPlaceholder": "Je wachtwoord",
       "submit": "Inloggen",
+      "submitting": "Even geduld...",
       "orGoogle": "of ga verder met Google",
+      "continueWithGoogle": "Doorgaan met Google",
+      "or": "of",
       "forgotPassword": "Wachtwoord vergeten?",
       "noAccount": "Nog geen account?",
-      "createAccount": "Maak er een"
+      "createAccount": "Maak er een",
+      "signUpFree": "Gratis aanmelden",
+      "skipDemo": "Overslaan — probeer de demo zonder account",
+      "demoNotice": "Demo-modus — accounts worden lokaal in je browser opgeslagen."
     },
     "signUp": {
       "title": "Maak je ModulCA-account aan",
+      "heading": "Maak je account aan",
+      "subtitle": "Begin gratis met het ontwerpen van je modulaire huis.",
       "email": "E-mail",
       "name": "Volledige naam (optioneel)",
+      "fullName": "Volledige naam",
+      "namePlaceholder": "Jouw naam",
+      "emailPlaceholder": "jij@voorbeeld.com",
       "password": "Wachtwoord",
       "passwordHint": "Minimaal 8 tekens",
+      "passwordPlaceholder": "Min. 6 tekens",
       "submit": "Account aanmaken",
       "hasAccount": "Heb je al een account?",
+      "signInLink": "Inloggen",
       "disclosure": "Door een account aan te maken ga je akkoord met onze Voorwaarden en Privacybeleid. Je kunt je gegevens op elk moment downloaden of verwijderen."
     },
     "errors": {
@@ -147,28 +303,53 @@
       "emailInUse": "Dit e-mailadres is al geregistreerd",
       "weakPassword": "Wachtwoord is te zwak",
       "networkError": "Netwerkfout — probeer opnieuw"
+    },
+    "nav": {
+      "login": "Inloggen",
+      "tryFreeDemo": "Probeer gratis demo",
+      "dashboard": "Dashboard",
+      "userFallback": "Gebruiker"
     }
   },
   "account": {
     "title": "Account & privacy",
+    "headerBack": "← Dashboard",
+    "headerLabel": "Accountinstellingen",
+    "yourAccount": "Jouw account",
     "email": "E-mail",
     "plan": "Huidig abonnement",
     "userId": "Gebruikers-ID",
+    "signInRequired": "Inloggen vereist",
+    "signInRequiredDesc": "Je moet ingelogd zijn om toegang te krijgen tot je accountinstellingen.",
     "export": {
       "title": "Download je gegevens",
-      "description": "Onder AVG artikel 15 en 20 heb je het recht om alle persoonsgegevens die wij over jou bewaren in een gestructureerd, machine-leesbaar formaat (JSON) te ontvangen.",
+      "description": "Onder AVG artikel 15 en 20 heb je het recht om alle persoonsgegevens die wij over jou bewaren in een gestructureerd, machine-leesbaar formaat (JSON) te ontvangen. De export bevat je profiel, projecten en renders.",
       "button": "Download mijn gegevens (JSON)",
       "preparing": "Voorbereiden...",
-      "success": "Je gegevens zijn gedownload."
+      "success": "Je gegevens zijn gedownload.",
+      "failed": "Export mislukt"
     },
     "delete": {
       "title": "Account verwijderen",
-      "description": "Onder AVG artikel 17 heb je het recht om verwijdering te verzoeken. We bieden een respijtperiode van 30 dagen, waarna gegevens permanent worden gewist.",
+      "descriptionPart1": "Onder AVG artikel 17 heb je het recht om verwijdering van je account en persoonsgegevens te verzoeken. We bieden een ",
+      "gracePeriod": "respijtperiode van 30 dagen",
+      "descriptionPart2": " waarna gegevens permanent worden gewist. Tijdens de respijtperiode kun je je account herstellen door een e-mail te sturen naar ",
+      "billingNote": "Let op: facturatiegegevens worden door Stripe bewaard volgens de Roemeense belastingwet (10 jaar) maar zijn na verwijdering niet meer aan je account gekoppeld.",
       "button": "Verwijder mijn account",
       "confirm": "Weet je het zeker? Dit annuleert abonnementen en logt je uit op alle apparaten.",
       "confirmButton": "Ja, verwijder mijn account",
+      "cancelButton": "Annuleren",
       "deleting": "Verwijderen...",
-      "success": "Account gepland voor verwijdering. Je hebt 30 dagen om te herstellen via privacy@modulca.eu. Je wordt nu uitgelogd..."
+      "success": "Account gepland voor verwijdering. Je hebt 30 dagen om te herstellen via privacy@modulca.eu. Je wordt nu uitgelogd...",
+      "failed": "Verwijdering mislukt",
+      "noSession": "Geen actieve sessie"
+    },
+    "privacyLinks": {
+      "intro": "Zie ons ",
+      "privacyPolicy": "Privacybeleid",
+      "and": " en ",
+      "cookiePolicy": "Cookiebeleid",
+      "outro": " voor volledige details."
     }
   },
   "cookies": {

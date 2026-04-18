@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/features/auth/store";
 import { getSupabase } from "@/shared/lib/supabase";
 
@@ -14,6 +15,8 @@ import { getSupabase } from "@/shared/lib/supabase";
  */
 export default function AccountSettingsPage() {
   const { userId, userEmail, userTier, signOut } = useAuthStore();
+  const t = useTranslations("account");
+  const tCommon = useTranslations("common");
 
   const [exporting, setExporting] = useState(false);
   const [confirmDelete, setConfirmDelete] = useState(false);
@@ -28,7 +31,7 @@ export default function AccountSettingsPage() {
     try {
       const sb = getSupabase();
       const token = sb ? (await sb.auth.getSession()).data.session?.access_token : null;
-      if (!token) throw new Error("No active session");
+      if (!token) throw new Error(t("delete.noSession"));
 
       const res = await fetch("/api/user/export", {
         method: "GET",
@@ -50,9 +53,9 @@ export default function AccountSettingsPage() {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
 
-      setStatus("Your data has been downloaded.");
+      setStatus(t("export.success"));
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Export failed");
+      setError(err instanceof Error ? err.message : t("export.failed"));
     } finally {
       setExporting(false);
     }
@@ -64,7 +67,7 @@ export default function AccountSettingsPage() {
     try {
       const sb = getSupabase();
       const token = sb ? (await sb.auth.getSession()).data.session?.access_token : null;
-      if (!token) throw new Error("No active session");
+      if (!token) throw new Error(t("delete.noSession"));
 
       const res = await fetch("/api/user/delete", {
         method: "DELETE",
@@ -75,7 +78,7 @@ export default function AccountSettingsPage() {
         throw new Error(body.error || `HTTP ${res.status}`);
       }
 
-      setStatus("Account scheduled for deletion. You have 30 days to restore by contacting privacy@modulca.eu. Signing out now...");
+      setStatus(t("delete.success"));
 
       // Sign out after brief delay so user sees the message
       setTimeout(async () => {
@@ -83,7 +86,7 @@ export default function AccountSettingsPage() {
         window.location.href = "/";
       }, 3000);
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Deletion failed");
+      setError(err instanceof Error ? err.message : t("delete.failed"));
       setConfirmDelete(false);
     } finally {
       setDeleting(false);
@@ -94,12 +97,12 @@ export default function AccountSettingsPage() {
     return (
       <div className="min-h-screen bg-brand-bone-100 flex items-center justify-center p-6">
         <div className="max-w-md text-center">
-          <h1 className="text-xl font-bold mb-4">Sign in required</h1>
+          <h1 className="text-xl font-bold mb-4">{t("signInRequired")}</h1>
           <p className="text-sm text-brand-gray mb-4">
-            You must be signed in to access your account settings.
+            {t("signInRequiredDesc")}
           </p>
           <Link href="/login" className="inline-block bg-brand-olive-700 text-white px-4 py-2 rounded-lg text-sm">
-            Sign in
+            {tCommon("signIn")}
           </Link>
         </div>
       </div>
@@ -110,28 +113,28 @@ export default function AccountSettingsPage() {
     <div className="min-h-screen bg-brand-bone-100">
       <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-brand-bone-300/60 bg-white/95 backdrop-blur-md px-4 md:px-8">
         <Link href="/dashboard" className="text-lg font-bold text-brand-charcoal">
-          ← Dashboard
+          {t("headerBack")}
         </Link>
-        <span className="text-sm text-brand-gray">Account Settings</span>
+        <span className="text-sm text-brand-gray">{t("headerLabel")}</span>
       </header>
 
       <main className="max-w-2xl mx-auto px-4 md:px-8 py-8 space-y-6">
-        <h1 className="text-2xl font-bold text-brand-charcoal">Account & Privacy</h1>
+        <h1 className="text-2xl font-bold text-brand-charcoal">{t("title")}</h1>
 
         {/* Account info */}
         <section className="bg-white rounded-lg border border-brand-bone-300/60 p-5">
-          <h2 className="text-base font-bold mb-3">Your Account</h2>
+          <h2 className="text-base font-bold mb-3">{t("yourAccount")}</h2>
           <dl className="text-sm space-y-2">
             <div className="flex justify-between">
-              <dt className="text-brand-gray">Email</dt>
+              <dt className="text-brand-gray">{t("email")}</dt>
               <dd className="text-brand-charcoal font-medium">{userEmail || "—"}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-brand-gray">Current plan</dt>
+              <dt className="text-brand-gray">{t("plan")}</dt>
               <dd className="text-brand-charcoal font-medium capitalize">{userTier}</dd>
             </div>
             <div className="flex justify-between">
-              <dt className="text-brand-gray">User ID</dt>
+              <dt className="text-brand-gray">{t("userId")}</dt>
               <dd className="text-brand-gray text-xs font-mono">{userId.slice(0, 8)}...</dd>
             </div>
           </dl>
@@ -139,36 +142,33 @@ export default function AccountSettingsPage() {
 
         {/* GDPR: Export data */}
         <section className="bg-white rounded-lg border border-brand-bone-300/60 p-5">
-          <h2 className="text-base font-bold mb-2">Download Your Data</h2>
+          <h2 className="text-base font-bold mb-2">{t("export.title")}</h2>
           <p className="text-sm text-brand-gray mb-4">
-            Under GDPR Article 15 and 20, you have the right to receive all personal data we hold
-            about you in a structured, machine-readable format (JSON). The export includes your
-            profile, projects, and renders.
+            {t("export.description")}
           </p>
           <button
             onClick={handleExport}
             disabled={exporting}
             className="bg-brand-olive-700 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-olive-800 disabled:opacity-50 transition-colors"
           >
-            {exporting ? "Preparing..." : "Download my data (JSON)"}
+            {exporting ? t("export.preparing") : t("export.button")}
           </button>
         </section>
 
         {/* GDPR: Delete account */}
         <section className="bg-white rounded-lg border border-red-200 p-5">
-          <h2 className="text-base font-bold mb-2 text-red-700">Delete Account</h2>
+          <h2 className="text-base font-bold mb-2 text-red-700">{t("delete.title")}</h2>
           <p className="text-sm text-brand-gray mb-4">
-            Under GDPR Article 17, you have the right to request deletion of your account and
-            personal data. We offer a <strong>30-day grace period</strong> after which data is
-            permanently erased. During the grace period, you can restore your account by emailing{" "}
+            {t("delete.descriptionPart1")}
+            <strong>{t("delete.gracePeriod")}</strong>
+            {t("delete.descriptionPart2")}
             <a href="mailto:privacy@modulca.eu" className="text-brand-olive-700 underline">
               privacy@modulca.eu
             </a>
             .
           </p>
           <p className="text-xs text-brand-gray mb-4">
-            Note: billing records are retained by Stripe per Romanian tax law (10 years) but are
-            not linked to your account after deletion.
+            {t("delete.billingNote")}
           </p>
 
           {!confirmDelete ? (
@@ -176,12 +176,12 @@ export default function AccountSettingsPage() {
               onClick={() => setConfirmDelete(true)}
               className="bg-red-50 text-red-700 border border-red-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-100 transition-colors"
             >
-              Delete my account
+              {t("delete.button")}
             </button>
           ) : (
             <div className="space-y-3 bg-red-50 p-4 rounded-lg border border-red-200">
               <p className="text-sm font-semibold text-red-800">
-                Are you sure? This will cancel subscriptions and sign you out from all devices.
+                {t("delete.confirm")}
               </p>
               <div className="flex gap-2">
                 <button
@@ -189,14 +189,14 @@ export default function AccountSettingsPage() {
                   disabled={deleting}
                   className="bg-red-600 text-white px-4 py-2 rounded-lg text-sm font-medium hover:bg-red-700 disabled:opacity-50 transition-colors"
                 >
-                  {deleting ? "Deleting..." : "Yes, delete my account"}
+                  {deleting ? t("delete.deleting") : t("delete.confirmButton")}
                 </button>
                 <button
                   onClick={() => setConfirmDelete(false)}
                   disabled={deleting}
                   className="bg-white text-brand-gray border border-brand-bone-300 px-4 py-2 rounded-lg text-sm font-medium hover:bg-brand-bone-100 transition-colors"
                 >
-                  Cancel
+                  {t("delete.cancelButton")}
                 </button>
               </div>
             </div>
@@ -217,11 +217,11 @@ export default function AccountSettingsPage() {
 
         {/* Links */}
         <section className="text-xs text-brand-gray pt-4 border-t border-brand-bone-300/60">
-          See our{" "}
-          <Link href="/privacy" className="text-brand-olive-700 underline">Privacy Policy</Link>{" "}
-          and{" "}
-          <Link href="/cookies" className="text-brand-olive-700 underline">Cookie Policy</Link>{" "}
-          for full details.
+          {t("privacyLinks.intro")}
+          <Link href="/privacy" className="text-brand-olive-700 underline">{t("privacyLinks.privacyPolicy")}</Link>
+          {t("privacyLinks.and")}
+          <Link href="/cookies" className="text-brand-olive-700 underline">{t("privacyLinks.cookiePolicy")}</Link>
+          {t("privacyLinks.outro")}
         </section>
       </main>
     </div>
