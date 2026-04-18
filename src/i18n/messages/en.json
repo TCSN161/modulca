@@ -513,5 +513,314 @@
       "label": "Language",
       "tooltip": "Change language"
     }
+  },
+  "faq": {
+    "metaTitle": "Frequently Asked Questions",
+    "metaDescription": "Everything about designing modular homes with ModulCA — 3×3m module system, pricing, building permits for Romania & Netherlands, timeline, and more.",
+    "ogTitle": "ModulCA — Frequently Asked Questions",
+    "ogDescription": "Answers about the 3×3m module system, pricing, permits in Romania and the Netherlands, timelines, and construction.",
+    "breadcrumbHome": "Home",
+    "breadcrumbCurrent": "FAQ",
+    "title": "Frequently Asked Questions",
+    "subtitle": "Everything you want to know about designing modular homes, the ModulCA platform, building permits in Romania and the Netherlands, and the construction process itself.",
+    "cta": {
+      "title": "Still have questions?",
+      "description": "Our AI consultant can help you design, explain regulations, and estimate costs for free.",
+      "startFree": "Start designing free",
+      "comparePlans": "Compare plans"
+    },
+    "groups": {
+      "platform": {
+        "title": "Platform & How it works",
+        "q1": {
+          "question": "What is ModulCA?",
+          "answer": "ModulCA is an AI-powered platform for designing modular wooden homes. You place 3×3m modules on your land, configure rooms and finishes, and receive 3D visualizations, AI renders, technical drawings, cost estimates, and connections to certified builders."
+        },
+        "q2": {
+          "question": "Who is ModulCA for?",
+          "answer": "Anyone considering a modular or prefabricated home — primarily homeowners in Romania and the Netherlands, architects evaluating modular for client projects, and builders looking for a pipeline of pre-designed projects."
+        },
+        "q3": {
+          "question": "Do I need architectural training?",
+          "answer": "No. The 13-step guided flow walks you from site selection to final construction drawings. The AI consultant explains regulations, dimensions, and trade-offs in plain language. Professional architects get advanced tools in the Architect tier."
+        },
+        "q4": {
+          "question": "What browsers are supported?",
+          "answer": "Modern evergreen browsers — Chrome, Edge, Safari, Firefox, Brave. The 3D walkthrough needs WebGL 2 (standard since 2017). VR mode requires a WebXR-compatible headset (Meta Quest, Vision Pro)."
+        }
+      },
+      "modules": {
+        "title": "The 3×3m module system",
+        "q1": {
+          "question": "Why 3×3m modules?",
+          "answer": "3×3m is the sweet spot for prefabrication: fits on standard trucks without wide-load permits, produces 9m² gross / ~7m² usable floor area (a typical single-room footprint), and plans cleanly into houses of 2–12 modules. Wall thickness is 15cm (interior) to 30cm (exterior insulated)."
+        },
+        "q2": {
+          "question": "Can I combine modules into open-plan spaces?",
+          "answer": "Yes. Interior walls between modules are optional and load-bearing columns are in the corners, so two adjacent modules give you 6×3m open space, three give you 9×3m, and so on. The configurator handles this automatically."
+        },
+        "q3": {
+          "question": "What's the structural system?",
+          "answer": "CLT (cross-laminated timber), timber frame, or SIP panels depending on the builder. Foundations use screw piles (76–114mm shaft, 1.5–3m depth) so the house is removable and leaves minimal ground disturbance."
+        },
+        "q4": {
+          "question": "Can I have multiple floors?",
+          "answer": "Yes — up to 2 floors are fully supported in the current release. Stair modules and structural reinforcement are handled by the configurator. Three-story designs are on the roadmap."
+        }
+      },
+      "pricing": {
+        "title": "Pricing & subscriptions",
+        "q1": {
+          "question": "How much does ModulCA cost?",
+          "answer": "Free tier (Explorer) is always free — design 1 project, 2 modules, basic visualization. Premium is €19.99/month (€199/year) for unlimited projects + AI renders. Architect is €49.99/month for pro tools (DWG/PDF export, white-label, vector knowledge base). Constructor is €149.90/month for builders (lead marketplace, team accounts)."
+        },
+        "q2": {
+          "question": "What does the modular house itself cost?",
+          "answer": "Typical turnkey cost in Romania is €1,000–2,000/m² depending on finish level. A 4-module house (~28m² usable) lands around €35–60k turnkey, foundation + transport included. Your ModulCA estimate is itemized — modules, foundation, transport, MEP, finishes, permits."
+        },
+        "q3": {
+          "question": "Is there a free trial or beta discount?",
+          "answer": "During the Beta period (launching May 1, 2026), all registered users get 3 months of Premium features free. Beyond that, Explorer tier stays free forever with 1 project + 2 modules."
+        },
+        "q4": {
+          "question": "Can I cancel anytime?",
+          "answer": "Yes. Subscriptions are monthly or yearly and cancelable from your account settings. You keep access until the end of the paid period, then downgrade to Explorer."
+        }
+      },
+      "permits": {
+        "title": "Building permits & regulations",
+        "q1": {
+          "question": "Can I actually build a house I design in ModulCA?",
+          "answer": "Yes. ModulCA generates the drawings your architect needs for a building permit application (DTAC in Romania, Omgevingsvergunning in Netherlands). A certified architect signs the project, and you submit to the local municipality. Our certified partner architects can handle the submission for you."
+        },
+        "q2": {
+          "question": "How does the Romanian building permit process work?",
+          "answer": "Six steps: (1) Certificat de Urbanism (CU) from primărie — 30 days, (2) Technical project (DTAC) signed by an architect, (3) Utility approvals (avize), (4) Autorizație de Construire — valid 12 months, (5) Construction with on-site supervision (diriginte de șantier), (6) Final inspection + cadastral registration (intabulare)."
+        },
+        "q3": {
+          "question": "How does the Dutch building permit process work?",
+          "answer": "Apply via the Omgevingsloket online portal. Since 2024, a Kwaliteitsborger (independent quality inspector) is required for new builds. Regular procedure is 8 weeks; extended procedure (for deviations from the local zoning plan) is 26 weeks. Bouwbesluit / BBL compliance is mandatory."
+        },
+        "q4": {
+          "question": "Does ModulCA handle the permit paperwork?",
+          "answer": "Not directly — permit submission must be signed by a licensed architect or engineer in the country of construction. We connect you with certified partner architects in Romania and the Netherlands (in Architect and Constructor tiers), and we generate the drawings they need."
+        }
+      },
+      "timeline": {
+        "title": "Timeline & construction",
+        "q1": {
+          "question": "How long does the whole process take?",
+          "answer": "Design in ModulCA: a few hours to a few days (depending on revisions). Permit process: 4–12 weeks in Romania, 8–26 weeks in Netherlands. Factory build: 6–10 weeks. On-site assembly: 2–5 days. Total: 3–8 months from signup to moving in."
+        },
+        "q2": {
+          "question": "Can the house be moved later?",
+          "answer": "Yes — screw-pile foundations can be unscrewed and modules are bolted together (not glued or welded). Disassembly and relocation takes 2–4 days with a qualified team. This is a key reason for using ModulCA if you're on leased land or plan to move."
+        },
+        "q3": {
+          "question": "How well-insulated are the modules?",
+          "answer": "ModulCA modules meet near-passive-house thermal performance — exterior wall U-value around 0.18 W/m²K (passive house is ≤0.15). Heating demand typically 15–25 kWh/m²·year. Builders can spec full passive standard on request."
+        }
+      },
+      "ai": {
+        "title": "AI & technology",
+        "q1": {
+          "question": "What AI does ModulCA use?",
+          "answer": "Multiple engines. For renders: FLUX, Stable Diffusion, DALL-E 3, Leonardo, Imagen 3, Runway — auto-selected by tier and subject. For the architectural consultant: Groq Llama 3.3 (free tier), OpenAI GPT-4o-mini (Premium), Anthropic Claude (Architect). All text generation is grounded in our 212-article knowledge base."
+        },
+        "q2": {
+          "question": "Is my design data private?",
+          "answer": "Yes. Projects are stored in your account (Supabase EU region) and are never shared with third parties or used to train AI models. You can export or delete your data at any time."
+        },
+        "q3": {
+          "question": "Can I export to CAD?",
+          "answer": "PDF export is available on all paid tiers. DWG export (for AutoCAD/Revit) is included in the Architect tier and above. SketchUp and IFC exports are on the roadmap."
+        }
+      }
+    }
+  },
+  "library": {
+    "header": {
+      "title": "Knowledge Library"
+    },
+    "hero": {
+      "title": "Architecture Knowledge Library",
+      "subtitle": "{articles} articles across {categories} domains and {regions} country regulations"
+    },
+    "search": {
+      "placeholder": "Search standards, regulations, dimensions, styles...",
+      "clear": "Clear search (Esc)",
+      "results": "{count} results for \"{query}\"",
+      "resultsOne": "{count} result for \"{query}\""
+    },
+    "bookmarks": {
+      "saved": "{count} saved",
+      "saveArticle": "Save article",
+      "bookmark": "Bookmark",
+      "removeBookmark": "Remove bookmark",
+      "listTitle": "Saved Articles ({count})",
+      "backToLibrary": "Back to library",
+      "empty": "No saved articles yet"
+    },
+    "detail": {
+      "back": "Back",
+      "sources": "Sources",
+      "loading": "Loading article...",
+      "lockedTitle": "Premium Content",
+      "lockedDescription": "Full article content is available for Premium and Architect subscribers.",
+      "upgradeButton": "Upgrade to Premium",
+      "truncated": "Article truncated on free tier.",
+      "truncatedUpgrade": "Upgrade to Premium",
+      "truncatedSuffix": " for the full content.",
+      "askConsultant": "Ask AI Consultant about \"{title}\"",
+      "relatedArticles": "Related Articles",
+      "updated": "Updated {date}",
+      "minRead": "{min} min read",
+      "pro": "Pro"
+    },
+    "categoryView": {
+      "allCategories": "All categories",
+      "articles": "{count} articles",
+      "all": "All",
+      "euShared": "EU Shared ({count})",
+      "upgradeTitle": "Upgrade to access {name} regulations",
+      "noMatches": "No articles match this filter"
+    },
+    "sections": {
+      "featured": "Featured Articles",
+      "booksAndReferences": "Books & References",
+      "freeResources": "Free Resources ({count})",
+      "essentialBooks": "Essential Books ({count})",
+      "browseFreeBooks": "Browse all free books →",
+      "browseAllBooks": "Browse all books →",
+      "practicalGuides": "Practical Guides",
+      "stepByStep": "Step-by-Step Guides",
+      "browseAllGuides": "Browse all guides →"
+    },
+    "categoryCard": {
+      "articles": "{count} articles",
+      "articlesOne": "{count} article"
+    },
+    "footer": {
+      "version": "ModulCA Knowledge Library v2.0 — {articles} articles across Neufert standards, EU regulations, and {regions} country codes",
+      "upgradePrefix": "",
+      "upgradeLink": "Upgrade to Premium",
+      "upgradeSuffix": " for full article access and deep AI consultation"
+    }
+  },
+  "portfolio": {
+    "metaTitle": "Portfolio",
+    "hero": {
+      "label": "Portfolio",
+      "title": "Built with ModulCA",
+      "subtitle": "Real modular homes designed using our 3×3m precision grid. From compact studios to family courtyards — filter by country, size, or cost to find inspiration for your own project."
+    },
+    "stats": {
+      "featuredProjects": "Featured Projects",
+      "modulesDesigned": "Modules Designed",
+      "totalArea": "Total Area",
+      "avgAssembly": "Avg. Assembly",
+      "days": "{days} days"
+    },
+    "filters": {
+      "country": "Country",
+      "allCountries": "All countries",
+      "size": "Size",
+      "anySize": "Any size",
+      "sizeSmall": "Small (≤ 30 m²)",
+      "sizeMedium": "Medium (31–75 m²)",
+      "sizeLarge": "Large (76+ m²)",
+      "sortBy": "Sort by",
+      "sortFeatured": "Featured",
+      "sortAreaAsc": "Area · smallest first",
+      "sortAreaDesc": "Area · largest first",
+      "sortCostAsc": "Cost · lowest first",
+      "sortCostDesc": "Cost · highest first",
+      "totalFiltered": "{filtered} of {total} projects",
+      "ofTotalProjects": "of {total} projects"
+    },
+    "empty": {
+      "noMatches": "No projects match the selected filters.",
+      "clearFilters": "Clear filters"
+    },
+    "cta": {
+      "title": "Ready to design your modular home?",
+      "description": "Start with our free designer — place modules on your land, choose finishes, get instant cost estimates, and connect with certified builders.",
+      "startFree": "Start Designing — Free",
+      "askAi": "Ask AI Architect"
+    }
+  },
+  "press": {
+    "metaTitle": "Press & Investors",
+    "metaDescription": "ModulCA press kit, company facts, media resources, and investor relations. AI-powered modular construction platform for Romania and the Netherlands.",
+    "ogTitle": "ModulCA — Press & Investor Relations",
+    "ogDescription": "Company facts, founder story, media assets, and investor resources for the ModulCA modular construction platform.",
+    "breadcrumbCurrent": "Press",
+    "hero": {
+      "title": "Press & Investor Relations",
+      "subtitle": "ModulCA is the first end-to-end digital platform for designing, visualizing, and sourcing modular wooden homes — engineered for the Romanian and Dutch markets, ready for the EU energy transition."
+    },
+    "glance": {
+      "title": "At a glance",
+      "launchedLabel": "Launched",
+      "launchedValue": "Beta: May 1, 2026",
+      "marketsLabel": "Markets",
+      "marketsValue": "Romania, Netherlands",
+      "moduleLabel": "Module system",
+      "moduleValue": "3×3m grid, CLT / timber frame / SIP",
+      "knowledgeLabel": "Knowledge base",
+      "knowledgeValue": "212 articles, 17 categories",
+      "aiLabel": "AI engines",
+      "aiValue": "19 render providers, 4 consultants",
+      "tiersLabel": "Tiers",
+      "tiersValue": "Explorer (free) → Constructor (€149.90/mo)"
+    },
+    "thesis": {
+      "title": "The market thesis",
+      "romania": {
+        "title": "Romania modular market",
+        "p1": "~60,000 new single-family permits/year",
+        "p2": "Average turnkey build cost: €1,000–2,000/m²",
+        "p3": "Demand shifting from concrete to timber (EU Green Deal incentives)",
+        "p4": "Modular share: <3% today, projected 8–12% by 2030"
+      },
+      "netherlands": {
+        "title": "Netherlands modular market",
+        "p1": "Government target: 100,000 new homes/year through 2030",
+        "p2": "Shortage of ~390,000 homes (2024 SCP data)",
+        "p3": "Kwaliteitsborger (2024) + BENG rules favor factory-built quality",
+        "p4": "Modular a priority in Woningbouw Impuls funding"
+      },
+      "moat": {
+        "title": "Technology moat",
+        "p1": "Only platform combining: 3D configurator + AI renders + structural engineering + regional permit guidance + builder marketplace",
+        "p2": "212-article knowledge base grounds every AI consultant response in real regulations",
+        "p3": "Multi-provider AI strategy keeps gross margins above 80% at all tiers",
+        "p4": "EU-hosted (Supabase EU, Resend EU, Sentry EU, Fireworks EU) — GDPR-native"
+      }
+    },
+    "founder": {
+      "title": "From the founder",
+      "p1": "Housing in Central Europe has been priced out of reach for an entire generation. The fix is not more concrete — it's better-engineered, faster-built, more sustainable homes, designed with tools that today's buyers actually use.",
+      "p2": "ModulCA is the platform I wished existed when I spent years designing modular homes by hand. We combine the grid-based rigor of professional modular architecture with the accessibility of consumer software and the power of modern AI — so the next 100,000 Romanian and Dutch homes can be designed in an afternoon, permitted in weeks, and built in months instead of years.",
+      "signature": "— Costin, Founder"
+    },
+    "mediaKit": {
+      "title": "Media kit",
+      "description": "Journalists, partners, and investors — reach out for high-resolution assets, interviews, or pitch decks.",
+      "pressReleaseEn": "Press release (EN)",
+      "pressReleaseRo": "Press release (RO)",
+      "logoPack": "Logo pack (SVG, PNG)",
+      "screenshots": "Product screenshots",
+      "founderPhoto": "Founder photo + bio",
+      "pitchDeck": "Pitch deck (PDF)",
+      "statusComing": "Coming May 1, 2026",
+      "statusOnRequest": "Available on request",
+      "statusInvestors": "For accredited investors — request via email"
+    },
+    "contact": {
+      "title": "Press & investor contact",
+      "description": "For interviews, media assets, partnership inquiries, or investor materials, reach us directly:",
+      "responseTime": "Typical response time: under 24 hours on business days."
+    }
   }
 }

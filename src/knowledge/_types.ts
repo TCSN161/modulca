@@ -54,6 +54,21 @@ export interface KBDocumentMeta {
   region?: string;
   /** Scope of the regulation */
   regionScope?: KBRegionScope;
+  /**
+   * Content language (ISO 639-1).
+   * Defaults to "en" (source of truth). Translations live alongside their source
+   * with a filename suffix: `room-dimensions.md` (EN) + `room-dimensions.ro.md` (RO).
+   * The build script (`scripts/build-knowledge.mjs`) detects the suffix and sets
+   * this field automatically. Manual override via frontmatter is possible but rare.
+   */
+  language?: "en" | "ro" | "nl" | "de" | "fr";
+  /**
+   * When this article is a translation of another, links to the source id.
+   * Null/undefined for EN sources. Set automatically by build script when
+   * detecting `<id>.<lang>.md` pattern — the suffix strips out of id, base id
+   * points to EN source.
+   */
+  translationOf?: string;
 }
 
 /**

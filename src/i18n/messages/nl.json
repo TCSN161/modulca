@@ -513,5 +513,314 @@
       "label": "Taal",
       "tooltip": "Taal wijzigen"
     }
+  },
+  "faq": {
+    "metaTitle": "Veelgestelde vragen",
+    "metaDescription": "Alles over het ontwerpen van modulaire woningen met ModulCA — 3×3m modulair systeem, prijzen, bouwvergunningen voor Roemenië en Nederland, tijdlijn en meer.",
+    "ogTitle": "ModulCA — Veelgestelde vragen",
+    "ogDescription": "Antwoorden over het 3×3m modulaire systeem, prijzen, vergunningen in Roemenië en Nederland, tijdlijnen en constructie.",
+    "breadcrumbHome": "Home",
+    "breadcrumbCurrent": "Veelgestelde vragen",
+    "title": "Veelgestelde vragen",
+    "subtitle": "Alles wat je wilt weten over het ontwerpen van modulaire woningen, het ModulCA-platform, bouwvergunningen in Roemenië en Nederland, en het bouwproces zelf.",
+    "cta": {
+      "title": "Nog vragen?",
+      "description": "Onze AI-consultant kan je helpen met ontwerpen, regelgeving uitleggen en kosten inschatten — gratis.",
+      "startFree": "Begin gratis met ontwerpen",
+      "comparePlans": "Abonnementen vergelijken"
+    },
+    "groups": {
+      "platform": {
+        "title": "Platform en hoe het werkt",
+        "q1": {
+          "question": "Wat is ModulCA?",
+          "answer": "ModulCA is een AI-gedreven platform voor het ontwerpen van modulaire houten woningen. Je plaatst 3×3m modules op je grond, configureert kamers en afwerkingen, en ontvangt 3D-visualisaties, AI-renders, technische tekeningen, kostenramingen en contacten met gecertificeerde bouwers."
+        },
+        "q2": {
+          "question": "Voor wie is ModulCA?",
+          "answer": "Iedereen die een modulaire of geprefabriceerde woning overweegt — vooral huiseigenaren in Roemenië en Nederland, architecten die modulair evalueren voor klantprojecten, en bouwers die op zoek zijn naar een stroom voorbereide projecten."
+        },
+        "q3": {
+          "question": "Heb ik een architectuuropleiding nodig?",
+          "answer": "Nee. De begeleide 13-stappen flow leidt je van locatieselectie tot definitieve bouwtekeningen. De AI-consultant legt regelgeving, afmetingen en afwegingen uit in begrijpelijke taal. Professionele architecten krijgen geavanceerde tools in het Architect-abonnement."
+        },
+        "q4": {
+          "question": "Welke browsers worden ondersteund?",
+          "answer": "Moderne evergreen browsers — Chrome, Edge, Safari, Firefox, Brave. De 3D-rondleiding vereist WebGL 2 (standaard sinds 2017). VR-modus vereist een WebXR-compatibele headset (Meta Quest, Vision Pro)."
+        }
+      },
+      "modules": {
+        "title": "Het 3×3m modulaire systeem",
+        "q1": {
+          "question": "Waarom 3×3m modules?",
+          "answer": "3×3m is het optimale punt voor prefabricage: past op standaardvrachtwagens zonder vergunningen voor breed transport, produceert 9m² bruto / ~7m² bruikbare vloeroppervlakte (een typische footprint voor één kamer) en laat zich elegant plannen tot woningen van 2–12 modules. Wanddikte is 15cm (interieur) tot 30cm (geïsoleerd exterieur)."
+        },
+        "q2": {
+          "question": "Kan ik modules combineren tot open ruimtes?",
+          "answer": "Ja. Binnenwanden tussen modules zijn optioneel en dragende kolommen staan in de hoeken, dus twee aangrenzende modules geven 6×3m open ruimte, drie geven 9×3m, enzovoort. De configurator regelt dit automatisch."
+        },
+        "q3": {
+          "question": "Wat is het constructieve systeem?",
+          "answer": "CLT (kruislaaghout), houtskeletbouw of SIP-panelen afhankelijk van de bouwer. Funderingen gebruiken schroefpalen (76–114mm schacht, 1,5–3m diepte) zodat de woning verplaatsbaar is en minimale bodemverstoring achterlaat."
+        },
+        "q4": {
+          "question": "Kan ik meerdere verdiepingen hebben?",
+          "answer": "Ja — tot 2 verdiepingen worden volledig ondersteund in de huidige versie. Trapmodules en constructieve versterking worden door de configurator afgehandeld. Ontwerpen met drie verdiepingen staan op de roadmap."
+        }
+      },
+      "pricing": {
+        "title": "Prijzen en abonnementen",
+        "q1": {
+          "question": "Wat kost ModulCA?",
+          "answer": "Het gratis abonnement (Explorer) is altijd gratis — ontwerp 1 project, 2 modules, basisvisualisatie. Premium is € 19,99/maand (€ 199/jaar) voor onbeperkte projecten + AI-renders. Architect is € 49,99/maand voor pro-tools (DWG/PDF-export, white-label, vectorkennisbank). Constructor is € 149,90/maand voor bouwers (leadmarktplaats, teamaccounts)."
+        },
+        "q2": {
+          "question": "Wat kost de modulaire woning zelf?",
+          "answer": "Typische turn-keykosten in Roemenië liggen op € 1.000–2.000/m² afhankelijk van afwerkingsniveau. Een woning met 4 modules (~28m² bruikbaar) komt neer op ongeveer € 35–60k turn-key, fundering + transport inbegrepen. Je ModulCA-raming is gespecificeerd — modules, fundering, transport, installaties, afwerkingen, vergunningen."
+        },
+        "q3": {
+          "question": "Is er een gratis proefperiode of bètakorting?",
+          "answer": "Tijdens de bètaperiode (lancering 1 mei 2026) krijgen alle geregistreerde gebruikers 3 maanden Premium-functies gratis. Daarna blijft het Explorer-abonnement voor altijd gratis met 1 project + 2 modules."
+        },
+        "q4": {
+          "question": "Kan ik op elk moment opzeggen?",
+          "answer": "Ja. Abonnementen zijn maandelijks of jaarlijks en kunnen worden opgezegd via je accountinstellingen. Je behoudt toegang tot het einde van de betaalde periode en gaat daarna terug naar Explorer."
+        }
+      },
+      "permits": {
+        "title": "Bouwvergunningen en regelgeving",
+        "q1": {
+          "question": "Kan ik daadwerkelijk een huis bouwen dat ik in ModulCA ontwerp?",
+          "answer": "Ja. ModulCA genereert de tekeningen die je architect nodig heeft voor een bouwvergunningaanvraag (DTAC in Roemenië, Omgevingsvergunning in Nederland). Een gecertificeerde architect tekent het project, en jij dient het in bij de lokale gemeente. Onze gecertificeerde partnerarchitecten kunnen de indiening voor je afhandelen."
+        },
+        "q2": {
+          "question": "Hoe verloopt het Roemeense vergunningsproces?",
+          "answer": "Zes stappen: (1) Certificat de Urbanism (CU) van primărie — 30 dagen, (2) Technisch project (DTAC) getekend door een architect, (3) Goedkeuringen nutsvoorzieningen (avize), (4) Autorizație de Construire — 12 maanden geldig, (5) Bouw met toezicht op de bouwplaats (diriginte de șantier), (6) Eindcontrole + kadastrale registratie (intabulare)."
+        },
+        "q3": {
+          "question": "Hoe verloopt het Nederlandse vergunningsproces?",
+          "answer": "Aanvragen via het Omgevingsloket online. Sinds 2024 is een Kwaliteitsborger (onafhankelijk kwaliteitsinspecteur) verplicht voor nieuwbouw. Reguliere procedure is 8 weken; uitgebreide procedure (bij afwijkingen van het bestemmingsplan) is 26 weken. Conformiteit met Bouwbesluit / BBL is verplicht."
+        },
+        "q4": {
+          "question": "Regelt ModulCA de vergunningspapieren?",
+          "answer": "Niet direct — de vergunningsaanvraag moet worden ondertekend door een gediplomeerd architect of ingenieur in het land van bouw. Wij verbinden je met gecertificeerde partnerarchitecten in Roemenië en Nederland (in Architect- en Constructor-abonnementen) en wij genereren de tekeningen die ze nodig hebben."
+        }
+      },
+      "timeline": {
+        "title": "Tijdlijn en constructie",
+        "q1": {
+          "question": "Hoe lang duurt het hele proces?",
+          "answer": "Ontwerp in ModulCA: enkele uren tot enkele dagen (afhankelijk van revisies). Vergunningsproces: 4–12 weken in Roemenië, 8–26 weken in Nederland. Fabrieksbouw: 6–10 weken. Montage op locatie: 2–5 dagen. Totaal: 3–8 maanden van aanmelding tot verhuizen."
+        },
+        "q2": {
+          "question": "Kan de woning later verplaatst worden?",
+          "answer": "Ja — schroefpaalfunderingen kunnen worden losgeschroefd en modules zijn aan elkaar gebout (niet gelijmd of gelast). Demontage en verplaatsing duurt 2–4 dagen met een gekwalificeerd team. Dit is een belangrijke reden om ModulCA te gebruiken als je op gepacht land staat of verhuizen overweegt."
+        },
+        "q3": {
+          "question": "Hoe goed zijn de modules geïsoleerd?",
+          "answer": "ModulCA-modules benaderen passiefhuis-thermische prestaties — U-waarde van de buitenmuur is ongeveer 0,18 W/m²K (passiefhuis is ≤0,15). Verwarmingsvraag ligt doorgaans op 15–25 kWh/m²·jaar. Bouwers kunnen op verzoek volledige passiefstandaard specificeren."
+        }
+      },
+      "ai": {
+        "title": "AI en technologie",
+        "q1": {
+          "question": "Welke AI gebruikt ModulCA?",
+          "answer": "Meerdere engines. Voor renders: FLUX, Stable Diffusion, DALL-E 3, Leonardo, Imagen 3, Runway — automatisch geselecteerd per abonnement en onderwerp. Voor de architectuurconsultant: Groq Llama 3.3 (gratis), OpenAI GPT-4o-mini (Premium), Anthropic Claude (Architect). Alle tekstgeneratie is gegrond in onze kennisbank met 212 artikelen."
+        },
+        "q2": {
+          "question": "Zijn mijn ontwerpgegevens privé?",
+          "answer": "Ja. Projecten worden opgeslagen in je account (Supabase EU-regio) en worden nooit gedeeld met derden of gebruikt om AI-modellen te trainen. Je kunt je gegevens op elk moment exporteren of verwijderen."
+        },
+        "q3": {
+          "question": "Kan ik exporteren naar CAD?",
+          "answer": "PDF-export is beschikbaar in alle betaalde abonnementen. DWG-export (voor AutoCAD/Revit) is inbegrepen in het Architect-abonnement en hoger. SketchUp- en IFC-export staan op de roadmap."
+        }
+      }
+    }
+  },
+  "library": {
+    "header": {
+      "title": "Kennisbibliotheek"
+    },
+    "hero": {
+      "title": "Architectuur Kennisbibliotheek",
+      "subtitle": "{articles} artikelen in {categories} domeinen en {regions} landelijke regelgeving"
+    },
+    "search": {
+      "placeholder": "Zoek normen, regelgeving, afmetingen, stijlen...",
+      "clear": "Zoekopdracht wissen (Esc)",
+      "results": "{count} resultaten voor \"{query}\"",
+      "resultsOne": "{count} resultaat voor \"{query}\""
+    },
+    "bookmarks": {
+      "saved": "{count} opgeslagen",
+      "saveArticle": "Artikel opslaan",
+      "bookmark": "Bladwijzer",
+      "removeBookmark": "Bladwijzer verwijderen",
+      "listTitle": "Opgeslagen artikelen ({count})",
+      "backToLibrary": "Terug naar bibliotheek",
+      "empty": "Nog geen opgeslagen artikelen"
+    },
+    "detail": {
+      "back": "Terug",
+      "sources": "Bronnen",
+      "loading": "Artikel laden...",
+      "lockedTitle": "Premium-content",
+      "lockedDescription": "De volledige artikelinhoud is beschikbaar voor Premium- en Architect-abonnees.",
+      "upgradeButton": "Upgrade naar Premium",
+      "truncated": "Artikel ingekort in het gratis abonnement.",
+      "truncatedUpgrade": "Upgrade naar Premium",
+      "truncatedSuffix": " voor de volledige inhoud.",
+      "askConsultant": "Vraag AI-consultant over \"{title}\"",
+      "relatedArticles": "Gerelateerde artikelen",
+      "updated": "Bijgewerkt {date}",
+      "minRead": "{min} min leestijd",
+      "pro": "Pro"
+    },
+    "categoryView": {
+      "allCategories": "Alle categorieën",
+      "articles": "{count} artikelen",
+      "all": "Alle",
+      "euShared": "EU gedeeld ({count})",
+      "upgradeTitle": "Upgrade voor toegang tot regelgeving uit {name}",
+      "noMatches": "Geen artikelen komen overeen met dit filter"
+    },
+    "sections": {
+      "featured": "Uitgelichte artikelen",
+      "booksAndReferences": "Boeken en referenties",
+      "freeResources": "Gratis bronnen ({count})",
+      "essentialBooks": "Essentiële boeken ({count})",
+      "browseFreeBooks": "Bekijk alle gratis boeken →",
+      "browseAllBooks": "Bekijk alle boeken →",
+      "practicalGuides": "Praktische gidsen",
+      "stepByStep": "Stapsgewijze gidsen",
+      "browseAllGuides": "Bekijk alle gidsen →"
+    },
+    "categoryCard": {
+      "articles": "{count} artikelen",
+      "articlesOne": "{count} artikel"
+    },
+    "footer": {
+      "version": "ModulCA Kennisbibliotheek v2.0 — {articles} artikelen over Neufert-normen, EU-regelgeving en {regions} landelijke codes",
+      "upgradePrefix": "",
+      "upgradeLink": "Upgrade naar Premium",
+      "upgradeSuffix": " voor volledige artikeltoegang en diepgaande AI-consultatie"
+    }
+  },
+  "portfolio": {
+    "metaTitle": "Portfolio",
+    "hero": {
+      "label": "Portfolio",
+      "title": "Gebouwd met ModulCA",
+      "subtitle": "Echte modulaire woningen ontworpen met ons 3×3m precisieraster. Van compacte studio's tot gezinspatio's — filter op land, grootte of kosten om inspiratie te vinden voor je eigen project."
+    },
+    "stats": {
+      "featuredProjects": "Uitgelichte projecten",
+      "modulesDesigned": "Ontworpen modules",
+      "totalArea": "Totale oppervlakte",
+      "avgAssembly": "Gem. montage",
+      "days": "{days} dagen"
+    },
+    "filters": {
+      "country": "Land",
+      "allCountries": "Alle landen",
+      "size": "Grootte",
+      "anySize": "Elke grootte",
+      "sizeSmall": "Klein (≤ 30 m²)",
+      "sizeMedium": "Middel (31–75 m²)",
+      "sizeLarge": "Groot (76+ m²)",
+      "sortBy": "Sorteren op",
+      "sortFeatured": "Uitgelicht",
+      "sortAreaAsc": "Oppervlakte · oplopend",
+      "sortAreaDesc": "Oppervlakte · aflopend",
+      "sortCostAsc": "Kosten · oplopend",
+      "sortCostDesc": "Kosten · aflopend",
+      "totalFiltered": "{filtered} van {total} projecten",
+      "ofTotalProjects": "van {total} projecten"
+    },
+    "empty": {
+      "noMatches": "Geen projecten komen overeen met de geselecteerde filters.",
+      "clearFilters": "Filters wissen"
+    },
+    "cta": {
+      "title": "Klaar om je modulaire woning te ontwerpen?",
+      "description": "Begin met onze gratis designer — plaats modules op je land, kies afwerkingen, krijg directe kostenramingen en verbind met gecertificeerde bouwers.",
+      "startFree": "Begin met ontwerpen — gratis",
+      "askAi": "Vraag de AI-architect"
+    }
+  },
+  "press": {
+    "metaTitle": "Pers en investeerders",
+    "metaDescription": "ModulCA perskit, bedrijfsgegevens, mediabronnen en investeerdersrelaties. AI-gedreven modulair bouwplatform voor Roemenië en Nederland.",
+    "ogTitle": "ModulCA — Pers en investeerdersrelaties",
+    "ogDescription": "Bedrijfsgegevens, oprichtersverhaal, mediamateriaal en investeerdersbronnen voor het ModulCA modulaire bouwplatform.",
+    "breadcrumbCurrent": "Pers",
+    "hero": {
+      "title": "Pers en investeerdersrelaties",
+      "subtitle": "ModulCA is het eerste end-to-end digitale platform voor het ontwerpen, visualiseren en inkopen van modulaire houten woningen — ontworpen voor de Roemeense en Nederlandse markt, klaar voor de EU-energietransitie."
+    },
+    "glance": {
+      "title": "In één oogopslag",
+      "launchedLabel": "Lancering",
+      "launchedValue": "Beta: 1 mei 2026",
+      "marketsLabel": "Markten",
+      "marketsValue": "Roemenië, Nederland",
+      "moduleLabel": "Modulair systeem",
+      "moduleValue": "3×3m raster, CLT / houtskelet / SIP",
+      "knowledgeLabel": "Kennisbank",
+      "knowledgeValue": "212 artikelen, 17 categorieën",
+      "aiLabel": "AI-engines",
+      "aiValue": "19 render-aanbieders, 4 consultants",
+      "tiersLabel": "Abonnementen",
+      "tiersValue": "Explorer (gratis) → Constructor (€ 149,90/mnd)"
+    },
+    "thesis": {
+      "title": "De marktthese",
+      "romania": {
+        "title": "Roemeense modulaire markt",
+        "p1": "~60.000 nieuwe eengezinsvergunningen/jaar",
+        "p2": "Gemiddelde turn-keykosten: € 1.000–2.000/m²",
+        "p3": "Vraag verschuift van beton naar hout (EU Green Deal-stimulansen)",
+        "p4": "Modulair aandeel: <3% vandaag, verwacht 8–12% in 2030"
+      },
+      "netherlands": {
+        "title": "Nederlandse modulaire markt",
+        "p1": "Overheidsdoel: 100.000 nieuwe woningen/jaar tot 2030",
+        "p2": "Tekort van ~390.000 woningen (SCP-data 2024)",
+        "p3": "Kwaliteitsborger (2024) + BENG-regels bevoordelen fabriekskwaliteit",
+        "p4": "Modulair is een prioriteit in de financiering Woningbouw Impuls"
+      },
+      "moat": {
+        "title": "Technologische voorsprong",
+        "p1": "Enige platform dat combineert: 3D-configurator + AI-renders + constructieve engineering + regionale vergunningsbegeleiding + bouwersmarktplaats",
+        "p2": "Kennisbank met 212 artikelen onderbouwt elk antwoord van de AI-consultant met echte regelgeving",
+        "p3": "Multi-provider AI-strategie houdt brutomarges boven 80% op alle abonnementen",
+        "p4": "EU-gehost (Supabase EU, Resend EU, Sentry EU, Fireworks EU) — AVG-native"
+      }
+    },
+    "founder": {
+      "title": "Van de oprichter",
+      "p1": "Woningen in Centraal-Europa zijn onbereikbaar geworden voor een hele generatie. De oplossing is niet meer beton — het zijn beter gebouwde, sneller opgetrokken, duurzamere woningen, ontworpen met tools die kopers van vandaag daadwerkelijk gebruiken.",
+      "p2": "ModulCA is het platform dat ik had gewild toen ik jarenlang met de hand modulaire woningen ontwierp. We combineren de rastergebaseerde precisie van professionele modulaire architectuur met de toegankelijkheid van consumentensoftware en de kracht van moderne AI — zodat de volgende 100.000 Roemeense en Nederlandse woningen in een middag ontworpen, in weken vergund en in maanden gebouwd kunnen worden in plaats van jaren.",
+      "signature": "— Costin, oprichter"
+    },
+    "mediaKit": {
+      "title": "Perskit",
+      "description": "Journalisten, partners en investeerders — neem contact op voor hoge-resolutie materiaal, interviews of pitch decks.",
+      "pressReleaseEn": "Persbericht (EN)",
+      "pressReleaseRo": "Persbericht (RO)",
+      "logoPack": "Logopakket (SVG, PNG)",
+      "screenshots": "Productscreenshots",
+      "founderPhoto": "Oprichtersfoto + bio",
+      "pitchDeck": "Pitch deck (PDF)",
+      "statusComing": "Beschikbaar vanaf 1 mei 2026",
+      "statusOnRequest": "Op aanvraag beschikbaar",
+      "statusInvestors": "Voor erkende investeerders — op aanvraag via e-mail"
+    },
+    "contact": {
+      "title": "Pers- en investeerderscontact",
+      "description": "Voor interviews, mediamateriaal, partnerverzoeken of investeerdersmateriaal, bereik ons direct:",
+      "responseTime": "Typische reactietijd: binnen 24 uur op werkdagen."
+    }
   }
 }

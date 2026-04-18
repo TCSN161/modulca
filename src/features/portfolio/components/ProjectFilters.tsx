@@ -5,6 +5,7 @@
  * Pure presentational — parent owns state and derived list.
  */
 
+import { useTranslations } from "next-intl";
 import type { PortfolioProject } from "../types";
 
 export type SizeBucket = "all" | "small" | "medium" | "large";
@@ -24,16 +25,17 @@ interface Props {
 }
 
 export default function ProjectFilters({ projects, value, onChange, totalFiltered }: Props) {
+  const t = useTranslations("portfolio.filters");
   const countries = Array.from(new Set(projects.map((p) => p.country).filter(Boolean) as string[])).sort();
 
   return (
     <div className="flex flex-wrap items-center gap-3 p-4 rounded-[12px] bg-white border border-brand-bone-300/60">
       <Select
-        label="Country"
+        label={t("country")}
         value={value.country}
         onChange={(v) => onChange({ ...value, country: v })}
       >
-        <option value="all">All countries</option>
+        <option value="all">{t("allCountries")}</option>
         {countries.map((c) => (
           <option key={c} value={c}>
             {c}
@@ -42,30 +44,31 @@ export default function ProjectFilters({ projects, value, onChange, totalFiltere
       </Select>
 
       <Select
-        label="Size"
+        label={t("size")}
         value={value.size}
         onChange={(v) => onChange({ ...value, size: v as SizeBucket })}
       >
-        <option value="all">Any size</option>
-        <option value="small">Small (≤ 30 m²)</option>
-        <option value="medium">Medium (31–75 m²)</option>
-        <option value="large">Large (76+ m²)</option>
+        <option value="all">{t("anySize")}</option>
+        <option value="small">{t("sizeSmall")}</option>
+        <option value="medium">{t("sizeMedium")}</option>
+        <option value="large">{t("sizeLarge")}</option>
       </Select>
 
       <Select
-        label="Sort by"
+        label={t("sortBy")}
         value={value.sort}
         onChange={(v) => onChange({ ...value, sort: v as SortMode })}
       >
-        <option value="featured">Featured</option>
-        <option value="area-asc">Area · smallest first</option>
-        <option value="area-desc">Area · largest first</option>
-        <option value="cost-asc">Cost · lowest first</option>
-        <option value="cost-desc">Cost · highest first</option>
+        <option value="featured">{t("sortFeatured")}</option>
+        <option value="area-asc">{t("sortAreaAsc")}</option>
+        <option value="area-desc">{t("sortAreaDesc")}</option>
+        <option value="cost-asc">{t("sortCostAsc")}</option>
+        <option value="cost-desc">{t("sortCostDesc")}</option>
       </Select>
 
       <div className="ml-auto text-xs text-brand-gray">
-        <span className="font-semibold text-brand-charcoal">{totalFiltered}</span> of {projects.length} projects
+        <span className="font-semibold text-brand-charcoal">{totalFiltered}</span>{" "}
+        {t("ofTotalProjects", { total: projects.length })}
       </div>
     </div>
   );

@@ -1,5 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import Footer from "@/features/shared/components/Footer";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import MobileNav from "@/app/MobileNav";
@@ -9,110 +11,66 @@ import {
   SITE_URL,
 } from "@/shared/lib/schema";
 
-export const metadata: Metadata = {
-  title: "Press & Investors",
-  description:
-    "ModulCA press kit, company facts, media resources, and investor relations. AI-powered modular construction platform for Romania and the Netherlands.",
-  alternates: { canonical: `${SITE_URL}/press` },
-  openGraph: {
-    title: "ModulCA — Press & Investor Relations",
-    description:
-      "Company facts, founder story, media assets, and investor resources for the ModulCA modular construction platform.",
-    url: `${SITE_URL}/press`,
-    images: [
-      {
-        url: "/og?title=Press+%26+Investors&subtitle=Modular+Construction+Platform",
-        width: 1200,
-        height: 630,
-      },
-    ],
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("press");
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+    alternates: { canonical: `${SITE_URL}/press` },
+    openGraph: {
+      title: t("ogTitle"),
+      description: t("ogDescription"),
+      url: `${SITE_URL}/press`,
+      images: [
+        {
+          url: "/og?title=Press+%26+Investors&subtitle=Modular+Construction+Platform",
+          width: 1200,
+          height: 630,
+        },
+      ],
+    },
+  };
+}
 
 /* ------------------------------------------------------------------ */
-/*  Company facts — single source of truth for metrics                 */
+/*  Structural keys — actual labels/values pulled from i18n            */
 /* ------------------------------------------------------------------ */
 
 const COMPANY_FACTS = [
-  { label: "Launched", value: "Beta: May 1, 2026" },
-  { label: "Markets", value: "Romania, Netherlands" },
-  { label: "Module system", value: "3×3m grid, CLT / timber frame / SIP" },
-  { label: "Knowledge base", value: "212 articles, 17 categories" },
-  { label: "AI engines", value: "19 render providers, 4 consultants" },
-  { label: "Tiers", value: "Explorer (free) → Constructor (€149.90/mo)" },
-];
+  { labelKey: "launchedLabel", valueKey: "launchedValue" },
+  { labelKey: "marketsLabel", valueKey: "marketsValue" },
+  { labelKey: "moduleLabel", valueKey: "moduleValue" },
+  { labelKey: "knowledgeLabel", valueKey: "knowledgeValue" },
+  { labelKey: "aiLabel", valueKey: "aiValue" },
+  { labelKey: "tiersLabel", valueKey: "tiersValue" },
+] as const;
 
 const MARKET_FACTS = [
-  {
-    title: "Romania modular market",
-    points: [
-      "~60,000 new single-family permits/year",
-      "Average turnkey build cost: €1,000–2,000/m²",
-      "Demand shifting from concrete to timber (EU Green Deal incentives)",
-      "Modular share: <3% today, projected 8–12% by 2030",
-    ],
-  },
-  {
-    title: "Netherlands modular market",
-    points: [
-      "Government target: 100,000 new homes/year through 2030",
-      "Shortage of ~390,000 homes (2024 SCP data)",
-      "Kwaliteitsborger (2024) + BENG rules favor factory-built quality",
-      "Modular a priority in Woningbouw Impuls funding",
-    ],
-  },
-  {
-    title: "Technology moat",
-    points: [
-      "Only platform combining: 3D configurator + AI renders + structural engineering + regional permit guidance + builder marketplace",
-      "212-article knowledge base grounds every AI consultant response in real regulations",
-      "Multi-provider AI strategy keeps gross margins above 80% at all tiers",
-      "EU-hosted (Supabase EU, Resend EU, Sentry EU, Fireworks EU) — GDPR-native",
-    ],
-  },
-];
+  { id: "romania", points: ["p1", "p2", "p3", "p4"] },
+  { id: "netherlands", points: ["p1", "p2", "p3", "p4"] },
+  { id: "moat", points: ["p1", "p2", "p3", "p4"] },
+] as const;
 
 const MEDIA_KIT = [
-  {
-    label: "Press release (EN)",
-    url: null,
-    status: "Coming May 1, 2026",
-  },
-  {
-    label: "Press release (RO)",
-    url: null,
-    status: "Coming May 1, 2026",
-  },
-  {
-    label: "Logo pack (SVG, PNG)",
-    url: null,
-    status: "Available on request",
-  },
-  {
-    label: "Product screenshots",
-    url: null,
-    status: "Available on request",
-  },
-  {
-    label: "Founder photo + bio",
-    url: null,
-    status: "Available on request",
-  },
-  {
-    label: "Pitch deck (PDF)",
-    url: null,
-    status: "For accredited investors — request via email",
-  },
-];
+  { labelKey: "pressReleaseEn", statusKey: "statusComing" },
+  { labelKey: "pressReleaseRo", statusKey: "statusComing" },
+  { labelKey: "logoPack", statusKey: "statusOnRequest" },
+  { labelKey: "screenshots", statusKey: "statusOnRequest" },
+  { labelKey: "founderPhoto", statusKey: "statusOnRequest" },
+  { labelKey: "pitchDeck", statusKey: "statusInvestors" },
+] as const;
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                           */
 /* ------------------------------------------------------------------ */
 
 export default function PressPage() {
+  const t = useTranslations("press");
+  const tNav = useTranslations("nav");
+
   const breadcrumbs = breadcrumbListSchema([
-    { name: "Home", url: SITE_URL },
-    { name: "Press", url: `${SITE_URL}/press` },
+    { name: tNav("home"), url: SITE_URL },
+    { name: t("breadcrumbCurrent"), url: `${SITE_URL}/press` },
   ]);
 
   return (
@@ -129,11 +87,11 @@ export default function PressPage() {
             ModulCA
           </Link>
           <div className="hidden items-center gap-8 md:flex">
-            <Link href="/#features" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">Features</Link>
-            <Link href="/pricing" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">Pricing</Link>
-            <Link href="/portfolio" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">Portfolio</Link>
-            <Link href="/blog" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">Blog</Link>
-            <Link href="/faq" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">FAQ</Link>
+            <Link href="/#features" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">{tNav("features")}</Link>
+            <Link href="/pricing" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">{tNav("pricing")}</Link>
+            <Link href="/portfolio" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">{tNav("portfolio")}</Link>
+            <Link href="/blog" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">{tNav("blog")}</Link>
+            <Link href="/faq" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal">{tNav("faq")}</Link>
           </div>
           <div className="flex items-center gap-2">
             <AuthNav />
@@ -147,17 +105,15 @@ export default function PressPage() {
         <section className="border-b border-brand-bone-300/60 bg-gradient-to-b from-brand-bone-100 to-brand-bone-200/40 py-16 md:py-24">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <nav className="mb-6 text-xs text-brand-gray" aria-label="Breadcrumb">
-              <Link href="/" className="hover:text-brand-charcoal">Home</Link>
+              <Link href="/" className="hover:text-brand-charcoal">{tNav("home")}</Link>
               <span className="mx-2">/</span>
-              <span>Press</span>
+              <span>{t("breadcrumbCurrent")}</span>
             </nav>
             <h1 className="mb-4 text-4xl font-bold tracking-heading text-brand-charcoal md:text-5xl">
-              Press & Investor Relations
+              {t("hero.title")}
             </h1>
             <p className="max-w-3xl text-lg text-brand-gray">
-              ModulCA is the first end-to-end digital platform for designing,
-              visualizing, and sourcing modular wooden homes — engineered for the
-              Romanian and Dutch markets, ready for the EU energy transition.
+              {t("hero.subtitle")}
             </p>
           </div>
         </section>
@@ -165,19 +121,19 @@ export default function PressPage() {
         {/* ---- Quick facts ---- */}
         <section className="mx-auto max-w-5xl px-4 py-16 sm:px-6 lg:px-8">
           <h2 className="mb-6 text-2xl font-bold tracking-heading text-brand-charcoal">
-            At a glance
+            {t("glance.title")}
           </h2>
           <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {COMPANY_FACTS.map((fact) => (
               <div
-                key={fact.label}
+                key={fact.labelKey}
                 className="rounded-xl border border-brand-bone-300/60 bg-white p-5"
               >
                 <dt className="text-[11px] font-bold uppercase tracking-wider text-brand-gray">
-                  {fact.label}
+                  {t(`glance.${fact.labelKey}`)}
                 </dt>
                 <dd className="mt-1 text-sm font-semibold text-brand-charcoal">
-                  {fact.value}
+                  {t(`glance.${fact.valueKey}`)}
                 </dd>
               </div>
             ))}
@@ -188,22 +144,22 @@ export default function PressPage() {
         <section className="border-t border-brand-bone-300/60 bg-brand-bone-200/30 py-16">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <h2 className="mb-8 text-2xl font-bold tracking-heading text-brand-charcoal">
-              The market thesis
+              {t("thesis.title")}
             </h2>
             <div className="grid grid-cols-1 gap-6 md:grid-cols-3">
               {MARKET_FACTS.map((block) => (
                 <div
-                  key={block.title}
+                  key={block.id}
                   className="rounded-xl border border-brand-bone-300/60 bg-white p-6"
                 >
                   <h3 className="mb-4 text-base font-bold tracking-heading text-brand-charcoal">
-                    {block.title}
+                    {t(`thesis.${block.id}.title`)}
                   </h3>
                   <ul className="space-y-2 text-sm leading-relaxed text-brand-gray">
-                    {block.points.map((pt, i) => (
-                      <li key={i} className="flex gap-2">
+                    {block.points.map((pk) => (
+                      <li key={pk} className="flex gap-2">
                         <span className="mt-1 inline-block h-1 w-1 flex-shrink-0 rounded-full bg-brand-amber-600" />
-                        <span>{pt}</span>
+                        <span>{t(`thesis.${block.id}.${pk}`)}</span>
                       </li>
                     ))}
                   </ul>
@@ -216,25 +172,13 @@ export default function PressPage() {
         {/* ---- Founder note ---- */}
         <section className="mx-auto max-w-3xl px-4 py-16 sm:px-6 md:py-24 lg:px-8">
           <h2 className="mb-4 text-2xl font-bold tracking-heading text-brand-charcoal">
-            From the founder
+            {t("founder.title")}
           </h2>
           <div className="prose prose-lg max-w-none text-brand-gray">
-            <p>
-              Housing in Central Europe has been priced out of reach for an entire
-              generation. The fix is not more concrete — it's better-engineered,
-              faster-built, more sustainable homes, designed with tools that today's
-              buyers actually use.
-            </p>
-            <p>
-              ModulCA is the platform I wished existed when I spent years designing
-              modular homes by hand. We combine the grid-based rigor of professional
-              modular architecture with the accessibility of consumer software and
-              the power of modern AI — so the next 100,000 Romanian and Dutch homes
-              can be designed in an afternoon, permitted in weeks, and built in
-              months instead of years.
-            </p>
+            <p>{t("founder.p1")}</p>
+            <p>{t("founder.p2")}</p>
             <p className="text-sm text-brand-gray">
-              — Costin, Founder
+              {t("founder.signature")}
             </p>
           </div>
         </section>
@@ -243,20 +187,19 @@ export default function PressPage() {
         <section className="border-t border-brand-bone-300/60 bg-brand-bone-200/30 py-16">
           <div className="mx-auto max-w-5xl px-4 sm:px-6 lg:px-8">
             <h2 className="mb-2 text-2xl font-bold tracking-heading text-brand-charcoal">
-              Media kit
+              {t("mediaKit.title")}
             </h2>
             <p className="mb-8 text-sm text-brand-gray">
-              Journalists, partners, and investors — reach out for high-resolution
-              assets, interviews, or pitch decks.
+              {t("mediaKit.description")}
             </p>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
               {MEDIA_KIT.map((item) => (
                 <div
-                  key={item.label}
+                  key={item.labelKey}
                   className="flex items-center justify-between rounded-lg border border-brand-bone-300/60 bg-white px-5 py-4"
                 >
-                  <span className="text-sm font-medium text-brand-charcoal">{item.label}</span>
-                  <span className="text-xs text-brand-gray">{item.status}</span>
+                  <span className="text-sm font-medium text-brand-charcoal">{t(`mediaKit.${item.labelKey}`)}</span>
+                  <span className="text-xs text-brand-gray">{t(`mediaKit.${item.statusKey}`)}</span>
                 </div>
               ))}
             </div>
@@ -266,11 +209,10 @@ export default function PressPage() {
         {/* ---- Contact ---- */}
         <section className="mx-auto max-w-3xl px-4 py-16 text-center sm:px-6 md:py-20 lg:px-8">
           <h2 className="mb-3 text-2xl font-bold tracking-heading text-brand-charcoal">
-            Press & investor contact
+            {t("contact.title")}
           </h2>
           <p className="mb-6 text-brand-gray">
-            For interviews, media assets, partnership inquiries, or investor
-            materials, reach us directly:
+            {t("contact.description")}
           </p>
           <a
             href="mailto:press@modulca.eu"
@@ -279,7 +221,7 @@ export default function PressPage() {
             press@modulca.eu
           </a>
           <p className="mt-8 text-xs text-brand-gray">
-            Typical response time: under 24 hours on business days.
+            {t("contact.responseTime")}
           </p>
         </section>
       </main>

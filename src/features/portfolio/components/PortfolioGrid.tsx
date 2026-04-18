@@ -13,6 +13,7 @@
  */
 
 import { useState, useMemo } from "react";
+import { useTranslations } from "next-intl";
 import type { PortfolioProject } from "../types";
 import ProjectCard from "./ProjectCard";
 import ProjectFilters, { applyFilters, type FilterState } from "./ProjectFilters";
@@ -22,6 +23,7 @@ interface Props {
 }
 
 export default function PortfolioGrid({ projects }: Props) {
+  const t = useTranslations("portfolio");
   const [filters, setFilters] = useState<FilterState>({
     country: "all",
     size: "all",
@@ -44,7 +46,7 @@ export default function PortfolioGrid({ projects }: Props) {
       {filtered.length === 0 ? (
         <div className="rounded-[16px] bg-white border border-brand-bone-300/60 p-12 text-center">
           <p className="text-sm text-brand-gray mb-4">
-            No projects match the selected filters.
+            {t("empty.noMatches")}
           </p>
           <button
             onClick={() =>
@@ -52,7 +54,7 @@ export default function PortfolioGrid({ projects }: Props) {
             }
             className="text-sm font-semibold text-brand-olive-700 hover:text-brand-olive-500 transition-colors"
           >
-            Clear filters
+            {t("empty.clearFilters")}
           </button>
         </div>
       ) : (

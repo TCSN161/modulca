@@ -513,5 +513,314 @@
       "label": "Limbă",
       "tooltip": "Schimbă limba"
     }
+  },
+  "faq": {
+    "metaTitle": "Întrebări frecvente",
+    "metaDescription": "Tot ce trebuie să știi despre designul caselor modulare cu ModulCA — sistem modular 3×3m, prețuri, autorizații de construcție pentru România și Olanda, cronologie și multe altele.",
+    "ogTitle": "ModulCA — Întrebări frecvente",
+    "ogDescription": "Răspunsuri despre sistemul modular 3×3m, prețuri, autorizații în România și Olanda, cronologie și construcție.",
+    "breadcrumbHome": "Acasă",
+    "breadcrumbCurrent": "Întrebări frecvente",
+    "title": "Întrebări frecvente",
+    "subtitle": "Tot ce vrei să știi despre designul caselor modulare, platforma ModulCA, autorizațiile de construcție din România și Olanda și procesul de construcție în sine.",
+    "cta": {
+      "title": "Mai ai întrebări?",
+      "description": "Consultantul nostru AI te poate ajuta să designezi, să înțelegi reglementările și să estimezi costurile — gratuit.",
+      "startFree": "Începe designul gratuit",
+      "comparePlans": "Compară planurile"
+    },
+    "groups": {
+      "platform": {
+        "title": "Platforma și cum funcționează",
+        "q1": {
+          "question": "Ce este ModulCA?",
+          "answer": "ModulCA este o platformă cu AI pentru designul caselor modulare din lemn. Plasezi module de 3×3m pe terenul tău, configurezi camere și finisaje și primești vizualizări 3D, randări AI, desene tehnice, estimări de cost și conexiuni cu constructori certificați."
+        },
+        "q2": {
+          "question": "Cui se adresează ModulCA?",
+          "answer": "Oricui își dorește o casă modulară sau prefabricată — în principal proprietari din România și Olanda, arhitecți care evaluează soluția modulară pentru proiectele clienților și constructori care caută un flux de proiecte pre-designate."
+        },
+        "q3": {
+          "question": "Am nevoie de pregătire în arhitectură?",
+          "answer": "Nu. Fluxul ghidat în 13 pași te conduce de la selectarea terenului până la desenele finale de construcție. Consultantul AI îți explică reglementările, dimensiunile și compromisurile într-un limbaj accesibil. Arhitecții profesioniști primesc instrumente avansate în planul Arhitect."
+        },
+        "q4": {
+          "question": "Ce browsere sunt acceptate?",
+          "answer": "Browserele moderne evergreen — Chrome, Edge, Safari, Firefox, Brave. Turul 3D necesită WebGL 2 (standard din 2017). Modul VR necesită un headset compatibil WebXR (Meta Quest, Vision Pro)."
+        }
+      },
+      "modules": {
+        "title": "Sistemul modular de 3×3m",
+        "q1": {
+          "question": "De ce module de 3×3m?",
+          "answer": "3×3m este punctul optim pentru prefabricare: se încadrează pe camioane standard fără autorizații pentru transport agabaritic, produce 9m² brut / ~7m² utili (amprenta tipică a unei camere), și se planifică elegant în case de 2–12 module. Grosimea pereților este de 15cm (interior) până la 30cm (exterior izolat)."
+        },
+        "q2": {
+          "question": "Pot combina module pentru spații open-plan?",
+          "answer": "Da. Pereții interiori dintre module sunt opționali, iar stâlpii de rezistență sunt în colțuri, așa că două module adiacente îți oferă un spațiu deschis de 6×3m, trei îți oferă 9×3m și așa mai departe. Configuratorul gestionează automat acest lucru."
+        },
+        "q3": {
+          "question": "Care este sistemul structural?",
+          "answer": "CLT (lemn laminat încrucișat), cadru de lemn sau panouri SIP, în funcție de constructor. Fundațiile folosesc piloți șurub (tijă 76–114mm, adâncime 1,5–3m), astfel încât casa este demontabilă și lasă perturbări minime ale solului."
+        },
+        "q4": {
+          "question": "Pot avea mai multe etaje?",
+          "answer": "Da — până la 2 etaje sunt pe deplin susținute în versiunea curentă. Modulele cu scări și consolidarea structurală sunt gestionate de configurator. Design-urile cu trei etaje sunt pe foaia de parcurs."
+        }
+      },
+      "pricing": {
+        "title": "Prețuri și abonamente",
+        "q1": {
+          "question": "Cât costă ModulCA?",
+          "answer": "Planul gratuit (Explorer) este întotdeauna gratuit — designezi 1 proiect, 2 module, vizualizare de bază. Premium este 19,99 €/lună (199 €/an) pentru proiecte nelimitate + randări AI. Arhitect este 49,99 €/lună pentru instrumente pro (export DWG/PDF, white-label, bază de cunoștințe vectorială). Constructor este 149,90 €/lună pentru constructori (marketplace de lead-uri, conturi de echipă)."
+        },
+        "q2": {
+          "question": "Cât costă efectiv casa modulară?",
+          "answer": "Costul tipic la cheie în România este de 1.000–2.000 €/m², în funcție de nivelul finisajelor. O casă de 4 module (~28m² utili) se încadrează la aproximativ 35–60 mii € la cheie, fundație + transport incluse. Estimarea ta ModulCA este detaliată — module, fundație, transport, instalații, finisaje, autorizații."
+        },
+        "q3": {
+          "question": "Există o perioadă de probă sau reducere beta?",
+          "answer": "În perioada Beta (lansare 1 mai 2026), toți utilizatorii înregistrați primesc 3 luni de funcții Premium gratuit. Ulterior, planul Explorer rămâne gratuit pentru totdeauna, cu 1 proiect + 2 module."
+        },
+        "q4": {
+          "question": "Pot anula oricând?",
+          "answer": "Da. Abonamentele sunt lunare sau anuale și pot fi anulate din setările contului. Păstrezi accesul până la finalul perioadei plătite, apoi treci automat pe Explorer."
+        }
+      },
+      "permits": {
+        "title": "Autorizații de construcție și reglementări",
+        "q1": {
+          "question": "Pot construi efectiv o casă designată în ModulCA?",
+          "answer": "Da. ModulCA generează desenele de care are nevoie arhitectul tău pentru cererea de autorizație de construcție (DTAC în România, Omgevingsvergunning în Olanda). Un arhitect certificat semnează proiectul, iar tu îl depui la primăria locală. Arhitecții noștri parteneri certificați pot gestiona depunerea pentru tine."
+        },
+        "q2": {
+          "question": "Cum funcționează procesul de autorizare în România?",
+          "answer": "Șase pași: (1) Certificat de Urbanism (CU) de la primărie — 30 de zile, (2) Proiectul tehnic (DTAC) semnat de un arhitect, (3) Avize de utilități, (4) Autorizație de Construire — valabilă 12 luni, (5) Execuție cu supraveghere (diriginte de șantier), (6) Recepție finală + intabulare cadastrală."
+        },
+        "q3": {
+          "question": "Cum funcționează procesul de autorizare în Olanda?",
+          "answer": "Depui cererea prin portalul online Omgevingsloket. Din 2024, un Kwaliteitsborger (inspector independent de calitate) este obligatoriu pentru construcțiile noi. Procedura regulată este de 8 săptămâni; procedura extinsă (pentru abateri de la planul local de zonare) este de 26 de săptămâni. Conformitatea cu Bouwbesluit / BBL este obligatorie."
+        },
+        "q4": {
+          "question": "Gestionează ModulCA documentația de autorizare?",
+          "answer": "Nu direct — depunerea autorizației trebuie semnată de un arhitect sau inginer licențiat în țara de construcție. Te conectăm cu arhitecți parteneri certificați din România și Olanda (în planurile Arhitect și Constructor) și generăm desenele de care au nevoie."
+        }
+      },
+      "timeline": {
+        "title": "Cronologie și construcție",
+        "q1": {
+          "question": "Cât durează întregul proces?",
+          "answer": "Design în ModulCA: câteva ore până la câteva zile (în funcție de revizuiri). Procesul de autorizare: 4–12 săptămâni în România, 8–26 săptămâni în Olanda. Construcția în fabrică: 6–10 săptămâni. Asamblarea pe șantier: 2–5 zile. Total: 3–8 luni de la înscriere până la mutare."
+        },
+        "q2": {
+          "question": "Casa poate fi mutată ulterior?",
+          "answer": "Da — fundațiile cu piloți șurub pot fi deșurubate, iar modulele sunt înșurubate între ele (nu lipite sau sudate). Dezasamblarea și relocarea durează 2–4 zile cu o echipă calificată. Acesta este un motiv important pentru a folosi ModulCA dacă ești pe teren închiriat sau planifici să te muți."
+        },
+        "q3": {
+          "question": "Cât de bine izolate sunt modulele?",
+          "answer": "Modulele ModulCA ating performanțe termice aproape de standardul passive-house — coeficient U pentru peretele exterior de aproximativ 0,18 W/m²K (passive house este ≤0,15). Necesarul de încălzire este tipic de 15–25 kWh/m²·an. Constructorii pot specifica standard passive complet la cerere."
+        }
+      },
+      "ai": {
+        "title": "AI și tehnologie",
+        "q1": {
+          "question": "Ce AI folosește ModulCA?",
+          "answer": "Mai multe motoare. Pentru randări: FLUX, Stable Diffusion, DALL-E 3, Leonardo, Imagen 3, Runway — selectate automat după plan și subiect. Pentru consultantul arhitectural: Groq Llama 3.3 (plan gratuit), OpenAI GPT-4o-mini (Premium), Anthropic Claude (Arhitect). Toată generarea de text este ancorată în baza noastră de cunoștințe cu 212 articole."
+        },
+        "q2": {
+          "question": "Datele mele de design sunt private?",
+          "answer": "Da. Proiectele sunt stocate în contul tău (regiunea UE a Supabase) și nu sunt niciodată împărtășite cu terți sau folosite pentru antrenarea modelelor AI. Îți poți exporta sau șterge datele oricând."
+        },
+        "q3": {
+          "question": "Pot exporta în CAD?",
+          "answer": "Exportul PDF este disponibil pentru toate planurile plătite. Exportul DWG (pentru AutoCAD/Revit) este inclus în planul Arhitect și superior. Exporturile SketchUp și IFC sunt pe foaia de parcurs."
+        }
+      }
+    }
+  },
+  "library": {
+    "header": {
+      "title": "Bibliotecă de cunoștințe"
+    },
+    "hero": {
+      "title": "Bibliotecă de cunoștințe în arhitectură",
+      "subtitle": "{articles} articole în {categories} domenii și {regions} reglementări naționale"
+    },
+    "search": {
+      "placeholder": "Caută standarde, reglementări, dimensiuni, stiluri...",
+      "clear": "Șterge căutarea (Esc)",
+      "results": "{count} rezultate pentru \"{query}\"",
+      "resultsOne": "{count} rezultat pentru \"{query}\""
+    },
+    "bookmarks": {
+      "saved": "{count} salvate",
+      "saveArticle": "Salvează articolul",
+      "bookmark": "Marchează",
+      "removeBookmark": "Șterge marcajul",
+      "listTitle": "Articole salvate ({count})",
+      "backToLibrary": "Înapoi la bibliotecă",
+      "empty": "Nu ai articole salvate încă"
+    },
+    "detail": {
+      "back": "Înapoi",
+      "sources": "Surse",
+      "loading": "Se încarcă articolul...",
+      "lockedTitle": "Conținut Premium",
+      "lockedDescription": "Conținutul complet al articolului este disponibil pentru abonații Premium și Arhitect.",
+      "upgradeButton": "Upgrade la Premium",
+      "truncated": "Articol trunchiat în planul gratuit.",
+      "truncatedUpgrade": "Upgrade la Premium",
+      "truncatedSuffix": " pentru conținutul integral.",
+      "askConsultant": "Întreabă consultantul AI despre „{title}”",
+      "relatedArticles": "Articole similare",
+      "updated": "Actualizat {date}",
+      "minRead": "{min} min de citit",
+      "pro": "Pro"
+    },
+    "categoryView": {
+      "allCategories": "Toate categoriile",
+      "articles": "{count} articole",
+      "all": "Toate",
+      "euShared": "UE comun ({count})",
+      "upgradeTitle": "Upgrade pentru acces la reglementările din {name}",
+      "noMatches": "Niciun articol nu corespunde acestui filtru"
+    },
+    "sections": {
+      "featured": "Articole recomandate",
+      "booksAndReferences": "Cărți și referințe",
+      "freeResources": "Resurse gratuite ({count})",
+      "essentialBooks": "Cărți esențiale ({count})",
+      "browseFreeBooks": "Vezi toate cărțile gratuite →",
+      "browseAllBooks": "Vezi toate cărțile →",
+      "practicalGuides": "Ghiduri practice",
+      "stepByStep": "Ghiduri pas cu pas",
+      "browseAllGuides": "Vezi toate ghidurile →"
+    },
+    "categoryCard": {
+      "articles": "{count} articole",
+      "articlesOne": "{count} articol"
+    },
+    "footer": {
+      "version": "Biblioteca de cunoștințe ModulCA v2.0 — {articles} articole despre standardele Neufert, reglementări UE și {regions} coduri naționale",
+      "upgradePrefix": "",
+      "upgradeLink": "Upgrade la Premium",
+      "upgradeSuffix": " pentru acces complet la articole și consultanță AI aprofundată"
+    }
+  },
+  "portfolio": {
+    "metaTitle": "Portofoliu",
+    "hero": {
+      "label": "Portofoliu",
+      "title": "Construit cu ModulCA",
+      "subtitle": "Case modulare reale designate folosind grila noastră de precizie 3×3m. De la studiouri compacte până la curți familiale — filtrează după țară, dimensiune sau cost pentru a găsi inspirație pentru propriul proiect."
+    },
+    "stats": {
+      "featuredProjects": "Proiecte recomandate",
+      "modulesDesigned": "Module designate",
+      "totalArea": "Suprafață totală",
+      "avgAssembly": "Asamblare medie",
+      "days": "{days} zile"
+    },
+    "filters": {
+      "country": "Țară",
+      "allCountries": "Toate țările",
+      "size": "Dimensiune",
+      "anySize": "Orice dimensiune",
+      "sizeSmall": "Mică (≤ 30 m²)",
+      "sizeMedium": "Medie (31–75 m²)",
+      "sizeLarge": "Mare (76+ m²)",
+      "sortBy": "Sortează după",
+      "sortFeatured": "Recomandate",
+      "sortAreaAsc": "Suprafață · crescător",
+      "sortAreaDesc": "Suprafață · descrescător",
+      "sortCostAsc": "Cost · crescător",
+      "sortCostDesc": "Cost · descrescător",
+      "totalFiltered": "{filtered} din {total} proiecte",
+      "ofTotalProjects": "din {total} proiecte"
+    },
+    "empty": {
+      "noMatches": "Niciun proiect nu corespunde filtrelor selectate.",
+      "clearFilters": "Șterge filtrele"
+    },
+    "cta": {
+      "title": "Gata să-ți designezi casa modulară?",
+      "description": "Începe cu designerul nostru gratuit — plasează module pe teren, alege finisaje, obține estimări instant de cost și conectează-te cu constructori certificați.",
+      "startFree": "Începe designul — gratuit",
+      "askAi": "Întreabă arhitectul AI"
+    }
+  },
+  "press": {
+    "metaTitle": "Presă și investitori",
+    "metaDescription": "Kit de presă ModulCA, date despre companie, resurse media și relații cu investitorii. Platformă de construcție modulară bazată pe AI pentru România și Olanda.",
+    "ogTitle": "ModulCA — Presă și relații cu investitorii",
+    "ogDescription": "Date despre companie, povestea fondatorului, materiale media și resurse pentru investitori pentru platforma de construcție modulară ModulCA.",
+    "breadcrumbCurrent": "Presă",
+    "hero": {
+      "title": "Presă și relații cu investitorii",
+      "subtitle": "ModulCA este prima platformă digitală end-to-end pentru designul, vizualizarea și aprovizionarea caselor modulare din lemn — construită pentru piețele din România și Olanda, pregătită pentru tranziția energetică a UE."
+    },
+    "glance": {
+      "title": "Pe scurt",
+      "launchedLabel": "Lansare",
+      "launchedValue": "Beta: 1 mai 2026",
+      "marketsLabel": "Piețe",
+      "marketsValue": "România, Olanda",
+      "moduleLabel": "Sistem modular",
+      "moduleValue": "Grilă 3×3m, CLT / cadru lemn / SIP",
+      "knowledgeLabel": "Bază de cunoștințe",
+      "knowledgeValue": "212 articole, 17 categorii",
+      "aiLabel": "Motoare AI",
+      "aiValue": "19 furnizori de randare, 4 consultanți",
+      "tiersLabel": "Planuri",
+      "tiersValue": "Explorer (gratuit) → Constructor (149,90 €/lună)"
+    },
+    "thesis": {
+      "title": "Teza de piață",
+      "romania": {
+        "title": "Piața modulară din România",
+        "p1": "~60.000 autorizații noi pentru locuințe individuale/an",
+        "p2": "Cost mediu la cheie: 1.000–2.000 €/m²",
+        "p3": "Cererea migrează de la beton la lemn (stimulente EU Green Deal)",
+        "p4": "Cota modularului: <3% astăzi, estimată la 8–12% până în 2030"
+      },
+      "netherlands": {
+        "title": "Piața modulară din Olanda",
+        "p1": "Țintă guvernamentală: 100.000 locuințe noi/an până în 2030",
+        "p2": "Deficit de ~390.000 locuințe (date SCP 2024)",
+        "p3": "Kwaliteitsborger (2024) + regulile BENG favorizează calitatea din fabrică",
+        "p4": "Modularul este o prioritate în finanțarea Woningbouw Impuls"
+      },
+      "moat": {
+        "title": "Avantaj tehnologic",
+        "p1": "Singura platformă care combină: configurator 3D + randări AI + inginerie structurală + ghid de autorizații regional + marketplace de constructori",
+        "p2": "Bază de cunoștințe cu 212 articole care ancorează fiecare răspuns al consultantului AI în reglementări reale",
+        "p3": "Strategia AI multi-furnizor menține marja brută peste 80% la toate planurile",
+        "p4": "Găzduit în UE (Supabase UE, Resend UE, Sentry UE, Fireworks UE) — GDPR nativ"
+      }
+    },
+    "founder": {
+      "title": "Din partea fondatorului",
+      "p1": "Locuințele din Europa Centrală au devenit inaccesibile pentru o întreagă generație. Soluția nu înseamnă mai mult beton — ci case mai bine inginerite, construite mai rapid și mai sustenabile, designate cu instrumente pe care cumpărătorii de azi chiar le folosesc.",
+      "p2": "ModulCA este platforma pe care mi-am dorit să existe în anii în care am designat case modulare manual. Combinăm rigoarea bazată pe grilă a arhitecturii modulare profesionale cu accesibilitatea software-ului de consum și puterea AI-ului modern — astfel încât următoarele 100.000 de locuințe românești și olandeze să poată fi designate într-o după-amiază, autorizate în săptămâni și construite în luni, nu în ani.",
+      "signature": "— Costin, Fondator"
+    },
+    "mediaKit": {
+      "title": "Kit de presă",
+      "description": "Jurnaliști, parteneri și investitori — contactați-ne pentru materiale de înaltă rezoluție, interviuri sau prezentări pitch.",
+      "pressReleaseEn": "Comunicat de presă (EN)",
+      "pressReleaseRo": "Comunicat de presă (RO)",
+      "logoPack": "Pachet logo (SVG, PNG)",
+      "screenshots": "Capturi de ecran produs",
+      "founderPhoto": "Fotografie + biografie fondator",
+      "pitchDeck": "Pitch deck (PDF)",
+      "statusComing": "Disponibil din 1 mai 2026",
+      "statusOnRequest": "Disponibil la cerere",
+      "statusInvestors": "Pentru investitori acreditați — cerere pe email"
+    },
+    "contact": {
+      "title": "Contact presă și investitori",
+      "description": "Pentru interviuri, materiale media, parteneriate sau resurse pentru investitori, contactează-ne direct:",
+      "responseTime": "Timp tipic de răspuns: sub 24 de ore în zilele lucrătoare."
+    }
   }
 }

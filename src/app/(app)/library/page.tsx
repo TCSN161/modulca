@@ -2,6 +2,7 @@
 
 import { useState, useMemo, useEffect } from "react";
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { ARTICLES, CATEGORIES, REGIONS } from "@/knowledge/_index";
 import { CATEGORY_DEFINITIONS } from "@/knowledge/_taxonomy";
 import type { KBDocumentMeta } from "@/knowledge/_types";
@@ -178,6 +179,8 @@ function ArticleDetail({
   bookmarked?: boolean;
   onToggleBookmark?: () => void;
 }) {
+  const t = useTranslations("library.detail");
+  const tBookmarks = useTranslations("library.bookmarks");
   const region = article.region
     ? REGIONS.find((r) => r.code === article.region)
     : null;
@@ -219,7 +222,7 @@ function ArticleDetail({
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
         </svg>
-        Back
+        {t("back")}
       </button>
 
       <div className="mb-3 flex items-center justify-between">
@@ -228,7 +231,7 @@ function ArticleDetail({
           <button
             onClick={onToggleBookmark}
             className="p-1.5 rounded-lg hover:bg-gray-100 transition-colors"
-            title={bookmarked ? "Remove bookmark" : "Save article"}
+            title={bookmarked ? tBookmarks("removeBookmark") : tBookmarks("saveArticle")}
           >
             <svg className={`h-5 w-5 ${bookmarked ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
               <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
@@ -249,17 +252,17 @@ function ArticleDetail({
         )}
         {article.proOnly && (
           <span className="rounded-full bg-purple-100 px-2.5 py-0.5 text-xs font-medium text-purple-700">
-            Pro
+            {t("pro")}
           </span>
         )}
         {readingTime > 0 && (
           <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-500">
-            {readingTime} min read
+            {t("minRead", { min: readingTime })}
           </span>
         )}
         {article.lastUpdated && (
           <span className="rounded-full bg-gray-100 px-2.5 py-0.5 text-xs font-medium text-gray-400">
-            Updated {article.lastUpdated}
+            {t("updated", { date: article.lastUpdated })}
           </span>
         )}
       </div>
@@ -276,7 +279,7 @@ function ArticleDetail({
       {/* Sources */}
       {article.sources.length > 0 && (
         <div className="mb-4">
-          <h4 className="mb-1 text-xs font-bold uppercase text-gray-400">Sources</h4>
+          <h4 className="mb-1 text-xs font-bold uppercase text-gray-400">{t("sources")}</h4>
           {article.sources.map((src, i) => (
             <div key={i} className="text-sm text-gray-600">{src}</div>
           ))}
@@ -287,20 +290,20 @@ function ArticleDetail({
       {loading ? (
         <div className="mt-6 flex items-center justify-center py-12">
           <div className="h-6 w-6 animate-spin rounded-full border-2 border-brand-teal-800 border-t-transparent" />
-          <span className="ml-2 text-sm text-gray-500">Loading article...</span>
+          <span className="ml-2 text-sm text-gray-500">{t("loading")}</span>
         </div>
       ) : isLocked || !content ? (
         <div className="mt-6 rounded-xl border-2 border-dashed border-purple-200 bg-purple-50/50 p-8 text-center">
           <div className="mb-2 text-3xl">🔒</div>
-          <h3 className="mb-2 text-base font-semibold text-purple-800">Premium Content</h3>
+          <h3 className="mb-2 text-base font-semibold text-purple-800">{t("lockedTitle")}</h3>
           <p className="mb-4 text-sm text-purple-600">
-            Full article content is available for Premium and Architect subscribers.
+            {t("lockedDescription")}
           </p>
           <Link
             href="/pricing"
             className="inline-block rounded-lg bg-purple-600 px-5 py-2 text-sm font-semibold text-white hover:bg-purple-700 transition-colors"
           >
-            Upgrade to Premium
+            {t("upgradeButton")}
           </Link>
         </div>
       ) : (
@@ -309,11 +312,11 @@ function ArticleDetail({
           {truncated && (
             <div className="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-center">
               <p className="text-sm text-amber-800">
-                Article truncated on free tier.{" "}
+                {t("truncated")}{" "}
                 <Link href="/pricing" className="font-semibold underline hover:text-amber-900">
-                  Upgrade to Premium
-                </Link>{" "}
-                for the full content.
+                  {t("truncatedUpgrade")}
+                </Link>
+                {t("truncatedSuffix")}
               </p>
             </div>
           )}
@@ -325,7 +328,7 @@ function ArticleDetail({
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M8.625 12a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H8.25m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0H12m4.125 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm0 0h-.375M21 12c0 4.556-4.03 8.25-9 8.25a9.764 9.764 0 01-2.555-.337A5.972 5.972 0 015.41 20.97a5.969 5.969 0 01-.474-.065 4.48 4.48 0 00.978-2.025c.09-.457-.133-.901-.467-1.226C3.93 16.178 3 14.189 3 12c0-4.556 4.03-8.25 9-8.25s9 3.694 9 8.25z" />
               </svg>
-              Ask AI Consultant about &ldquo;{article.title}&rdquo;
+              {t("askConsultant", { title: article.title })}
             </Link>
           </div>
         </div>
@@ -334,7 +337,7 @@ function ArticleDetail({
       {/* Related articles */}
       {article.relatedArticles && article.relatedArticles.length > 0 && (
         <div className="mt-6">
-          <h4 className="mb-2 text-xs font-bold uppercase text-gray-400">Related Articles</h4>
+          <h4 className="mb-2 text-xs font-bold uppercase text-gray-400">{t("relatedArticles")}</h4>
           <div className="flex flex-wrap gap-2">
             {article.relatedArticles.map((relId) => {
               const rel = ARTICLES.find((a) => a.id === relId);
@@ -370,6 +373,7 @@ function ArticleCard({
   bookmarked?: boolean;
   onToggleBookmark?: () => void;
 }) {
+  const tBookmarks = useTranslations("library.bookmarks");
   const region = article.region ? REGIONS.find((r) => r.code === article.region) : null;
 
   return (
@@ -402,7 +406,7 @@ function ArticleCard({
             <button
               onClick={(e) => { e.stopPropagation(); onToggleBookmark(); }}
               className="p-0.5 rounded hover:bg-gray-100 transition-colors"
-              title={bookmarked ? "Remove bookmark" : "Bookmark"}
+              title={bookmarked ? tBookmarks("removeBookmark") : tBookmarks("bookmark")}
             >
               <svg className={`h-4 w-4 ${bookmarked ? "text-amber-500 fill-amber-500" : "text-gray-300"}`} viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" />
@@ -426,6 +430,7 @@ function ArticleCard({
 /* ------------------------------------------------------------------ */
 
 export default function LibraryPage() {
+  const t = useTranslations("library");
   const effectiveTier = useAuthStore((s) => {
     const { getEffectiveTier } = s;
     return getEffectiveTier();
@@ -519,7 +524,7 @@ export default function LibraryPage() {
             </Link>
             <span className="hidden sm:inline-block text-xs text-gray-400">|</span>
             <h1 className="hidden sm:inline-block text-sm font-semibold text-gray-700">
-              Knowledge Library
+              {t("header.title")}
             </h1>
           </div>
           <AuthNav />
@@ -531,10 +536,13 @@ export default function LibraryPage() {
         <div className="mx-auto max-w-6xl px-4 py-6">
           <div className="flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Architecture Knowledge Library</h2>
+              <h2 className="text-2xl font-bold text-gray-900">{t("hero.title")}</h2>
               <p className="mt-1 text-sm text-gray-500">
-                {ARTICLES.length} articles across {categories.length} domains and{" "}
-                {regionsWithArticles.length} country regulations
+                {t("hero.subtitle", {
+                  articles: ARTICLES.length,
+                  categories: categories.length,
+                  regions: regionsWithArticles.length,
+                })}
               </p>
             </div>
             <div className="flex items-center gap-3">
@@ -555,7 +563,7 @@ export default function LibraryPage() {
                 }`}
               >
                 <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="currentColor"><path d="M17.593 3.322c1.1.128 1.907 1.077 1.907 2.185V21L12 17.25 4.5 21V5.507c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0z" /></svg>
-                {bookmarks.size} saved
+                {t("bookmarks.saved", { count: bookmarks.size })}
               </button>
             )}
           </div>
@@ -576,14 +584,14 @@ export default function LibraryPage() {
                   setActiveArticle(null);
                   setRegionFilter(null);
                 }}
-                placeholder="Search standards, regulations, dimensions, styles..."
+                placeholder={t("search.placeholder")}
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 py-2.5 pl-10 pr-9 text-sm text-gray-700 placeholder:text-gray-400 focus:border-brand-teal-800 focus:bg-white focus:outline-none focus:ring-1 focus:ring-brand-teal-800"
               />
               {search && (
                 <button
                   onClick={() => { setSearch(""); }}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
-                  title="Clear search (Esc)"
+                  title={t("search.clear")}
                 >
                   <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
@@ -601,12 +609,12 @@ export default function LibraryPage() {
           /* Bookmarked articles */
           <div>
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-bold text-gray-900">Saved Articles ({bookmarks.size})</h3>
+              <h3 className="text-lg font-bold text-gray-900">{t("bookmarks.listTitle", { count: bookmarks.size })}</h3>
               <button
                 onClick={() => setShowBookmarks(false)}
                 className="text-sm text-gray-500 hover:text-gray-700"
               >
-                Back to library
+                {t("bookmarks.backToLibrary")}
               </button>
             </div>
             <div className="grid gap-2 sm:grid-cols-2">
@@ -621,7 +629,7 @@ export default function LibraryPage() {
               ))}
             </div>
             {bookmarks.size === 0 && (
-              <div className="py-12 text-center text-sm text-gray-400">No saved articles yet</div>
+              <div className="py-12 text-center text-sm text-gray-400">{t("bookmarks.empty")}</div>
             )}
           </div>
         ) : activeArticle ? (
@@ -644,14 +652,14 @@ export default function LibraryPage() {
               <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                 <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
               </svg>
-              All categories
+              {t("categoryView.allCategories")}
             </button>
 
             <h3 className="mb-1 text-lg font-bold text-gray-900">
               {activeCategory.icon} {activeCategory.label}
             </h3>
             <p className="mb-4 text-sm text-gray-500">
-              {ARTICLES.filter((a) => a.category === activeCategoryId).length} articles
+              {t("categoryView.articles", { count: ARTICLES.filter((a) => a.category === activeCategoryId).length })}
             </p>
 
             {/* Region filter for regulations */}
@@ -663,7 +671,7 @@ export default function LibraryPage() {
                     !regionFilter ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  All
+                  {t("categoryView.all")}
                 </button>
                 {regionsWithArticles.map((r) => {
                   const locked = isRegionLocked(r.code);
@@ -678,7 +686,7 @@ export default function LibraryPage() {
                           ? "bg-brand-teal-800 text-white"
                           : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                       }`}
-                      title={locked ? `Upgrade to access ${r.name} regulations` : undefined}
+                      title={locked ? t("categoryView.upgradeTitle", { name: r.name }) : undefined}
                     >
                       {r.flag} {r.name} ({r.articleCount}){locked && " 🔒"}
                     </button>
@@ -690,7 +698,7 @@ export default function LibraryPage() {
                     regionFilter === "EU" ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                   }`}
                 >
-                  🇪🇺 EU Shared ({ARTICLES.filter((a) => a.category === activeCategoryId && !a.region).length})
+                  🇪🇺 {t("categoryView.euShared", { count: ARTICLES.filter((a) => a.category === activeCategoryId && !a.region).length })}
                 </button>
               </div>
             )}
@@ -707,7 +715,7 @@ export default function LibraryPage() {
               ))}
               {categoryArticles.length === 0 && (
                 <div className="col-span-2 py-8 text-center text-sm text-gray-400">
-                  No articles match this filter
+                  {t("categoryView.noMatches")}
                 </div>
               )}
             </div>
@@ -716,7 +724,9 @@ export default function LibraryPage() {
           /* Search results */
           <div>
             <p className="mb-4 text-sm text-gray-500">
-              {searchResults.length} result{searchResults.length !== 1 ? "s" : ""} for &ldquo;{search}&rdquo;
+              {searchResults.length === 1
+                ? t("search.resultsOne", { count: searchResults.length, query: search })
+                : t("search.results", { count: searchResults.length, query: search })}
             </p>
             <div className="grid gap-2 sm:grid-cols-2">
               {searchResults.map((article) => (
@@ -735,7 +745,7 @@ export default function LibraryPage() {
           <>
             {/* Featured articles row */}
             <div className="mb-6">
-              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">Featured Articles</h3>
+              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">{t("sections.featured")}</h3>
               <div className="grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
                 {ARTICLES.filter((a) => ["room-dimensions", "modulca-platform", "ro-building-permit", "passive-house"].includes(a.id)).map((article) => (
                   <button
@@ -751,13 +761,13 @@ export default function LibraryPage() {
             </div>
             {/* Books & References section */}
             <div className="mb-6">
-              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">📕 Books & References</h3>
+              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">📕 {t("sections.booksAndReferences")}</h3>
               <div className="grid gap-3 sm:grid-cols-2">
                 {/* Free resources */}
                 <div className="rounded-xl border border-green-100 bg-green-50/50 p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">📖</span>
-                    <h4 className="text-sm font-bold text-green-800">Free Resources ({getFreeBooks().length})</h4>
+                    <h4 className="text-sm font-bold text-green-800">{t("sections.freeResources", { count: getFreeBooks().length })}</h4>
                   </div>
                   <div className="space-y-1.5">
                     {getFreeBooks().slice(0, 5).map((book) => (
@@ -776,7 +786,7 @@ export default function LibraryPage() {
                       href="/library/books"
                       className="inline-block text-xs text-green-600 hover:underline mt-1"
                     >
-                      Browse all free books →
+                      {t("sections.browseFreeBooks")}
                     </Link>
                   </div>
                 </div>
@@ -785,7 +795,7 @@ export default function LibraryPage() {
                 <div className="rounded-xl border border-amber-100 bg-amber-50/50 p-4">
                   <div className="flex items-center gap-2 mb-3">
                     <span className="text-lg">⭐</span>
-                    <h4 className="text-sm font-bold text-amber-800">Essential Books ({getPaidBooks().length})</h4>
+                    <h4 className="text-sm font-bold text-amber-800">{t("sections.essentialBooks", { count: getPaidBooks().length })}</h4>
                   </div>
                   <div className="space-y-1.5">
                     {getPaidBooks().slice(0, 5).map((book) => (
@@ -804,7 +814,7 @@ export default function LibraryPage() {
                       href="/library/books"
                       className="inline-block text-xs text-amber-600 hover:underline mt-1"
                     >
-                      Browse all books →
+                      {t("sections.browseAllBooks")}
                     </Link>
                   </div>
                 </div>
@@ -812,11 +822,11 @@ export default function LibraryPage() {
             </div>
             {/* Practical Guides section */}
             <div className="mb-6">
-              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">🗺️ Practical Guides</h3>
+              <h3 className="mb-3 text-sm font-bold text-gray-700 uppercase tracking-wider">🗺️ {t("sections.practicalGuides")}</h3>
               <div className="rounded-xl border border-blue-100 bg-blue-50/50 p-4">
                 <div className="flex items-center gap-2 mb-3">
                   <span className="text-lg">💡</span>
-                  <h4 className="text-sm font-bold text-blue-800">Step-by-Step Guides</h4>
+                  <h4 className="text-sm font-bold text-blue-800">{t("sections.stepByStep")}</h4>
                 </div>
                 <div className="space-y-1.5">
                   {ARTICLES.filter((a) => a.category === "guides").slice(0, 5).map((guide) => (
@@ -833,7 +843,7 @@ export default function LibraryPage() {
                     href="/library/guides"
                     className="inline-block text-xs text-blue-600 hover:underline mt-1"
                   >
-                    Browse all guides →
+                    {t("sections.browseAllGuides")}
                   </Link>
                 </div>
               </div>
@@ -853,7 +863,9 @@ export default function LibraryPage() {
                       {cat.label}
                     </div>
                     <div className="mt-1 text-xs text-gray-500">
-                      {cat.articleCount} article{cat.articleCount !== 1 ? "s" : ""}
+                      {cat.articleCount === 1
+                        ? t("categoryCard.articlesOne", { count: cat.articleCount })
+                        : t("categoryCard.articles", { count: cat.articleCount })}
                       {cat.hasRegions && (
                         <span className="ml-1.5">
                           · {regionsWithArticles.map((r) => r.flag).join(" ")} 🇪🇺
@@ -878,13 +890,13 @@ export default function LibraryPage() {
       {/* Footer */}
       <footer className="border-t border-gray-100 bg-white py-6 text-center">
         <p className="text-xs text-gray-400">
-          ModulCA Knowledge Library v2.0 — {ARTICLES.length} articles across Neufert standards, EU regulations, and {regionsWithArticles.length} country codes
+          {t("footer.version", { articles: ARTICLES.length, regions: regionsWithArticles.length })}
         </p>
         <p className="mt-1 text-xs text-gray-400">
           <Link href="/pricing" className="hover:text-brand-teal-800 hover:underline">
-            Upgrade to Premium
-          </Link>{" "}
-          for full article access and deep AI consultation
+            {t("footer.upgradeLink")}
+          </Link>
+          {t("footer.upgradeSuffix")}
         </p>
       </footer>
     </div>
