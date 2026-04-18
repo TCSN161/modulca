@@ -30,7 +30,10 @@
     "dashboard": "Dashboard",
     "account": "Account",
     "contact": "Contact",
-    "about": "Over ons"
+    "about": "Over ons",
+    "features": "Functies",
+    "howItWorks": "Hoe het werkt",
+    "forBuilders": "Voor bouwers"
   },
   "footer": {
     "beta": "ModulCA Beta",
@@ -65,8 +68,14 @@
   "home": {
     "hero": {
       "title": "Ontwerp je modulaire huis in enkele minuten",
-      "subtitle": "AI-platform — plaats 3×3m modules op je grond, visualiseer in 3D, krijg vergunning-klare tekeningen. Gratis starten.",
+      "versionBadge": "Versie 1.0 Live",
+      "titlePart1": "Ontwerp je",
+      "titleAccent": "modulaire huis",
+      "titlePart2": "in enkele minuten",
+      "subtitle": "Het eerste end-to-end platform voor modulaire houten huizen in Roemenië en Nederland. Ontwerp met ons 3×3m-modulesysteem, krijg AI-renders, technische tekeningen en kostenramingen — en neem vervolgens contact op met gecertificeerde bouwers.",
       "ctaPrimary": "Begin met ontwerpen — gratis",
+      "ctaQuiz": "Doe de stijlquiz",
+      "ctaHowItWorks": "Zie hoe het werkt",
       "ctaSecondary": "Bekijk 2-min demo"
     },
     "benefits": {

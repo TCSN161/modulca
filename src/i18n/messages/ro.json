@@ -30,7 +30,10 @@
     "dashboard": "Panou de control",
     "account": "Cont",
     "contact": "Contact",
-    "about": "Despre"
+    "about": "Despre",
+    "features": "Funcționalități",
+    "howItWorks": "Cum funcționează",
+    "forBuilders": "Pentru constructori"
   },
   "footer": {
     "beta": "ModulCA Beta",
@@ -65,8 +68,14 @@
   "home": {
     "hero": {
       "title": "Designează-ți casa modulară în câteva minute",
-      "subtitle": "Platformă AI — poziționezi module de 3×3m pe teren, vizualizezi în 3D, obții planuri gata de autorizație. Gratuit la start.",
+      "versionBadge": "Versiunea 1.0 Live",
+      "titlePart1": "Designează-ți",
+      "titleAccent": "casa modulară",
+      "titlePart2": "în câteva minute",
+      "subtitle": "Prima platformă end-to-end pentru case modulare din lemn în România și Olanda. Designează cu sistemul nostru de module 3×3m, obține randări AI, desene tehnice și estimări de cost — apoi conectează-te cu constructori certificați.",
       "ctaPrimary": "Începe designul — gratuit",
+      "ctaQuiz": "Fă testul de stil",
+      "ctaHowItWorks": "Vezi cum funcționează",
       "ctaSecondary": "Vezi demo 2 minute"
     },
     "benefits": {

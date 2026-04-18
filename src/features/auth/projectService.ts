@@ -53,7 +53,29 @@ export type ProjectResult<T> =
   | { ok: false; error: ProjectServiceError };
 
 const LOCAL_KEY = "modulca-projects";
-const SELECT_COLS = "id, name, data, thumbnail, deleted_at, created_at, updated_at";
+
+/**
+ * SELECT columns — base set that exists in migration 004 (projects table v1).
+ * Extended columns (thumbnail, deleted_at) are added by migration 008.
+ * We request the extended set but fall back automatically if the live DB
+ * hasn't been migrated yet (PGRST204 "column not found" triggers fallback).
+ */
+const SELECT_COLS_BASE = "id, name, data, created_at, updated_at";
+const SELECT_COLS_EXTENDED = "id, name, data, thumbnail, deleted_at, created_at, updated_at";
+
+/**
+ * Detect missing-column errors from Supabase/PostgREST so we can fall back
+ * to the base schema without breaking the user flow.
+ * Error codes/messages we recognise:
+ *   - PGRST204 — "Could not find the 'X' column of 'Y' in the schema cache"
+ *   - 42703 — PostgreSQL "column does not exist"
+ */
+function isMissingColumnError(err: { code?: string; message?: string } | null | undefined): boolean {
+  if (!err) return false;
+  if (err.code === "PGRST204" || err.code === "42703") return true;
+  const msg = err.message?.toLowerCase() ?? "";
+  return msg.includes("could not find") && msg.includes("column");
+}
 
 /* ── localStorage helpers ── */
 
@@ -85,22 +107,41 @@ export async function listProjects(userId: string): Promise<ProjectRecord[]> {
     return loadLocalProjects().filter((p) => !p.deleted_at);
   }
 
-  const { data, error } = await sb
+  // Try extended schema first (with thumbnail + deleted_at)
+  const extendedResult = await sb
     .from("projects")
-    .select(SELECT_COLS)
+    .select(SELECT_COLS_EXTENDED)
     .eq("user_id", userId)
     .is("deleted_at", null)
     .order("updated_at", { ascending: false });
 
-  if (error) {
-    console.warn("[projectService] list error:", error.message);
-    return loadLocalProjects().filter((p) => !p.deleted_at); // fallback
+  if (!extendedResult.error) {
+    return (extendedResult.data ?? []) as ProjectRecord[];
   }
 
-  return (data ?? []) as ProjectRecord[];
+  // Fallback: base schema (pre-migration-008 DBs don't have these columns)
+  if (isMissingColumnError(extendedResult.error)) {
+    const baseResult = await sb
+      .from("projects")
+      .select(SELECT_COLS_BASE)
+      .eq("user_id", userId)
+      .order("updated_at", { ascending: false });
+    if (!baseResult.error) {
+      return (baseResult.data ?? []).map((p) => ({
+        ...(p as Partial<ProjectRecord> & { id: string; name: string; data: ProjectDesignData; created_at: string; updated_at: string }),
+        thumbnail: null,
+        deleted_at: null,
+      })) as ProjectRecord[];
+    }
+    console.warn("[projectService] list fallback error:", baseResult.error.message);
+  } else {
+    console.warn("[projectService] list error:", extendedResult.error.message);
+  }
+
+  return loadLocalProjects().filter((p) => !p.deleted_at); // final fallback
 }
 
-/** List soft-deleted projects (trash) */
+/** List soft-deleted projects (trash) — requires migration 008 */
 export async function listDeletedProjects(userId: string): Promise<ProjectRecord[]> {
   const sb = getSupabase();
 
@@ -110,12 +151,14 @@ export async function listDeletedProjects(userId: string): Promise<ProjectRecord
 
   const { data, error } = await sb
     .from("projects")
-    .select(SELECT_COLS)
+    .select(SELECT_COLS_EXTENDED)
     .eq("user_id", userId)
     .not("deleted_at", "is", null)
     .order("deleted_at", { ascending: false });
 
   if (error) {
+    // Pre-migration-008 DBs have no deleted_at column — trash folder is empty
+    if (isMissingColumnError(error)) return [];
     console.warn("[projectService] listDeleted error:", error.message);
     return [];
   }
@@ -161,43 +204,81 @@ export async function saveProject(
 
   // Supabase mode
   if (project.id) {
-    const updatePayload: Record<string, unknown> = {
+    // UPDATE: try with extended columns, fall back to base if schema lacks them
+    const extendedPayload: Record<string, unknown> = {
       name: project.name,
       data: project.data,
     };
-    if (project.thumbnail !== undefined) updatePayload.thumbnail = project.thumbnail;
+    if (project.thumbnail !== undefined) extendedPayload.thumbnail = project.thumbnail;
 
-    const { data, error } = await sb
+    const updateResult = await sb
       .from("projects")
-      .update(updatePayload)
+      .update(extendedPayload)
       .eq("id", project.id)
       .eq("user_id", userId)
-      .select(SELECT_COLS)
+      .select(SELECT_COLS_EXTENDED)
       .single();
 
-    if (error) {
-      console.warn("[projectService] update error:", error.message);
-      return { ok: false, error: { code: "SUPABASE_ERROR", message: error.message } };
+    if (!updateResult.error) {
+      return { ok: true, value: updateResult.data as ProjectRecord };
     }
-    return { ok: true, value: data as ProjectRecord };
+
+    if (isMissingColumnError(updateResult.error)) {
+      // Fallback: update without thumbnail, return with null placeholders
+      const basePayload = { name: project.name, data: project.data };
+      const fbResult = await sb
+        .from("projects")
+        .update(basePayload)
+        .eq("id", project.id)
+        .eq("user_id", userId)
+        .select(SELECT_COLS_BASE)
+        .single();
+      if (!fbResult.error && fbResult.data) {
+        return { ok: true, value: { ...(fbResult.data as Record<string, unknown>), thumbnail: null, deleted_at: null } as unknown as ProjectRecord };
+      }
+    }
+
+    console.warn("[projectService] update error:", updateResult.error.message);
+    return { ok: false, error: { code: "SUPABASE_ERROR", message: updateResult.error.message } };
   }
 
-  const { data, error } = await sb
+  // INSERT: try with extended columns, fall back if needed
+  const extendedInsert: Record<string, unknown> = {
+    user_id: userId,
+    name: project.name,
+    data: project.data,
+  };
+  if (project.thumbnail !== undefined) extendedInsert.thumbnail = project.thumbnail;
+
+  const insertResult = await sb
     .from("projects")
-    .insert({
-      user_id: userId,
-      name: project.name,
-      data: project.data,
-      thumbnail: project.thumbnail ?? null,
-    })
-    .select(SELECT_COLS)
+    .insert(extendedInsert)
+    .select(SELECT_COLS_EXTENDED)
     .single();
 
-  if (error) {
-    console.warn("[projectService] insert error:", error.message);
-    return { ok: false, error: { code: "SUPABASE_ERROR", message: error.message } };
+  if (!insertResult.error) {
+    return { ok: true, value: insertResult.data as ProjectRecord };
   }
-  return { ok: true, value: data as ProjectRecord };
+
+  if (isMissingColumnError(insertResult.error)) {
+    // Fallback: insert without thumbnail (pre-migration-008 schema)
+    const baseInsert = { user_id: userId, name: project.name, data: project.data };
+    const fbResult = await sb
+      .from("projects")
+      .insert(baseInsert)
+      .select(SELECT_COLS_BASE)
+      .single();
+    if (!fbResult.error && fbResult.data) {
+      return { ok: true, value: { ...(fbResult.data as Record<string, unknown>), thumbnail: null, deleted_at: null } as unknown as ProjectRecord };
+    }
+    if (fbResult.error) {
+      console.warn("[projectService] insert fallback error:", fbResult.error.message);
+      return { ok: false, error: { code: "SUPABASE_ERROR", message: fbResult.error.message } };
+    }
+  }
+
+  console.warn("[projectService] insert error:", insertResult.error.message);
+  return { ok: false, error: { code: "SUPABASE_ERROR", message: insertResult.error.message } };
 }
 
 /** Load a single project by ID */
@@ -211,18 +292,32 @@ export async function loadProject(userId: string, projectId: string): Promise<Pr
     return { ok: true, value: found };
   }
 
-  const { data, error } = await sb
+  const extended = await sb
     .from("projects")
-    .select(SELECT_COLS)
+    .select(SELECT_COLS_EXTENDED)
     .eq("id", projectId)
     .eq("user_id", userId)
     .single();
 
-  if (error) {
-    console.warn("[projectService] load error:", error.message);
-    return { ok: false, error: { code: "SUPABASE_ERROR", message: error.message } };
+  if (!extended.error) {
+    return { ok: true, value: extended.data as ProjectRecord };
   }
-  return { ok: true, value: data as ProjectRecord };
+
+  // Fallback for pre-migration-008 schema
+  if (isMissingColumnError(extended.error)) {
+    const base = await sb
+      .from("projects")
+      .select(SELECT_COLS_BASE)
+      .eq("id", projectId)
+      .eq("user_id", userId)
+      .single();
+    if (!base.error && base.data) {
+      return { ok: true, value: { ...(base.data as Record<string, unknown>), thumbnail: null, deleted_at: null } as unknown as ProjectRecord };
+    }
+  }
+
+  console.warn("[projectService] load error:", extended.error.message);
+  return { ok: false, error: { code: extended.error.code === "PGRST116" ? "NOT_FOUND" : "SUPABASE_ERROR", message: extended.error.message } };
 }
 
 /** Soft-delete a project (move to trash) */
@@ -240,17 +335,31 @@ export async function deleteProject(userId: string, projectId: string): Promise<
     return { ok: true, value: true };
   }
 
-  const { error } = await sb
+  // Try soft-delete first (requires migration 008)
+  const softResult = await sb
     .from("projects")
     .update({ deleted_at: now })
     .eq("id", projectId)
     .eq("user_id", userId);
 
-  if (error) {
-    console.warn("[projectService] delete error:", error.message);
-    return { ok: false, error: { code: "SUPABASE_ERROR", message: error.message } };
+  if (!softResult.error) {
+    return { ok: true, value: true };
   }
-  return { ok: true, value: true };
+
+  // Pre-migration-008 schema: hard-delete instead (no grace period available)
+  if (isMissingColumnError(softResult.error)) {
+    const hardResult = await sb
+      .from("projects")
+      .delete()
+      .eq("id", projectId)
+      .eq("user_id", userId);
+    if (!hardResult.error) return { ok: true, value: true };
+    console.warn("[projectService] hard-delete error:", hardResult.error.message);
+    return { ok: false, error: { code: "SUPABASE_ERROR", message: hardResult.error.message } };
+  }
+
+  console.warn("[projectService] delete error:", softResult.error.message);
+  return { ok: false, error: { code: "SUPABASE_ERROR", message: softResult.error.message } };
 }
 
 /** Restore a soft-deleted project */

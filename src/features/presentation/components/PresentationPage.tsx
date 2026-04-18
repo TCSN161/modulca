@@ -100,12 +100,24 @@ const DEFAULT_SLIDES: SlideConfig[] = [
   { id: "next", label: "Next Steps", description: "Contact, timeline, builder info", enabled: true },
 ];
 
-/** Texture background URLs for common materials (Unsplash) */
+/**
+ * Material texture preview images.
+ * Mapped to LOCAL curated product photos (public/images/products/) so what
+ * users see in the slide actually matches the material they selected in
+ * the designer. Unmapped materials show a solid color swatch from
+ * FLOOR_MATERIALS / WALL_MATERIALS definitions — accurate, no confusion.
+ *
+ * To add a new material texture: drop image in public/images/products/ and
+ * add the mapping here. The material id MUST match the id in
+ * src/features/design/layouts.ts → FLOOR_MATERIALS / WALL_MATERIALS.
+ */
 const MATERIAL_TEXTURES: Record<string, string> = {
-  oak: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=200&h=200&fit=crop&q=60",
-  walnut: "https://images.unsplash.com/photo-1588854337115-1c67d9247e4d?w=200&h=200&fit=crop&q=60",
-  concrete: "https://images.unsplash.com/photo-1617791160505-6f00504e3519?w=200&h=200&fit=crop&q=60",
-  marble: "https://images.unsplash.com/photo-1618220179428-22790b461013?w=200&h=200&fit=crop&q=60",
+  // Floor materials (ids from FLOOR_MATERIALS)
+  oak: "/images/products/fin-01-oak-flooring.jpg",
+  // walnut: no curated image yet — fallback to color swatch
+  // concrete: no curated image yet — fallback to color swatch
+  // Wall materials (ids from WALL_MATERIALS) — all use color swatches
+  // alabaster, sage, slate: clean solid colors render better than forcing a photo
 };
 
 /** Product catalog for matching localStorage IDs — must match IDs from ProductsPage */

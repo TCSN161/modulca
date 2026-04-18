@@ -30,7 +30,10 @@
     "dashboard": "Dashboard",
     "account": "Account",
     "contact": "Contact",
-    "about": "About"
+    "about": "About",
+    "features": "Features",
+    "howItWorks": "How It Works",
+    "forBuilders": "For Builders"
   },
   "footer": {
     "beta": "ModulCA Beta",
@@ -65,8 +68,14 @@
   "home": {
     "hero": {
       "title": "Design Your Modular Home in Minutes",
-      "subtitle": "AI-powered platform — place 3×3m modules on your land, visualize in 3D, get permit-ready drawings. Start free.",
-      "ctaPrimary": "Start designing — free",
+      "versionBadge": "Version 1.0 Live",
+      "titlePart1": "Design Your",
+      "titleAccent": "Modular Home",
+      "titlePart2": "in Minutes",
+      "subtitle": "The first end-to-end platform for modular wooden homes in Romania and the Netherlands. Design with our 3×3m module system, get AI renders, technical drawings, and cost estimates — then connect with certified builders.",
+      "ctaPrimary": "Start Designing — Free",
+      "ctaQuiz": "Take the Style Quiz",
+      "ctaHowItWorks": "See How It Works",
       "ctaSecondary": "Watch 2-min demo"
     },
     "benefits": {

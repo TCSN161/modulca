@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import MobileNav from "./MobileNav";
 import Footer from "@/features/shared/components/Footer";
@@ -67,6 +68,8 @@ function IconPlay() {
 const jsonLd = softwareAppSchema();
 
 export default function HomePage() {
+  const tHome = useTranslations("home");
+  const tNav = useTranslations("nav");
   return (
     <div className="flex min-h-screen flex-col bg-brand-bone-100">
       <script
@@ -80,12 +83,12 @@ export default function HomePage() {
             ModulCA
           </span>
           <div className="hidden items-center gap-8 md:flex">
-            <a href="#features" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Features</a>
-            <a href="#how-it-works" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">How It Works</a>
-            <a href="#pricing" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Pricing</a>
-            <a href="#for-builders" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">For Builders</a>
-            <Link href="/portfolio" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Portfolio</Link>
-            <Link href="/blog" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">Blog</Link>
+            <a href="#features" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">{tNav("features")}</a>
+            <a href="#how-it-works" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">{tNav("howItWorks")}</a>
+            <a href="#pricing" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">{tNav("pricing")}</a>
+            <a href="#for-builders" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">{tNav("forBuilders")}</a>
+            <Link href="/portfolio" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">{tNav("portfolio")}</Link>
+            <Link href="/blog" className="text-sm font-medium text-brand-gray hover:text-brand-charcoal transition-colors">{tNav("blog")}</Link>
           </div>
           <div className="flex items-center gap-2">
             <AuthNav />
@@ -111,39 +114,36 @@ export default function HomePage() {
             <div className="max-w-xl">
               <div className="mb-5 inline-flex items-center rounded-full border border-brand-olive-200 bg-brand-bone-200/80 px-3 py-1 text-xs font-semibold uppercase tracking-label text-brand-olive-700">
                 <span className="mr-2 inline-block h-1.5 w-1.5 rounded-full bg-brand-olive-500 animate-pulse" />
-                Version 1.0 Live
+                {tHome("hero.versionBadge")}
               </div>
               <h1 className="mb-6 text-2xl font-extrabold tracking-heading text-brand-charcoal sm:text-4xl lg:text-[3.5rem] lg:leading-[1.1]">
-                Design Your
+                {tHome("hero.titlePart1")}
                 <br />
-                <em className="text-brand-olive-700 not-italic font-extrabold" style={{ fontStyle: "italic" }}>Modular Home</em>
+                <em className="text-brand-olive-700 not-italic font-extrabold" style={{ fontStyle: "italic" }}>{tHome("hero.titleAccent")}</em>
                 <br />
-                in Minutes
+                {tHome("hero.titlePart2")}
               </h1>
               <p className="mb-8 max-w-md text-base text-brand-gray leading-relaxed sm:text-lg">
-                The first end-to-end platform for modular wooden homes in Romania
-                and the Netherlands. Design with our 3&times;3m module system, get
-                AI renders, technical drawings, and cost estimates &mdash; then
-                connect with certified builders.
+                {tHome("hero.subtitle")}
               </p>
               <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
                 <Link
                   href="/project/new"
                   className="btn-primary px-7 py-3.5 text-base shadow-subtle min-h-[44px]"
                 >
-                  Start Designing — Free
+                  {tHome("hero.ctaPrimary")}
                 </Link>
                 <Link
                   href="/quiz"
                   className="inline-flex items-center gap-2 rounded-[12px] border-2 border-brand-teal-800 bg-brand-teal-50 px-6 py-3 text-sm font-semibold text-brand-teal-900 transition-colors hover:bg-brand-teal-100"
                 >
-                  Take the Style Quiz
+                  {tHome("hero.ctaQuiz")}
                 </Link>
                 <a
                   href="#how-it-works"
                   className="inline-flex items-center gap-2 rounded-[12px] border border-brand-bone-400 bg-white px-6 py-3.5 text-sm font-semibold text-brand-charcoal transition-colors hover:bg-brand-bone-200"
                 >
-                  <IconPlay /> See How It Works
+                  <IconPlay /> {tHome("hero.ctaHowItWorks")}
                 </a>
               </div>
             </div>
