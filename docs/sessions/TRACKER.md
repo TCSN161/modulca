@@ -11,6 +11,7 @@
 | Chat | Task ID | Started | ETA | Scope | Status |
 |---|---|---|---|---|---|
 | Main (this chat) | MAIN-ongoing | 2026-04-16 | ongoing | Orchestrator + code changes | 🟢 Active |
+| External Ops & Partnerships | EXT-OPS-001 | 2026-04-18 | prep complete; awaits user input then multi-day outreach | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟡 Prep done, awaits user GO on 3 placeholders (LinkedIn URL, Stripe acct ID, Supabase Pro upgrade decision) |
 
 ---
 
@@ -20,7 +21,6 @@ These are queued — spawn in order as blockers clear and capacity allows.
 
 | Priority | Chat type | Template | Blocking condition | Why |
 |---|---|---|---|---|
-| 🔴 P0 | External Ops & Partnerships | `external-ops.md` | None — can spawn now | DPA emails (beta launch blocker for GDPR) + Startup programs ($150-300K credits potential) |
 | 🟡 P1 | Content & SEO | `content-seo.md` | After DPA replies start returning | Translate top 10 KB articles to RO (infra ready) + publish 5 RO blog drafts + OG images |
 | 🟡 P1 | Frontend QA | `frontend-qa.md` | Pre-launch final week | A11y pass, keyboard nav StepNav, focus management modals, mobile 375px final audit |
 | 🟡 P1 | Testing | `testing.md` | Pre-launch final week | Playwright E2E for auth + Stripe flows, edge cases, coverage boost |
@@ -65,8 +65,8 @@ Tracking what's waiting on external / human-only actions.
 
 ## 📊 Quick stats
 
-- Active chats: 1 / 3 (cap)
-- Planned chats: 7
+- Active chats: 2 / 3 (cap)
+- Planned chats: 6
 - Past chats: 0 (tracking started today)
 - Current calendar week focus: pre-beta finalization
 - Days to beta launch: 13 (target 2026-05-01)
