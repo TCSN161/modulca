@@ -34,6 +34,10 @@
     "db:analyze": "node scripts/supabase-query-analyzer.mjs",
     "db:analyze:json": "node scripts/supabase-query-analyzer.mjs --json",
     "db:analyze:reset": "node scripts/supabase-query-analyzer.mjs --reset",
+    "session:sync": "node scripts/session-sync.mjs",
+    "session:sync:yes": "node scripts/session-sync.mjs --yes",
+    "session:sync:watch": "node scripts/session-sync.mjs --watch",
+    "session:sync:json": "node scripts/session-sync.mjs --json --no-pull",
     "domains:check": "node scripts/domain-check.mjs",
     "domains:check:json": "node scripts/domain-check.mjs --json"
   },

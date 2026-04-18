@@ -96,5 +96,20 @@
       "Write(package.json)",
       "Write(package-lock.json)"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "cd /c/Users/Costin/Documents/modulca 2>/dev/null && git fetch origin master >/dev/null 2>&1 && AHEAD=$(git rev-list --count HEAD..@{u} 2>/dev/null || echo 0) && if [ \"$AHEAD\" -gt 0 ]; then echo \"{\\\"systemMessage\\\":\\\"📡 $AHEAD new commit(s) on origin/master from parallel chats. Run: npm run session:sync\\\"}\"; fi",
+            "timeout": 10,
+            "async": false
+          }
+        ]
+      }
+    ]
   }
 }
