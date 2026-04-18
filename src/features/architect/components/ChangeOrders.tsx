@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useArchitectStore } from "../store";
 import { PHASE_DEFINITIONS } from "../phases";
 import type { PhaseId, ChangeOrderStatus, ChangeOrderImpact } from "../types";
@@ -24,7 +24,23 @@ export default function ChangeOrders() {
   const project = useArchitectStore((s) => s.project);
   const addChangeOrder = useArchitectStore((s) => s.addChangeOrder);
   const setChangeOrderStatus = useArchitectStore((s) => s.setChangeOrderStatus);
-  const coImpact = useArchitectStore((s) => s.getChangeOrderImpact());
+
+  // Compute derived data via useMemo — calling selectors that return NEW
+  // object references every render triggers Zustand subscription loops.
+  const coImpact = useMemo(() => {
+    if (!project) return { totalCost: 0, totalDays: 0, approved: 0, pending: 0 };
+    const approved = project.changeOrders.filter((co) => co.status === "approved");
+    const pending = project.changeOrders.filter(
+      (co) => co.status === "proposed" || co.status === "assessed"
+    );
+    return {
+      totalCost: approved.reduce((s, co) => s + co.costDelta, 0),
+      totalDays: approved.reduce((s, co) => s + co.scheduleDelta, 0),
+      approved: approved.length,
+      pending: pending.length,
+    };
+  }, [project]);
+
   const [showForm, setShowForm] = useState(false);
   const [form, setForm] = useState({
     title: "",

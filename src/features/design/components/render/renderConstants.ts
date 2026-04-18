@@ -94,50 +94,58 @@ export interface StylePin {
   h: number;
   color: string;
   cat: string;
-  img: string;
+  /**
+   * OPTIONAL image URL. When unset, the pin shows as a clean color swatch +
+   * label + category badge. Previously populated with generic Unsplash URLs
+   * that didn't match the label (e.g. "Light Wood Flooring" showing ocean waves).
+   * Unreliable third-party photos are worse than no photo — adding photos back
+   * requires curation (prefer images hosted under /public/images/inspiration/
+   * so we can verify and version them).
+   */
+  img?: string;
 }
 
 export const STYLE_PINS: Record<string, StylePin[]> = {
   scandinavian: [
-    { label: "Nordic Living Room", h: 220, color: "#E8DFD0", cat: "Living", img: "https://images.unsplash.com/photo-1616486338812-3dadae4b4ace?w=400&q=80" },
-    { label: "Oak Side Table", h: 160, color: "#D4A76A", cat: "Furniture", img: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80" },
-    { label: "Linen Curtains", h: 180, color: "#F0EDE5", cat: "Textile", img: "https://images.unsplash.com/photo-1513694203232-719a280e022f?w=400&q=80" },
-    { label: "Birch Bookshelf", h: 240, color: "#D4B896", cat: "Furniture", img: "https://images.unsplash.com/photo-1594620302200-9a762244a156?w=400&q=80" },
-    { label: "Ceramic Pendant", h: 150, color: "#C8CDD0", cat: "Lighting", img: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=400&q=80" },
-    { label: "Wool Throw Blanket", h: 170, color: "#E0D8C8", cat: "Textile", img: "https://images.unsplash.com/photo-1522771739844-6a9f6d5f14af?w=400&q=80" },
-    { label: "Minimalist Kitchen", h: 200, color: "#F5F3EF", cat: "Kitchen", img: "https://images.unsplash.com/photo-1556909114-f6e7ad7d3136?w=400&q=80" },
-    { label: "White Stone Vase", h: 140, color: "#EDEBE5", cat: "Decor", img: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=400&q=80" },
-    { label: "Light Wood Flooring", h: 190, color: "#C8A878", cat: "Flooring", img: "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=400&q=80" },
-    { label: "Simple Desk Setup", h: 210, color: "#D0C8B8", cat: "Office", img: "https://images.unsplash.com/photo-1518455027359-f3f8164ba6bd?w=400&q=80" },
-    { label: "Fog Grey Sofa", h: 180, color: "#B8BCC0", cat: "Furniture", img: "https://images.unsplash.com/photo-1540574163026-643ea20ade25?w=400&q=80" },
-    { label: "Clean Bathroom", h: 230, color: "#E8E4DC", cat: "Bathroom", img: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&q=80" },
+    { label: "Nordic Living Room", h: 220, color: "#E8DFD0", cat: "Living" },
+    { label: "Oak Side Table", h: 160, color: "#D4A76A", cat: "Furniture" },
+    { label: "Linen Curtains", h: 180, color: "#F0EDE5", cat: "Textile" },
+    { label: "Birch Bookshelf", h: 240, color: "#D4B896", cat: "Furniture" },
+    { label: "Ceramic Pendant", h: 150, color: "#C8CDD0", cat: "Lighting" },
+    { label: "Wool Throw Blanket", h: 170, color: "#E0D8C8", cat: "Textile" },
+    { label: "Minimalist Kitchen", h: 200, color: "#F5F3EF", cat: "Kitchen" },
+    { label: "White Stone Vase", h: 140, color: "#EDEBE5", cat: "Decor" },
+    { label: "Light Wood Flooring", h: 190, color: "#C8A878", cat: "Flooring" },
+    { label: "Simple Desk Setup", h: 210, color: "#D0C8B8", cat: "Office" },
+    { label: "Fog Grey Sofa", h: 180, color: "#B8BCC0", cat: "Furniture" },
+    { label: "Clean Bathroom", h: 230, color: "#E8E4DC", cat: "Bathroom" },
   ],
   industrial: [
-    { label: "Exposed Brick Loft", h: 230, color: "#B5654A", cat: "Living", img: "https://images.unsplash.com/photo-1560448204-e02f11c3d0e2?w=400&q=80" },
-    { label: "Steel Shelf Unit", h: 200, color: "#5A5A5A", cat: "Furniture", img: "https://images.unsplash.com/photo-1532372576444-dda954194ad0?w=400&q=80" },
-    { label: "Edison Bulb Cluster", h: 150, color: "#C87941", cat: "Lighting", img: "https://images.unsplash.com/photo-1524484485831-a92ffc0de03f?w=400&q=80" },
-    { label: "Concrete Countertop", h: 170, color: "#B0AFA8", cat: "Kitchen", img: "https://images.unsplash.com/photo-1556909114-44e3e70034e2?w=400&q=80" },
-    { label: "Leather Club Chair", h: 190, color: "#8B5E3C", cat: "Furniture", img: "https://images.unsplash.com/photo-1506439773649-6e0eb8cfb237?w=400&q=80" },
-    { label: "Iron Pipe Rack", h: 160, color: "#4A4A4A", cat: "Storage", img: "https://images.unsplash.com/photo-1581783898377-1c85bf937427?w=400&q=80" },
-    { label: "Distressed Wood Table", h: 210, color: "#7B5B3A", cat: "Furniture", img: "https://images.unsplash.com/photo-1533090481720-856c6e3c1fdc?w=400&q=80" },
-    { label: "Metal Pendant Lamp", h: 140, color: "#3A3A3A", cat: "Lighting", img: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=400&q=80" },
-    { label: "Raw Concrete Floor", h: 180, color: "#9A9890", cat: "Flooring", img: "https://images.unsplash.com/photo-1600607687644-c7171b42498f?w=400&q=80" },
-    { label: "Copper Faucet", h: 150, color: "#C87941", cat: "Fixture", img: "https://images.unsplash.com/photo-1584622650111-993a426fbf0a?w=400&q=80" },
-    { label: "Wire Frame Mirror", h: 220, color: "#6A6A6A", cat: "Decor", img: "https://images.unsplash.com/photo-1618219740975-d40978bb7378?w=400&q=80" },
-    { label: "Canvas Art Print", h: 200, color: "#444", cat: "Decor", img: "https://images.unsplash.com/photo-1513519245088-0e12902e35ca?w=400&q=80" },
+    { label: "Exposed Brick Loft", h: 230, color: "#B5654A", cat: "Living" },
+    { label: "Steel Shelf Unit", h: 200, color: "#5A5A5A", cat: "Furniture" },
+    { label: "Edison Bulb Cluster", h: 150, color: "#C87941", cat: "Lighting" },
+    { label: "Concrete Countertop", h: 170, color: "#B0AFA8", cat: "Kitchen" },
+    { label: "Leather Club Chair", h: 190, color: "#8B5E3C", cat: "Furniture" },
+    { label: "Iron Pipe Rack", h: 160, color: "#4A4A4A", cat: "Storage" },
+    { label: "Distressed Wood Table", h: 210, color: "#7B5B3A", cat: "Furniture" },
+    { label: "Metal Pendant Lamp", h: 140, color: "#3A3A3A", cat: "Lighting" },
+    { label: "Raw Concrete Floor", h: 180, color: "#9A9890", cat: "Flooring" },
+    { label: "Copper Faucet", h: 150, color: "#C87941", cat: "Fixture" },
+    { label: "Wire Frame Mirror", h: 220, color: "#6A6A6A", cat: "Decor" },
+    { label: "Canvas Art Print", h: 200, color: "#444", cat: "Decor" },
   ],
   "warm-contemporary": [
-    { label: "Walnut Dining Room", h: 220, color: "#7B5B3A", cat: "Dining", img: "https://images.unsplash.com/photo-1617806118233-18e1de247200?w=400&q=80" },
-    { label: "Bouclé Armchair", h: 180, color: "#F2EBD9", cat: "Furniture", img: "https://images.unsplash.com/photo-1567538096630-e0c55bd6374c?w=400&q=80" },
-    { label: "Sage Velvet Cushions", h: 150, color: "#8FAE8B", cat: "Textile", img: "https://images.unsplash.com/photo-1616627561950-9f746e330187?w=400&q=80" },
-    { label: "Brass Floor Lamp", h: 210, color: "#C8A96E", cat: "Lighting", img: "https://images.unsplash.com/photo-1513506003901-1e6a229e2d15?w=400&q=80" },
-    { label: "Terracotta Tiles", h: 170, color: "#C4735C", cat: "Flooring", img: "https://images.unsplash.com/photo-1600566752355-35792bedcfea?w=400&q=80" },
-    { label: "Fluted Glass Panel", h: 190, color: "#D4DDD2", cat: "Fixture", img: "https://images.unsplash.com/photo-1600210492486-724fe5c67fb0?w=400&q=80" },
-    { label: "Curved Wood Console", h: 160, color: "#8B6B4A", cat: "Furniture", img: "https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=400&q=80" },
-    { label: "Textured Wall Art", h: 230, color: "#A08868", cat: "Decor", img: "https://images.unsplash.com/photo-1579783902614-a3fb3927b6a5?w=400&q=80" },
-    { label: "Warm Bedroom Setup", h: 200, color: "#D4B898", cat: "Bedroom", img: "https://images.unsplash.com/photo-1618221195710-dd6b41faaea6?w=400&q=80" },
-    { label: "Green Plant Corner", h: 140, color: "#6A8A6A", cat: "Decor", img: "https://images.unsplash.com/photo-1545241047-6083a3684587?w=400&q=80" },
-    { label: "Stone Basin Sink", h: 180, color: "#B0A898", cat: "Bathroom", img: "https://images.unsplash.com/photo-1552321554-5fefe8c9ef14?w=400&q=80" },
-    { label: "Woven Pendant Light", h: 160, color: "#C4A882", cat: "Lighting", img: "https://images.unsplash.com/photo-1540932239986-30128078f3c5?w=400&q=80" },
+    { label: "Walnut Dining Room", h: 220, color: "#7B5B3A", cat: "Dining" },
+    { label: "Bouclé Armchair", h: 180, color: "#F2EBD9", cat: "Furniture" },
+    { label: "Sage Velvet Cushions", h: 150, color: "#8FAE8B", cat: "Textile" },
+    { label: "Brass Floor Lamp", h: 210, color: "#C8A96E", cat: "Lighting" },
+    { label: "Terracotta Tiles", h: 170, color: "#C4735C", cat: "Flooring" },
+    { label: "Fluted Glass Panel", h: 190, color: "#D4DDD2", cat: "Fixture" },
+    { label: "Curved Wood Console", h: 160, color: "#8B6B4A", cat: "Furniture" },
+    { label: "Textured Wall Art", h: 230, color: "#A08868", cat: "Decor" },
+    { label: "Warm Bedroom Setup", h: 200, color: "#D4B898", cat: "Bedroom" },
+    { label: "Green Plant Corner", h: 140, color: "#6A8A6A", cat: "Decor" },
+    { label: "Stone Basin Sink", h: 180, color: "#B0A898", cat: "Bathroom" },
+    { label: "Woven Pendant Light", h: 160, color: "#C4A882", cat: "Lighting" },
   ],
 };

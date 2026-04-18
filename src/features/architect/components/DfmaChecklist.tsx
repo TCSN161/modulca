@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useMemo } from "react";
 import { useArchitectStore } from "../store";
 import { DFMA_CATEGORY_LABELS, PHASE_DEFINITIONS } from "../phases";
 import type { DfmaCategory } from "../types";
@@ -11,9 +11,22 @@ export default function DfmaChecklist() {
   const project = useArchitectStore((s) => s.project);
   const toggleDfmaItem = useArchitectStore((s) => s.toggleDfmaItem);
   const setDfmaItemNotes = useArchitectStore((s) => s.setDfmaItemNotes);
-  const dfmaProgress = useArchitectStore((s) => s.getDfmaProgress());
   const [filterCategory, setFilterCategory] = useState<DfmaCategory | "all">("all");
   const [showOnlyUnchecked, setShowOnlyUnchecked] = useState(false);
+
+  // Compute derived progress here (not via selector) to avoid new-object-per-render
+  // infinite re-renders (selector returning new object triggers Zustand subscription).
+  const dfmaProgress = useMemo(() => {
+    if (!project) return { checked: 0, total: 0, critical: 0, criticalDone: 0 };
+    const items = project.dfmaItems;
+    const critical = items.filter((i) => i.critical);
+    return {
+      checked: items.filter((i) => i.checked).length,
+      total: items.length,
+      critical: critical.length,
+      criticalDone: critical.filter((i) => i.checked).length,
+    };
+  }, [project]);
 
   if (!project) return null;
 
