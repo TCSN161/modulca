@@ -12,7 +12,7 @@
 | Layer | Chat | Task ID | Started | ETA | Scope | Status |
 |---|---|---|---|---|---|---|
 | Captain | claude/modest-blackwell-dfbf1f | CAPTAIN-2026-04 | 2026-04-20 (Mon) EET | ~2026-04-30 (pre-launch rotation to CAPTAIN-2026-05) | Strategic coordination; 11-day beta-launch window | 🟢 Active — scratchpad `active/2026-04-20-captain-2026-04.md` |
-| Weekly Ops | *(spawn prompt produced; awaits user to paste into new chat)* | WEEK-2026-W17 | 2026-04-20 (Mon) EET | 2026-04-24 (Fri) | Week of Apr 20–24 sprint | ⏳ Spawn prompt in Captain scratchpad §"Week W17 — Weekly Ops spawn prompt" |
+| Weekly Ops | claude/nice-chandrasekhar-aa2808 | WEEK-2026-W17 | 2026-04-20 (Mon) EET | 2026-04-24 (Fri) | Week of Apr 20–24 sprint execution; dispatches FE-QA-001 + TEST-001 | 🟢 Active — scratchpad `active/2026-W17-weekly-ops.md` |
 | Specialist (External Ops) | EXT-OPS-001 | EXT-OPS-001 | 2026-04-18 | prep complete; awaits user inputs then closes dormant | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟡 Prep done, awaits user GO on 3 placeholders (LinkedIn URL, Stripe acct ID, Supabase Pro decision) |
 
 ### Retired sessions (within last rotation)
@@ -73,7 +73,7 @@ Tracking what's waiting on external / human-only actions.
 
 ## 📊 Quick stats
 
-- Active chats: 1 / 3 cap (EXT-OPS-001). Captain + Weekly Ops pending spawn on 2026-04-20.
+- Active chats: 3 / 3 cap (Captain CAPTAIN-2026-04, Weekly Ops WEEK-2026-W17, Specialist EXT-OPS-001 dormant-awaits-user). EXT-OPS-001 closes dormant once user provides the 3 inputs → cap restores to 2 → FE-QA-001 spawns Tue/Wed.
 - Planned chats: 6 Specialist queues
 - Past chats: Main chat retired 2026-04-18 after handoff to Captain architecture
 - Current calendar week focus: pre-beta finalization, Captain architecture rollout
