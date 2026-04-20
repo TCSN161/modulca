@@ -38,6 +38,9 @@
     "session:sync:yes": "node scripts/session-sync.mjs --yes",
     "session:sync:watch": "node scripts/session-sync.mjs --watch",
     "session:sync:json": "node scripts/session-sync.mjs --json --no-pull",
+    "monitor:collect": "node scripts/monitor-collect.mjs",
+    "monitor:collect:dry": "node scripts/monitor-collect.mjs --dry --verbose",
+    "monitor:collect:verbose": "node scripts/monitor-collect.mjs --verbose",
     "domains:check": "node scripts/domain-check.mjs",
     "domains:check:json": "node scripts/domain-check.mjs --json"
   },

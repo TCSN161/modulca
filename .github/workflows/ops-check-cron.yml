@@ -1,0 +1,170 @@
+name: Ops Check (cron)
+
+# Scheduled health monitoring — runs every 6 hours.
+# On failure: opens/updates a GitHub Issue (email notification to watchers)
+# so the team sees the problem without needing dashboard logins.
+#
+# Also runs monitor-collect.mjs to persist signals into Supabase so the
+# autonomous agent has historical data (Stage 1 per docs/AUTONOMOUS_AGENT.md).
+
+on:
+  schedule:
+    # Every 6h: 00:00, 06:00, 12:00, 18:00 UTC
+    - cron: '0 */6 * * *'
+  workflow_dispatch:  # manual trigger via Actions tab
+    inputs:
+      verbose:
+        description: 'Verbose logging'
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+  issues: write   # required to auto-open/update issue on failures
+
+jobs:
+  ops-check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      NEXT_PUBLIC_APP_URL: ${{ vars.NEXT_PUBLIC_APP_URL || 'https://www.modulca.eu' }}
+      STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+      NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+      RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+      VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+      SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+      SENTRY_ORG: ${{ vars.SENTRY_ORG || 'modulca' }}
+      SENTRY_PROJECT: ${{ vars.SENTRY_PROJECT || 'modulca-web' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci --legacy-peer-deps
+
+      # ─── Run ops-check (CI mode exits 1 on failures) ───
+      - name: Run ops:check
+        id: ops
+        run: npm run ops:check:ci
+        continue-on-error: true  # continue to next steps to gather more data
+
+      # ─── Run monitor-collect (writes signals to Supabase) ───
+      - name: Collect monitoring signals
+        id: monitor
+        if: ${{ env.SUPABASE_SERVICE_ROLE_KEY != '' }}
+        run: node scripts/monitor-collect.mjs ${{ inputs.verbose && '--verbose' || '' }}
+        continue-on-error: true
+
+      # ─── Capture ops:check JSON for the issue body ───
+      - name: Generate ops report JSON
+        id: report
+        if: ${{ steps.ops.outcome == 'failure' }}
+        run: |
+          npm run ops:check:json > ops-report.json 2>&1 || true
+          echo "report_path=ops-report.json" >> $GITHUB_OUTPUT
+
+      # ─── On failure: open or update a tracking issue ───
+      - name: Open/update failure issue
+        if: ${{ steps.ops.outcome == 'failure' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            let reportBody = 'No report available.';
+            try {
+              reportBody = fs.readFileSync('ops-report.json', 'utf8');
+            } catch (e) { /* continue */ }
+
+            // Look for existing open issue with our label
+            const { data: existing } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ops-alert',
+            });
+
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            const timestamp = new Date().toISOString();
+
+            const body = `## Ops check failure detected (${timestamp})
+
+            **Run**: ${runUrl}
+            **Triggered by**: ${context.eventName}
+
+            <details><summary>Report JSON (click to expand)</summary>
+
+            \`\`\`json
+            ${reportBody.slice(0, 50000)}
+            \`\`\`
+
+            </details>
+
+            ---
+
+            Auto-opened by \`.github/workflows/ops-check-cron.yml\`.
+            Close this issue manually once resolved.`;
+
+            if (existing.length > 0) {
+              // Update existing issue with comment rather than opening duplicate
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: existing[0].number,
+                body,
+              });
+              console.log(`Updated existing issue #${existing[0].number}`);
+            } else {
+              // Open new issue
+              const { data: newIssue } = await github.rest.issues.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                title: `🚨 Ops check failed — ${new Date().toISOString().slice(0, 10)}`,
+                body,
+                labels: ['ops-alert', 'automated'],
+              });
+              console.log(`Opened new issue #${newIssue.number}`);
+            }
+
+      # ─── On pass: close any open ops-alert issues ───
+      - name: Close resolved issues
+        if: ${{ steps.ops.outcome == 'success' }}
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { data: open } = await github.rest.issues.listForRepo({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              state: 'open',
+              labels: 'ops-alert',
+            });
+            const runUrl = `https://github.com/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
+            for (const issue of open) {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                body: `✅ Ops check now passing. Auto-closing.\n\nRun: ${runUrl}`,
+              });
+              await github.rest.issues.update({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: issue.number,
+                state: 'closed',
+              });
+              console.log(`Closed resolved issue #${issue.number}`);
+            }
+
+      # ─── Fail workflow if ops:check failed ───
+      - name: Fail workflow on ops-check failure
+        if: ${{ steps.ops.outcome == 'failure' }}
+        run: exit 1
