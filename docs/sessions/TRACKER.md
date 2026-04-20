@@ -11,10 +11,15 @@
 
 | Layer | Chat | Task ID | Started | ETA | Scope | Status |
 |---|---|---|---|---|---|---|
-| Captain | *(pending spawn)* | CAPTAIN-2026-04 | 2026-04-20 (planned) | ~2026-05 boundary | Strategic coordination | ⏳ Pending user to spawn via `templates/captain.md` |
-| Weekly Ops | *(pending spawn)* | WEEK-2026-W17 | 2026-04-20 (Mon) | 2026-04-24 (Fri) | Week of Apr 20-24 sprint | ⏳ Awaits Captain Monday brief |
-| Specialist (External Ops) | EXT-OPS-001 | EXT-OPS-001 | 2026-04-18 | prep complete; awaits user input then multi-day outreach | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟡 Prep done, awaits user GO on 3 placeholders (LinkedIn URL, Stripe acct ID, Supabase Pro decision) |
-| Main (old) | MAIN-ongoing | 2026-04-16 | RETIRING 2026-04-18 | Orchestrator (→ handed off to Captain) | 🔴 Retired 2026-04-18, handoff at `active/2026-04-20-captain-handoff.md` |
+| Captain | claude/modest-blackwell-dfbf1f | CAPTAIN-2026-04 | 2026-04-20 (Mon) EET | ~2026-04-30 (pre-launch rotation to CAPTAIN-2026-05) | Strategic coordination; 11-day beta-launch window | 🟢 Active — scratchpad `active/2026-04-20-captain-2026-04.md` |
+| Weekly Ops | *(spawn prompt produced; awaits user to paste into new chat)* | WEEK-2026-W17 | 2026-04-20 (Mon) EET | 2026-04-24 (Fri) | Week of Apr 20–24 sprint | ⏳ Spawn prompt in Captain scratchpad §"Week W17 — Weekly Ops spawn prompt" |
+| Specialist (External Ops) | EXT-OPS-001 | EXT-OPS-001 | 2026-04-18 | prep complete; awaits user inputs then closes dormant | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟡 Prep done, awaits user GO on 3 placeholders (LinkedIn URL, Stripe acct ID, Supabase Pro decision) |
+
+### Retired sessions (within last rotation)
+
+| Layer | Chat | Task ID | Retired | Outcome |
+|---|---|---|---|---|
+| Main (pre-Captain-architecture) | MAIN-ongoing | MAIN-ongoing | 2026-04-18 | Orchestrator retired after writing handoff at `active/2026-04-20-captain-handoff.md`. |
 
 ---
 
