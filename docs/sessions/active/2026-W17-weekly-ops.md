@@ -126,8 +126,9 @@ _(to be filled — end with Friday Handoff section below)_
 
 | Specialist | Task ID | Template | Dispatched | Closed | Status | Scratchpad |
 |---|---|---|---|---|---|---|
-| Frontend QA | FE-QA-001 | frontend-qa.md | _(pending — Tue/Wed)_ | — | 📅 queued | _(to be created at dispatch: `docs/sessions/active/2026-04-2X-frontend-qa-FE-QA-001.md`)_ |
-| Testing | TEST-001 | testing.md | _(pending — Thu/Fri)_ | — | 📅 queued | _(to be created at dispatch: `docs/sessions/active/2026-04-2X-testing-TEST-001.md`)_ |
+| Frontend QA | FE-QA-001 | frontend-qa.md | _(pending — Tue AM)_ | — | 📅 queued + pre-dispatch scratchpad ready | `docs/sessions/active/2026-04-21-frontend-qa-FE-QA-001.md` (pre-created 2026-04-20 PM, spawn prompt embedded inside) |
+| Ops (Telegram) | OPS-001 | ops.md | _(pending — Wed PM post-FE-QA close)_ | — | 📅 queued + pre-dispatch scratchpad ready | `docs/sessions/active/2026-04-22-ops-OPS-001.md` (pre-created 2026-04-20 PM, spawn prompt + user prerequisites @BotFather inside) |
+| Testing | TEST-001 | testing.md | _(pending — Thu AM post-OPS-001 close)_ | — | 📅 queued + pre-dispatch scratchpad ready | `docs/sessions/active/2026-04-23-testing-TEST-001.md` (pre-created 2026-04-20 PM, spawn prompt embedded inside) |
 
 Siblings active at spawn (not dispatched by me):
 - **Captain** CAPTAIN-2026-04 (strategic; not counted as Specialist).
@@ -149,6 +150,179 @@ Queued for next week (per Captain):
 ## Blockers / escalations opened this week
 
 _(none yet — Monday spawn)_
+
+---
+
+## 📦 Ready-to-use assets for W17 (prepped 2026-04-20 afternoon by Weekly Ops)
+
+> User ("Costin") explicitly asked Weekly Ops to front-load all autonomous prep on Monday so Tue-Fri = execution + unexpected-handling. These assets are copy-paste ready — user executes with zero prep friction.
+
+### 📅 Day-by-day week plan
+
+| Day | User does (~30-90 min each) | Weekly Ops does (autonomous) | Specialist active | Cap |
+|---|---|---|---|---|
+| **Mon 2026-04-20** ✅ DONE | Supabase Pro upgrade, migration 010 run, paste EXT-OPS-001 inputs | Monday critical path close, pre-dispatch scratchpads for FE-QA/TEST/OPS, prep assets batch | EXT-OPS-001 closed dormant | 2/3 |
+| **Tue 2026-04-21** | Paste FE-QA-001 spawn prompt → new Claude Code chat (morning). Start 6 DPAs + 6 startup apps from kit (~2-3h at own pace) | Verify first `ops-check-cron` green tick, monitor FE-QA progress, update TRACKER on FE-QA spawn + close | **FE-QA-001** (mobile 375 + a11y pass Steps 1–14) | 3/3 |
+| **Wed 2026-04-22** | 10-min BotFather + GitHub secrets setup (for OPS-001 — see Asset 5), paste OPS-001 spawn prompt mid-day after FE-QA closes. Execute Perplexity handoff if Captain produces one | Relay Captain's Perplexity topic, monitor OPS-001, file research result at `docs/research/2026-04-22-perplexity-<topic>.md` | **FE-QA-001** (closes mid-day) → **OPS-001** (Telegram notifications layer, ~90 min) | 3/3 serial |
+| **Thu 2026-04-23** | Paste TEST-001 spawn prompt → new chat (morning). Continue DPA replies triage if vendors reply | Monitor TEST-001, verify Telegram notifications working (4+ cron ticks by now) | **TEST-001** (Playwright E2E auth + Stripe mock + CloudSync coverage) | 3/3 |
+| **Fri 2026-04-24** | Close any user-blockers, verify Vercel DPA archived (real deadline 2026-04-25), reply to any specialist questions | Close TEST-001 coordination, write Friday Handoff to Captain (§section below), close WEEK-2026-W17 | TEST-001 (closes mid/late) | 3/3 → 2/3 |
+
+### 📧 Asset 1 — Accountant email (RO, ready to send)
+
+**To**: contabila pentru MCA SRL
+**Subject**: `MCA SRL — 3 întrebări rapide pentru setup intrare săptămâna asta`
+
+```
+Bună [Nume],
+
+Pregătim lansarea publică ModulCA pe 1 mai și vreau să finalizez setup-ul
+administrativ pentru MCA SRL. 3 întrebări rapide dacă ai 5 min:
+
+1. Semnătură Calificată / SPV:
+   Ai deja certificat digital calificat propriu (de la alți clienți)?
+   Dacă da, aș prefera să semnăm împuternicire SPV pe MCA SRL (formular
+   ANAF 150) ca tu să depui declarațiile în numele firmei, nu să
+   cumpăr un certificat nou pe firmă. Cost MCA SRL: 0 lei vs ~200 lei
+   dacă trebuie certificat separat.
+
+2. Istoric VIES — MCA SRL:
+   Am verificat astăzi VIES pentru RO35294600 și a întors "invalid for
+   cross-border transactions" — deci firma nu e (sau nu mai e) înregistrată
+   pentru operațiuni intracomunitare.
+   a. A fost MCA SRL vreodată înregistrată (cod TVA intracomunitar
+      activ pe VIES)?
+   b. Dacă da, când s-a inactivat și de ce (inactivitate 12 luni /
+      non-conformitate / cerere voluntară)?
+   c. Poți să depui formular ANAF 098 pentru re-activare (sau prima
+      activare, după caz)? Am mai multe SaaS-uri străine (Supabase,
+      Stripe, Vercel, Sentry, Resend) care îmi facturează 19% VAT
+      extra lunar — reverse charge intracomunitar ar însemna ~€300-500
+      economie/an.
+
+3. App de facturare preferată:
+   Vrem să emitem primele facturi MCA SRL în săptămânile următoare
+   (clienți + consultanță + primele conversii ModulCA). Obligatoriu
+   cu integrare e-Factura / SPV. Opțiuni pe care le-am în vedere:
+   - Oblio (free tier generos)
+   - FGO / facturis.ro (free 25 facturi/lună)
+   - SmartBill (~50 RON/lună, cel mai popular cu contabilii)
+
+   Ce preferi tu? Mă aliniez la alegerea ta ca să poți deschide direct
+   fișierul firmei când vine vremea bilanțului.
+
+Context scurt: MCA SRL va avea primele încasări prin Stripe (abonamente
+€19.99 / €49.99 / €149.90) începând probabil cu luna iunie (bank verification
+Stripe încă în proces). Până atunci, plățile spre furnizori externe le fac
+din card personal — va trebui să discutăm decont asociat / împrumut asociat
+la momentul potrivit.
+
+Mulțumesc mult pentru răspuns!
+
+Costin Muraru
+Founder & CEO
+ATELIER DE PROIECTARE MCA S.R.L.
+CUI RO35294600 | J40/14760/2015
+Str. Lacul Plopului nr. 10, Sector 5, București 051735
+costin@modulca.eu | modulca.eu
+```
+
+**How to send**: copy above text → Gmail → New compose → to: your contabila email → send. Reply arrives in 1-3 days typically. Relay to me in this chat and I log findings + update Captain queue accordingly.
+
+### ✅ Asset 2 — DPA + Startup app execution checklist (flat, ordered, ~2h total)
+
+From `docs/pitch/vendor-dpa-emails.md` + `docs/pitch/startup-programs-applications.md` (already 100% send-ready post fe6b88d):
+
+**Batch A — 4 DPAs via dashboard self-serve (~20 min total)**
+
+| # | Vendor | URL | Values to confirm in form | Download |
+|---|---|---|---|---|
+| 1 | Stripe | https://dashboard.stripe.com/settings/legal | Entity: ATELIER DE PROIECTARE MCA S.R.L. | Signed DPA PDF |
+| 2 | Sentry | https://sentry.io/settings/modulca/legal/ | Same | Signed DPA PDF |
+| 3 | Vercel | https://vercel.com/teams/uiiacgsauto-8044s-projects/settings/billing → Legal | Same | Signed DPA PDF |
+| 4 | Microsoft Clarity | Dashboard → Data Protection tab | Configure masking/consent + download Microsoft DPA PDF | DPA PDF |
+
+→ Save all 4 PDFs to `~/Documents/modulca-business/legal/dpa/DPA-<vendor>-2026-04-20.pdf` (outside git).
+
+**Batch B — 2 DPAs via email (~15 min, reply window starts)**
+
+| # | Vendor | From | To | Body source |
+|---|---|---|---|---|
+| 5 | Supabase | costin@modulca.eu | support@supabase.com (cc privacy@supabase.com) | `docs/pitch/vendor-dpa-emails.md` §1 |
+| 6 | Resend | costin@modulca.eu | support@resend.com | `docs/pitch/vendor-dpa-emails.md` §3 |
+
+→ Open kit file → copy body → paste → send. Replies typically 3-7 days.
+
+**Batch C — 6 startup apps (~2h, can split across Tue + Thu)**
+
+| Order | Program | URL | Kit section | Time |
+|---|---|---|---|---|
+| 1 | Microsoft Founders Hub | https://startups.microsoft.com/signup | §3 | 20 min |
+| 2 | Supabase for Startups | https://supabase.com/startups | §8 | 15 min (**Pro confirmed — eligible**) |
+| 3 | Vercel for Startups | https://vercel.com/startups | §7 | 15 min |
+| 4 | Figma for Startups | https://www.figma.com/community/startup-program | §9 | 15 min |
+| 5 | Together.ai Startup | https://www.together.ai/forms/startup-program | §4 | 15 min |
+| 6 | Anthropic Startup | https://www.anthropic.com/startups | §6 | 20 min |
+
+→ Open kit file → each program has pre-filled answer table (Field → Answer) → paste answers into form → submit.
+
+→ After each submission, append to kit's §Submission Log: `# | Program | Date | Reference email | Status: submitted | Credit TBD | Expiry TBD | Notes`
+
+### 🗄️ Asset 3 — Migration 009 paste-ready (when user has 2 min)
+
+From TRACKER §Blockers: "Migration 009 run in Supabase Dashboard | User (SQL Editor) | db:analyze script | When user has 2 min".
+
+**File**: `supabase/migrations/009_query_analyzer_rpc.sql` is already correctly structured (no forward-FK bug unlike 010). Paste as-is.
+
+**Instructions**:
+1. Open https://supabase.com/dashboard/project/_/sql/new → select ModulCA Project / main
+2. Open file `supabase/migrations/009_query_analyzer_rpc.sql` locally → Ctrl+A → Ctrl+C
+3. Paste into SQL Editor → Run
+4. Expected: `Success. No rows returned.` (creates pg_stat_statements extension + 6 analyzer functions, all service_role gated)
+5. Verify: `select routine_name from information_schema.routines where routine_schema='public' and routine_name like 'analyzer_%';` → should return 6 rows (analyzer_slow_queries, analyzer_frequent_queries, analyzer_db_health, analyzer_unused_indexes, analyzer_table_sizes, analyzer_reset_stats)
+
+Unblocks `npm run db:analyze` for performance monitoring. Nice-to-have before launch; not blocking May 1.
+
+### 🔍 Asset 4 — 3 candidate Perplexity topics for Captain's mid-week handoff
+
+Captain produces the final choice; these are 3 ranked candidates covering different strategic angles:
+
+**Topic A — Accounting SaaS for RO pre-revenue SRL + contabil onboarding** ⭐ recommended
+Query: *"For a pre-revenue Romanian SRL (single administrator, solo founder, first invoices within 60 days), compare Oblio vs FGO vs SmartBill for e-Factura + SPV integration, monthly cost, accountant compatibility, and 12-month scalability. Cite Romanian freelance accountant community recommendations from 2025-2026."*
+Rationale: directly actionable, cheap, unblocks accountant engagement within days.
+
+**Topic B — EU Civil Protection Mechanism 2026-Q3/Q4 calls for urban-resilience + construction-tech consortia** (Captain's original suggestion)
+Query: *"List all EU Civil Protection Mechanism and Horizon Europe calls open or opening 2026-Q3/Q4 that accept Romanian SME+NGO consortia with focus on urban resilience, modular construction, or crisis-management tech. For each: deadline, funding ceiling, consortium requirements, typical first-time applicant success rate."*
+Rationale: opens grant funding pipeline for MCA SRL + UII ONG dual structure (per ECOSYSTEM_ARCHITECTURE.md).
+
+**Topic C — Monetization patterns for vertical-SaaS with Supabase headroom** (from user's Monday question)
+Query: *"For a modular-construction-design SaaS (RO/EU market, pre-launch) moving from Supabase Free to Pro, what Supabase-backed premium features consistently drive tier-upgrade conversions in comparable vertical-SaaS plays (archicad-style tools, Procore-style, housebuilder CRMs)? Prioritize features that monetize DB headroom, storage, bandwidth, or edge functions specifically. Cite revenue data / case studies from 2024-2026."*
+Rationale: ties back to user's Monday strategic question; Captain may delegate this to a future Audit Specialist instead of Perplexity.
+
+→ Captain picks one → paste `▶ PERPLEXITY HANDOFF` block (format per `docs/TOOLS_INTEGRATION.md` §Tool 1) → user runs → result filed at `docs/research/2026-04-22-perplexity-<slug>.md`.
+
+### 📱 Asset 5 — BotFather / GitHub secrets quick-guide (for OPS-001 pre-dispatch)
+
+Full details in `docs/sessions/active/2026-04-22-ops-OPS-001.md` §Pre-Dispatch; here's the 10-min compact version:
+
+1. Telegram → search `@BotFather` → `/newbot` → name: `ModulCA Monitoring`, username: `modulca_monitor_bot` (or similar). Save the HTTP API token.
+2. Open the new bot → send `/start`. In browser: `https://api.telegram.org/bot<TOKEN>/getUpdates` → copy `"chat":{"id":<NUMBER>}`.
+3. https://github.com/TCSN161/modulca/settings/secrets/actions → New repository secret:
+   - `TELEGRAM_BOT_TOKEN` = the token from step 1
+   - `TELEGRAM_CHAT_ID` = the chat id from step 2
+4. Tell me "BotFather done" → I give you OPS-001 spawn prompt Wed PM.
+
+### 🧠 Skills / automation to activate this week (my proposals)
+
+Claude Code has built-in skills that could reduce friction for the week. I can invoke these autonomously if you say "go"; otherwise they queue as optional.
+
+| Skill | What it does | ROI this week | Scope risk |
+|---|---|---|---|
+| `less-permission-prompts` | Scans recent transcripts for common read-only Bash/MCP tool calls, adds allowlist to `.claude/settings.json` → reduces permission prompts for all chats | 🟢 High — every chat Tue-Fri benefits (FE-QA, OPS, TEST) | ⚠️ Modifies `.claude/settings.json`; not clearly my scope per PARALLEL_SESSIONS §3. Needs your "go". |
+| `consolidate-memory` | Reviews memory files, merges duplicates, prunes stale index entries | 🟡 Medium — keeps memory lean for Captain rotation end-April | 🟢 Low — operates only on user memory (~/.claude/projects/.../memory/) |
+| `schedule` | Creates a cron-style task to run a prompt on interval | 🟡 Medium — could auto-check `ops-check-cron` tick status daily | 🟢 Low — scheduled tasks are additive |
+| `security-review` | Complete security review of current branch changes | 🔴 NOT for W17 — would overlap with FE-QA scope and duplicate audit-specialist work | n/a |
+
+**Recommendation**: I activate `less-permission-prompts` + `consolidate-memory` this week if you approve (5 min total). `schedule` is nice-to-have but can wait. `security-review` = skip for W17, defer to post-launch audit cadence.
 
 ---
 

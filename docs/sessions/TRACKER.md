@@ -29,10 +29,13 @@ These are queued — spawn in order as blockers clear and capacity allows.
 
 | Priority | Chat type | Template | Blocking condition | Why |
 |---|---|---|---|---|
-| 🟡 P1 | Content & SEO | `content-seo.md` | After DPA replies start returning | Translate top 10 KB articles to RO (infra ready) + publish 5 RO blog drafts + OG images |
-| 🟡 P1 | Frontend QA | `frontend-qa.md` | Pre-launch final week | A11y pass, keyboard nav StepNav, focus management modals, mobile 375px final audit |
-| 🟡 P1 | Testing | `testing.md` | Pre-launch final week | Playwright E2E for auth + Stripe flows, edge cases, coverage boost |
+| 🔴 P0 (W17) | Frontend QA | `frontend-qa.md` | Tue 2026-04-21 AM — pre-dispatch scratchpad ready at `active/2026-04-21-frontend-qa-FE-QA-001.md` | Pre-launch mobile 375 + a11y pass Steps 1–14 |
+| 🔴 P0 (W17) | Ops (Telegram bot) | `ops.md` | Wed 2026-04-22 PM post-FE-QA close — pre-dispatch scratchpad ready at `active/2026-04-22-ops-OPS-001.md` | AUTONOMOUS_AGENT Stage 1 remaining: Telegram notification layer (commands deferred to OPS-003 W18) |
+| 🔴 P0 (W17) | Testing | `testing.md` | Thu 2026-04-23 AM post-OPS-001 close — pre-dispatch scratchpad ready at `active/2026-04-23-testing-TEST-001.md` | Playwright E2E auth + Stripe mock + CloudSync coverage, launch-week regression moat |
+| 🟡 P1 | Content & SEO | `content-seo.md` | After DPA replies start returning (W18+) | Translate top 10 KB articles to RO + publish 5 RO blog drafts + OG images |
+| 🟡 P1 | External Ops | `external-ops.md` | EXT-OPS-002 triggers when ≥3 DPAs return signed (W18 likely) | Batch-process DPA replies + Stripe Climate email (now unblocked post fe6b88d with acct_id) |
 | 🟢 P2 | Ops (Stripe go-live) | `ops.md` | After bank verification clears | Run `npm run stripe:go-live` cutover + verify webhooks + sync Vercel |
+| 🟢 P2 | Ops (Migration 010 FK fix) | `ops.md` | OPS-002, after OPS-001 closes, before any fresh-DB spin-up ever runs 010 again | Canonical `supabase/migrations/010_monitoring_signals.sql:44` has forward-FK bug; needs reorder |
 | 🟢 P2 | Architect Tools | `architect-tools.md` | Post-beta | Step 14 UX polish, DfMA workflow, client dashboard features |
 | 🟢 P3 | Audit (quarterly) | `audit.md` | Quarterly cadence | Security sweep + GDPR recheck + perf profile |
 
@@ -52,7 +55,10 @@ Keep newest-first. Include outcome summary + lessons so future chats benefit.
 
 Accumulate non-obvious findings here. Any chat should skim this section at spawn.
 
-- _(none yet — first entry will appear after first external-ops session closes)_
+- **2026-04-20 (EXT-OPS-001 handoff)** — **Specialist continuity survives a chat-session break if commits are clean.** User couldn't re-open original EXT-OPS-001 chat (from 2026-04-18); spawned a fresh Claude Code chat with the scratchpad path as first context. Commit `fe6b88d` landed on master cleanly. Lesson: trust the git log + scratchpad protocol over chat-memory preservation. The architecture is antifragile by design here — don't over-engineer chat persistence.
+- **2026-04-20 (Monday session-2 rebase)** — **Stash-and-rebase protocol works when peer chats push concurrently.** EXT-OPS-001 pushed `fe6b88d` while Weekly Ops had uncommitted scratchpad edits. Stashed scratchpad + `.claude/` stray deletions separately, rebased onto origin/master (fast-forward clean, no code conflicts because files didn't overlap), popped scratchpad. Zero data loss. Pattern to repeat when multiple chats commit within same hour.
+- **2026-04-20 (Migration 010 FK forward-reference bug)** — **Always read a new migration top-to-bottom before running, even if marked idempotent.** File `supabase/migrations/010:44` referenced `public.incidents(id)` before the `incidents` table was created at line 71. Fresh-DB run would fail. Workaround: extract the `incidents` CREATE block, run it first, then the full file — idempotent `if not exists` handles the re-create cleanly. Flagged for OPS-002 to fix the canonical file properly.
+- **2026-04-20 (Monday autonomous prep pattern established)** — **User asked Weekly Ops to front-load all autonomous-possible work on Monday so Tue-Fri can focus on execution + unexpected.** Weekly Ops produced: 3 pre-dispatch scratchpads (FE-QA-001, OPS-001, TEST-001) each with full spawn prompt inside; 5 ready-to-use assets (accountant email, DPA/startup checklist, migration 009 paste, Perplexity candidates, BotFather guide); skills proposal. Pattern to repeat weekly: **Monday = prep batch; Tue-Fri = dispatch + assist.**
 
 ---
 
