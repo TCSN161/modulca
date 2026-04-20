@@ -83,7 +83,14 @@
       "Write(supabase/migrations/011_*.sql)",
       "Write(supabase/migrations/012_*.sql)",
       "Write(.github/workflows/ops-check-cron.yml)",
-      "Write(.github/workflows/monitor-*.yml)"
+      "Write(.github/workflows/monitor-*.yml)",
+      "Bash(pushd *)",
+      "Bash(tasklist *)",
+      "mcp__Claude_in_Chrome__tabs_context_mcp",
+      "mcp__Claude_Preview__preview_snapshot",
+      "mcp__Claude_Preview__preview_console_logs",
+      "mcp__Claude_Preview__preview_logs",
+      "mcp__Claude_Preview__preview_screenshot"
     ],
     "deny": [
       "Bash(git push --force*)",
