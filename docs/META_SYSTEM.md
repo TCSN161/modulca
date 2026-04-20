@@ -117,6 +117,20 @@ See `docs/TOOLS_INTEGRATION.md` for each tool's specifics.
 
 ---
 
+## 🔤 Naming convention
+
+**Full reference**: `docs/sessions/README.md` §Naming convention (single source of truth).
+
+Quick summary:
+- **Task IDs**: `CAPTAIN-YYYY-MM`, `WEEK-YYYY-Www`, `EXT-OPS-NNN`, `CONTENT-NNN`, `FE-QA-NNN`, `TEST-NNN`, `ARCH-NNN`, `AUDIT-NNN`, `OPS-NNN`, `BUG-NNN`.
+- **Scratchpads**: `docs/sessions/active/YYYY-MM-DD-<role>-<taskid>.md` (Weekly Ops uses `YYYY-Www-weekly-ops.md`).
+- **Commits**: `chore(<layer>): <summary>` where `<layer>` = `captain` / `weekly-ops` / `ext-ops` / `content` / `fe-qa` / `test` / `arch` / `audit` / `ops` / `bug-fix` / `session` / `tracker` / `config`.
+- **Research outputs**: `docs/research/YYYY-MM-DD-<tool>-<topic>.md`.
+
+Consistency is how any chat (and any future human) knows what a file is without opening it.
+
+---
+
 ## 📂 File structure (what's where)
 
 ```

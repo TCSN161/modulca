@@ -111,6 +111,90 @@ From `docs/PARALLEL_SESSIONS.md` and the ecosystem architecture principles:
 
 ---
 
+## 🔤 Naming convention (single source of truth)
+
+Every artifact produced by a chat follows these patterns. **Consistency here is how any chat (or any human) can instantly see what a file is, who owns it, and when it was made.**
+
+### Task IDs (what goes in TRACKER + spawn prompt)
+
+| Layer | Template | Task ID format | Example | Notes |
+|---|---|---|---|---|
+| Captain | `captain.md` | `CAPTAIN-YYYY-MM` | `CAPTAIN-2026-04` | One per month. Month = rotation period. |
+| Weekly Ops | `weekly-ops.md` | `WEEK-YYYY-Www` | `WEEK-2026-W17` | ISO week number. One per Mon-Fri. |
+| External Ops | `external-ops.md` | `EXT-OPS-NNN` | `EXT-OPS-001` | Incremental. Next = max in TRACKER + 1. |
+| Content & SEO | `content-seo.md` | `CONTENT-NNN` | `CONTENT-001` | Incremental. |
+| Frontend QA | `frontend-qa.md` | `FE-QA-NNN` | `FE-QA-001` | Incremental. |
+| Testing | `testing.md` | `TEST-NNN` | `TEST-001` | Incremental. |
+| Architect Tools | `architect-tools.md` | `ARCH-NNN` | `ARCH-001` | Incremental. |
+| Audit | `audit.md` | `AUDIT-NNN` | `AUDIT-001` | Incremental. |
+| Ops (EXCLUSIVE) | `ops.md` | `OPS-NNN` | `OPS-001` | Incremental. Only one active ever. |
+| Bug fix | `bug-fix.md` | `BUG-NNN` | `BUG-001` | Incremental. |
+
+### Scratchpad filenames (in `docs/sessions/active/`)
+
+Pattern: **date or period → role → task ID**. Sortable by date, groupable by role, unique per task.
+
+| Type | Filename | Example |
+|---|---|---|
+| Captain session | `YYYY-MM-DD-captain-YYYY-MM.md` | `2026-04-20-captain-2026-04.md` |
+| Captain handoff | `YYYY-MM-DD-captain-handoff.md` | `2026-04-30-captain-handoff.md` |
+| Weekly Ops week | `YYYY-Www-weekly-ops.md` | `2026-W17-weekly-ops.md` |
+| External Ops | `YYYY-MM-DD-external-ops-EXT-OPS-NNN.md` | `2026-04-18-external-ops-EXT-OPS-001.md` |
+| Content & SEO | `YYYY-MM-DD-content-seo-CONTENT-NNN.md` | `2026-04-22-content-seo-CONTENT-001.md` |
+| Frontend QA | `YYYY-MM-DD-frontend-qa-FE-QA-NNN.md` | `2026-04-23-frontend-qa-FE-QA-001.md` |
+| Testing | `YYYY-MM-DD-testing-TEST-NNN.md` | `2026-04-24-testing-TEST-001.md` |
+| Architect Tools | `YYYY-MM-DD-architect-tools-ARCH-NNN.md` | `2026-04-25-architect-tools-ARCH-001.md` |
+| Audit | `YYYY-MM-DD-audit-AUDIT-NNN.md` | `2026-04-26-audit-AUDIT-001.md` |
+| Ops | `YYYY-MM-DD-ops-OPS-NNN.md` | `2026-04-27-ops-OPS-001.md` |
+| Bug fix | `YYYY-MM-DD-bug-fix-BUG-NNN.md` | `2026-04-28-bug-fix-BUG-001.md` |
+
+Notes:
+- **Dates in EET** (Europe/Bucharest). User's timezone — consistency matters when cross-referencing commits.
+- **Captain handoff has no task ID suffix** — only one is current per rotation, the date uniquely identifies it.
+- **Weekly Ops uses ISO week** (`Www`), not a calendar date — one file spans Mon-Fri.
+- **Specialist scratchpads use spawn date** (not close date) so the file sorts with the session's actual start.
+
+### Commit message prefixes
+
+| Prefix | Scope | Who commits | Example |
+|---|---|---|---|
+| `feat(<area>):` | New feature / capability | Weekly Ops or Specialist | `feat(i18n): migrate pricing page to RO+EN` |
+| `fix(<area>):` | Bug fix | Specialist (bug-fix or inline) | `fix(auth): session timeout race condition` |
+| `docs(<area>):` | Documentation | Captain or any | `docs(meta): update decision log for April` |
+| `chore(captain):` | Captain maintenance | Captain only | `chore(captain): week-close 2026-W17` |
+| `chore(weekly-ops):` | Weekly Ops standup | Weekly Ops only | `chore(weekly-ops): Tuesday standup — EXT-OPS unblocked` |
+| `chore(ext-ops):` | External Ops work | External Ops Specialist | `chore(ext-ops): DPA emails sent to 4 vendors` |
+| `chore(content):` | Content & SEO work | Content Specialist | `chore(content): 3 KB articles translated RO` |
+| `chore(fe-qa):` | Frontend QA work | Frontend QA Specialist | `chore(fe-qa): a11y pass on Steps 1-7` |
+| `chore(test):` | Testing work | Testing Specialist | `chore(test): Playwright E2E for auth flow` |
+| `chore(arch):` | Architect Tools work | Architect Specialist | `chore(arch): DfMA checklist UX polish` |
+| `chore(audit):` | Audit findings | Audit Specialist | `chore(audit): Q2 security sweep report` |
+| `chore(ops):` | Production ops | Ops Specialist | `chore(ops): Stripe test→live cutover OPS-001` |
+| `chore(bug-fix):` | Bug-fix session | Bug-Fix Specialist | `chore(bug-fix): step 14 infinite loop BUG-007` |
+| `chore(session): close` | Closing a session | Any (end-of-session) | `chore(session): close EXT-OPS-001 — 4 DPAs sent` |
+| `chore(tracker):` | TRACKER.md update | Any | `chore(tracker): spawn WEEK-2026-W17` |
+| `chore(config):` | Settings / tooling | Any | `chore(config): extend allow list for ops` |
+
+Linking commits to sessions: include `→ unblocks <task-id>` in the commit body (not title) when A finishes work that B was waiting on. Grep-friendly.
+
+### Research / tool outputs (from `docs/TOOLS_INTEGRATION.md`)
+
+| Type | Filename | Example |
+|---|---|---|
+| Perplexity research | `docs/research/YYYY-MM-DD-<topic-slug>.md` | `docs/research/2026-04-22-nl-modular-permits.md` |
+| NotebookLM synthesis | `docs/research/YYYY-MM-DD-notebooklm-<topic>.md` | `docs/research/2026-04-25-notebooklm-dpa-synthesis.md` |
+| Codex CLI review | `docs/research/YYYY-MM-DD-codex-<scope>.md` | `docs/research/2026-04-27-codex-stripe-golive.md` |
+| Grok trend scan | `docs/research/YYYY-MM-DD-grok-<query>.md` | `docs/research/2026-05-01-grok-launch-sentiment.md` |
+| Claude Design mockup | `docs/design/YYYY-MM-DD-<artifact>.md` + images | `docs/design/2026-04-29-one-pager-v3.md` |
+
+Why this matters: research accumulates fast. Without a consistent filename, finding "that Perplexity query about NL permits from 3 weeks ago" becomes archaeology.
+
+### Memory files (at `~/.claude/projects/.../memory/`)
+
+Already follow a clean `<kind>_<subject>.md` pattern (`user_costin.md`, `project_modulca.md`, `principle_modular_i18n.md`, `feedback_autonomy.md`). Don't rename these; they're referenced across chats.
+
+---
+
 ## 💬 Communication between chats
 
 Chats **cannot** talk directly. Communication is file-based:
