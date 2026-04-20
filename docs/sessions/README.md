@@ -1,8 +1,27 @@
-# Session System — Parallel Chat Coordination
+# Session System — 3-Layer Captain Architecture
 
-> **Purpose**: keep parallel Claude Code chats coherent, trackable, non-destructive.
+> **Purpose**: keep parallel Claude Code chats coherent, trackable, non-destructive across months of work.
 > **Anchor**: this folder is the single source of truth for how sessions start, run, and hand off.
+> **Architecture**: see `docs/META_SYSTEM.md` for the 3-Layer Captain model (Captain → Weekly Ops → Specialists).
 > **Companion**: `docs/PARALLEL_SESSIONS.md` for full protocol; this README is the quick-start.
+> **External AI tools**: see `docs/TOOLS_INTEGRATION.md` for Perplexity / NotebookLM / Codex / Grok / Claude Design / Manus handoff protocols.
+
+---
+
+## 🏗️ The 3-Layer model (at a glance)
+
+```
+┌──────────────────────────────────────────────────┐
+│ CAPTAIN     — strategic, 1 active, ~monthly      │
+│ WEEKLY OPS  — sprint exec, 1 active, Mon→Fri     │
+│ SPECIALISTS — deep focus, ≤1 active, task-life   │
+└──────────────────────────────────────────────────┘
+         + external AI tools as sub-agents
+```
+
+Hard cap: **3 concurrent Claude Code chats** (Captain + Weekly Ops + at most 1 Specialist).
+
+Full detail in `docs/META_SYSTEM.md`. Every new chat reads `META_SYSTEM.md` at spawn.
 
 ---
 
@@ -13,16 +32,21 @@ docs/sessions/
 ├── README.md                       # You are here
 ├── TRACKER.md                      # Live state of all sessions (past, active, planned)
 ├── templates/                      # Copy-paste spawn prompts per chat type
+│   ├── captain.md                  # 🆕 Captain — strategic coordinator (monthly)
+│   ├── weekly-ops.md               # 🆕 Weekly Ops — sprint execution (Mon-Fri)
 │   ├── external-ops.md             # DPA outreach, Startup apps, CSR, partnerships
 │   ├── content-seo.md              # Translations, blog, SEO content, OG images
 │   ├── frontend-qa.md              # Mobile, a11y, UX polish, keyboard nav
 │   ├── testing.md                  # E2E Playwright, unit coverage, edge cases
 │   ├── architect-tools.md          # Step 14 (Architect), DfMA, client dashboard
 │   ├── audit.md                    # Read-only security/perf/GDPR audits
-│   ├── ops.md                      # Tech ops: Stripe live, Vercel, env, migrations
+│   ├── ops.md                      # Tech ops: Stripe live, Vercel, env, migrations (EXCLUSIVE)
 │   └── bug-fix.md                  # Generic bug-fix template
 └── active/                         # Per-session scratchpads (one file per run)
-    └── YYYY-MM-DD-<role>-<taskid>.md
+    ├── YYYY-MM-DD-captain-<YYYYMM>.md            # Captain session scratchpads
+    ├── YYYY-MM-DD-captain-handoff.md             # Captain rotation handoffs
+    ├── YYYY-Www-weekly-ops.md                    # Weekly Ops week scratchpad
+    └── YYYY-MM-DD-<specialist-role>-<taskid>.md  # Specialist scratchpads
 ```
 
 ---
@@ -71,16 +95,19 @@ From `docs/PARALLEL_SESSIONS.md` and the ecosystem architecture principles:
 
 ## 🎯 Template selection matrix
 
-| Your goal | Template | Typical duration |
-|---|---|---|
-| Send DPA emails, apply to startup programs, CSR outreach | `external-ops.md` | 1-3h |
-| Translate content, publish blog, SEO metadata, OG images | `content-seo.md` | 2-6h |
-| Mobile responsive fixes, a11y pass, UX polish | `frontend-qa.md` | 2-6h |
-| Playwright E2E, unit coverage gaps, edge cases | `testing.md` | 2-4h |
-| Step 14 (Architect) features, DfMA checklist, client dashboard | `architect-tools.md` | 4-8h |
-| Security sweep, perf profiling, GDPR audit (READ ONLY) | `audit.md` | 1-3h |
-| Stripe live cutover, Vercel env sync, CI changes (exclusive!) | `ops.md` | 15 min - 2h |
-| Fix specific bug + add regression test | `bug-fix.md` | 30 min - 3h |
+| Your goal | Template | Layer | Typical duration |
+|---|---|---|---|
+| Start a new Captain rotation (monthly) | `captain.md` | Captain | ~1 month lifespan |
+| Start a new week (Monday) | `weekly-ops.md` | Weekly Ops | Mon→Fri |
+| Send DPA emails, apply to startup programs, CSR outreach | `external-ops.md` | Specialist | 1-3h |
+| Translate content, publish blog, SEO metadata, OG images | `content-seo.md` | Specialist | 2-6h |
+| Mobile responsive fixes, a11y pass, UX polish | `frontend-qa.md` | Specialist | 2-6h |
+| Playwright E2E, unit coverage gaps, edge cases | `testing.md` | Specialist | 2-4h |
+| Step 14 (Architect) features, DfMA checklist, client dashboard | `architect-tools.md` | Specialist | 4-8h |
+| Security sweep, perf profiling, GDPR audit (READ ONLY) | `audit.md` | Specialist | 1-3h |
+| Stripe live cutover, Vercel env sync, CI changes (EXCLUSIVE!) | `ops.md` | Specialist | 15 min - 2h |
+| Fix specific bug + add regression test | `bug-fix.md` | Specialist | 30 min - 3h |
+| External AI research / doc synthesis / code review / trend scan | see `docs/TOOLS_INTEGRATION.md` | sub-agent | varies |
 
 ---
 
@@ -125,13 +152,17 @@ See `docs/PARALLEL_SESSIONS.md` §4.5 for full recovery protocol.
 ## 📖 Reading order for any new chat
 
 Every new chat reads these in order at spawn:
-1. `docs/sessions/README.md` (this file)
-2. `docs/PARALLEL_SESSIONS.md` (full protocol)
-3. `docs/ECOSYSTEM_ARCHITECTURE.md` (what we're building + legal entities)
-4. `docs/TASK_MASTER.md` (what's planned, what's done)
-5. `docs/sessions/TRACKER.md` (live state)
-6. Its own template file
-7. Last 2-3 entries in `docs/sessions/active/` for context
+1. `docs/META_SYSTEM.md` (the 3-layer architecture + golden rules)
+2. `docs/sessions/README.md` (this file)
+3. `docs/PARALLEL_SESSIONS.md` (full protocol)
+4. `docs/ECOSYSTEM_ARCHITECTURE.md` (what we're building + legal entities)
+5. `docs/TASK_MASTER.md` (what's planned, what's done)
+6. `docs/sessions/TRACKER.md` (live state)
+7. Its own template file
+8. For Captain: latest `active/<date>-captain-handoff.md`
+9. For Weekly Ops: latest `active/YYYY-Www-1-weekly-ops.md` (previous week)
+10. For Specialists: last 2-3 scratchpads in `active/` for context
+11. `docs/TOOLS_INTEGRATION.md` if the chat may need external AI tools
 
 That's ~20 min of reading, but reduces context-rebuild waste massively.
 

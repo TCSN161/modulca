@@ -1,6 +1,7 @@
 # Session Tracker
 
-> Live state of all Claude Code parallel sessions.
+> Live state of all Claude Code parallel sessions across the 3-Layer Captain Architecture.
+> Architecture: see `docs/META_SYSTEM.md`. Quickstart: see `docs/sessions/README.md`.
 > Update this every time a session starts, pauses, or ends.
 > **Hard cap: 3 active sessions.** Check this file before spawning anything new.
 
@@ -8,10 +9,12 @@
 
 ## 🟢 Active sessions (right now)
 
-| Chat | Task ID | Started | ETA | Scope | Status |
-|---|---|---|---|---|---|
-| Main (this chat) | MAIN-ongoing | 2026-04-16 | ongoing | Orchestrator + code changes | 🟢 Active |
-| External Ops & Partnerships | EXT-OPS-001 | 2026-04-18 | prep complete; awaits user input then multi-day outreach | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟡 Prep done, awaits user GO on 3 placeholders (LinkedIn URL, Stripe acct ID, Supabase Pro upgrade decision) |
+| Layer | Chat | Task ID | Started | ETA | Scope | Status |
+|---|---|---|---|---|---|---|
+| Captain | *(pending spawn)* | CAPTAIN-2026-04 | 2026-04-20 (planned) | ~2026-05 boundary | Strategic coordination | ⏳ Pending user to spawn via `templates/captain.md` |
+| Weekly Ops | *(pending spawn)* | WEEK-2026-W17 | 2026-04-20 (Mon) | 2026-04-24 (Fri) | Week of Apr 20-24 sprint | ⏳ Awaits Captain Monday brief |
+| Specialist (External Ops) | EXT-OPS-001 | EXT-OPS-001 | 2026-04-18 | prep complete; awaits user input then multi-day outreach | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟡 Prep done, awaits user GO on 3 placeholders (LinkedIn URL, Stripe acct ID, Supabase Pro decision) |
+| Main (old) | MAIN-ongoing | 2026-04-16 | RETIRING 2026-04-18 | Orchestrator (→ handed off to Captain) | 🔴 Retired 2026-04-18, handoff at `active/2026-04-20-captain-handoff.md` |
 
 ---
 
@@ -65,11 +68,12 @@ Tracking what's waiting on external / human-only actions.
 
 ## 📊 Quick stats
 
-- Active chats: 2 / 3 (cap)
-- Planned chats: 6
-- Past chats: 0 (tracking started today)
-- Current calendar week focus: pre-beta finalization
-- Days to beta launch: 13 (target 2026-05-01)
+- Active chats: 1 / 3 cap (EXT-OPS-001). Captain + Weekly Ops pending spawn on 2026-04-20.
+- Planned chats: 6 Specialist queues
+- Past chats: Main chat retired 2026-04-18 after handoff to Captain architecture
+- Current calendar week focus: pre-beta finalization, Captain architecture rollout
+- Days to beta launch: 11 (target 2026-05-01)
+- Architecture: 3-Layer Captain (see `docs/META_SYSTEM.md`) — first rotation spawns 2026-04-20
 
 ---
 
