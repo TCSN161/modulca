@@ -14,7 +14,7 @@
 [FOUNDER_FIRST_NAME]   = Costin
 [FOUNDER_LAST_NAME]    = Muraru
 [FOUNDER_EMAIL]        = costin@modulca.eu
-[FOUNDER_LINKEDIN]     = LINKEDIN_URL_PENDING  # user to provide before any submission
+[FOUNDER_LINKEDIN]     = https://www.linkedin.com/in/muraru-costin-93320bba/
 [COMPANY_LEGAL_NAME]   = ATELIER DE PROIECTARE MCA S.R.L.
 [COMPANY_SHORT_NAME]   = MCA SRL
 [COMPANY_VAT]          = RO35294600
@@ -284,7 +284,7 @@ Body: [Short pitch + "Use of credits" + traction bullets + polite ask for $10k�
 | Company | MCA SRL (ModulCA) |
 | Website | https://modulca.eu |
 | Supabase project ref | gtlldluonbtgjabokjfo |
-| Current plan | Free — **upgrade to Pro required before submission** (Startup Program prereq; see session scratchpad PENDING USER INPUT) |
+| Current plan | **Pro — eligible to apply now** (upgraded 2026-04-20; Tax ID RO35294600 on file; daily backups enabled). |
 | Stage | Pre-seed, public beta 1 May 2026 |
 | Pitch | [Use "Short description"] |
 | Supabase usage | Postgres (core schema: 60+ tables), Auth (email + OAuth), Storage (GLB 3D models, user uploads), Realtime (architect-buyer collab), pgvector (229-article RAG index for AI consultant), Edge Functions (AI engine orchestration). |
@@ -342,7 +342,7 @@ I'm Costin, founder of ModulCA — an AI-powered 14-step modular-home
 design SaaS launching public beta on 1 May 2026 from Romania.
 Legal entity: ATELIER DE PROIECTARE MCA S.R.L. (VAT RO35294600).
 
-We are already on Stripe (account STRIPE_ACCT_ID_PENDING) and shipping our first
+We are already on Stripe (account acct_1TLkh2F72yiHtCID) and shipping our first
 paid subscriptions (Free / EUR 19.99 / EUR 49.99 / EUR 149.90).
 I wanted to ask:
 
@@ -419,9 +419,11 @@ Expected approval timeline:
 
 | # | Program | Submission date (UTC) | Applicant name | Reference email | Status | Credit amount (if approved) | Expiry | Notes |
 |---|---|---|---|---|---|---|---|---|
-| — | — | — | — | — | — | — | — | _No submissions yet — awaits user GO + LinkedIn URL + (for Supabase) Pro upgrade + (for Stripe Climate) acct ID._ |
+| — | — | — | — | — | — | — | — | _No submissions yet — kit is 100% send-ready as of 2026-04-20 (LinkedIn URL, Stripe acct ID, Supabase Pro plan all confirmed)._ |
 
 ### Per-session breakdown
 
 **EXT-OPS-001 (2026-04-18)** — prep session, no submissions sent. Kit personalized, placeholders filled except `LINKEDIN_URL_PENDING` and `STRIPE_ACCT_ID_PENDING`. See `docs/sessions/active/2026-04-18-external-ops-EXT-OPS-001.md`.
+
+**EXT-OPS-001 closure (2026-04-20)** — all remaining placeholders filled: LinkedIn URL (`https://www.linkedin.com/in/muraru-costin-93320bba/`), Stripe acct ID (`acct_1TLkh2F72yiHtCID`), Supabase upgraded to Pro (Tax ID RO35294600 on file, daily backups enabled). Kit is 100% send-ready.
 
