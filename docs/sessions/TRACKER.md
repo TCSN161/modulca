@@ -13,7 +13,7 @@
 |---|---|---|---|---|---|---|
 | Captain | claude/modest-blackwell-dfbf1f | CAPTAIN-2026-04 | 2026-04-20 (Mon) EET | ~2026-04-30 (pre-launch rotation to CAPTAIN-2026-05) | Strategic coordination; 11-day beta-launch window | 🟢 Active — scratchpad `active/2026-04-20-captain-2026-04.md` |
 | Weekly Ops | claude/nice-chandrasekhar-aa2808 | WEEK-2026-W17 | 2026-04-20 (Mon) EET | 2026-04-24 (Fri) | Week of Apr 20–24 sprint execution; dispatches FE-QA-001 + TEST-001 | 🟢 Active — scratchpad `active/2026-W17-weekly-ops.md` |
-| Specialist (External Ops) | EXT-OPS-001 | EXT-OPS-001 | 2026-04-18 | prep complete; awaits user inputs then closes dormant | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟡 Prep done, awaits user GO on 3 placeholders (LinkedIn URL, Stripe acct ID, Supabase Pro decision) |
+| Specialist (External Ops) | EXT-OPS-001 (run in new worktree 2026-04-20) | EXT-OPS-001 | 2026-04-18 | 2026-04-20 — kit 100% send-ready | DPA outreach (6 vendors) + Startup apps (6 programs) | 🟢 Inputs filled + committed `fe6b88d`; closed dormant awaiting user to execute 6 DPAs (~45 min) + 6 startup submissions (~2h) |
 
 ### Retired sessions (within last rotation)
 
@@ -73,7 +73,7 @@ Tracking what's waiting on external / human-only actions.
 
 ## 📊 Quick stats
 
-- Active chats: 3 / 3 cap (Captain CAPTAIN-2026-04, Weekly Ops WEEK-2026-W17, Specialist EXT-OPS-001 dormant-awaits-user). EXT-OPS-001 closes dormant once user provides the 3 inputs → cap restores to 2 → FE-QA-001 spawns Tue/Wed.
+- Active chats: 2 / 3 cap (Captain CAPTAIN-2026-04, Weekly Ops WEEK-2026-W17). EXT-OPS-001 closed dormant 2026-04-20 after commit fe6b88d landed — kit 100% send-ready; user executes 6 DPAs + 6 startup apps at own pace (deadline Vercel DPA Sat 2026-04-25). Headroom: FE-QA-001 safe to spawn Tue AM.
 - Planned chats: 6 Specialist queues
 - Past chats: Main chat retired 2026-04-18 after handoff to Captain architecture
 - Current calendar week focus: pre-beta finalization, Captain architecture rollout

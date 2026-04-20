@@ -59,6 +59,55 @@ Open threads ending Monday:
 - Awaiting user: 3 EXT-OPS-001 inputs, migration 010 run, Codex CLI install (optional), domain purchases (optional).
 - Captain produces Perplexity topic by Wednesday AM for mid-week relay.
 
+**EXT-OPS-001 input tracker** (collecting here; relay to EXT-OPS-001 chat as a single block once all 3 in):
+- ✅ #1 LinkedIn URL: `https://www.linkedin.com/in/muraru-costin-93320bba/` (received 2026-04-20)
+- ✅ #2 Stripe acct_id: `acct_1TLkh2F72yiHtCID` (received 2026-04-20)
+- ✅ #3 Supabase Pro UPGRADED (confirmed 2026-04-20 via billing screenshot — ModulCA Org now on Pro Plan)
+
+**Paste-ready block for EXT-OPS-001** delivered to user 2026-04-20. Awaiting EXT-OPS-001 commit `chore(ext-ops): fill remaining personalization placeholders` to land on master.
+
+**Supabase Pro operational housekeeping flagged to user** (separate from EXT-OPS-001 scope):
+- Tax ID missing on billing (needs RO35294600 / MCA SRL) — dashboard banner warning.
+- Spend Cap currently ON (included-usage limit) — recommended: keep ON for launch-week cost safety.
+- Daily backups auto-enabled on Pro (verified by user screenshot 2026-04-20 — first snapshot at 04:06 UTC).
+- User paying via personal card (MCA SRL has no revenue yet). Pattern: record as decont/împrumut asociat via accountant — normal for early-stage RO SRL.
+
+**VIES check result 2026-04-20** (user verified): RO35294600 = domestic VAT-registered but **NOT on VIES** (no ANAF Form 098 on file). Foreign SaaS will charge ~19% local VAT (no reverse-charge) until VIES registered. Supabase VAT impact: ~€57/yr. Full-stack cumulative impact once all SaaS billing via MCA SRL: ~€300-500/yr VAT savings once VIES on.
+
+**Queued for Captain Session 2** (NOT launch-blocking, 30-60 day task):
+- Engage Romanian accountant for MCA SRL (monthly bookkeeping + Form 098 VIES filing + VAT return + founder-expense reimbursement structure). Budget: ~€50-400/mo depending on freelance vs firm. ROI on Form 098: 2-4 months via reverse-charge savings across SaaS stack.
+- "Monetize extra Supabase Pro resources" strategic question (from user 2026-04-20). Proposed Routes A (Perplexity handoff) or B (Audit Specialist) — Captain picks.
+
+**Strategic question escalated to Captain**: user asked about "monetize extra Supabase resources" — that's product/revenue strategy, out of Weekly Ops scope per golden rules. Queued for Captain Session 2 with suggested framing (Perplexity handoff or Audit Specialist brief).
+
+**Migration 010 bug flagged to Captain** (for OPS-NNN dispatch):
+- `supabase/migrations/010_monitoring_signals.sql:44` has forward FK reference to `public.incidents(id)` before that table is created at line 71. Fails on fresh DB with "relation public.incidents does not exist". Workaround delivered to user: run `incidents` CREATE block first, then full file (idempotent). Canonical file needs proper reorder by Ops Specialist per PARALLEL_SESSIONS §3 (supabase/migrations is Ops-exclusive, not Weekly Ops scope).
+
+**Migration 010 status: LIVE in Supabase prod** (user verified 2026-04-20, Monday afternoon):
+- 2b: `incidents` shell block executed → Success (RLS enabled via Supabase "Run and enable RLS" option).
+- 2c: Full migration file (monitoring_signals + incidents re-skip + remediation_log + RLS + policies + helper functions) executed → Success (user clicked "Run this query" on the destructive-operations warning; revokes/drops were idempotent cleanups, not data loss).
+- 2d: Verification SELECT returned 3 rows (incidents, monitoring_signals, remediation_log) → Autonomous Agent Stage 1 data layer confirmed live.
+- Next: watch for first green GitHub Actions `ops-check-cron` tick (6h schedule). Weekly Ops to verify + flag anomalies in Monday evening / Tuesday morning standup.
+
+**EXT-OPS-001 closure** (2026-04-20 afternoon — Monday critical path COMPLETE):
+- User continued EXT-OPS-001 in a fresh Claude Code chat (original 2026-04-18 chat not re-opened; not a problem — work landed on master cleanly).
+- Commit `fe6b88d` (chore(ext-ops): fill remaining personalization placeholders) pushed to master; pulled into this worktree via rebase (after stashing/restoring local scratchpad).
+- Edits confirmed at docs/pitch/startup-programs-applications.md: line 17 (LinkedIn URL), line 345 (Stripe acct_id), line 287 (Supabase row → "Pro — eligible to apply now"). Submission-log Notes row also updated with closure marker.
+- Kit 100% send-ready per EXT-OPS-001 verification. User now executes 6 DPAs (~45 min) + 6 startup apps (~2h batch) per kit §"Suggested 2-hour batch plan" at own pace. Real hard deadline: Vercel DPA Saturday 2026-04-25.
+- TRACKER.md updated: EXT-OPS-001 status 🟡 → 🟢 (inputs-filled-committed, kit send-ready); cap 3/3 → 2/3; FE-QA-001 Tuesday-AM dispatch unblocked.
+- Lesson (first entry for TRACKER §Lessons): Specialist continuity survives a chat-session break if commits are clean + scratchpad stays on master. Don't over-engineer chat preservation — trust the git log + scratchpad protocol.
+
+**Monday critical path CLOSED 2026-04-20 afternoon (EET):**
+- [x] Supabase Pro upgrade + tax ID saved (RO35294600 / ATELIER DE PROIECTARE MCA S.R.L. / full address)
+- [x] Migration 010 LIVE (incidents + monitoring_signals + remediation_log + RLS + policies + 4 helper functions)
+- [x] EXT-OPS-001 inputs filled + kit 100% send-ready (commit `fe6b88d`)
+
+**Monday remaining (optional, deferrable to Tue)**:
+- [ ] Accountant email (VIES history + app preference Oblio/FGO/SmartBill + Semnătură Calificată question) — user sends when they have 5 min; response gates 30-60 day accountant engagement
+- [ ] User executes 6 DPAs + 6 startup apps from kit (hard deadline Sat 2026-04-25 for Vercel DPA)
+- [ ] Codex CLI install (needed Week 2 Stripe go-live review)
+- [ ] Domain purchases (€95/yr brand protection)
+
 ### Tuesday 2026-04-21
 _(to be filled)_
 
