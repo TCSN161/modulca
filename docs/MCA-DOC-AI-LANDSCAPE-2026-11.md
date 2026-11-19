@@ -50,13 +50,27 @@ Three questions answered:
 - **Effort**: 1 line change + test
 
 ### 3.3 Bulk code execution (Phase 2 CATUC translate)
-- **Recommended NEW**: **DeepSeek V3-Coder** via API
-  - Price: $0.14/1M input, $0.28/1M output — cheapest viable for code
-  - Quality: Rivals Claude Sonnet for refactoring/translation tasks
-  - Setup: Add `DEEPSEEK_API_KEY` to `.env.local`
-  - Account: platform.deepseek.com — $5 trial credit on signup
-- **Alternative free**: Groq Llama 4 (already in env) — slower latency, but €0
-- **Decision**: Primary = DeepSeek paid, fallback = Groq Llama 4
+
+**Correction (2026-11-19, post-signup verification)**:
+- DeepSeek no longer gives $5 trial credit automatically — new accounts start at $0.
+  Key signup still works, but platform.deepseek.com requires a prepaid top-up
+  before any API call succeeds (`insufficient_balance_error` otherwise).
+- Groq free tier **does not currently host Llama 4** on our account —
+  model inventory is `openai/gpt-oss-120b`, `qwen/qwen3.8-27b`, GPT-OSS-20B
+  and prompt-guard variants. Llama 4 may require a different tier or was
+  removed.
+
+**Revised decision** (cost-first, zero top-up required for Phase 1-2):
+- **Primary**: **Gemini 2.5 Flash** — free 1500 req/day, key already in `.env.local`
+- **Secondary**: **Groq `openai/gpt-oss-120b`** — free tier, ~30 req/min cap
+- **Escalation**: **DeepSeek V3-Coder** — key in `.env.local` as `DEEPSEEK_API_KEY`;
+  activate with $5 top-up at platform.deepseek.com only when Phase 2 CATUC
+  translate load exceeds Gemini + Groq free quotas (not expected before Phase 4).
+
+**Setup state**:
+- `DEEPSEEK_API_KEY` ✅ in `.env.local`, ❌ NOT yet synced to Vercel (unusable at $0)
+- `GEMINI_API_KEY` ✅ in both local + Vercel (prod + dev)
+- `GROQ_API_KEY` ✅ in both local + Vercel (already configured)
 
 ### 3.4 Document synthesis (Phase 2 CATUC → Q&A from 1.25MB legal text)
 - **Recommended**: **NotebookLM free** (already planned)
