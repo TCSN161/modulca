@@ -250,27 +250,29 @@ interface ConsultantTierConfig {
 }
 
 /** Maps the aiConsultantTier level to RAG depth + provider chain */
+// Note: Together.ai removed from chains 2026-11-19 (free tier expired Jul 2026).
+// Config kept below for re-enable if we pay. See MCA-DOC-BLOCKERS B14.
 const CONSULTANT_DEPTH: Record<string, ConsultantTierConfig> = {
   free: {
     maxArticles: 2,
     maxChars: 2000,
     maxTokens: 768,
     answerNote: "Upgrade to Premium for deeper, regulation-specific answers.",
-    providerChain: ["groq", "together", "pollinations"],
+    providerChain: ["groq", "pollinations"],
   },
   premium: {
     maxArticles: 4,
     maxChars: 6000,
     maxTokens: 1024,
     answerNote: "",
-    providerChain: ["openai", "groq", "together", "pollinations"],
+    providerChain: ["openai", "groq", "pollinations"],
   },
   architect: {
     maxArticles: 6,
     maxChars: 12000,
     maxTokens: 2048,
     answerNote: "",
-    providerChain: ["anthropic", "openai", "groq", "together", "pollinations"],
+    providerChain: ["anthropic", "openai", "groq", "pollinations"],
   },
 };
 

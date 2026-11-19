@@ -73,12 +73,10 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - **Phase**: Phase 1-2 (low priority, don't ship broken)
 - **Owner**: Claude
 
-### B12. Next.js 16 middleware → proxy rename pending
-- **Impact**: `src/middleware.ts` uses deprecated name; works today, breaks in Next 17
-- **Fix**: Rename `src/middleware.ts` → `src/proxy.ts` + update any imports
-- **Est. time**: 30 min + regression tests
-- **Phase**: Phase 1-2
-- **Owner**: Claude
+### ✅ B12. Next.js 16 middleware → proxy rename — RESOLVED 2026-11-19
+- **Fix applied**: `git mv src/middleware.ts src/proxy.ts` + renamed `export function middleware(...)` → `export function proxy(...)`
+- **Verified**: `npm run typecheck` 0 errors + `npm run test:run` 147/147 pass
+- **Pending**: Confirm no warning in next `npm run build`
 
 ### B13. `public.public_renders` table missing from Supabase
 - **Impact**: Gallery page "recent renders" section fails silently
@@ -92,16 +90,33 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - **Phase**: Phase 1 (quick cleanup)
 - **Owner**: Claude investigate, user runs migration
 
-### B14. Together.ai free tier expired (142 days ago)
-- **Impact**: NeufertAI providerChain references an engine that's no longer free
-- **Discovered**: `engines:audit:json` 2026-11-19 — `freeExpiresAt: 2026-07-01`
-- **Fix**: 
-  1. Move Together.ai from "hero" to "premium-only" OR remove entirely
-  2. Update `src/app/api/consultant/route.ts:273` providerChain
-  3. Update `docs/AI_PROVIDERS.md` status
-- **Est. time**: 20 min
-- **Phase**: Phase 1 (clean up before users hit broken fallback)
-- **Owner**: Claude
+### ✅ B14. Together.ai free tier expired — RESOLVED 2026-11-19
+- **Fix applied**: Removed "together" from all 3 providerChain arrays (free/premium/architect tiers) in `src/app/api/consultant/route.ts:259-273`
+- **Config kept**: Full Together.ai client config remains in file (lines 458+) for easy re-enable if we pay
+- **Verified**: `npm run typecheck` + `npm run test:run` green
+- **Still TODO**: Update `docs/AI_PROVIDERS.md` status badge (minor doc cleanup)
+
+### B15. Dependencies outdated + 53 vulnerabilities (surfaced 2026-11-19 `npm audit`)
+- **Impact**: Security advisories + feature drift; blocks eventual Next.js 17 upgrade
+- **Discovered**: `npm audit --json` + `npm outdated`
+- **Breakdown**:
+  - 5 critical, 12 high, 34 moderate, 2 low vulnerabilities
+  - Major version drift on: `@prisma/client 5 → 7`, `@stripe/stripe-js 9 → 10`, `@types/node 20 → 26`, `eslint 9 → 10`, `lucide-react 0 → 1`, `@react-three/postprocessing 2 → 3`, `@sentry/nextjs 10 → 11`
+  - Minor/patch drift: 30+ packages behind
+- **Fix approach**:
+  1. Run `npm audit fix` first (patches auto-applied, low risk)
+  2. For CRITICAL/HIGH: investigate each, prioritize fixes
+  3. Minor updates batch: run `npm update` in dedicated session, test thoroughly
+  4. Major updates: individual PRs with migration notes (one at a time)
+- **Est. time**: 2-3h total, spread Phase 1-2
+- **Phase**: Phase 1 (fix critical/high vuln), Phase 2-3 (major upgrades)
+- **Owner**: Claude (analysis) + User (approve breaking-change migrations)
+- **Deferred**: Full migration of @prisma 5→7 (likely breaking changes) — dedicated sub-task
+
+### ✅ MCA-P1-T15. AI landscape doc written — DONE 2026-11-19
+- **Output**: [MCA-DOC-AI-LANDSCAPE-2026-11](MCA-DOC-AI-LANDSCAPE-2026-11.md)
+- **Key decisions**: NeufertAI upgrade to claude-sonnet-5-5, add DeepSeek V3 for bulk execution, enable prompt caching, keep ChatGPT Plus as second-opinion
+- **Render/3D landscape**: Separate brief for `3.renderi AI` chat ([2026-11-19-brief-for-3renderi-ai-chat.md](research/2026-11-19-brief-for-3renderi-ai-chat.md))
 
 ### B7. Captain session 2026-04-20 never executed
 - **Impact**: Session artifacts show April activity that never happened post-handoff

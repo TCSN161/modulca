@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * Route protection middleware.
+ * Route protection proxy (Next.js 16+ convention; renamed from middleware 2026-11-19).
  *
  * Strategy: Client-side auth with Supabase means we can't verify JWT here
  * without @supabase/ssr (adds complexity). Instead we use a lightweight approach:
@@ -48,7 +48,7 @@ const PUBLIC_PREFIXES = [
   "/og",             // Dynamic OG image route (must be accessible for social previews)
 ];
 
-export function middleware(request: NextRequest) {
+export function proxy(request: NextRequest) {
   const { pathname } = request.nextUrl;
 
   // Allow public paths
