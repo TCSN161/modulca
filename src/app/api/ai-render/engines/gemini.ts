@@ -16,7 +16,10 @@ import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
 import { devLog } from "@/shared/lib/devLog";
 const API_KEY = process.env.GEMINI_API_KEY || "";
-const MODEL = "gemini-2.5-flash-image";
+// Upgraded 2026-11-19 per U6 (MCA-DOC-AI-ENGINES-EXTENDED): Nano Banana 2.1
+// is the newest in the Gemini image family — same free-tier quota as 2.5
+// but better instruction following + architectural coherence.
+const MODEL = "gemini-nano-banana-2.1";
 const API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`;
 
 /** Aspect ratio chosen from dimensions — informs the prompt */
