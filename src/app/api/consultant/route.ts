@@ -364,7 +364,7 @@ async function buildRAGContext(question: string, maxArticles = 4, maxChars = 600
  * Platform accounts needed (create free accounts first):
  *   - Groq:         console.groq.com      — Free: 30 req/min, 14.4K tokens/min
  *   - Together:     api.together.xyz       — Free: $1 credit, then pay-as-you-go
- *   - OpenAI:       platform.openai.com    — Pay-as-you-go (~$0.15/1M input tokens for gpt-4o-mini)
+ *   - OpenAI:       platform.openai.com    — Pay-as-you-go (~$0.25/1M input tokens for gpt-5.4-mini)
  *   - Anthropic:    console.anthropic.com  — Pay-as-you-go (~$3/1M input tokens for claude-sonnet)
  *   - Pollinations: text.pollinations.ai   — Free, no key needed (fallback)
  *
@@ -426,16 +426,21 @@ const ALL_PROVIDERS: Record<string, Provider> = {
   openai: {
     id: "openai",
     url: "https://api.openai.com/v1/chat/completions",
-    model: "gpt-4o-mini",
+    // Migrated from gpt-4o-mini → gpt-5.4-mini 2026-11-19 (MCA-U2).
+    // Handoff asked for gpt-5.1-mini but that SKU doesn't exist — OpenAI's
+    // mini/nano tier skipped 5.1/5.2/5.3/5.5 and resumes at 5.4. gpt-5.4-mini
+    // is the closest in-family equivalent, same price band, better reasoning.
+    // NOTE: gpt-5.4+ requires max_completion_tokens (not max_tokens).
+    model: "gpt-5.4-mini",
     keyEnv: "OPENAI_API_KEY",
     buildHeaders: (apiKey) => ({
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     }),
     buildBody: (messages, maxTokens) => ({
-      model: "gpt-4o-mini",
+      model: "gpt-5.4-mini",
       messages,
-      max_tokens: maxTokens,
+      max_completion_tokens: maxTokens,
       temperature: 0.7,
     }),
     extractReply: (data: any) => data?.choices?.[0]?.message?.content || null,

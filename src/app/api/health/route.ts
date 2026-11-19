@@ -23,7 +23,7 @@ function getAnthropicKey(): string {
 
 const PROVIDER_INFO: { id: string; keyCheck?: () => boolean; keyEnv?: string; model: string; tiers: string[] }[] = [
   { id: "anthropic", keyCheck: () => !!getAnthropicKey(), model: "claude-sonnet-5-5", tiers: ["architect"] },
-  { id: "openai", keyEnv: "OPENAI_API_KEY", model: "gpt-4o-mini", tiers: ["premium", "architect"] },
+  { id: "openai", keyEnv: "OPENAI_API_KEY", model: "gpt-5.4-mini", tiers: ["premium", "architect"] },
   { id: "groq", keyEnv: "GROQ_API_KEY", model: "openai/gpt-oss-120b", tiers: ["free", "premium", "architect"] },
   { id: "gemini", keyEnv: "GEMINI_API_KEY", model: "gemini-flash-latest", tiers: ["free", "premium", "architect"] },
   { id: "pollinations", model: "openai-proxy", tiers: ["free", "premium", "architect"] },
