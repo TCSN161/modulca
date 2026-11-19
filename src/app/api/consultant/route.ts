@@ -443,14 +443,17 @@ const ALL_PROVIDERS: Record<string, Provider> = {
   groq: {
     id: "groq",
     url: "https://api.groq.com/openai/v1/chat/completions",
-    model: "llama-3.3-70b-versatile",
+    // Model list verified 2026-11-19 via GET /v1/models — llama-3.3-70b-versatile
+    // is no longer available on Groq free tier. GPT-OSS 120B is the strongest
+    // free option, $0.15/1M in / $0.60/1M out beyond rate limits.
+    model: "openai/gpt-oss-120b",
     keyEnv: "GROQ_API_KEY",
     buildHeaders: (apiKey) => ({
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
     }),
     buildBody: (messages, maxTokens) => ({
-      model: "llama-3.3-70b-versatile",
+      model: "openai/gpt-oss-120b",
       messages,
       max_tokens: maxTokens,
       temperature: 0.7,
