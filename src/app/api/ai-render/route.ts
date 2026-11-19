@@ -21,7 +21,7 @@ import { devLog } from "@/shared/lib/devLog";
 // import { wavespeedEngine } from "./engines/wavespeed";
 // import { runwayEngine } from "./engines/runway";
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
-import { canUseEngine, recordSuccess, recordFailure } from "./engines/creditManager";
+import { canUseEngine, recordSuccess, recordFailure, type Tier } from "./engines/creditManager";
 import { logRender } from "./engines/renderLogger";
 import { makeCacheKey, getCachedRender, cacheResult } from "./engines/renderCache";
 
@@ -339,6 +339,8 @@ async function tryEngines(
 ) {
   const mode: "text2img" | "img2img" = renderReq.baseImage ? "img2img" : "text2img";
   const tier = renderReq.tier || "free";
+  // U9 — pass tier to creditManager so monthly cap + band gate engage.
+  const creditCtx = { tier: tier as Tier };
 
   // ── Cache check (skip for img2img since base image varies) ──
   if (!renderReq.baseImage && engineParam) {
@@ -368,7 +370,7 @@ async function tryEngines(
 
   /** Helper: handle a successful engine result */
   async function onSuccess(engineId: string, result: AiRenderResult) {
-    recordSuccess(engineId, result.costUsd ?? 0, result.latencyMs ?? 0);
+    recordSuccess(engineId, result.costUsd ?? 0, result.latencyMs ?? 0, creditCtx);
 
     // Cache the result (fire and forget, text2img only)
     if (!renderReq.baseImage) {
@@ -388,7 +390,7 @@ async function tryEngines(
 
   /** Helper: handle a failed engine attempt */
   function onFailure(engineId: string, error: string) {
-    recordFailure(engineId, error);
+    recordFailure(engineId, error, creditCtx);
     logRender({
       prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
       seed: renderReq.seed, mode, tier, engine_id: engineId,
@@ -401,8 +403,8 @@ async function tryEngines(
     const eng = ENGINES[engineParam];
     if (eng.estimatedCostUsd > maxCostUsd) {
       devLog(`[ai-render] Engine "${engineParam}" exceeds cost ceiling ($${eng.estimatedCostUsd} > $${maxCostUsd}), skipping to fallback`);
-    } else if (!canUseEngine(engineParam)) {
-      devLog(`[ai-render] Engine "${engineParam}" has no credits remaining, skipping to fallback`);
+    } else if (!canUseEngine(engineParam, creditCtx)) {
+      devLog(`[ai-render] Engine "${engineParam}" blocked (tier/band/cap/credits), skipping to fallback`);
     } else {
       devLog(`[ai-render] Using engine: ${engineParam}`);
       const result = await eng.fn(renderReq);
@@ -431,8 +433,8 @@ async function tryEngines(
       devLog(`[ai-render] Skipping "${engineId}" — over cost ceiling ($${engine.estimatedCostUsd} > $${maxCostUsd})`);
       continue;
     }
-    if (!canUseEngine(engineId)) {
-      devLog(`[ai-render] Skipping "${engineId}" — no credits or disabled`);
+    if (!canUseEngine(engineId, creditCtx)) {
+      devLog(`[ai-render] Skipping "${engineId}" — blocked by tier/band/cap/credits`);
       continue;
     }
     devLog(`[ai-render] Trying engine: ${engineId}`);
