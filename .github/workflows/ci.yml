@@ -43,13 +43,18 @@ jobs:
 
       - name: Check bundle size
         run: |
-          echo "Build output:"
+          echo "Build output (total, incl cache):"
           du -sh .next/ 2>/dev/null || echo "Build dir not found"
+          echo "Build output (deployment-relevant, excl .next/cache):"
+          du -sh --exclude=.next/cache .next/ 2>/dev/null || true
           echo "---"
-          # Fail if build exceeds 500MB
-          SIZE=$(du -sm .next/ 2>/dev/null | cut -f1)
+          # Only the deployment-relevant files are shipped to Vercel.
+          # .next/cache/ is build-time scratch (webpack + SWC transforms),
+          # typically 1-2GB, not deployed. Measuring it inflates the check.
+          # Fail if DEPLOYMENT size exceeds 500MB.
+          SIZE=$(du -sm --exclude=.next/cache .next/ 2>/dev/null | cut -f1)
           if [ "$SIZE" -gt 500 ]; then
-            echo "::error::Build too large: ${SIZE}MB (max 500MB)"
+            echo "::error::Deployment bundle too large: ${SIZE}MB (max 500MB)"
             exit 1
           fi
-          echo "Build size: ${SIZE}MB — OK"
+          echo "Deployment bundle size: ${SIZE}MB — OK"
