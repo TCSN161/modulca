@@ -30,15 +30,10 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - **Owner**: Claude (writing) + Vlad Ioniță (legal review) + Costin (coordination)
 - **Phase**: 2 (Nov 26 - Dec 5)
 
-### B3. NeufertAI model outdated
-- **Current**: `claude-sonnet-4-20250514` (April-era)
-- **Should be**: `claude-sonnet-5-5` (Oct 2026 release, supports better reasoning for complex legal queries)
-- **File**: `src/app/api/consultant/route.ts` lines ~392, 408
-- **Impact**: Users get worse CATUC answers than possible
-- **Fix**: One-line env var or constant swap + test E2E
-- **Est. time**: 30 min total
-- **Owner**: Claude
-- **Depends on**: `@anthropic-ai/sdk` version supporting new model → check in Phase 1 audit
+### ✅ B3. NeufertAI model outdated — RESOLVED 2026-11-19 (by Chat 3)
+- **Fix applied**: `claude-sonnet-4-20250514` → `claude-sonnet-5-5`. Commit `2cfae40`, live on Vercel.
+- **Bonus fix**: Chat 3 also caught + fixed critical Groq bug — `llama-3.3-70b-versatile` returned 404 silently (broke NeufertAI fallback). Replaced with `openai/gpt-oss-120b`. Commit `b8a6c20`.
+- **Credit**: Chat 3 (AI Engines & Rendering) — handoff doc `MCA-HANDOFF-1-MAIN-2026-11-19.md`
 
 ### B4. Vlad Ioniță formal engagement not documented
 - **Impact**: Legal exposure if we claim signing architect without contract
