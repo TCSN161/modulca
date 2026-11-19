@@ -63,6 +63,46 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - **Fix**: `npm install -g npm@11.21.3` (user runs, not Claude)
 - **Phase**: Phase 1 cleanup
 
+### B11. Sentry SDK config deprecations (surfaced in build 2026-11-19)
+- **Impact**: Will break in future Sentry major update; Turbopack won't work with current config
+- **Fix items**:
+  1. Rename `sentry.client.config.ts` → `instrumentation-client.ts`
+  2. Create `instrumentation.ts` at project root (Next 16 convention)
+  3. Replace `disableLogger: true` with `webpack.treeshake.removeDebugLogging`
+- **Est. time**: 1-2h with testing
+- **Phase**: Phase 1-2 (low priority, don't ship broken)
+- **Owner**: Claude
+
+### B12. Next.js 16 middleware → proxy rename pending
+- **Impact**: `src/middleware.ts` uses deprecated name; works today, breaks in Next 17
+- **Fix**: Rename `src/middleware.ts` → `src/proxy.ts` + update any imports
+- **Est. time**: 30 min + regression tests
+- **Phase**: Phase 1-2
+- **Owner**: Claude
+
+### B13. `public.public_renders` table missing from Supabase
+- **Impact**: Gallery page "recent renders" section fails silently
+- **Discovered**: Build log 2026-11-19 — `[gallery] recent renders fetch failed`
+- **Possible causes**:
+  1. Migration that creates `public_renders` was never run (check `supabase/migrations/`)
+  2. Table was dropped during Supabase pause (unlikely, data preserved)
+  3. Schema cache stale (unlikely after restore)
+- **Fix**: `grep -rn "public_renders" supabase/migrations/` → identify creating migration → run in SQL Editor
+- **Est. time**: 15 min investigation + 2 min SQL
+- **Phase**: Phase 1 (quick cleanup)
+- **Owner**: Claude investigate, user runs migration
+
+### B14. Together.ai free tier expired (142 days ago)
+- **Impact**: NeufertAI providerChain references an engine that's no longer free
+- **Discovered**: `engines:audit:json` 2026-11-19 — `freeExpiresAt: 2026-07-01`
+- **Fix**: 
+  1. Move Together.ai from "hero" to "premium-only" OR remove entirely
+  2. Update `src/app/api/consultant/route.ts:273` providerChain
+  3. Update `docs/AI_PROVIDERS.md` status
+- **Est. time**: 20 min
+- **Phase**: Phase 1 (clean up before users hit broken fallback)
+- **Owner**: Claude
+
 ### B7. Captain session 2026-04-20 never executed
 - **Impact**: Session artifacts show April activity that never happened post-handoff
 - **Fix**: Archive April sessions in TRACKER.md "Past"
