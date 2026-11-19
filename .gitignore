@@ -3,6 +3,9 @@
 # Claude Code worktrees
 .claude/worktrees/
 
+# Claude Code local (per-user) settings — personal overrides, never committed
+.claude/settings.local.json
+
 # dependencies
 /node_modules
 /.pnp
