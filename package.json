@@ -13,6 +13,8 @@
     "engines:audit": "node scripts/engines-audit.mjs",
     "engines:audit:save": "node scripts/engines-audit.mjs --save",
     "engines:audit:json": "node scripts/engines-audit.mjs --json",
+    "engines:check": "node scripts/engines-model-check.mjs",
+    "engines:check:json": "node scripts/engines-model-check.mjs --json",
     "seed:gallery": "node scripts/seed-gallery.mjs",
     "start": "next start",
     "lint": "eslint",
