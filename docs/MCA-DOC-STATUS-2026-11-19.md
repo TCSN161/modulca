@@ -219,29 +219,26 @@ Per memory file `project_status_april2026.md` (snapshot 2026-04-16):
 
 **Reality check (2026-11-19)**: `ops:check` result = **25 ✅ / 4 ⚠️ / 2 ❌** out of 31 checks (new checks added since April). Not bad for 7mo pause. See [[MCA-DOC-BLOCKERS-2026-11-19]] for critical items.
 
-### Live ops:check findings (2026-11-19)
+### Live ops:check findings (2026-11-19 ~20:00 EET — post Supabase restore)
 
-**Critical (❌)**:
-- Supabase REST API: fetch failed
-- Supabase Projects table: fetch failed
-  - **Likely cause**: Supabase auto-paused after 1+ week inactivity on Free tier. Click "Restore" in dashboard likely fixes.
-  - **Verify in**: supabase.com/dashboard/project/{id} → should show "Paused" badge
+**30 ✅ / 2 ⚠️ / 0 ❌** (improved from 25/4/2 earlier same day after paying $12.90 overdue Supabase invoice + restoring project)
 
-**Warnings (⚠️)**:
-- Stripe mode = TEST (expected, planned to stay test until public launch)
-- Supabase Profiles table: fetch failed (same root cause as critical)
-- Supabase Auth service: fetch failed (same)
-- Working tree: 1 uncommitted change (docs/references/catuc/ — intentional, to commit today)
+**Warnings (⚠️) — both expected**:
+- Stripe mode = TEST (planned to stay test until public launch Feb 2027)
+- Working tree: has in-flight uncommitted docs (routine during session)
 
-**Confirmed working (25 ✅)**:
+**Confirmed working**:
+- **Supabase**: REST API ✅, Projects table ✅, Profiles table ✅, Auth ✅, Google OAuth enabled ✅
 - All 46 env variables correctly configured
 - Stripe: 6 active products, webhooks enabled, 3 tier prices live (€19.99 / €49.99 / €149.90 monthly)
 - **Resend: modulca.eu domain VERIFIED** 🎯
 - TypeScript: 0 errors
-- Tests: 147 passing (unchanged from April — code didn't rot)
+- Tests: 147 passing (unchanged from April — code didn't rot in 7 months)
 - modulca.eu: HTTP 200 LIVE 🎯
 - /api/health endpoint: Status OK 🎯
 - Git remote: up to date with origin
+
+**Historical finding (resolved)**: Initial 2 critical failures were Supabase unreachable due to $12.90 Jul 2026 outstanding invoice. Paid, restored, Healthy.
 
 ---
 

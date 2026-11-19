@@ -9,15 +9,14 @@
 
 ## 🟥 Critical (block work NOW)
 
-### B1. Supabase project auto-paused
-- **Impact**: DB-dependent features broken: auth, profile data, projects CRUD
-- **Discovered**: `ops:check` 2026-11-19 (REST API + Projects table fetch failed)
-- **Likely cause**: Supabase Free tier auto-pauses projects after ~7 days no activity. We paused 7 months.
-- **Fix**: User logs supabase.com/dashboard → open ModulCA project → click "Restore" / "Resume"
-- **Est. time**: 2 min user + ~5 min restore
-- **Owner**: User (needs dashboard login)
-- **Verify after fix**: `npm run ops:check` again → should show 27+ ✅
-- **Status**: ⏳ Awaiting user
+_No critical blockers as of 2026-11-19 ~20:00 EET._
+
+### ✅ B1. Supabase project auto-paused — RESOLVED 2026-11-19
+- **Root cause (actual)**: NOT auto-pause — had $12.90 unpaid invoice from Jul 2026 Pro-tier partial billing
+- **Fix taken**: User paid $12.90 (FGOSHO-00006) → restored project → status Healthy
+- **Verification**: `ops:check` 30 ✅ / 2 ⚠️ / 0 ❌ (vs prior 25 ✅ / 4 ⚠️ / 2 ❌)
+- **Data preserved**: Projects + Profiles tables + Auth all queryable. "Last migration: No migrations" is UI quirk (we used SQL Editor, not Supabase CLI push)
+- **Follow-up**: Keep Supabase Free; set payment method with far expiry to avoid future lockout
 
 ---
 
