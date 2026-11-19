@@ -391,7 +391,7 @@ const ALL_PROVIDERS: Record<string, Provider> = {
   anthropic: {
     id: "anthropic",
     url: "https://api.anthropic.com/v1/messages",
-    model: "claude-sonnet-4-20250514",
+    model: "claude-sonnet-5-5",
     keyEnv: "ANTHROPIC_API_KEY",
     getKey: () => process.env.MODULCA_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY || undefined,
     buildHeaders: (apiKey) => ({
@@ -407,7 +407,7 @@ const ALL_PROVIDERS: Record<string, Provider> = {
         content: m.content,
       }));
       return {
-        model: "claude-sonnet-4-20250514",
+        model: "claude-sonnet-5-5",
         system,
         messages: chatMsgs,
         max_tokens: maxTokens,
