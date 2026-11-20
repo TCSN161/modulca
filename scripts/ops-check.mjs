@@ -395,20 +395,24 @@ function checkBuildAndTest() {
     check("build", "TypeScript", "fail", `${errorCount} error(s)`);
   }
 
-  // Tests
-  const testResult = run("npx vitest run 2>&1");
-  if (testResult) {
-    const match = testResult.match(/Tests\s+(\d+)\s+passed/);
-    const failMatch = testResult.match(/(\d+)\s+failed/);
-    if (failMatch && parseInt(failMatch[1]) > 0) {
-      check("build", "Tests", "fail", `${failMatch[1]} failed`);
-    } else if (match) {
-      check("build", "Tests", "pass", `${match[1]} passed`);
-    } else {
-      check("build", "Tests", "warn", "Could not parse test output");
-    }
+  // Tests — skip when OPS_CHECK_SKIP_TESTS=true (main CI workflow already runs tests on every push)
+  if (process.env.OPS_CHECK_SKIP_TESTS === "true") {
+    check("build", "Tests", "skip", "Skipped (main CI workflow runs tests on push)");
   } else {
-    check("build", "Tests", "fail", "Test runner failed");
+    const testResult = run("npx vitest run 2>&1");
+    if (testResult) {
+      const match = testResult.match(/Tests\s+(\d+)\s+passed/);
+      const failMatch = testResult.match(/(\d+)\s+failed/);
+      if (failMatch && parseInt(failMatch[1]) > 0) {
+        check("build", "Tests", "fail", `${failMatch[1]} failed`);
+      } else if (match) {
+        check("build", "Tests", "pass", `${match[1]} passed`);
+      } else {
+        check("build", "Tests", "warn", "Could not parse test output");
+      }
+    } else {
+      check("build", "Tests", "fail", "Test runner failed");
+    }
   }
 
   // Check for .env.local in .gitignore
