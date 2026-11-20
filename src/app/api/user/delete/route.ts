@@ -28,7 +28,7 @@ export const dynamic = "force-dynamic";
 function getStripe(): Stripe | null {
   const key = process.env.STRIPE_SECRET_KEY;
   if (!key) return null;
-  return new Stripe(key, { apiVersion: "2026-03-25.dahlia" });
+  return new Stripe(key, { apiVersion: "2026-08-26.dahlia" });
 }
 
 export async function DELETE(req: NextRequest) {
