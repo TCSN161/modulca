@@ -54,6 +54,25 @@ jobs:
       - name: Install dependencies
         run: npm ci --legacy-peer-deps
 
+      # ─── Build .env.local from secrets (ops-check.mjs reads from file, not process.env) ───
+      - name: Build .env.local from secrets
+        run: |
+          cat > .env.local <<'EOF'
+          NEXT_PUBLIC_SUPABASE_URL=${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY=${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          SUPABASE_SERVICE_ROLE_KEY=${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+          NEXT_PUBLIC_APP_URL=${{ vars.NEXT_PUBLIC_APP_URL || 'https://www.modulca.eu' }}
+          NEXT_PUBLIC_APP_NAME=ModulCA
+          STRIPE_SECRET_KEY=${{ secrets.STRIPE_SECRET_KEY }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
+          STRIPE_WEBHOOK_SECRET=${{ secrets.STRIPE_WEBHOOK_SECRET }}
+          RESEND_API_KEY=${{ secrets.RESEND_API_KEY }}
+          RESEND_FROM_EMAIL=noreply@modulca.eu
+          NEXT_PUBLIC_SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          SENTRY_DSN=${{ secrets.NEXT_PUBLIC_SENTRY_DSN }}
+          EOF
+          echo "env.local created with $(wc -l < .env.local) lines"
+
       # ─── Run ops-check (CI mode exits 1 on failures) ───
       - name: Run ops:check
         id: ops
