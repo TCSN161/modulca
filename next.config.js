@@ -1,4 +1,4 @@
-const { withSentryConfig } = require("@sentry/nextjs");
+const { withSentryConfig } = require("@sentry/nextjs/config");
 const withBundleAnalyzer = require("@next/bundle-analyzer")({
   enabled: process.env.ANALYZE === "true",
 });
@@ -63,8 +63,12 @@ module.exports = sentryEnabled
       // Upload source maps for better stack traces
       widenClientFileUpload: true,
 
-      // Tree-shake Sentry logger in production
-      disableLogger: true,
+      // Tree-shake Sentry debug logger in production (renamed from `disableLogger` in Sentry SDK v10+)
+      webpack: {
+        treeshake: {
+          removeDebugLogging: true,
+        },
+      },
 
       // Hide source maps from users
       hideSourceMaps: true,

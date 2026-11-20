@@ -105,3 +105,9 @@ Sentry.init({
   // Tag environment
   environment: process.env.NODE_ENV || "development",
 });
+
+/**
+ * Required for Next.js 16 App Router navigation instrumentation.
+ * Hooks client-side route transitions into Sentry traces.
+ */
+export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;
