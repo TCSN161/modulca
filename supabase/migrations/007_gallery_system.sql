@@ -59,10 +59,12 @@ create table if not exists public.public_renders (
   rating_sum int not null default 0,                -- sum of all star values
   rating_count int not null default 0,
   view_count int not null default 0,
+  -- Base score: avg_stars × sqrt(votes). Time-decay must live in query, not here,
+  -- because Postgres requires generated-stored expressions to be IMMUTABLE and
+  -- now() is VOLATILE. See view public.public_renders_scored below for decayed score.
   score_weighted numeric generated always as (
     case when rating_count = 0 then 0
     else (rating_sum::numeric / rating_count) * sqrt(rating_count)
-         / (1 + (extract(epoch from (now() - created_at)) / 86400) * 0.02)
     end
   ) stored,
 
@@ -262,4 +264,17 @@ comment on table public.render_ratings is
 comment on table public.gallery_settings is
   'Single-row global gallery config. Admins toggle display options here.';
 comment on column public.public_renders.score_weighted is
-  'HN-style score: avg_stars × sqrt(votes) / (1 + age_days × 0.02). Auto-computed.';
+  'Base rank: avg_stars × sqrt(votes). Query public_renders_scored for time-decayed score.';
+
+/* ── Scored view: adds HN-style time decay at query time ──────────── */
+create or replace view public.public_renders_scored as
+  select
+    pr.*,
+    case when pr.rating_count = 0 then 0
+    else pr.score_weighted
+         / (1 + (extract(epoch from (now() - pr.created_at)) / 86400) * 0.02)
+    end as score_decayed
+  from public.public_renders pr;
+
+comment on view public.public_renders_scored is
+  'Query this view (not public_renders directly) for sort-by-score UIs. Adds age-decay factor at query time.';
