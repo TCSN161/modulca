@@ -124,6 +124,17 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - **Fix**: Costin decides each
 - **Phase**: Phase 2-3 (parallel to CATUC work)
 
+### ✅ Novita signup — DONE 2026-11-20 (card NOT required for key creation)
+- **Status**: Key generated without card bind (contrary to Step 1 wizard suggestion)
+- **Balance**: $0.00 — cannot execute requests until future top-up
+- **Stored**: .env.local + GitHub secret `NOVITA_API_KEY` + Vercel Production (Secret type)
+- **Follow-up**: $5 top-up when Phase 2 CATUC image generation needs backup (optional)
+
+### ✅ WaveSpeed signup — DONE 2026-11-20
+- Account: wavespeed.ai (uii.acgs.auto@gmail.com)
+- Key: `modulca-production`, Full access, Active, $1 credit
+- Stored: .env.local + GitHub secret `WAVESPEED_API_KEY` + Vercel Production (Secret type)
+
 ### B9. Dependencies possibly outdated (`npm outdated` not yet run)
 - **Fix**: Run `npm outdated` → classify upgrades (major vs minor vs security)
 - **Est. time**: 30 min analysis
