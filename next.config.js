@@ -8,10 +8,13 @@ const createNextIntlPlugin = require("next-intl/plugin");
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
-const isGitHubPages = process.env.GITHUB_ACTIONS === "true";
+// GITHUB_ACTIONS is set automatically for EVERY CI run — using it to trigger
+// static export broke CI because force-dynamic routes conflict with output:export.
+// Use an explicit opt-in flag so only the dedicated GH Pages workflow turns it on.
+const isGitHubPagesBuild = process.env.DEPLOY_TARGET === "github-pages";
 
 const nextConfig = {
-  ...(isGitHubPages ? { output: "export", basePath: "/modulca", assetPrefix: "/modulca/" } : {}),
+  ...(isGitHubPagesBuild ? { output: "export", basePath: "/modulca", assetPrefix: "/modulca/" } : {}),
   reactStrictMode: true,
   turbopack: {},
   // Modular imports — only pulls in the icons/components actually used,
@@ -28,7 +31,7 @@ const nextConfig = {
     ],
   },
   images: {
-    unoptimized: isGitHubPages, // only disable optimization for static export
+    unoptimized: isGitHubPagesBuild, // only disable optimization for static export
     remotePatterns: [
       { protocol: "https", hostname: "*.supabase.co" },
       { protocol: "https", hostname: "tile.openstreetmap.org" },
