@@ -62,3 +62,4 @@ Thumbs.db
 test-results/
 playwright-report/
 .env.local.tmp*
+.env*
