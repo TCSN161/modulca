@@ -557,7 +557,7 @@ export default function PermitTracker({
         {/* Footer */}
         <div className="border-t border-gray-100 px-5 py-3 text-center">
           <p className="text-[10px] text-gray-400">
-            Based on Romanian building regulations (Legea 50/1991, modificată). Contact your local primărie for specific requirements.
+            Based on Romanian building regulations (CATUC — Legea 169/2026, Monitorul Oficial 661/10.08.2026, effective 25.08.2026). Contact your local primărie for specific requirements.
           </p>
         </div>
       </div>
