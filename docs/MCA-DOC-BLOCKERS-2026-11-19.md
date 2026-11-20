@@ -135,6 +135,14 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - Key: `modulca-production`, Full access, Active, $1 credit
 - Stored: .env.local + GitHub secret `WAVESPEED_API_KEY` + Vercel Production (Secret type)
 
+### B17. Ops Check cron needs 7 more GitHub secrets
+- **Discovered**: 2026-11-20 — manual trigger failed, log showed empty env vars
+- **Missing secrets**: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `RESEND_API_KEY`, `VERCEL_TOKEN`, `SENTRY_AUTH_TOKEN`
+- **Temporary action**: Workflow disabled to avoid cron failure spam
+- **Fix**: Add 7 secrets via GitHub Settings or `gh secret set`, then re-enable workflow
+- **Phase**: Tomorrow (after weekly token reset)
+- **Est. time**: 15 min
+
 ### B9. Dependencies possibly outdated (`npm outdated` not yet run)
 - **Fix**: Run `npm outdated` → classify upgrades (major vs minor vs security)
 - **Est. time**: 30 min analysis
