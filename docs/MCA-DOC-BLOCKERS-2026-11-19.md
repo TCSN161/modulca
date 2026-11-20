@@ -135,7 +135,20 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - Key: `modulca-production`, Full access, Active, $1 credit
 - Stored: .env.local + GitHub secret `WAVESPEED_API_KEY` + Vercel Production (Secret type)
 
-### B17. Ops Check cron multi-layer issue (expanded 2026-11-20 evening)
+### ✅ B17. Ops Check cron multi-layer issue — RESOLVED 2026-11-20 evening
+
+Final fix layer:
+- 7 secrets added to GitHub: NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY, NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, STRIPE_WEBHOOK_SECRET, RESEND_API_KEY
+- 2 external tokens generated + added: VERCEL_TOKEN, SENTRY_AUTH_TOKEN
+- yml fix 1: added 2 missing env mappings
+- yml fix 2: write .env.local from secrets BEFORE running (ops-check.mjs reads from file, not process.env)
+- script fix: added OPS_CHECK_SKIP_TESTS flag — cron doesn't duplicate CI's test run
+- Final run: ✅ SUCCESS
+- Commits: `5e18b5c`, `f1e714d`, `c9f3cc8`
+
+All 4 workflows now ACTIVE + GREEN.
+
+### B17-ORIG. Ops Check cron multi-layer issue (initial analysis)
 - **Discovered**: 2026-11-20 — manual trigger failed with 7 passed / 3 warnings / 7 critical failures
 - **Progress tonight**: Added 5/7 secrets via `vercel env pull` + `gh secret set`:
   ✅ NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY,
