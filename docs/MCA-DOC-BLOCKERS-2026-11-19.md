@@ -135,13 +135,29 @@ _No critical blockers as of 2026-11-19 ~20:00 EET._
 - Key: `modulca-production`, Full access, Active, $1 credit
 - Stored: .env.local + GitHub secret `WAVESPEED_API_KEY` + Vercel Production (Secret type)
 
-### B17. Ops Check cron needs 7 more GitHub secrets
-- **Discovered**: 2026-11-20 — manual trigger failed, log showed empty env vars
-- **Missing secrets**: `NEXT_PUBLIC_SUPABASE_URL`, `SUPABASE_SERVICE_ROLE_KEY`, `STRIPE_SECRET_KEY`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `RESEND_API_KEY`, `VERCEL_TOKEN`, `SENTRY_AUTH_TOKEN`
-- **Temporary action**: Workflow disabled to avoid cron failure spam
-- **Fix**: Add 7 secrets via GitHub Settings or `gh secret set`, then re-enable workflow
+### B17. Ops Check cron multi-layer issue (expanded 2026-11-20 evening)
+- **Discovered**: 2026-11-20 — manual trigger failed with 7 passed / 3 warnings / 7 critical failures
+- **Progress tonight**: Added 5/7 secrets via `vercel env pull` + `gh secret set`:
+  ✅ NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY,
+     NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY, RESEND_API_KEY
+- **Still missing at GitHub secret level**:
+  - `VERCEL_TOKEN` — generate at vercel.com/account/tokens
+  - `SENTRY_AUTH_TOKEN` — generate at sentry.io/settings/account/api/auth-tokens
+- **Still missing at yml env mapping level** (ops-check-cron.yml lines 30-40):
+  - `NEXT_PUBLIC_SUPABASE_ANON_KEY` → need to add to secrets + yml
+  - `STRIPE_WEBHOOK_SECRET` → need to add to secrets + yml
+  - `NEXT_PUBLIC_SENTRY_DSN` → warning-only, optional
+  - 6× Stripe price IDs (`NEXT_PUBLIC_STRIPE_PRICE_*`) → warning-only, optional
+- **Additional**: "Test runner failed" during workflow — possibly `npm ci --legacy-peer-deps` lockfile issue on Ubuntu 26
+- **Temporary action**: Workflow disabled again to avoid 6h cron failure spam
+- **Fix tomorrow**:
+  1. Add 2 missing secrets (NEXT_PUBLIC_SUPABASE_ANON_KEY, STRIPE_WEBHOOK_SECRET) via `gh secret set` from `.env.local` or `vercel env pull`
+  2. Generate VERCEL_TOKEN + SENTRY_AUTH_TOKEN (user action)
+  3. Update `ops-check-cron.yml` to map all needed env vars
+  4. Investigate "Test runner failed" root cause (maybe `npm ci --legacy-peer-deps` vs `npm install`)
+  5. Re-enable workflow + manual trigger to verify
 - **Phase**: Tomorrow (after weekly token reset)
-- **Est. time**: 15 min
+- **Est. time**: 30-45 min (not 15 as initially estimated)
 
 ### B9. Dependencies possibly outdated (`npm outdated` not yet run)
 - **Fix**: Run `npm outdated` → classify upgrades (major vs minor vs security)
