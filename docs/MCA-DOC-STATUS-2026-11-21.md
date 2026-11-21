@@ -45,10 +45,16 @@ Prod verified healthy after each rotation (ops:check 30 ✅, /api/health status 
 - [x] NotebookLM query packet written (25 queries)
 - [x] CATUC source files in repo (3.7 MB)
 - [x] CATUC translate route live at `/api/catuc-translate`
-- [x] Pre-Phase 2 quick wins: F1 (PermitTracker) + F5 (_meta.yaml) + F7 (choosing-land) done
-- [ ] Vlad Ioniță formal engagement (user coordinate this week)
-- [ ] NotebookLM upload done by user (any time before Nov 26)
-- [ ] F2, F3, F4, F6, F9, F10 — pending Phase 2 work with NotebookLM answers
+- [x] `scripts/catuc-ingest.mjs` ready (NotebookLM JSON → auto-generated .new.md)
+- [x] Pre-Phase 2 frontmatter wins: F1, F5, F6, F7 (4 files)
+- [x] Pre-Phase 2 body inline refs: F9 (articles-ro.ts 2 blog bodies), F10 (ro-03 blog draft)
+- [x] F2 skeleton stub (`building-permit-process.new.md`) — chapters + TBD markers ready for NotebookLM content fill
+- [x] knowledge/_index.ts regenerated (reflects all frontmatter updates)
+- [ ] Vlad Ioniță formal engagement (user coordinate — email template at `docs/MCA-DOC-VLAD-EMAIL-TEMPLATE.md`)
+- [ ] NotebookLM upload done by user (step-by-step in `docs/MCA-DOC-WEEKEND-PLAN-2026-11-22.md`)
+- [ ] F3, F4, F6 body — Phase 2 kickoff work (needs NotebookLM content)
+
+**Total pre-prepped**: 6/10 CATUC source files + 1 skeleton = 7/10 visible progress. Phase 2 starts from position of strength.
 
 ---
 
