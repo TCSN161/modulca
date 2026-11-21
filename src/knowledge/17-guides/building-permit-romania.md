@@ -3,7 +3,7 @@ id: "building-permit-romania"
 title: "How to Get a Building Permit in Romania (Step-by-Step)"
 category: "guides"
 tags: ["permit", "romania", "legal", "autorizatie", "CU", "AC"]
-sources: ["Legea 50/1991 privind autorizarea executarii lucrarilor de constructii", "Normele metodologice din 2024", "Ordinul MLPDA 839/2009"]
+sources: ["Legea 169/2026 (CATUC) — Codul Amenajarii Teritoriului, Urbanismului si Constructiilor", "Monitorul Oficial 661/10.08.2026", "Ministerul Dezvoltarii — Clarificari CATUC 2026"]
 difficulty: "beginner"
 lastUpdated: "2026-04-15"
 proOnly: false
