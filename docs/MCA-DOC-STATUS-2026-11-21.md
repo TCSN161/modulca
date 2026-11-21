@@ -31,10 +31,12 @@ Zero commits, zero scheduled workflow failures.
 
 ## 3. Today priorities (~30 min)
 
-1. Supabase SERVICE_ROLE rotation (user)
-2. OpenAI key rotation (user)
-3. Phase 2 safe quick wins: F7 `choosing-land-modular-home.md` sources — ✅ done this morning
+1. ✅ Supabase migrated to new sb_ key system + legacy JWT disabled (anon → publishable, service_role → secret)
+2. ✅ OpenAI key rotated (modulca-production-2026-11, both old revoked)
+3. ✅ Phase 2 safe quick win: F7 `choosing-land-modular-home.md` sources updated
 4. NotebookLM upload instructions final check — ready at [`docs/research/2026-11-19-notebooklm-catuc-queries.md`](research/2026-11-19-notebooklm-catuc-queries.md)
+
+Prod verified healthy after each rotation (ops:check 30 ✅, /api/health status ok).
 
 ---
 
