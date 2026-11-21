@@ -108,8 +108,11 @@ export const ltxVideoEngine: AiRenderEngine = async (
       buffer,
       contentType: "video/mp4",
       engine: "ltx-video",
-      // ~4s video at $0.012/sec via fal
-      costUsd: 0.048,
+      // LTX-2.3 on fal Nov 2026: Fast 1080p = $0.04/sec, Pro = $0.06/sec.
+      // ~4s video at Fast tier = $0.16 (not the $0.048 my earlier scaffold
+      // assumed — original $0.012/sec was LTX 0.9.1 which is marked
+      // "research only" and no longer the primary endpoint).
+      costUsd: 0.16,
       latencyMs: Date.now() - startMs,
       prompt: req.prompt,
     };
