@@ -3,7 +3,7 @@ id: "choosing-land-modular-home"
 title: "How to Choose Land for a Modular Home"
 category: "guides"
 tags: ["land", "plot", "modular", "site-selection"]
-sources: ["Legea 50/1991", "Codul Civil Roman", "Normativ NP 074 privind documentatii de urbanism"]
+sources: ["Legea 169/2026 (CATUC)", "Codul Civil Roman", "Normativ NP 074 privind documentatii de urbanism"]
 difficulty: "beginner"
 lastUpdated: "2026-04-15"
 proOnly: false
