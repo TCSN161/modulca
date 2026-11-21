@@ -15,6 +15,8 @@
     "engines:audit:json": "node scripts/engines-audit.mjs --json",
     "engines:check": "node scripts/engines-model-check.mjs",
     "engines:check:json": "node scripts/engines-model-check.mjs --json",
+    "test:engines": "node scripts/test-live-engines.mjs",
+    "test:img2img": "node scripts/test-live-img2img.mjs",
     "seed:gallery": "node scripts/seed-gallery.mjs",
     "start": "next start",
     "lint": "eslint",
