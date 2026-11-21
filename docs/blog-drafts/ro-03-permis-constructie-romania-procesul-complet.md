@@ -8,7 +8,7 @@ date: "2026-04-18"
 
 # Permis de construcție România — procesul AC pas cu pas
 
-Procesul de obținere a autorizației de construire în România are reputația de a fi lent și imprevizibil. Reputația este doar parțial meritată: în realitate, parcursul este bine definit de Legea 50/1991, iar întârzierile apar aproape întotdeauna în același loc. Acest ghid parcurge fiecare etapă, cu timpi reali măsurați pe 340 proiecte urmărite de echipa ModulCA în perioada 2023-2025, costuri actualizate pentru 2026 și lista de greșeli care prelungesc dosarul cu luni întregi.
+Procesul de obținere a autorizației de construire în România are reputația de a fi lent și imprevizibil. Reputația este doar parțial meritată: în realitate, parcursul este bine definit de CATUC (Legea 169/2026, în vigoare din 25.08.2026), care consolidează vechile Lege 50/1991 și 350/2001, iar întârzierile apar aproape întotdeauna în același loc. Acest ghid parcurge fiecare etapă, cu timpi reali măsurați pe 340 proiecte urmărite de echipa ModulCA în perioada 2023-2025, costuri actualizate pentru 2026 și lista de greșeli care prelungesc dosarul cu luni întregi.
 
 ## Privire de ansamblu
 
@@ -127,7 +127,7 @@ Procesul de autorizare pentru o casă modulară este **identic** cu cel pentru o
 
 ## Resurse suplimentare
 
-Procesul evoluează. Legea 50/1991 a fost modificată de peste 30 de ori în ultimii 20 ani. Pentru versiunea actualizată 2026 și diferențele pe sectoare/municipii, consultă [biblioteca noastră de reglementări](/library), actualizată trimestrial de echipa noastră juridică.
+Procesul evoluează. CATUC a înlocuit în august 2026 vechile Lege 50/1991 (modificată de peste 30 de ori) și Lege 350/2001, consolidând regimul de urbanism și autorizare într-un singur cod. Pentru versiunea actualizată 2026 și diferențele pe sectoare/municipii, consultă [biblioteca noastră de reglementări](/library), actualizată trimestrial de echipa noastră juridică.
 
 ## Pasul următor
 
