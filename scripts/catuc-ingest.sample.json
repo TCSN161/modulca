@@ -1,0 +1,28 @@
+{
+  "notebookName": "CATUC 169/2026",
+  "exportedAt": "2026-11-26",
+  "_comment": "Sample format for NotebookLM Q&A export. After running NotebookLM queries, fill this structure with the answers and run: node scripts/catuc-ingest.mjs scripts/catuc-ingest.sample.json. Each query needs id, question, answer. Citations are optional but recommended.",
+  "queries": [
+    {
+      "id": "Q1",
+      "question": "Please provide the complete verbatim text of CATUC (Legea 169/2026) articles 294, 295, 296, 297, 298, and 299.",
+      "answer": "Art. 294. (1) Lucrările de construire care se încadrează în categoria prevăzută la art. [...] se pot executa pe bază de notificare. (2) Se execută pe bază de notificare: a) locuințe unifamiliale izolate: (i) [...] (ii) de regim P sau D+P, cu suprafața construită desfășurată de maxim 150 mp, situate în intravilan; [... continue with Q2-Q6 verbatim ...] Art. 299. (1) Nu se autorizează și nu se notifică: (2) Lucrările care nu necesită autorizație sau notificare includ: c) anexe gospodărești cu suprafața construită maximă de 20 mp și înălțime la cornișă de maxim 2,5 m, situate în extravilan sau intravilan rural.",
+      "citations": [
+        "catuc-169-2026-text.md — Titlul VIII, Capitolul [TBD]",
+        "catuc-169-2026-articole.json — art. 294 through art. 299"
+      ]
+    },
+    {
+      "id": "Q2",
+      "question": "Which CATUC articles replace Legea 50/1991 art. 1, art. 7, and art. 11?",
+      "answer": "[REPLACE WITH NOTEBOOKLM ANSWER — mapping of old articles to new CATUC articles]",
+      "citations": []
+    },
+    {
+      "id": "Q3",
+      "question": "Which CATUC articles replace Legea 350/2001 provisions about PUG, PUZ, PUD, and certificat de urbanism?",
+      "answer": "[REPLACE WITH NOTEBOOKLM ANSWER]",
+      "citations": []
+    }
+  ]
+}
