@@ -18,8 +18,25 @@ Use single-word English short names. No RO/EN mixing, no spaces, no slashes.
 | 3 | **Engines** | AI engines + rendering + video + visuals | "AI Engines & Rendering", "render_ai", "render_AI" |
 | 4 | **Billing** | Pricing, subscriptions, credit manager, Stripe, bank, CUI, API-key signup | "Prices/Accounts", "Preturi, conturi", "Preturi conturi" |
 | 5 | **Drawings** | Technical drawings, DWG/PDF export, CAD standards | "Technical Drawings", "desen tehnic" |
+| 6 | _reserved_ | TBD when needed (likely Marketing, Analytics, Ops, or Legal) | — |
+| 7 | **Partners** | Collaborators + partners: Vlad engagement, engineers, module producers, DPAs, startup programs, journalists, strategic partners | "Colaboratori si parteneri" |
 
 **Rule**: Use the canonical name in session titles, commits, handoff filenames, and docs. Old names are deprecated.
+
+### 1.1 Extensibility — adding a new chat category
+
+When a 6th or future chat becomes necessary, apply these rules:
+
+1. **Scope first, then number** — write a one-paragraph scope statement before claiming a chat number. If scope overlaps >50% with an existing chat, don't create a new one; extend the existing.
+2. **Canonical name** — single English word, PascalCase or single word, ≤10 chars. No spaces, no slashes, no RO/EN mixing.
+3. **Update 2 files** on creation:
+   - This doc (§1 table + a one-line scope)
+   - `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md` §1 "Scope per chat" table
+4. **Commit message format**: `docs(chats): register chat {N}.{Name} — {scope one-liner}`
+5. **Apply all existing rules** (session naming §2, granularity §3, weekly schedule §4, no-delete §5) immediately from chat creation.
+6. **Memory sync** — if the new chat is long-lived and strategic, add a reference in `memory/project_modulca_2_0.md` so future sessions find it on startup.
+
+**Sequence reservation**: numbers 1-7 claimed. 6 is reserved for next inevitable need (Marketing or Analytics are the two most likely candidates when we hit Phase 6-7). Numbers 8+ open for later expansion.
 
 ---
 

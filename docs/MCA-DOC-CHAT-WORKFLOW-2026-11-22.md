@@ -1,8 +1,8 @@
 # MCA-DOC-CHAT-WORKFLOW-2026-11-22
 
-**Status**: Canonical workflow rules — all 5 ModulCA chats align to this
+**Status**: Canonical workflow rules — all ModulCA chats align to this (currently 6, extensible per §1 of MCA-DOC-CHAT-NAMING-2026-11-22)
 **Owner**: Costin Muraru
-**Applies to**: Chat 1 MAIN, Chat 2 NeufertAI, Chat 3 AI Engines & Rendering, Chat 4 Prices/Accounts, Chat 5 Technical Drawings
+**Applies to**: Chat 1 MAIN, Chat 2 Neufert, Chat 3 Engines, Chat 4 Billing, Chat 5 Drawings, Chat 7 Partners (Chat 6 reserved)
 **Rule**: Any chat opening a new session reads this file before starting work. Memory files point here.
 
 ---
@@ -12,10 +12,12 @@
 | Chat | Owns | Does NOT own |
 |---|---|---|
 | **1. MAIN** | Orchestration, meta-decisions, cross-cutting concerns, blocker triage, cross-chat coordination, daily planning, workflow optimization, language conventions, workspace decisions | Writing engine code, legal consultant logic, pricing models, technical drawings |
-| **2. NeufertAI** | Consultant chain (`src/app/api/consultant/`), prompt engineering, legal text (CATUC 169/2026, Codul Fiscal), NotebookLM workflow, RAG depth per tier | Engine-level config, pricing enforcement, renders |
-| **3. AI Engines & Rendering** | Render pipeline, image engines (19 of them), video engines (LTX scaffold, Wan OSS), visual output, presentation slide engine, model-freshness audits, Three.js walkthrough recording | Consultant text logic, billing enforcement, construction docs |
-| **4. Prices/Accounts** | Subscription tiers (`src/features/auth/types.ts`), credit manager (`src/app/api/ai-render/engines/creditManager.ts`), Stripe test→live, API key signup workflow, bank/CUI/billing, pricing bands mapping | Engine code, consultant logic, drawings |
-| **5. Technical Drawings** | Construction documentation (DWG/PDF export), CAD standards, dimension conventions, engineering drawings output | Rendered imagery (that's Chat 3), legal text (Chat 2) |
+| **2. Neufert** | Consultant chain (`src/app/api/consultant/`), prompt engineering, legal text (CATUC 169/2026, Codul Fiscal), NotebookLM workflow, RAG depth per tier | Engine-level config, pricing enforcement, renders |
+| **3. Engines** | Render pipeline, image engines (19 of them), video engines (LTX scaffold, Wan OSS), visual output, presentation slide engine, model-freshness audits, Three.js walkthrough recording | Consultant text logic, billing enforcement, construction docs |
+| **4. Billing** | Subscription tiers (`src/features/auth/types.ts`), credit manager (`src/app/api/ai-render/engines/creditManager.ts`), Stripe test→live, API key signup workflow, bank/CUI/billing, pricing bands mapping | Engine code, consultant logic, drawings |
+| **5. Drawings** | Construction documentation (DWG/PDF export), CAD standards, dimension conventions, engineering drawings output | Rendered imagery (that's Chat 3), legal text (Chat 2) |
+| **6.** _reserved_ | TBD when needed (likely Marketing, Analytics, Ops, or Legal) | — |
+| **7. Partners** | Collaborator + partner relationships: Vlad engagement docs, engineers/module producers coordination, DPA vendor outreach, startup program applications, press/journalist contacts, strategic partner conversations | Code, legal text content, pricing logic |
 
 **Rule**: If a message starts in the wrong chat, the receiving chat redirects with one line: *"This belongs in Chat [N] — ask there: [1-sentence prompt]"*. No multi-paragraph explanation, no duplicated work.
 
