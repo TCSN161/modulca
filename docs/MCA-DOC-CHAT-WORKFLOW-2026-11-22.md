@@ -138,8 +138,104 @@ Memory file `user_costin.md` already points chats to `project_modulca_2_0.md`, w
 
 ---
 
-## 9. Changelog
+## 9. Read-first ritual (every new session, ~5 min)
+
+Any new chat session starts by reading 3 files from disk, in order:
+
+1. `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md` (this file — rules)
+2. `docs/MCA-DOC-CHAT-NAMING-2026-11-22.md` (session naming format)
+3. Latest status snapshot — find it via `ls docs/MCA-DOC-STATUS-*.md | tail -1`
+
+Plus, if entering a Phase currently in progress, read that phase's spec:
+- Phase 2 → `docs/MCA-SPEC-CATUC-PHASE2-PLAN.md`
+- Phase 3 → `docs/MCA-SPEC-CATUC-PHASE3-PLATFORM.md`
+- Phase 4+ → equivalent
+
+Open blockers always at `docs/MCA-DOC-BLOCKERS-ACTIVE-{latest-date}.md`.
+
+Everything else is in memory file (`project_modulca_2_0.md`) which Claude auto-loads.
+
+**Why 5 min, not 15**: Captain's original ritual was 15 min across 8 files because the old 3-Layer architecture had more handoff surface. Our flat 7-chat + memory file structure needs less.
+
+---
+
+## 10. Write boundaries per chat
+
+Each chat writes only within its ownership paths. Prevents accidental cross-chat edits.
+
+| Chat | ALLOWED write paths | FORBIDDEN (don't touch) |
+|---|---|---|
+| **1. MAIN** | `docs/**` (all MCA-* docs, handoffs, research, sessions), memory files, `.github/workflows/**`, `.claude/**`, root config files (next.config, tsconfig, package.json — with user approval) | `src/app/api/consultant/**`, `src/app/api/ai-render/**`, `src/features/auth/types.ts` (those belong to specialists) |
+| **2. Neufert** | `src/app/api/consultant/**`, `src/app/api/catuc-translate/**`, `src/knowledge/**`, `src/features/blog/**`, `docs/research/*catuc*`, `docs/MCA-SPEC-CATUC-*` | `src/app/api/ai-render/**`, `creditManager.ts`, drawings, Stripe, auth flow |
+| **3. Engines** | `src/app/api/ai-render/**`, `src/features/*/components/*Three*`, `scripts/engines-*.mjs`, `docs/MCA-DOC-AI-ENGINES-*`, engine billing data | Consultant logic, legal text, pricing enforcement |
+| **4. Billing** | `src/features/auth/types.ts`, `src/app/api/ai-render/engines/creditManager.ts`, `src/app/api/stripe/**`, `scripts/stripe-*.mjs`, `docs/STRIPE_*`, `docs/MCA-DOC-PRICING-*` | Engine code, consultant logic, drawings |
+| **5. Drawings** | `src/features/drawings/**` (future), `src/app/api/drawings/**` (future), CAD export scripts | Render imagery, legal text |
+| **7. Partners** | `docs/MCA-DOC-VLAD-*`, `docs/MCA-DOC-PARTNERS-*`, DPA templates, startup app docs, press kit docs, email outreach drafts | Code anywhere, pricing logic |
+
+**Shared infrastructure** (everyone can touch, with explicit intention):
+- `.gitignore`, `README.md`, `supabase/migrations/**` (coordinate via handoff first — never two chats editing migrations)
+- Test files (`*.test.ts`) — chat that owns the feature owns its tests
+
+**Enforcement**: honor-system. If a chat accidentally writes outside its boundary, next session calls it out in commit review + revert if needed. Repeated violations = tighten rule.
+
+---
+
+## 11. Captain's inheritance — patterns we lift (Captain itself retired)
+
+Captain layer is deprecated. Its orchestration role is Chat 1 MAIN's job now. But 4 patterns from Captain are worth keeping and are codified elsewhere in this doc:
+
+| Pattern | Where in this doc |
+|---|---|
+| **File-based communication** (no side channels, no pasted context between chats) | §5 Handoff protocol |
+| **Fresh is strength** (new session from memory+docs = more coherent than long session) | §2 Session-ending signals |
+| **Scope boundaries** (each chat owns one domain, nothing crosses) | §1 Scope per chat, §10 Write boundaries |
+| **Decision log** (strategic decisions recorded somewhere searchable) | §11.1 below |
+
+### 11.1 Decision log
+
+Strategic decisions that affect >1 chat or >1 week get logged in:
+
+`docs/MCA-STRAT-DECISIONS.md` — append-only, one line per decision, newest-first.
+
+Format:
+```
+| Date | Decision | Driver | Supersedes |
+|---|---|---|---|
+| 2026-11-22 | Captain layer retired, Chat 1 MAIN owns orchestration | Workflow simplification | April 3-Layer Captain Architecture |
+| 2026-11-22 | English-first for substantive technical content | Token optimization + consistency | — |
+| 2026-11-20 | 4 critical keys rotated (Anthropic, Supabase x2, OpenAI) | Screenshots exposed values | — |
+| 2026-11-19 | Launch target: Feb 1 2027 public, Dec 15 2026 invite-only | Rebaseline after 7mo pause + CATUC law change | April May 1 target |
+```
+
+New decision → one line → commit. No prose explanations in the log — those live in the committing doc.
+
+### 11.2 Kill-switch patterns (from Captain §7)
+
+Graceful abort conditions, by chat:
+- **Any chat accidentally touches forbidden path** → stop, revert, note in next commit
+- **Session feels stuck >15 min on same sub-step** → close session, start fresh with the context doc updated
+- **Prod incident mid-work** → all chats pause except whichever owns the incident (usually MAIN or Engines) → resolve first, then resume
+- **User unavailable + a decision gates progress** → commit a draft marked `DRAFT: awaiting user decision on X` → close session → resume when user replies
+
+---
+
+## 12. Ritual calendar
+
+| Rhythm | Owner | Output | Effort |
+|---|---|---|---|
+| **Daily morning** | Chat 1 MAIN | 3-5 tasks mapped to chats, effort levels, token estimates | Opus Medium, 5 min |
+| **Daily evening** (optional) | Chat 1 MAIN | Day wrap: shipped / in flight / blocked, 3 lines | Opus Low, 2 min |
+| **Friday evening** | Chat 1 MAIN | `docs/MCA-DOC-WEEK-{YYYY-Www}-SCHEDULE.md` for next week + wrap-up of current week | Opus High, 15-30 min |
+| **Last Sunday of month** | Chat 1 MAIN | `docs/MCA-LOG-MONTH-{YYYY-MM}-retrospective.md` — phase progress, lessons, decisions to revisit, budget check | Opus High, 30-45 min |
+| **End of each Phase** | Chat that owns the Phase | Phase retrospective embedded in MCA-LOG at phase close | Opus High, 20-30 min |
+
+Antifragility compounds: each retro's lessons update this workflow doc. Over time, the system gets cheaper + smarter.
+
+---
+
+## 13. Changelog
 
 | Date | Change | Driver |
 |---|---|---|
 | 2026-11-22 | Initial doc created in Chat 3 to codify multi-chat workflow | Costin asked how to optimize token usage across all 5 chats; English-first switch same day |
+| 2026-11-22 | Added §9 Read-first ritual, §10 Write boundaries, §11 Captain's inheritance (decision log + kill switches), §12 Ritual calendar | MAIN: Captain layer retired, patterns lifted into flat 7-chat structure |
