@@ -14,7 +14,7 @@ Post Phase 1 close, consolidated clean list. Old blockers (B1, B3, B5, B7, B10, 
 - **Files**: F2 building-permit-process, F3 modular-prefab-regulations, F4 urban-planning-pug-puz, F6 building-permit-romania (body prose), plus NEW chapter catuc-169-2026 + clarificări
 - **Status**: 4/10 pre-prepped (F1, F5, F6 frontmatter, F7 frontmatter, F9 body, F10 body)
 - **Blocked on**: NotebookLM upload by user → `scripts/catuc-ingest.mjs` processes → .new.md siblings
-- **Phase**: 2 (Nov 26 - Dec 5)
+- **Phase**: 2 (Nov 25 - Dec 5)
 - **Owner**: User (NotebookLM) + Claude (writing) + Vlad Ioniță (review)
 
 ### B4. Vlad Ioniță formal engagement not documented

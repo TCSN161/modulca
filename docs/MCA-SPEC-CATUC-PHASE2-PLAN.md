@@ -381,7 +381,7 @@ Q20. Summary: Top 10 changes a Romanian homeowner/developer needs to know about 
 | **TOTAL USER TIME** | **~5 hours** | - | Vlad review + NotebookLM upload |
 
 **Daily plan** (10 days):
-- Day 1 (Nov 26): NotebookLM upload + Q1-Q10 synthesis
+- Day 1 (Nov 25): NotebookLM upload + Q1-Q10 synthesis
 - Day 2: Finish Q11-Q20 + article mapping table
 - Day 3: F1 + F5 (quick wins) + start F3 (critical)
 - Day 4: Finish F3 (modular-prefab) + send to Vlad for early review

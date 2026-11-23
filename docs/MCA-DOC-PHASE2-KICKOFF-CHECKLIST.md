@@ -1,6 +1,6 @@
 # MCA-DOC-PHASE2-KICKOFF-CHECKLIST
 
-**Pentru**: Miercuri 26 Nov 2026 — Phase 2 start day  
+**Pentru**: Miercuri 25 Nov 2026 — Phase 2 start day (moved from 26, see W48 schedule §0)  
 **Owner**: Costin + Claude  
 **Prev**: [[MCA-SPEC-CATUC-PHASE2-PLAN]] · [[MCA-DOC-WEEKEND-PLAN-2026-11-22]]
 
@@ -18,7 +18,7 @@ Dacă NotebookLM NU e done → tu faci primul pe Mi dimineață (1h paste), apoi
 
 ---
 
-## 📋 Pe ziua de 26 Nov
+## 📋 Pe ziua de 25 Nov
 
 ### Dimineață (09:00-12:00)
 

@@ -9,6 +9,7 @@
 
 | Date | Decision | Driver | Supersedes |
 |---|---|---|---|
+| 2026-11-23 | Phase 2 kickoff Wed 25 Nov (F2 Wed, F3 Thu, F4+F6 Fri); NotebookLM ingest runs in Chat 2 | 26 Nov is a Thursday; keep weekday sequence; ingest writes Neufert paths | "Wed 26 Nov" kickoff |
 | 2026-11-22 | Captain layer retired, Chat 1 MAIN owns orchestration; 7-chat flat structure (Chat 6 reserved) | Workflow simplification — April 3-Layer Captain overengineered for our scale | April 3-Layer Captain Architecture |
 | 2026-11-22 | English-first for substantive technical content + docs + commits (RO allowed for legal verbatim or conversational chat) | Token optimization + cross-chat consistency | — |
 | 2026-11-22 | Session naming format `{N}.{seq}.{Label}_{topic}_{YYYYMMDD}`, one session per shippable deliverable not per phase | Clear audit trail + context freshness per topic | ad-hoc chat names |
