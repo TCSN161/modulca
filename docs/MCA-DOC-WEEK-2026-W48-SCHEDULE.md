@@ -3,6 +3,7 @@
 **Written by**: 1.02.MAIN_WeeklyPlan-W48_20261123 (Monday, not Friday — first week of the ritual)
 **Phase**: Phase 1 closed (100%). Phase 2 (CATUC content) kicks off **Wed 25 Nov**.
 **Inputs**: [[MCA-DOC-STATUS-2026-11-21]] · [[MCA-DOC-WEEKEND-PLAN-2026-11-22]] · [[MCA-DOC-PHASE2-KICKOFF-CHECKLIST]] · [[MCA-SPEC-CATUC-PHASE2-PLAN]]
+**Bigger picture (all chats, to Dec 15 beta)**: [[MCA-DOC-ROADMAP-ALL-CHATS-2026-11-23]]
 
 ---
 
@@ -25,6 +26,7 @@ Earlier docs say "Phase 2 kickoff **Wed 26** Nov". **26 Nov 2026 is a Thursday.*
 | Mon 23 | 1.MAIN | 1.02.MAIN_WeeklyPlan-W48_20261123 (this one; stays open for Vlad + NotebookLM updates) | 30 min | 8k |
 | Mon 23 | user | — Vlad email: personalize + send ([template](MCA-DOC-VLAD-EMAIL-TEMPLATE.md)) | 30 min | 0 |
 | Tue 24 AM | user | — NotebookLM: upload 3 CATUC sources + Q1–Q10 ([queries](research/2026-11-19-notebooklm-catuc-queries.md)) | 1–1.5h | 0 |
+| Tue 24 | user | — DeepSeek $5 top-up (Phase 2 translation from Wed 25; or tell MAIN "no") | 2 min | 0 |
 | Tue 24 | 2.Neufert | 2.02.Neufert_NotebookLM-Ingest_20261124 | 30 min | 8k |
 | Tue 24 PM | 1.MAIN | 1.03.MAIN_Phase2-Readiness_20261124 (Go/No-Go + kickoff handoff) | 20 min | 6k |
 | **Wed 25** | 2.Neufert | **2.03.Neufert_Phase2-F2-Content_20261125** (kickoff) | 3h | 30k |
@@ -33,6 +35,7 @@ Earlier docs say "Phase 2 kickoff **Wed 26** Nov". **26 Nov 2026 is a Thursday.*
 | Fri 27 | 1.MAIN | 1.04.MAIN_Week-Wrap-W48_20261127 (W48 wrap + W49 schedule) | 30 min | 8k |
 | Sat 28 | — | Buffer only (overflow from F3/F4/F6). Default: rest. | — | 0 |
 | Sat 28 → | 7.Partners | Only if Vlad replies: 7.0x.Partners_Vlad-Engagement_{date} | 30 min | 5k |
+| Sun 29 | 1.MAIN | 1.05.MAIN_Month-Retro-2026-11_20261129 (last Sunday of month ritual) | 30 min | 8k |
 
 **Total estimated tokens**: ~160k (≈ 103k Neufert, ≈ 22k MAIN, ≈ 5k Partners, rest margin). Weekly budget resets Sat 06:00.
 
