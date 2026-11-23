@@ -166,10 +166,10 @@ Each chat writes only within its ownership paths. Prevents accidental cross-chat
 | Chat | ALLOWED write paths | FORBIDDEN (don't touch) |
 |---|---|---|
 | **1. MAIN** | `docs/**` (all MCA-* docs, handoffs, research, sessions), memory files, `.github/workflows/**`, `.claude/**`, root config files (next.config, tsconfig, package.json — with user approval) | `src/app/api/consultant/**`, `src/app/api/ai-render/**`, `src/features/auth/types.ts` (those belong to specialists) |
-| **2. Neufert** | `src/app/api/consultant/**`, `src/app/api/catuc-translate/**`, `src/knowledge/**`, `src/features/blog/**`, `docs/research/*catuc*`, `docs/MCA-SPEC-CATUC-*` | `src/app/api/ai-render/**`, `creditManager.ts`, drawings, Stripe, auth flow |
+| **2. Neufert** | `src/app/api/consultant/**`, `src/app/api/catuc-translate/**`, `src/knowledge/**`, `src/features/blog/**`, `src/features/catuc/**` + `src/app/(app)/catuc-check/**` + `src/app/api/catuc-check/**` (Phase 3 checker + Profile Engine), `src/app/(app)/privacy/**` + `src/app/(app)/terms/**` (legal pages text), `docs/research/*catuc*`, `docs/MCA-SPEC-CATUC-*` | `src/app/api/ai-render/**`, `creditManager.ts`, drawings, Stripe, auth flow |
 | **3. Engines** | `src/app/api/ai-render/**`, `src/features/*/components/*Three*`, `scripts/engines-*.mjs`, `docs/MCA-DOC-AI-ENGINES-*`, engine billing data | Consultant logic, legal text, pricing enforcement |
-| **4. Billing** | `src/features/auth/types.ts`, `src/app/api/ai-render/engines/creditManager.ts`, `src/app/api/stripe/**`, `scripts/stripe-*.mjs`, `docs/STRIPE_*`, `docs/MCA-DOC-PRICING-*` | Engine code, consultant logic, drawings |
-| **5. Drawings** | `src/features/drawings/**` (future), `src/app/api/drawings/**` (future), CAD export scripts | Render imagery, legal text |
+| **4. Billing** | `src/features/auth/types.ts`, `src/app/api/ai-render/engines/creditManager.ts`, `src/app/api/stripe/**`, `src/features/beta/**` + `src/app/api/feedback/**` (beta badge + feedback widget), `scripts/stripe-*.mjs`, `docs/STRIPE_*`, `docs/MCA-DOC-PRICING-*` | Engine code, consultant logic, drawings |
+| **5. Drawings** | `src/features/drawings/**` (future), `src/app/api/drawings/**` (future), `src/features/permits/**` + `src/app/api/permits/**` (Phase 3 PermitTracker PDFs), `docs/MCA-SPEC-PERMITTRACKER-*`, CAD export scripts | Render imagery, legal text |
 | **7. Partners** | `docs/MCA-DOC-VLAD-*`, `docs/MCA-DOC-PARTNERS-*`, DPA templates, startup app docs, press kit docs, email outreach drafts | Code anywhere, pricing logic |
 
 **Shared infrastructure** (everyone can touch, with explicit intention):
@@ -239,3 +239,4 @@ Antifragility compounds: each retro's lessons update this workflow doc. Over tim
 |---|---|---|
 | 2026-11-22 | Initial doc created in Chat 3 to codify multi-chat workflow | Costin asked how to optimize token usage across all 5 chats; English-first switch same day |
 | 2026-11-22 | Added §9 Read-first ritual, §10 Write boundaries, §11 Captain's inheritance (decision log + kill switches), §12 Ritual calendar | MAIN: Captain layer retired, patterns lifted into flat 7-chat structure |
+| 2026-11-23 | §10: new write paths — Neufert (catuc checker/Profile Engine, privacy/terms), Billing (beta badge/feedback), Drawings (PermitTracker) | Phase 3 ownership decided in MCA-DOC-ROADMAP-ALL-CHATS-2026-11-23 §3 |

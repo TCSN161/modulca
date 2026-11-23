@@ -49,8 +49,8 @@ Legend: 🔴 gate for a phase · 🟡 should happen in that window · ⚪ later 
 | W49 Nov 28–Dec 3 | 🔴 Apply Vlad's review fixes | Vlad window |
 | W49 Thu–Fri Dec 4–5 | 🔴 Promote `.new.md` → live, F8 `_index.ts` regen, deploy | Only after Vlad sign-off (D11 rule) |
 | W49 | 🟡 Consultant (NeufertAI) RAG: point answers at the new CATUC content; smoke test 10 CATUC questions | |
-| W50 Dec 6–10 | 🔴 Phase 3: `/catuc-check` checker logic + tests + route; Profile Engine | **Ownership proposal**, see §3 Q1 |
-| W50 | 🟡 Privacy Policy + ToS beta clause ("preview product, no SLA") | **Ownership proposal**, see §3 Q2 |
+| W50 Dec 6–10 | 🔴 Phase 3: `/catuc-check` checker logic + tests + route; Profile Engine | Owner decided 2026-11-23, see §3 Q1 |
+| W50 | 🟡 Privacy Policy + ToS beta clause ("preview product, no SLA") | Owner decided 2026-11-23, see §3 Q2 |
 
 ### Chat 3 — Engines (renders, video, 3D)
 
@@ -69,7 +69,7 @@ Nothing blocking this week. Everything ITEM-wise in its handoffs is closed.
 |---|---|---|
 | **Tue 24** | 🔴 **DeepSeek $5 top-up** (you, 2 min) — Phase 2 uses it for translation on Wed 25 | Fits €12 headroom. Without it, Claude does translation (more Claude tokens) |
 | W50 | 🔴 Beta promo path: invite user signs up → gets Premium for 3 months → credits/quotas correct → downgrade logic dated | Test end-to-end in Stripe TEST mode |
-| W50 | 🟡 Beta-specific onboarding: "BETA" badge + feedback widget | **Ownership proposal**, see §3 Q3 |
+| W50 | 🟡 Beta-specific onboarding: "BETA" badge + feedback widget | Owner decided 2026-11-23, see §3 Q3 |
 | Jan 16–31 | 🔴 Stripe test → live cutover (`docs/STRIPE_GO_LIVE_CHECKLIST.md`), CUI/bank details | Phase 6 |
 
 ### Chat 5 — Drawings (technical docs, PDF/DWG)
@@ -79,7 +79,7 @@ Not opened yet. First real work is Phase 3.
 | When | Item | Notes |
 |---|---|---|
 | W49 | 🟡 First session (5.01): read-only audit of existing export/PDF code (`src/features/output`, presentation) → write `MCA-SPEC-PERMITTRACKER-PDF.md` | ~1–2h, prepares Phase 3 |
-| W50 Dec 11–12 | 🔴 PermitTracker v0: 3 PDF templates (notification package, art. 294) + zip/download | **Ownership proposal**, see §3 Q1 |
+| W50 Dec 11–12 | 🔴 PermitTracker v0: 3 PDF templates (notification package, art. 294) + zip/download | Owner decided 2026-11-23, see §3 Q1 |
 | Dec 11 → 13 | 🔴 Send PDFs to Vlad Dec 11, sign-off by Dec 13 | Phase 3 risk table |
 | Jan+ | ⚪ DWG export v0 | |
 
@@ -113,11 +113,11 @@ Not opened yet. First real work is Phase 3.
 
 ---
 
-## 3. Open questions (decide at Fri 27 wrap at the latest)
+## 3. Ownership decisions (accepted by Costin 2026-11-23)
 
-1. **Who builds Phase 3 code?** The Phase 3 spec has no chat owner. Proposal: Chat 2 Neufert owns `/catuc-check` + Profile Engine (new path `src/features/catuc/**`, CATUC domain logic); Chat 5 Drawings owns PermitTracker PDFs (`src/features/permits/**`). Both paths must be added to WORKFLOW §10.
-2. **Who owns Privacy Policy / ToS text?** Proposal: Chat 2 (it owns legal text), Chat 7 checks wording with Vlad if needed.
-3. **Who owns the beta badge + feedback widget?** Cross-cutting UI that no chat owns today. Proposal: Chat 4 Billing (it already owns tiers and the beta promo).
+1. ✅ **Phase 3 code**: Chat 2 Neufert owns `/catuc-check` + Profile Engine (new path `src/features/catuc/**`, CATUC domain logic); Chat 5 Drawings owns PermitTracker PDFs (`src/features/permits/**`). Both paths added to WORKFLOW §10.
+2. ✅ **Privacy Policy / ToS text**: Chat 2 (it owns legal text), Chat 7 checks wording with Vlad if needed.
+3. ✅ **Beta badge + feedback widget**: Chat 4 Billing (it already owns tiers and the beta promo). Paths: `src/features/beta/**`, `src/app/api/feedback/**`.
 4. **Is Chat 6 needed before beta?** No. Beta feedback triage can live in MAIN until Jan. Revisit at the Jan 15 Go/No-Go.
 
 ---
