@@ -13,13 +13,14 @@ The template proposed a €300–500/month retainer. That is **6–10× the €5
 
 | Layer | What | Who pays | Recommended terms |
 |---|---|---|---|
-| **A. Pre-beta review package** (Nov 28 → Dec 15) | Review Phase 2 CATUC content (F1–F10 + new chapter) + Phase 3 PermitTracker PDF templates (Dec 11–13) | ModulCA, **one-off** | Fixed fee for ~8–10h of work. Budget **€250–400**, final number after asking his hourly rate. This is a one-off cost outside the monthly cap: Costin's decision. |
-| **B. Ongoing content review** (Jan → Jun 2027) | Quarterly update of CATUC articles + ad-hoc questions | ModulCA, per block | **Per block, not retainer**: ~€100–150 per review block, max 1 per quarter + urgent changes (new Norme metodologice). Move to a retainer only after revenue. |
+| **A. Pre-beta review package** (Nov 28 → Dec 15) | **Narrowed scope, ~4–5h**: full review only of the legally critical pieces — F3 modular-prefab-regulations, F2 building-permit-process, and the art. 294 notification PDF templates (Dec 11–13). Other files (F1, F4–F10, new chapter) get a 15-min skim, or Claude cross-checks them against the article text. | ModulCA | **Max €150 cash** (Costin, 2026-11-23: keep it lower). Preferred form: **"founding partner" deal** — €0–100 now + **€150 deferred**, payable from first revenue or at the latest by Feb 28, 2027. Compensated mainly in kind (see below). If he asks more than €150 for this scope: cut scope further (F3 + PDFs only), not raise the fee. |
+| **B. Ongoing content review** (Jan → Jun 2027) | Quarterly update of CATUC articles + ad-hoc questions | ModulCA, per block | **Per block, ~€75–100**, only when the law/norms actually change. No retainer before revenue. |
 | **C. Real user projects** (DTAC, notification packages) | Vlad's office **draws up / checks and signs** the documentation for platform users | **The end client pays Vlad directly** | Vlad sets his own fee and contracts directly with the client. ModulCA takes **no commission at the start** (see §3 deontology). ModulCA's value to him = qualified leads + a project that is already 60–70% structured. |
 
 **Zero-cost value for Vlad** (makes the deal fair without cash):
 - Free **Architect tier** (€49.99/mo) for him/his office, as long as the collaboration lasts.
-- Lead flow: beta users + the Cornetu pilot project go to him first.
+- Lead flow: beta users + the **Cornetu pilot project** go to him first — the pilot's DTAC is a real paid job for him (paid by the client), which is the main counterweight to the low review fee.
+- "Founding partner architect" status: first right of refusal on all platform project referrals in 2027.
 - "Partner architect" credit on the platform **only with his written consent** (and Costin's go-ahead).
 - Optional, **only after beta and only if he wants long-term commitment**: small advisor share (e.g., 0.5–1%, vested over 2 years, 6-month cliff) or a revenue share on Architect/Constructor tiers. Not part of the current discussion — note it as "possible in 2027".
 
@@ -75,7 +76,7 @@ Fee figures above are rough estimates of the Romanian market, not verified data.
 1. **Parties**: MCA SRL ↔ Vlad's practice (BIA/SRL).
 2. **Scope**: layer A (pre-beta package, deliverables + dates) + layer B (review blocks on request). Layer C stays **outside** the contract (Vlad ↔ client directly); the contract only says ModulCA may recommend him.
 3. **Turnaround**: review block delivered within X working days of receipt.
-4. **Fee & payment**: fixed amount for A; per-block amount for B; invoice + payment within 15 days.
+4. **Fee & payment**: A = €0–100 on delivery + €150 deferred (first revenue, latest 28.02.2027); B = per block; invoice + payment within 15 days.
 5. **Confidentiality**: unpublished content, internal data, platform roadmap.
 6. **Liability + disclaimer**: per §3.
 7. **Name/image use**: separate consent clause, revocable.
