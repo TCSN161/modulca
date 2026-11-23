@@ -116,6 +116,7 @@ NAMING doc §3 lists the ingest as `1.03.MAIN_NotebookLM-Ingest`. But `scripts/c
 | When | Event |
 |---|---|
 | Mon 23 | W48 schedule written. Kickoff moved to Wed 25 (Costin). Waiting on: Vlad email (sent? reply?), NotebookLM Q1–Q10. |
+| Mon 23 | **Vlad: OK in principle.** Next: 30-min call (questions + fee structure in `handoffs/MCA-HANDOFF-7-VLAD-ENGAGEMENT-2026-11-23.md`), then agreement draft in Chat 7. |
 
 ---
 
