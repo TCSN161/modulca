@@ -119,6 +119,7 @@ NAMING doc §3 lists the ingest as `1.03.MAIN_NotebookLM-Ingest`. But `scripts/c
 | Mon 23 | **Vlad: OK in principle.** Next: 30-min call (questions + fee structure in `handoffs/MCA-HANDOFF-7-VLAD-ENGAGEMENT-2026-11-23.md`), then agreement draft in Chat 7. |
 | Tue 24 AM | Readiness gate (infra half) done early by MAIN: ops:check 29/2/0, CI green. Local `.env.local` anon key is the disabled legacy JWT (local auth 401; prod OK). Kickoff handoff written: `handoffs/MCA-HANDOFF-2-PHASE2-KICKOFF-2026-11-24.md` → **evening session 1.03 not needed**. Remaining gate: NotebookLM Q1–Q10 ingested by EOD. |
 | Wed 25 | **No-Go applied**: NotebookLM not done Tue → ingest today, F2 Thu 26, F3 Fri 27, F4+F6 Mon 30. Vlad scope (F2, F3, PDFs) still ready for Sat 28 — no impact on his window. |
+| Wed 25 PM | NotebookLM Q1–Q10 done (Costin), file `research/2026-11-25-notebooklm-raw.txt`. MAIN spot-check: Q1 verbatim ✅, Q2 → DTAC is now **PAC** (ITEM-6), Q9 order number unverified (ITEM-7). Next: Chat 2 ingest. |
 
 ---
 

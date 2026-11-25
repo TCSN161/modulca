@@ -90,3 +90,8 @@ CATUC never uses "DTAC" (0 hits in `catuc-169-2026-text.md`). The authorization 
 - In all `.new.md` content: use PAC, with one line explaining "PAC (fostul DTAC)" for readers who know the old term.
 - Code/UI strings outside Chat 2 paths: list them in the W48 live log; MAIN routes them (no edits outside Chat 2 paths).
 - Partners: the Vlad email template and handoff also say DTAC → Chat 7 updates wording.
+
+### ITEM-7 — Q9 claim needs external verification before use
+NotebookLM Q9 cites **"Ordinul MDLPA nr. 1022/2026, M.Of. nr. 724 din 28.08.2026"**. Not found in `catuc-169-2026-text.md`; the Clarificări PDF is a **scanned image** (no extractable text), so it can't be checked locally. Treat as **unverified**: do not publish order numbers/dates until confirmed on legislatie.just.ro / Monitorul Oficial or by Vlad. Same rule for any act number NotebookLM cites that is not in the law text.
+
+**Input file**: answers are complete (Q1–Q10) in `docs/research/2026-11-25-notebooklm-raw.txt` (single `.txt`, renamed).
