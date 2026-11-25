@@ -2,7 +2,7 @@
 
 **Status**: Canonical workflow rules — all ModulCA chats align to this (currently 6, extensible per §1 of MCA-DOC-CHAT-NAMING-2026-11-22)
 **Owner**: Costin Muraru
-**Applies to**: Chat 1 MAIN, Chat 2 Neufert, Chat 3 Engines, Chat 4 Billing, Chat 5 Drawings, Chat 7 Partners (Chat 6 reserved)
+**Applies to**: Chat 1 MAIN, Chat 2 Neufert, Chat 3 Engines, Chat 4 Billing, Chat 5 Drawings, Chat 6 Marketing, Chat 7 Partners
 **Rule**: Any chat opening a new session reads this file before starting work. Memory files point here.
 
 ---
@@ -16,7 +16,7 @@
 | **3. Engines** | Render pipeline, image engines (19 of them), video engines (LTX scaffold, Wan OSS), visual output, presentation slide engine, model-freshness audits, Three.js walkthrough recording | Consultant text logic, billing enforcement, construction docs |
 | **4. Billing** | Subscription tiers (`src/features/auth/types.ts`), credit manager (`src/app/api/ai-render/engines/creditManager.ts`), Stripe test→live, API key signup workflow, bank/CUI/billing, pricing bands mapping | Engine code, consultant logic, drawings |
 | **5. Drawings** | Construction documentation (DWG/PDF export), CAD standards, dimension conventions, engineering drawings output | Rendered imagery (that's Chat 3), legal text (Chat 2) |
-| **6.** _reserved_ | TBD when needed (likely Marketing, Analytics, Ops, or Legal) | — |
+| **6. Marketing** | Communication + content strategy: brand voice, YouTube/Shorts/social, NotebookLM Studio outputs (video, audio, infographics, quizzes), lead magnets, content calendar, positioning + monetization of the CATUC permit service, press kit content (with Chat 7 for outreach) | Code, legal text content (Chat 2 writes, Marketing reuses verified facts), pricing enforcement (Chat 4) |
 | **7. Partners** | Collaborator + partner relationships: Vlad engagement docs, engineers/module producers coordination, DPA vendor outreach, startup program applications, press/journalist contacts, strategic partner conversations | Code, legal text content, pricing logic |
 
 **Rule**: If a message starts in the wrong chat, the receiving chat redirects with one line: *"This belongs in Chat [N] — ask there: [1-sentence prompt]"*. No multi-paragraph explanation, no duplicated work.
@@ -170,6 +170,7 @@ Each chat writes only within its ownership paths. Prevents accidental cross-chat
 | **3. Engines** | `src/app/api/ai-render/**`, `src/features/*/components/*Three*`, `scripts/engines-*.mjs`, `docs/MCA-DOC-AI-ENGINES-*`, engine billing data | Consultant logic, legal text, pricing enforcement |
 | **4. Billing** | `src/features/auth/types.ts`, `src/app/api/ai-render/engines/creditManager.ts`, `src/app/api/stripe/**`, `src/features/beta/**` + `src/app/api/feedback/**` (beta badge + feedback widget), `scripts/stripe-*.mjs`, `docs/STRIPE_*`, `docs/MCA-DOC-PRICING-*` | Engine code, consultant logic, drawings |
 | **5. Drawings** | `src/features/drawings/**` (future), `src/app/api/drawings/**` (future), `src/features/permits/**` + `src/app/api/permits/**` (Phase 3 PermitTracker PDFs), `docs/MCA-SPEC-PERMITTRACKER-*`, CAD export scripts | Render imagery, legal text |
+| **6. Marketing** | `docs/MCA-STRAT-CATUC-SERVICE-*`, `docs/MCA-DOC-MARKETING-*`, `docs/MCA-DOC-CONTENT-*`, `docs/content/**`, `docs/brand/**` | Code anywhere, legal text, pricing logic |
 | **7. Partners** | `docs/MCA-DOC-VLAD-*`, `docs/MCA-DOC-PARTNERS-*`, DPA templates, startup app docs, press kit docs, email outreach drafts | Code anywhere, pricing logic |
 
 **Shared infrastructure** (everyone can touch, with explicit intention):
@@ -240,3 +241,4 @@ Antifragility compounds: each retro's lessons update this workflow doc. Over tim
 | 2026-11-22 | Initial doc created in Chat 3 to codify multi-chat workflow | Costin asked how to optimize token usage across all 5 chats; English-first switch same day |
 | 2026-11-22 | Added §9 Read-first ritual, §10 Write boundaries, §11 Captain's inheritance (decision log + kill switches), §12 Ritual calendar | MAIN: Captain layer retired, patterns lifted into flat 7-chat structure |
 | 2026-11-23 | §10: new write paths — Neufert (catuc checker/Profile Engine, privacy/terms), Billing (beta badge/feedback), Drawings (PermitTracker) | Phase 3 ownership decided in MCA-DOC-ROADMAP-ALL-CHATS-2026-11-23 §3 |
+| 2026-11-25 | Chat 6 registered as **Marketing** (§1 scope, §10 write paths) | Costin: separate chat for CATUC service + communication strategy |

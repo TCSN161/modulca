@@ -18,7 +18,7 @@ Use single-word English short names. No RO/EN mixing, no spaces, no slashes.
 | 3 | **Engines** | AI engines + rendering + video + visuals | "AI Engines & Rendering", "render_ai", "render_AI" |
 | 4 | **Billing** | Pricing, subscriptions, credit manager, Stripe, bank, CUI, API-key signup | "Prices/Accounts", "Preturi, conturi", "Preturi conturi" |
 | 5 | **Drawings** | Technical drawings, DWG/PDF export, CAD standards | "Technical Drawings", "desen tehnic" |
-| 6 | _reserved_ | TBD when needed (likely Marketing, Analytics, Ops, or Legal) | — |
+| 6 | **Marketing** | Communication, content strategy, YouTube/social, NotebookLM Studio outputs, CATUC service positioning | — (registered 2026-11-25) |
 | 7 | **Partners** | Collaborators + partners: Vlad engagement, engineers, module producers, DPAs, startup programs, journalists, strategic partners | "Colaboratori si parteneri" |
 
 **Rule**: Use the canonical name in session titles, commits, handoff filenames, and docs. Old names are deprecated.
@@ -36,7 +36,7 @@ When a 6th or future chat becomes necessary, apply these rules:
 5. **Apply all existing rules** (session naming §2, granularity §3, weekly schedule §4, no-delete §5) immediately from chat creation.
 6. **Memory sync** — if the new chat is long-lived and strategic, add a reference in `memory/project_modulca_2_0.md` so future sessions find it on startup.
 
-**Sequence reservation**: numbers 1-7 claimed. 6 is reserved for next inevitable need (Marketing or Analytics are the two most likely candidates when we hit Phase 6-7). Numbers 8+ open for later expansion.
+**Sequence reservation**: numbers 1-7 claimed (6 = Marketing since 2026-11-25). Numbers 8+ open for later expansion (Analytics, Ops, Legal are likely candidates).
 
 ---
 

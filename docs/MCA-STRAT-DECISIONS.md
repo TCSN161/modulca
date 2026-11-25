@@ -9,6 +9,7 @@
 
 | Date | Decision | Driver | Supersedes |
 |---|---|---|---|
+| 2026-11-25 | CATUC permit service = detachable module inside modulca.eu (/autorizare), spin-out only on data; Chat 6 registered as Marketing | Costin: future standalone service + content channel | "Chat 6 not needed before beta" |
 | 2026-11-23 | Vlad pre-beta review: max €150 cash (founding-partner deal, mostly deferred + in-kind), scope narrowed to F2, F3, notification PDFs; no retainer before revenue | €50/mo cap, pre-revenue | Template €300–500/mo retainer |
 | 2026-11-23 | Phase 3 owners: Neufert = /catuc-check + Profile Engine + Privacy/ToS text; Drawings = PermitTracker PDFs; Billing = beta badge + feedback widget | Phase 3 spec had no chat owners | — |
 | 2026-11-23 | Phase 2 kickoff Wed 25 Nov (F2 Wed, F3 Thu, F4+F6 Fri); NotebookLM ingest runs in Chat 2 | 26 Nov is a Thursday; keep weekday sequence; ingest writes Neufert paths | "Wed 26 Nov" kickoff |
