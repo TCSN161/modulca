@@ -124,7 +124,7 @@ function scanMarkdownFiles(dir, basePath = KNOWLEDGE_DIR) {
 
     if (stat.isDirectory()) {
       results.push(...scanMarkdownFiles(fullPath, basePath));
-    } else if (extname(entry) === ".md") {
+    } else if (extname(entry) === ".md" && !entry.endsWith(".new.md")) { // .new.md = unreviewed drafts, indexed only after promotion
       const parsed = parseFrontmatter(fullPath);
       if (parsed) {
         results.push({
