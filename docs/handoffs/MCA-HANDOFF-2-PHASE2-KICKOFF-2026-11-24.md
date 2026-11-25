@@ -67,3 +67,26 @@ Claude reviews every DeepSeek output before commit.
 - One session per item; end each with the standard end-of-session line and the next session's opening prompt.
 - If an item overruns, carry it over; never rush F3.
 - Report back: one line per finished item in `docs/MCA-DOC-WEEK-2026-W48-SCHEDULE.md` §6 (live log) is enough — no separate handoff needed unless something blocks.
+
+---
+
+## 4. Added Wed 25 (from NotebookLM Q2, verified in source text)
+
+### ITEM-6 — DTAC → PAC terminology
+CATUC never uses "DTAC" (0 hits in `catuc-169-2026-text.md`). The authorization project is now **PAC — Proiectul pentru autorizarea construirii** (art. 262, 264; 4 hits). Our code still says DTAC in 12 files under `src/`:
+  - src/features/blog/articles-ro.ts
+  - src/features/blog/articles.ts
+  - src/features/consultant/neufertKB.ts
+  - src/features/design/components/technical/PermitTracker.tsx
+  - src/i18n/messages/en.json
+  - src/i18n/messages/nl.json
+  - src/i18n/messages/ro.json
+  - src/knowledge/06-regulations/RO/building-permit-process.md
+  - src/knowledge/06-regulations/RO/building-permit-process.new.md
+  - src/knowledge/06-regulations/RO/modular-prefab-regulations.new.md
+  - src/knowledge/17-guides/building-permit-romania.md
+  - src/knowledge/17-guides/first-time-builder-checklist.md
+
+- In all `.new.md` content: use PAC, with one line explaining "PAC (fostul DTAC)" for readers who know the old term.
+- Code/UI strings outside Chat 2 paths: list them in the W48 live log; MAIN routes them (no edits outside Chat 2 paths).
+- Partners: the Vlad email template and handoff also say DTAC → Chat 7 updates wording.
