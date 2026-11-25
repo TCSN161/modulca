@@ -8,12 +8,12 @@ sources: ["Legea 169/2026 (CATUC) — Codul Amenajării Teritoriului, Urbanismul
 difficulty: "intermediate"
 lastUpdated: "2026-11-21"
 proOnly: false
-status: "draft-skeleton-awaiting-notebooklm-and-vlad-review"
+status: "draft-skeleton-awaiting-notebooklm-and-architect-review"
 ---
 
 # Building Permit Process Under CATUC (Romania 2026+)
 
-> **⚠️ DRAFT SKELETON** — Structure only. Content sections marked `[TBD]` will be filled in Phase 2 kickoff (Nov 26) after NotebookLM synthesis of CATUC law + Vlad Ioniță review. Do NOT deploy this file until `.new.md` → `.md` atomic swap post-review.
+> **⚠️ DRAFT SKELETON** — Structure only. Content sections marked `[TBD]` will be filled in Phase 2 kickoff (Nov 26) after NotebookLM synthesis of CATUC law + review by the reviewing architect. Do NOT deploy this file until `.new.md` → `.md` atomic swap post-review.
 
 ## 1. Context: CATUC replaces Legea 50/1991
 
@@ -36,7 +36,7 @@ Pentru o casă unifamilială modulară, traseul depinde de:
 | **Regim înălțime** | P+1, P+M, P+E+M, peste | P sau D+P | Doar anexe |
 | **Suprafață** | Peste 150m² | Până la 150m² | Până la 20m² (rural) |
 | **Zonă** | Orice | Orice | Rural |
-| **Documente necesare** | DTAC + certificat urbanism + avize | Notificare simplificată | Nimic |
+| **Documente necesare** | PAC + certificat de urbanism + avize | Notificare simplificată | Nimic |
 | **Durată medie** | 60-180 zile | 30 zile | Instant |
 
 [TBD — detailed criteria + decision flowchart after NotebookLM Q4 + Q5]
@@ -53,7 +53,9 @@ Pentru o casă unifamilială modulară, traseul depinde de:
 - Timp: [TBD]
 - Cost: [TBD]
 
-### 3.2. Documentație tehnică pentru autorizație (DTAC)
+### 3.2. Proiectul pentru autorizarea construirii (PAC)
+
+PAC (fostul DTAC) — „Proiectul pentru autorizarea construirii”, denumirea din CATUC art. 262 și 264 pentru ceea ce Legea 50/1991 numea DTAC.
 
 [TBD — needs architect sign-off list from NotebookLM Q18]
 
@@ -124,5 +126,5 @@ Pentru case modulare, CATUC [TBD — needs Q5 answer to confirm no specific pref
 
 **Draft generated**: 2026-11-21 by Claude (autonomous skeleton pass).  
 **Sources to be integrated**: NotebookLM Q1-Q10 answers (user upload pending).  
-**Legal review required**: Arh. Vlad Ioniță before `.new.md` → `.md` atomic swap.  
+**Legal review required**: reviewing architect (arhitect cu drept de semnătură) before `.new.md` → `.md` atomic swap.  
 **Deploy gate**: MCA-SPEC-CATUC-PHASE2-PLAN.md §8.

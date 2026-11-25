@@ -8,12 +8,12 @@ sources: ["Legea 169/2026 (CATUC)", "Legea 10/1995 — Calitatea în construcți
 difficulty: "intermediate"
 lastUpdated: "2026-11-21"
 proOnly: false
-status: "draft-skeleton-awaiting-notebooklm-and-vlad-review"
+status: "draft-skeleton-awaiting-notebooklm-and-architect-review"
 ---
 
 # Modular & Prefabricated Construction Regulations Under CATUC
 
-> **⚠️ DRAFT SKELETON** — Chapter structure only. Content sections marked `[TBD]` require NotebookLM synthesis + **critical Vlad Ioniță legal review** before deploy. This is the MOST sensitive file in Phase 2 — every word about modular-specific CATUC application needs sign-off.
+> **⚠️ DRAFT SKELETON** — Chapter structure only. Content sections marked `[TBD]` require NotebookLM synthesis + **critical legal review by the reviewing architect** before deploy. This is the MOST sensitive file in Phase 2 — every word about modular-specific CATUC application needs sign-off.
 
 ## 1. CATUC and modular construction — same rules, different implications
 
@@ -38,7 +38,7 @@ Analiza preliminară:
 - **Notificare (art. 294)**: ✅ probabil — <150m², P only
 - **Autorizare**: necesar doar dacă nu ne calificăm pentru notificare
 
-[TBD — confirmă cu Vlad că raționamentul "3m > anexă" e corect per CATUC art. 299 definition]
+[TBD — confirmă cu arhitectul revizor că raționamentul "3m > anexă" e corect per CATUC art. 299 definition]
 
 ### 2.3 Casă familială (4-16 module, 36-144m²)
 
@@ -53,11 +53,13 @@ Analiza preliminară:
 
 ### 2.4 Mai mult de un etaj (P+1, P+E+M)
 
-[TBD — notificarea art. 294(2)(a)(ii) explicit limitată la P sau D+P, deci P+1 trece la autorizare completă. Confirmă Vlad.]
+[TBD — notificarea art. 294(2)(a)(ii) explicit limitată la P sau D+P, deci P+1 trece la autorizare completă. Confirmă arhitectul revizor.]
 
 ## 3. Documentație specific modulară
 
-### 3.1 DTAC pentru modular
+### 3.1 PAC pentru modular
+
+PAC (fostul DTAC) — „Proiectul pentru autorizarea construirii”, denumirea din CATUC art. 262 și 264 pentru ceea ce Legea 50/1991 numea DTAC.
 
 [TBD — ce piese necesită pentru modular vs tradițional, per Q18 (documents signed by architect)]
 
@@ -91,7 +93,7 @@ Legea 10/1995 rămâne în vigoare parallel cu CATUC. Pentru modular:
 |---|---|---|
 | Regim autorizare | CATUC general | CATUC general (identic) |
 | Durată obținere autorizație | [TBD] | [TBD] (poate mai scurt dacă se încadrează notificare) |
-| DTAC complexity | [TBD] | [TBD] (mai simplu structural dar mai detaliat asamblare) |
+| PAC complexity | [TBD] | [TBD] (mai simplu structural dar mai detaliat asamblare) |
 | Role arhitect semnatar | [TBD] | [TBD] |
 
 ## 7. Articole CATUC citate în acest capitol
@@ -107,5 +109,5 @@ Legea 10/1995 rămâne în vigoare parallel cu CATUC. Pentru modular:
 
 **Draft skeleton**: 2026-11-21 Claude.  
 **Sources to integrate**: NotebookLM Q1 (artcles 294-299), Q5 (modular/prefab mentions), Q7 (anexe definition), Q10 (architect role).  
-**Legal review**: Arh. Vlad Ioniță — **critical file**, review every paragraph.  
-**Deploy gate**: NO deploy without Vlad explicit sign-off in writing.
+**Legal review**: reviewing architect — **critical file**, review every paragraph.  
+**Deploy gate**: NO deploy without the reviewing architect's explicit sign-off in writing.

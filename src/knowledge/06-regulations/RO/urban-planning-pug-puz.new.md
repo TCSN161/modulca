@@ -8,12 +8,12 @@ sources: ["Legea 169/2026 (CATUC) — Titlul III (urbanism)", "Monitorul Oficial
 difficulty: "intermediate"
 lastUpdated: "2026-11-21"
 proOnly: false
-status: "draft-skeleton-awaiting-notebooklm-and-vlad-review"
+status: "draft-skeleton-awaiting-notebooklm-and-architect-review"
 ---
 
 # Urban Planning Under CATUC — PUG, PUZ, PUD (Romania 2026+)
 
-> **⚠️ DRAFT SKELETON** — Chapter structure. Content marked `[TBD]` filled from NotebookLM Q3 (PUG/PUZ/PUD provisions) + Vlad review.
+> **⚠️ DRAFT SKELETON** — Chapter structure. Content marked `[TBD]` filled from NotebookLM Q3 (PUG/PUZ/PUD provisions) + architect review.
 
 ## 1. CATUC consolidates urban planning
 
@@ -124,5 +124,5 @@ Scheletic:
 
 **Draft skeleton**: 2026-11-21 Claude.  
 **Sources to integrate**: NotebookLM Q3 (PUG/PUZ/PUD replacement in CATUC), Q19 (CU provisions).  
-**Legal review**: Arh. Vlad Ioniță — content prose each section.  
-**Deploy gate**: No deploy until Vlad sign-off.
+**Legal review**: reviewing architect — content prose each section.  
+**Deploy gate**: No deploy until architect sign-off.
