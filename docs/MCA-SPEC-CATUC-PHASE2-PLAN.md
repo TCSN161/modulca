@@ -278,22 +278,59 @@ vechea Legea 50/1991. Acest ghid parcurge fiecare etapă..."
 
 ---
 
-## 4. Article Mapping Table (filled as NotebookLM input arrives)
+## 4. Article Mapping Table (filled 2026-11-25, session 2.02 — verified against law text)
+
+Every CATUC article below was checked to exist in `docs/references/catuc/catuc-169-2026-articole.json` (art. 415/524 only in `catuc-169-2026-text.md` — JSON parse merged them into 414/523). Full Q&A + verification notes: `docs/research/2026-11-25-notebooklm-catuc-answers.md`.
+
+**Abrogation basis**: CATUC art. 576 alin. (3) lit. a)–b) abrogates Legea 350/2001 and Legea 50/1991 (plus Ord. 839/2009 and Ord. 233/2016, lit. d)–e)). Entry into force is automatic, not conditional on secondary legislation (art. 575 alin. (2)).
+
+### 4a. Legea 50/1991 → CATUC
 
 | Old reference | New CATUC article | Confidence | Source |
 |---|---|---|---|
-| Legea 50/1991 art. 1 (general) | CATUC art. 285 (general building authorization) | 🟨 Medium | Handoff hint |
-| Legea 50/1991 art. 11 (certificat urbanism) | CATUC art. 286-290 (tbd verify) | 🟩 TBD | NotebookLM |
-| Legea 50/1991 art. 7 (autorizație construire) | CATUC art. 285-293 | 🟨 Medium | Handoff hint |
-| "Notification for small houses" | CATUC art. 294(2)(a)(ii) ≤ 150m² P/D+P | 🟩 High | Handoff direct |
-| "No-formalities annex" | CATUC art. 299(2)(c) ≤ 20m² rural | 🟩 High | Handoff direct |
-| "Notification procedure" | CATUC art. 295-298 | 🟩 High | Handoff direct |
-| Legea 350/2001 art. 1 (urbanism) | CATUC Titlul III (tbd verify) | 🟨 Medium | Logical mapping |
-| Legea 350/2001 PUG/PUZ | CATUC art. ~200-250 range (tbd) | 🟨 Medium | NotebookLM |
-| OMS 839/2009 (norme metodologice) | CATUC norme metodologice (publicate?) | 🟩 TBD | Verify with Ministry |
-| HG 766/1997 (calitatea) | Legea 10/1995 + CATUC (unchanged?) | 🟩 TBD | Verify |
+| L.50 art. 1 (general obligation to obtain AC) | art. 245 (dreptul de execuție), art. 246 (autorizarea lucrărilor), art. 259 (autorizația de construire); exceptions built in: art. 294 (notificare), art. 299 (fără formalități) | 🟩 Verified | Q2 + law text |
+| L.50 art. 6 (certificat de urbanism) | art. 253–258 (5 CU types; construire clădiri = art. 257); CU validity 12–36 luni, public ≤ 60, prelungire ≤ 24 luni (art. 257 alin. (15)–(18)) | 🟩 Verified | Q2, Q3 + law text |
+| L.50 art. 7 (issuing AC, 30 days) | art. 248, art. 249 (procesul autorizării), **art. 273** (emitere: 30 zile calendaristice; urgență ≤ 7 zile lucrătoare). NotebookLM said art. 272 — wrong (272 = consultarea autorității emitente) | 🟩 Verified (corrected) | Q2 erratum + law text |
+| L.50 art. 7 (AC validity / prelungire) | art. 309 (valabilitate 3 ani; prelungirea termenului de valabilitate interzisă, alin. (5); prelungire ≤ 12 luni dacă lucrările nu pot fi finalizate, alin. (6)), art. 310 (pierderea valabilității) | 🟩 Verified (Q2 claim 12–36 luni was wrong) | Law text |
+| L.50 art. 7 + Ord. 839/2009 — DTAC | **PAC — Proiectul pentru autorizarea construirii**: art. 262 (conținutul documentației), art. 264 (PAC), art. 265 (documentații complementare). "DTAC" has 0 hits in CATUC | 🟩 Verified | Q2 + law text (ITEM-6) |
+| L.50 art. 11 (lucrări fără AC) | art. 294 (notificare simplificată), art. 299 (fără formalități) | 🟩 Verified | Q2 + law text |
+| L.50 art. 9 + L.184/2001 (signatory architect) | art. 264 alin. (8) (arhitect cu drept de semnătură obligatoriu la PAC și la procedura simplificată), art. 317 alin. (1) lit. a) (incl. conductor arhitect/urbanist pentru CC1 în afara zonelor protejate), art. 427–428, art. 434 (șef de proiect) | 🟩 Verified | Q10 + law text |
+| L.50 — modificare AC | art. 293 (autorizația de modificare) | 🟩 Verified (exists, title) | Q8 |
+| Transitory: AC/CU issued under L.50 | art. 582 alin. (4)–(5) (CU issued before 25.08.2026 keep validity; AC issued on their basis); art. 574 (recepții parțiale) | 🟩 Verified | Q8 + law text |
+| Transitory: prelungire AC emise sub L.50 neîncepute | "o singură dată, ≤ 12 luni" — only in MDLPA Clarificări pct. 8 (scanned PDF); art. 309(5) prohibits validity extension for CATUC ACs | 🟨 UNVERIFIED → architect review (F2) | Q8 |
 
-**Legend**: 🟩 verified against source, 🟨 educated guess, 🟩 TBD = needs lookup.
+### 4b. Legea 350/2001 → CATUC
+
+| Old reference | New CATUC article | Confidence | Source |
+|---|---|---|---|
+| L.350 — documentații de urbanism (general) | art. 13 (documentațiile de urbanism) | 🟩 Verified (exists, title) | Q3 |
+| L.350 — PUG | art. 45–61 (CUT > 4 only via PUG: art. 46; actualizare: art. 61, art. 573 — PUG > 7 ani); PUGZM art. 38, 40; valabilitate art. 109 | 🟩 Verified | Q3 + law text |
+| L.350 — PUZ | art. 62–76 (POT/CUT +max 20%, o singură dată: art. 66) | 🟩 Verified | Q3 + law text |
+| L.350 — PUD (Plan → **Proiect** urbanistic de detaliu) | art. 81–85 (aprobare prin **dispoziția primarului** ≤ 15 zile calendaristice de la avizul arhitectului-șef: art. 85) | 🟩 Verified | Q3 + law text |
+| L.350 — certificat de urbanism | art. 253–258 (see 4a) | 🟩 Verified | Q3 |
+| L.350 — RUR / urbanist cu drept de semnătură | art. 141, 142 | 🟩 Verified (exists, title) | Q10 |
+| Ord. 233/2016 (norme L.350) | abrogated (art. 576(3) lit. d)); replacement procedure "Ord. MDLPA nr. 1.022/2026" appears only as a Portal Legislativ note | ⚠️ UNVERIFIED (ITEM-7) — do not publish | Q9 + Portal note |
+
+### 4c. Topic-level (no 1:1 old article)
+
+| Topic | CATUC article | Confidence | Source |
+|---|---|---|---|
+| Notification — small house | art. 294 alin. (2) lit. a) pct. (ii): 1 locuință unifamilială, P sau D+P, fără subsol, ≤ 150 mp desfășurată, intravilan rural, nu în zone metropolitane / protejate; proiect-tip sau proiect individual avizat de arhitectul-șef de județ | 🟩 Verified (verbatim) | Q1 |
+| Notification — anexe ≤ 50 mp cumulat | art. 294 alin. (2) lit. a) pct. (i) | 🟩 Verified (verbatim) | Q1 |
+| Notification procedure | art. 295 (transmitere), art. 296 (aprobare tacită la 15 zile lucrătoare; start +15 zile calendaristice; valabil 3 ani), art. 297 (răspundere), art. 298 (geo + topo obligatorii pt. pct. (ii); recepție cu reprezentant UAT; RNC) | 🟩 Verified (verbatim) | Q1, Q4 |
+| Notification fee | art. 313 alin. (4): ½ din taxa de autorizare (L.227/2015). (art. 143 alin. (5) = ISC share, not the local fee) | 🟩 Verified | Q4 + law text |
+| No-formalities annex | art. 299 alin. (2) lit. c): ≤ 20 mp cumulat, ≤ 2,5 m, fără fundație, demontabile, lemn/metal, rural; declarație fiscală art. 299 alin. (12); recepție obligatorie alin. (5) | 🟩 Verified (verbatim) | Q1, Q7 |
+| Temporary constructions | art. 367 alin. (2): durată ≤ 5 ani, autorizare/notificare pe fiecare ciclu de amplasare | 🟩 Verified | Q5 + law text |
+| Modular / prefab | **No specific provisions** ("modular" 0, "industrializ" 0; "prefabricat" 6× only in technical specs: art. 408, 412, 517, Anexa 1) — same rules as traditional | 🟩 Verified (term counts) | Q5 |
+| Registrul Național al Construcțiilor | art. 415 | 🟩 Verified (verbatim, text.md) | Q6 |
+| Urmărirea costurilor de execuție | art. 524 | 🟩 Verified (verbatim, text.md) | Q6 |
+| Forms (CU, AC, notificare…) | "Ord. MDLPA nr. 975/2026" — Portal note on art. 262 only | ⚠️ UNVERIFIED (ITEM-7) | Q8, Q9 |
+| Secondary legislation | art. 578 alin. (2) (minister may issue orders/norms); authorities align ROF by 31.12.2026 (art. 578 alin. (1)) | 🟩 Verified | Q9 + law text |
+| HG 766/1997 (calitatea) | Annexes 1–5 stay in force until amended (art. 577 alin. (3)); also HG 925/1995, HG 273/1994 referenced in art. 577 | 🟩 Verified (location) | Q9 + law text |
+
+**Legend**: 🟩 Verified = article exists and the claim was checked in the law text · 🟨 = plausible, needs architect review · ⚠️ UNVERIFIED = act number/source outside the law text; do not publish.
+
+**Open for deploy gate (§8)**: 1 🟨 row (transitory L.50 extension) + 2 ⚠️ act numbers (Ord. 1.022/2026, Ord. 975/2026) need confirmation on legislatie.just.ro or by the reviewing architect.
 
 **Update triggers**: Each NotebookLM Q&A session updates this table.
 
