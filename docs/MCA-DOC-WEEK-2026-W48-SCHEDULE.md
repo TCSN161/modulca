@@ -25,13 +25,13 @@ Earlier docs say "Phase 2 kickoff **Wed 26** Nov". **26 Nov 2026 is a Thursday.*
 |---|---|---|---|---|
 | Mon 23 | 1.MAIN | 1.02.MAIN_WeeklyPlan-W48_20261123 (this one; stays open for Vlad + NotebookLM updates) | 30 min | 8k |
 | Mon 23 | user | — Vlad email: personalize + send ([template](MCA-DOC-VLAD-EMAIL-TEMPLATE.md)) | 30 min | 0 |
-| Tue 24 AM | user | — NotebookLM: upload 3 CATUC sources + Q1–Q10 ([queries](research/2026-11-19-notebooklm-catuc-queries.md)) | 1–1.5h | 0 |
-| Tue 24 | user | — DeepSeek $5 top-up (Phase 2 translation from Wed 25; or tell MAIN "no") | 2 min | 0 |
-| Tue 24 | 2.Neufert | 2.02.Neufert_NotebookLM-Ingest_20261124 | 30 min | 8k |
-| Tue 24 PM | 1.MAIN | 1.03.MAIN_Phase2-Readiness_20261124 (Go/No-Go + kickoff handoff) | 20 min | 6k |
-| **Wed 25** | 2.Neufert | **2.03.Neufert_Phase2-F2-Content_20261125** (kickoff) | 3h | 30k |
-| Thu 26 | 2.Neufert | 2.04.Neufert_Phase2-F3-Content_20261126 | 4h | 40k (CRITICAL) |
-| Fri 27 | 2.Neufert | 2.05.Neufert_Phase2-F4-F6-Content_20261127 | 3h | 25k |
+| **Wed 25** | user | — NotebookLM: upload 3 CATUC sources + Q1–Q10 ([queries](research/2026-11-19-notebooklm-catuc-queries.md)) | 1–1.5h | 0 |
+| Wed 25 | user | — DeepSeek $5 top-up (Phase 2 translation from Wed 25; or tell MAIN "no") | 2 min | 0 |
+| Wed 25 | 2.Neufert | 2.02.Neufert_NotebookLM-Ingest_20261125 | 30 min | 8k |
+| ~~Tue 24 PM~~ | 1.MAIN | ~~1.03 Readiness~~ — done early Tue AM in 1.02 | — | 0 |
+| **Thu 26** | 2.Neufert | **2.03.Neufert_Phase2-F2-Content_20261126** (kickoff) | 3h | 30k |
+| Fri 27 | 2.Neufert | 2.04.Neufert_Phase2-F3-Content_20261127 | 4h | 40k (CRITICAL) |
+| Mon 30 (W49) | 2.Neufert | 2.05.Neufert_Phase2-F4-F6-Content_20261130 | 3h | 25k |
 | Fri 27 | 1.MAIN | 1.04.MAIN_Week-Wrap-W48_20261127 (W48 wrap + W49 schedule) | 30 min | 8k |
 | Sat 28 | — | Buffer only (overflow from F3/F4/F6). Default: rest. | — | 0 |
 | Sat 28 → | 7.Partners | Only if Vlad replies: 7.0x.Partners_Vlad-Engagement_{date} | 30 min | 5k |
@@ -118,6 +118,7 @@ NAMING doc §3 lists the ingest as `1.03.MAIN_NotebookLM-Ingest`. But `scripts/c
 | Mon 23 | W48 schedule written. Kickoff moved to Wed 25 (Costin). Waiting on: Vlad email (sent? reply?), NotebookLM Q1–Q10. |
 | Mon 23 | **Vlad: OK in principle.** Next: 30-min call (questions + fee structure in `handoffs/MCA-HANDOFF-7-VLAD-ENGAGEMENT-2026-11-23.md`), then agreement draft in Chat 7. |
 | Tue 24 AM | Readiness gate (infra half) done early by MAIN: ops:check 29/2/0, CI green. Local `.env.local` anon key is the disabled legacy JWT (local auth 401; prod OK). Kickoff handoff written: `handoffs/MCA-HANDOFF-2-PHASE2-KICKOFF-2026-11-24.md` → **evening session 1.03 not needed**. Remaining gate: NotebookLM Q1–Q10 ingested by EOD. |
+| Wed 25 | **No-Go applied**: NotebookLM not done Tue → ingest today, F2 Thu 26, F3 Fri 27, F4+F6 Mon 30. Vlad scope (F2, F3, PDFs) still ready for Sat 28 — no impact on his window. |
 
 ---
 
