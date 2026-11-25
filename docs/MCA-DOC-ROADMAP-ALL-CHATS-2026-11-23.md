@@ -118,7 +118,17 @@ Not opened yet. First real work is Phase 3.
 1. ✅ **Phase 3 code**: Chat 2 Neufert owns `/catuc-check` + Profile Engine (new path `src/features/catuc/**`, CATUC domain logic); Chat 5 Drawings owns PermitTracker PDFs (`src/features/permits/**`). Both paths added to WORKFLOW §10.
 2. ✅ **Privacy Policy / ToS text**: Chat 2 (it owns legal text), Chat 7 checks wording with Vlad if needed.
 3. ✅ **Beta badge + feedback widget**: Chat 4 Billing (it already owns tiers and the beta promo). Paths: `src/features/beta/**`, `src/app/api/feedback/**`.
-4. **Is Chat 6 needed before beta?** No. Beta feedback triage can live in MAIN until Jan. Revisit at the Jan 15 Go/No-Go.
+4. ~~**Is Chat 6 needed before beta?** No.~~ → superseded by item 6.
+5. ✅ **Phase 3 = detachable module** (Costin, 2026-11-25): `features/catuc` + `features/permits` import nothing from the configurator; standalone input form; lives at modulca.eu `/autorizare`, spin-out only on data. Rules in [[MCA-STRAT-CATUC-SERVICE-CONTENT-2026-11-25]] §3.
+6. ✅ **Chat 6 = Marketing** registered 2026-11-25: communication + content strategy, YouTube / NotebookLM outputs, CATUC service positioning. Beta feedback triage still stays in MAIN.
+
+### Chat 6 — Marketing (new, 2026-11-25)
+
+| When | Item | Notes |
+|---|---|---|
+| First session | 🟡 Read the strategy doc, answer its §10 open questions with Costin, draft brand voice v0 + content pillars | No posting yet |
+| Dec (after Vlad F2/F3) | 🟡 Pilot 3–5 Shorts via NotebookLM "Scurt" video, quality gate §7 | |
+| Jan (Phase 6) | 🔴 Channel live, posting rhythm, lead-magnet PDF, quiz | Pre-launch |
 
 ---
 
