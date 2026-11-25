@@ -108,7 +108,7 @@ Open check: confirm Google's terms allow commercial use of NotebookLM-generated 
 |---|---|---|
 | Dec (after Vlad's F2/F3 review) | **3–5 Shorts** on verified facts: anexa 20 m² / 2,5 m · casa prin notificare 150 mp rural · aprobare tacită 15 zile · DTAC → PAC · ce studii îți trebuie | Costin + MAIN check |
 | Dec | Internal: "Analiză critică" audio on F2/F3 drafts; mind map → checker decision tree | Chat 2 |
-| Jan (Phase 6) | Open **Chat 6 Marketing**: channel setup, posting rhythm (e.g., 2 Shorts + 1 long / week), lead-magnet PDF, quiz on site | Chat 6 |
+| Jan (Phase 6) | **Chat 6 Marketing** (registered 2026-11-25, first session any time before): channel setup, posting rhythm (e.g., 2 Shorts + 1 long / week), lead-magnet PDF, quiz on site | Chat 6 |
 | Feb 1 → | Content plan tied to launch; measure (§9) | Chat 6 |
 
 Face/voice: AI voices are fine for drafts and audio overviews; **your own voice or face** (and Vlad's, if he agrees) builds more trust for the flagship videos.

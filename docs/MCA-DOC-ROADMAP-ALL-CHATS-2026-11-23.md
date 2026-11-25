@@ -41,10 +41,10 @@ Legend: 🔴 gate for a phase · 🟡 should happen in that window · ⚪ later 
 
 | When | Item | Notes |
 |---|---|---|
-| Tue 24 | 🔴 NotebookLM ingest (`catuc-ingest.mjs`) | Session 2.02 |
-| Wed 25 | 🔴 F2 building-permit-process | 2.03 |
-| Thu 26 | 🔴 F3 modular-prefab-regulations (critical legal) | 2.04 |
-| Fri 27 | 🔴 F4 urban-planning-pug-puz + F6 building-permit-romania | 2.05 |
+| Wed 25 | 🔴 NotebookLM ingest (`catuc-ingest.mjs`) + DTAC→PAC (ITEM-6) | Session 2.02 (No-Go shift +1 day) |
+| Thu 26 | 🔴 F2 building-permit-process | 2.03 |
+| Fri 27 | 🔴 F3 modular-prefab-regulations (critical legal) + Vlad package note (F2+F3) | 2.04 |
+| Mon 30 | 🔴 F4 urban-planning-pug-puz + F6 building-permit-romania | 2.05 |
 | W49 Mon–Tue | 🔴 New chapter `catuc-169-2026` + Ministry clarifications (needs NotebookLM Q11–Q25) | Last 2 of the "11 .new.md" |
 | W49 Nov 28–Dec 3 | 🔴 Apply Vlad's review fixes | Vlad window |
 | W49 Thu–Fri Dec 4–5 | 🔴 Promote `.new.md` → live, F8 `_index.ts` regen, deploy | Only after Vlad sign-off (D11 rule) |
@@ -67,7 +67,7 @@ Nothing blocking this week. Everything ITEM-wise in its handoffs is closed.
 
 | When | Item | Notes |
 |---|---|---|
-| **Tue 24** | 🔴 **DeepSeek $5 top-up** (you, 2 min) — Phase 2 uses it for translation on Wed 25 | Fits €12 headroom. Without it, Claude does translation (more Claude tokens) |
+| **by Thu 26** | 🔴 **DeepSeek $5 top-up** (you, 2 min) — Phase 2 uses it for translation from F2 (Thu 26) | Fits €12 headroom. Without it, Claude does translation (more Claude tokens) |
 | W50 | 🔴 Beta promo path: invite user signs up → gets Premium for 3 months → credits/quotas correct → downgrade logic dated | Test end-to-end in Stripe TEST mode |
 | W50 | 🟡 Beta-specific onboarding: "BETA" badge + feedback widget | Owner decided 2026-11-23, see §3 Q3 |
 | Jan 16–31 | 🔴 Stripe test → live cutover (`docs/STRIPE_GO_LIVE_CHECKLIST.md`), CUI/bank details | Phase 6 |
@@ -100,9 +100,12 @@ Not opened yet. First real work is Phase 3.
 | When | Action | Time |
 |---|---|---|
 | Mon 23 | Send Vlad email | 30 min |
-| Tue 24 AM | NotebookLM Q1–Q10 | 1–1.5h |
-| Tue 24 | DeepSeek $5 top-up (or tell MAIN "no") | 2 min |
-| Wed 25–Fri 27 | Read F2 / F3 / F4+F6 drafts (sense check, not legal review) | ~30 min/day |
+| ~~Tue 24~~ Wed 25 | ✅ NotebookLM Q1–Q10 (done, `docs/research/2026-11-25-notebooklm-raw.txt`) | 1–1.5h |
+| Wed 25 | Open Chat 2 session 2.02 (ingest) | 5 min + answers |
+| by Thu 26 | DeepSeek $5 top-up (or tell MAIN "no") | 2 min |
+| Thu 26–Mon 30 | Read F2 / F3 / F4+F6 drafts (sense check, not legal review) | ~30 min/day |
+| on Vlad's reply | Call with Vlad (questions in Chat 7 handoff §2; say "PAC"; ask Q9 order + OAR fee rule) | 30–45 min |
+| any time | Open Chat 6 Marketing session 6.01 (not urgent) | — |
 | Sun 29 | Optional: 10 min input for the monthly retro | 10 min |
 | W49 Mon | NotebookLM Q11–Q25 (same notebook, already set up) | ~1h |
 | W49 | Send DPA emails (Chat 7 prepares them) | 20 min |
