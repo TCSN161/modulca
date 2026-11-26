@@ -14,6 +14,11 @@ import type { ModuleConfig, SavedRender } from "@/features/design/store";
 import type { StyleDirection } from "@/features/design/styles";
 import { resolveSelectedProducts } from "../hooks/selectedProducts";
 import { presentationFileName } from "../hooks/projectName";
+import {
+  chunk, pageLabel, curateRenders, hasPlot, gridBounds,
+  RENDERS_PER_PAGE, MODULES_PER_DETAILS_PAGE, ROWS_PER_TABLE_PAGE,
+} from "../hooks/pdfPlan";
+import { compressForPdf } from "../hooks/compressImage";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -156,15 +161,11 @@ function makeStyles(t: { accent: string; bg: string; text: string }) {
 function SlidePage({
   children,
   slideLabel,
-  pageNum,
-  total,
   s,
   isFreeUser,
 }: {
   children: React.ReactNode;
   slideLabel: string;
-  pageNum: number;
-  total: number;
   s: ReturnType<typeof makeStyles>;
   isFreeUser?: boolean;
 }) {
@@ -173,9 +174,8 @@ function SlidePage({
       {children}
       <View style={s.footer}>
         <Text>{slideLabel}</Text>
-        <Text>
-          {pageNum} / {total}
-        </Text>
+        {/* BUG-ST23: real page numbers from react-pdf (the hand-counted total ignored extra pages) */}
+        <Text render={({ pageNumber, totalPages }) => `${pageNumber} / ${totalPages}`} />
       </View>
       {isFreeUser && (
         <Text style={{
@@ -194,28 +194,61 @@ function SlidePage({
   );
 }
 
+/** ST26 fallback: module grid footprint (3 m cells) when no plot polygon exists. */
+function ModuleFootprint({ modules, s, t }: {
+  modules: ModuleConfig[];
+  s: ReturnType<typeof makeStyles>;
+  t: { accent: string; bg: string; text: string };
+}) {
+  const b = gridBounds(modules);
+  const cell = Math.max(18, Math.min(48, Math.floor(Math.min(420 / Math.max(b.cols, 1), 260 / Math.max(b.rows, 1)))));
+  return (
+    <View style={{ marginBottom: 12 }}>
+      <Text style={{ ...s.body, opacity: 0.6, marginBottom: 8 }}>
+        No plot drawn yet (preset land). Module footprint, 3 × 3 m per module:
+      </Text>
+      <View style={{ position: "relative", width: b.cols * cell, height: b.rows * cell }}>
+        {modules.map((m, i) => (
+          <View key={i} style={{
+            position: "absolute",
+            left: (m.col - b.minCol) * cell,
+            top: (m.row - b.minRow) * cell,
+            width: cell - 2,
+            height: cell - 2,
+            backgroundColor: MODULE_COLORS[m.moduleType] || "#888",
+            borderRadius: 2,
+            justifyContent: "center",
+            alignItems: "center",
+          }}>
+            <Text style={{ fontSize: 6, color: "#FFFFFF" }}>{m.moduleType.slice(0, 4).toUpperCase()}</Text>
+          </View>
+        ))}
+      </View>
+      <Text style={{ fontSize: 7, color: t.text, opacity: 0.4, marginTop: 6 }}>
+        {b.cols * 3} × {b.rows * 3} m overall
+      </Text>
+    </View>
+  );
+}
+
 /* ------------------------------------------------------------------ */
 /*  PDF Document                                                       */
 /* ------------------------------------------------------------------ */
 
-function PresentationDocument(props: PdfGeneratorProps) {
+export function PresentationDocument(props: PdfGeneratorProps) {
   const t = TMPL[props.template];
   const s = makeStyles(t);
   const enabled = props.slides.filter((sl) => sl.enabled);
-  const total = enabled.length;
   const isFree = props.isFreeUser;
-  let pageNum = 0;
 
   const pages: React.ReactNode[] = [];
 
   for (const slide of enabled) {
-    pageNum++;
-    const pn = pageNum;
 
     switch (slide.id) {
       case "cover":
         pages.push(
-          <SlidePage key="cover" slideLabel="Cover" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+          <SlidePage key="cover" slideLabel="Cover" s={s} isFreeUser={isFree}>
             <View style={{ flex: 1, justifyContent: "center" }}>
               <View style={s.accentBar} />
               <Text style={{ ...s.title, fontSize: 36 }}>{props.projectName}</Text>
@@ -253,7 +286,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
         const roomList = Object.entries(roomCounts).map(([type, count]) => `${count} ${type}${count > 1 ? "s" : ""}`).join(", ");
         const styleName = props.style?.label || "modern";
         pages.push(
-          <SlidePage key="description" slideLabel="Project Description" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+          <SlidePage key="description" slideLabel="Project Description" s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Project Description</Text>
             <Text style={{ ...s.body, marginTop: 16, lineHeight: 1.8 }}>
@@ -288,17 +321,24 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "site":
         pages.push(
-          <SlidePage key="site" slideLabel="Site Plan" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+          <SlidePage key="site" slideLabel="Site Plan" s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Site Plan</Text>
-            <View style={s.row}>
-              <Text style={s.label}>Location</Text>
-              <Text style={s.value}>{props.mapCenter.lat.toFixed(5)}, {props.mapCenter.lng.toFixed(5)}</Text>
-            </View>
-            <View style={s.row}>
-              <Text style={s.label}>Polygon Points</Text>
-              <Text style={s.value}>{props.polygon.length}</Text>
-            </View>
+            {hasPlot(props.polygon) ? (
+              <>
+                <View style={s.row}>
+                  <Text style={s.label}>Location</Text>
+                  <Text style={s.value}>{props.mapCenter.lat.toFixed(5)}, {props.mapCenter.lng.toFixed(5)}</Text>
+                </View>
+                <View style={s.row}>
+                  <Text style={s.label}>Plot corners</Text>
+                  <Text style={s.value}>{props.polygon.length}</Text>
+                </View>
+              </>
+            ) : (
+              // BUG-ST26: preset land has no plot → show the module footprint instead of "0 points, Bucharest"
+              <ModuleFootprint modules={props.modules} s={s} t={t} />
+            )}
             <View style={s.row}>
               <Text style={s.label}>Total Modules</Text>
               <Text style={s.value}>{props.stats.totalModules}</Text>
@@ -315,11 +355,12 @@ function PresentationDocument(props: PdfGeneratorProps) {
         );
         break;
 
-      case "floorplan":
-        pages.push(
-          <SlidePage key="floorplan" slideLabel="Floor Plan" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+      case "floorplan": {
+        const fpPages = chunk(props.modules, ROWS_PER_TABLE_PAGE);
+        fpPages.forEach((rows, pi) => pages.push(
+          <SlidePage key={`floorplan-${pi}`} slideLabel={pageLabel("Floor Plan", pi, fpPages.length)} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
-            <Text style={s.sectionTitle}>Floor Plan — Module Layout</Text>
+            <Text style={s.sectionTitle}>{pageLabel("Floor Plan — Module Layout", pi, fpPages.length)}</Text>
             <View style={{ ...s.row, borderBottomWidth: 1, marginBottom: 4 }}>
               <Text style={{ ...s.label, fontWeight: "bold", width: "20%" }}>Module</Text>
               <Text style={{ ...s.label, fontWeight: "bold", width: "15%" }}>Type</Text>
@@ -328,7 +369,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
               <Text style={{ ...s.label, fontWeight: "bold", width: "15%" }}>Floor</Text>
               <Text style={{ ...s.label, fontWeight: "bold", width: "20%" }}>Walls</Text>
             </View>
-            {props.modules.slice(0, 16).map((m, i) => (
+            {rows.map((m, i) => (
               <View key={i} style={s.row}>
                 <Text style={{ ...s.body, width: "20%" }}>{m.label}</Text>
                 <Text style={{ ...s.body, width: "15%" }}>{m.moduleType}</Text>
@@ -341,12 +382,13 @@ function PresentationDocument(props: PdfGeneratorProps) {
               </View>
             ))}
           </SlidePage>
-        );
+        ));
         break;
+      }
 
       case "vision":
         pages.push(
-          <SlidePage key="vision" slideLabel="Design Vision" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+          <SlidePage key="vision" slideLabel="Design Vision" s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Design Vision</Text>
             {props.style ? (
@@ -380,13 +422,15 @@ function PresentationDocument(props: PdfGeneratorProps) {
         );
         break;
 
-      case "modules":
-        pages.push(
-          <SlidePage key="modules" slideLabel="Module Details" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+      case "modules": {
+        // BUG-ST24: paginate (slice(0, 8) dropped the 9th module)
+        const mdPages = chunk(props.modules, MODULES_PER_DETAILS_PAGE);
+        mdPages.forEach((mods, pi) => pages.push(
+          <SlidePage key={`modules-${pi}`} slideLabel={pageLabel("Module Details", pi, mdPages.length)} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
-            <Text style={s.sectionTitle}>Module Details</Text>
+            <Text style={s.sectionTitle}>{pageLabel("Module Details", pi, mdPages.length)}</Text>
             <View style={s.grid}>
-              {props.modules.slice(0, 8).map((m, i) => {
+              {mods.map((m, i) => {
                 const col = MODULE_COLORS[m.moduleType] || "#888";
                 return (
                   <View key={i} style={s.card}>
@@ -402,15 +446,16 @@ function PresentationDocument(props: PdfGeneratorProps) {
               })}
             </View>
           </SlidePage>
-        );
+        ));
         break;
+      }
 
       case "renders": {
-        // Show ALL saved renders — 4 per page, adding extra pages as needed
-        const renders = props.savedRenders;
+        // BUG-ST25: curated set (≤ 8, ≤ 2 per module first, no duplicates), 4 per page
+        const renders = curateRenders(props.savedRenders);
         if (renders.length === 0) {
           pages.push(
-            <SlidePage key="renders" slideLabel="AI Renders" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+            <SlidePage key="renders" slideLabel="AI Renders" s={s} isFreeUser={isFree}>
               <View style={s.accentBar} />
               <Text style={s.sectionTitle}>AI Renders</Text>
               <View style={{ flex: 1, justifyContent: "center", alignItems: "center" }}>
@@ -424,17 +469,16 @@ function PresentationDocument(props: PdfGeneratorProps) {
             </SlidePage>
           );
         } else {
-          const RENDERS_PER_PAGE = 4;
-          const renderPages = Math.ceil(renders.length / RENDERS_PER_PAGE);
-          for (let rp = 0; rp < renderPages; rp++) {
-            const chunk = renders.slice(rp * RENDERS_PER_PAGE, (rp + 1) * RENDERS_PER_PAGE);
-            const label = renderPages > 1 ? `AI Renders (${rp + 1}/${renderPages})` : "AI Renders";
+          const renderChunks = chunk(renders, RENDERS_PER_PAGE);
+          for (let rp = 0; rp < renderChunks.length; rp++) {
+            const group = renderChunks[rp];
+            const label = pageLabel("AI Renders", rp, renderChunks.length);
             pages.push(
-              <SlidePage key={`renders-${rp}`} slideLabel={label} pageNum={pn + rp} total={total + renderPages - 1} s={s} isFreeUser={isFree}>
+              <SlidePage key={`renders-${rp}`} slideLabel={label} s={s} isFreeUser={isFree}>
                 <View style={s.accentBar} />
                 <Text style={s.sectionTitle}>{label}</Text>
                 <View style={{ flexDirection: "row", flexWrap: "wrap", gap: 12, marginTop: 8 }}>
-                  {chunk.map((render, i) => (
+                  {group.map((render, i) => (
                     <View key={i} style={{ width: "48%", marginBottom: 8 }}>
                       <Image
                         src={render.imageUrl}
@@ -457,23 +501,22 @@ function PresentationDocument(props: PdfGeneratorProps) {
               </SlidePage>
             );
           }
-          // Adjust pageNum for extra render pages
-          if (renderPages > 1) pageNum += renderPages - 1;
         }
         break;
       }
 
-      case "materials":
-        pages.push(
-          <SlidePage key="materials" slideLabel="Materials & Finishes" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+      case "materials": {
+        const mtPages = chunk(props.modules, 12);
+        mtPages.forEach((rows, pi) => pages.push(
+          <SlidePage key={`materials-${pi}`} slideLabel={pageLabel("Materials & Finishes", pi, mtPages.length)} s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
-            <Text style={s.sectionTitle}>Materials & Finishes</Text>
+            <Text style={s.sectionTitle}>{pageLabel("Materials & Finishes", pi, mtPages.length)}</Text>
             <View style={s.row}>
               <Text style={s.label}>Finish Level</Text>
               <Text style={s.value}>{props.finishLabel}</Text>
             </View>
             <Text style={{ ...s.body, fontWeight: "bold", marginTop: 16, marginBottom: 8 }}>Module Finishes</Text>
-            {props.modules.slice(0, 12).map((m, i) => (
+            {rows.map((m, i) => (
               <View key={i} style={s.row}>
                 <Text style={{ ...s.body, width: "30%" }}>{m.label}</Text>
                 <Text style={{ ...s.body, width: "35%" }}>Floor: {m.floorFinish}</Text>
@@ -481,12 +524,13 @@ function PresentationDocument(props: PdfGeneratorProps) {
               </View>
             ))}
           </SlidePage>
-        );
+        ));
         break;
+      }
 
       case "products":
         pages.push(
-          <SlidePage key="products" slideLabel="Products" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+          <SlidePage key="products" slideLabel="Products" s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Selected Products</Text>
             {props.products.length > 0 ? (
@@ -521,7 +565,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "cost":
         pages.push(
-          <SlidePage key="cost" slideLabel="Cost Summary" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+          <SlidePage key="cost" slideLabel="Cost Summary" s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Cost Summary</Text>
             <View style={{ marginTop: 12 }}>
@@ -556,7 +600,7 @@ function PresentationDocument(props: PdfGeneratorProps) {
 
       case "next":
         pages.push(
-          <SlidePage key="next" slideLabel="Next Steps" pageNum={pn} total={total} s={s} isFreeUser={isFree}>
+          <SlidePage key="next" slideLabel="Next Steps" s={s} isFreeUser={isFree}>
             <View style={s.accentBar} />
             <Text style={s.sectionTitle}>Next Steps</Text>
             <View style={{ marginTop: 12, gap: 16 }}>
@@ -623,6 +667,10 @@ export default function PdfDownloadButton({
     setLoading(true);
     try {
       const products = loadProducts();
+      // BUG-ST25: embed only the curated renders, re-encoded as JPEG (was 29 PNGs → 14.9 MB)
+      const pdfRenders = await Promise.all(
+        curateRenders(savedRenders).map(async (r) => ({ ...r, imageUrl: await compressForPdf(r.imageUrl) })),
+      );
       const doc = (
         <PresentationDocument
           template={template}
@@ -636,7 +684,7 @@ export default function PdfDownloadButton({
           polygon={polygon}
           mapCenter={mapCenter}
           products={products}
-          savedRenders={savedRenders}
+          savedRenders={pdfRenders}
           isFreeUser={isFreeUser}
         />
       );
