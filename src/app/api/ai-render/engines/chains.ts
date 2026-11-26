@@ -69,16 +69,28 @@ export const FALLBACK_ORDER = [
 ] as const;
 
 /**
- * img2img (paid tiers) — engines that respect baseImage first, because
- * without structure preservation the 3D scene is wasted.
+ * img2img (paid tiers) — BUG-ST34 (2026-11-26): order is
+ *   1. structure-preserving engines (klein free; stability/fal/replicate/
+ *      wavespeed only when funded — creditManager skips the unfunded ones),
+ *   2. ai-horde img2img (free, keeps geometry),
+ *   3. FREE text2img last resort (cloudflare, pollinations).
+ * Paid text2img engines (leonardo, openai, …) ignore the 3D capture, so they
+ * are NOT here: before this fix a klein outage sent Costin's 3D render to
+ * Leonardo, which spent paid credit and threw away the 3D view. They are only
+ * appended when the caller opts in (allowPaidText2img).
  */
 export const IMG2IMG_FALLBACK = [
-  "cloudflare-klein", // free, structure-preserving, 4s — profit-first
-  "stability", "fal", "replicate", "wavespeed",
-  // text2img fallback (loses the 3D structure, keeps the prompt)
+  "cloudflare-klein", // free, structure-preserving, 4–7 s
+  "stability", "fal", "replicate", "wavespeed", // structure-preserving, paid (funded only)
+  "ai-horde",         // free img2img (weak, but keeps geometry)
+  "cloudflare",       // free text2img — loses the 3D view, last resort
+  "pollinations",     // free text2img — loses the 3D view, last resort
+] as const;
+
+/** Paid text2img engines: ignore baseImage. Only behind an explicit opt-in. */
+export const IMG2IMG_PAID_TEXT2IMG = [
   "blackforest", "openai", "fireworks", "runway", "leonardo",
-  "gemini", "together", "cloudflare", "huggingface", "pollinations",
-  "ai-horde",         // img2img since 2026-11-26
+  "gemini", "together", "huggingface",
 ] as const;
 
 /** img2img for guest_free / free (beta) — €0 only, geometry-preserving first. */
@@ -97,11 +109,15 @@ export function withFloor(chain: readonly string[], floor: readonly string[]): s
 }
 
 /** Best fallback chain for a tier + mode. Always contains the free floor. */
-export function getFallbackChain(tier: string, hasBaseImage: boolean): string[] {
+export function getFallbackChain(
+  tier: string,
+  hasBaseImage: boolean,
+  opts: { allowPaidText2img?: boolean } = {},
+): string[] {
   if (hasBaseImage) {
-    return tier === "free" || tier === "guest_free"
-      ? [...IMG2IMG_FREE]
-      : withFloor(IMG2IMG_FALLBACK, IMG2IMG_FREE);
+    if (tier === "free" || tier === "guest_free") return [...IMG2IMG_FREE];
+    const chain = withFloor(IMG2IMG_FALLBACK, IMG2IMG_FREE);
+    return opts.allowPaidText2img ? withFloor(chain, IMG2IMG_PAID_TEXT2IMG) : chain;
   }
   switch (tier) {
     case "guest_free":

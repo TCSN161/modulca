@@ -420,6 +420,7 @@ export async function POST(req: NextRequest) {
       engine: engineParam = null,
       baseImage = null,
       maxCostUsd = null,
+      allowPaidText2img = false,
     } = body as Record<string, unknown> & {
       prompt?: string;
       width?: number;
@@ -428,6 +429,8 @@ export async function POST(req: NextRequest) {
       engine?: string | null;
       baseImage?: string | null;
       maxCostUsd?: number | null;
+      /** BUG-ST34: img2img may fall to PAID text2img (ignores the 3D view) only on explicit opt-in. */
+      allowPaidText2img?: boolean;
     };
 
     // NEVER trust body.tier (BUG-SEC-02) — the verified session decides.
@@ -450,8 +453,10 @@ export async function POST(req: NextRequest) {
       `[ai-render] POST: "${String(prompt).slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} img2img=${!!baseImage} tier=${tier} maxCost=$${st.maxCost}`
     );
 
-    const order = getFallbackChain(tier, !!baseImage);
-    return await finishRender(await tryEngines(renderReq, engineParam as string | null, order, st.maxCost), st);
+    const order = getFallbackChain(tier, !!baseImage, { allowPaidText2img: allowPaidText2img === true });
+    // An explicit body.engine is tried first (tryEngines), then this chain.
+    const requested = typeof engineParam === "string" && engineParam !== "auto" ? engineParam : null;
+    return await finishRender(await tryEngines(renderReq, requested, order, st.maxCost), st);
   } catch (err) {
     console.error("[ai-render] POST unhandled error:", err);
     return NextResponse.json(

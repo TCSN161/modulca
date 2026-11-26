@@ -115,3 +115,48 @@ describe("BUG-ST03 — img2img POST (3D + Text → Image)", () => {
     });
   }
 });
+
+describe("BUG-ST34 — img2img never falls to paid text2img (leonardo leak)", () => {
+  const baseImage = "data:image/jpeg;base64," + Buffer.from("jpeg").toString("base64");
+  const post = async (body: Record<string, unknown>) => {
+    const { POST } = await import("./route");
+    return POST(nextReq("http://x/api/ai-render", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Authorization: "Bearer t" },
+      body: JSON.stringify({ prompt: "photoreal house", width: 1024, height: 576, baseImage, ...body }),
+    }));
+  };
+  beforeEach(async () => {
+    h.calls = [];
+    vi.unstubAllEnvs();
+    (await import("./engines/creditManager")).__resetCreditManagerState();
+  });
+
+  for (const tier of PAID) {
+    it(`${tier}: klein unavailable → ai-horde renders, leonardo/openai never tried`, async () => {
+      h.ctx = { ...h.ctx, tier, effectiveTier: tier };
+      h.ok = new Set(["ai-horde", "leonardo", "openai", "blackforest"]);
+      const res = await post({});
+      expect(res.status).toBe(200);
+      expect(res.headers.get("X-AI-Engine")).toBe("ai-horde");
+      const tried = h.calls.map((c) => c.id);
+      expect(tried[0]).toBe("cloudflare-klein");
+      for (const id of ["leonardo", "openai", "blackforest", "fireworks", "runway"]) expect(tried).not.toContain(id);
+    });
+  }
+
+  it("explicit body.engine is tried first", async () => {
+    h.ctx = { ...h.ctx, tier: "constructor", effectiveTier: "constructor" };
+    h.ok = new Set(["cloudflare-klein", "ai-horde"]);
+    const res = await post({ engine: "ai-horde" });
+    expect(res.headers.get("X-AI-Engine")).toBe("ai-horde");
+    expect(h.calls[0]).toMatchObject({ id: "ai-horde", baseImage });
+  });
+
+  it("engine=auto in the body behaves like no engine", async () => {
+    h.ctx = { ...h.ctx, tier: "premium", effectiveTier: "premium" };
+    h.ok = new Set(["cloudflare-klein"]);
+    await post({ engine: "auto" });
+    expect(h.calls[0].id).toBe("cloudflare-klein");
+  });
+});

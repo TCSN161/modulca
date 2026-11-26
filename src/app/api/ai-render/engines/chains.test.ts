@@ -72,3 +72,21 @@ describe("BUG-ST01 — unhealthy engine recovers after the cooldown", () => {
     expect(canUseEngine("cloudflare", { tier: "constructor" })).toBe(true);
   });
 });
+
+describe("BUG-ST34 — img2img chain order", () => {
+  const PAID_T2I = ["blackforest", "openai", "fireworks", "runway", "leonardo"];
+  for (const tier of ["premium", "architect", "constructor", "unknown"]) {
+    it(`${tier}: ai-horde before any text2img; no paid text2img by default`, () => {
+      const c = getFallbackChain(tier, true);
+      expect(c[0]).toBe("cloudflare-klein");
+      expect(c.indexOf("ai-horde")).toBeLessThan(c.indexOf("cloudflare"));
+      expect(c.indexOf("ai-horde")).toBeLessThan(c.indexOf("pollinations"));
+      for (const id of PAID_T2I) expect(c).not.toContain(id);
+    });
+  }
+  it("allowPaidText2img appends paid text2img AFTER the free engines", () => {
+    const c = getFallbackChain("architect", true, { allowPaidText2img: true });
+    expect(c).toContain("leonardo");
+    expect(c.indexOf("leonardo")).toBeGreaterThan(c.indexOf("pollinations"));
+  });
+});
