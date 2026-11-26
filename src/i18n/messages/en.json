@@ -822,5 +822,10 @@
       "description": "For interviews, media assets, partnership inquiries, or investor materials, reach us directly:",
       "responseTime": "Typical response time: under 24 hours on business days."
     }
+  },
+  "render": {
+    "engineUsed": "Rendered with {engine}",
+    "fallback": "(fallback: {failed} unavailable)",
+    "baseNotKept": "The 3D view was not kept: this engine works from text only."
   }
 }

@@ -4,6 +4,7 @@ import { RENDER_RESOLUTIONS } from "./renderConstants";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
 import { authHeaders } from "@/shared/lib/authHeaders";
+import { engineMetaFromHeaders, type EngineMeta } from "./engineMeta";
 import { toJpegDataUrl, BASE_IMAGE_QUALITY, STORED_RENDER_MAX_SIDE } from "./renderImage";
 
 interface UseRenderEngineParams {
@@ -22,6 +23,8 @@ interface UseRenderEngineReturn {
   aiError: string | null;
   aiElapsed: number;
   aiUsedEngine: string | null;
+  /** Engine + failed engines of the last image, and the input it was made from (BUG-ST29) */
+  aiEngineMeta: (EngineMeta & { inputMode: RenderInputMode }) | null;
   /** Resolves true when an image was produced */
   handleGenerateAiRender: (prompt: string) => Promise<boolean>;
   resetAiImage: () => void;
@@ -52,6 +55,7 @@ export function useRenderEngine({
   const [aiError, setAiError] = useState<string | null>(null);
   const [aiElapsed, setAiElapsed] = useState(0);
   const [aiUsedEngine, setAiUsedEngine] = useState<string | null>(null);
+  const [aiEngineMeta, setAiEngineMeta] = useState<UseRenderEngineReturn["aiEngineMeta"]>(null);
 
   // Elapsed time ticker for AI loading
   const tickerRef = useRef<ReturnType<typeof setInterval> | null>(null);
@@ -90,6 +94,7 @@ export function useRenderEngine({
     setAiError(null);
     setAiImageUrl(null);
     setAiUsedEngine(null);
+    setAiEngineMeta(null);
     setAiLoading(true);
     setAiElapsed(0);
     // Start elapsed timer
@@ -189,10 +194,15 @@ export function useRenderEngine({
         return false;
       }
 
-      const usedEngine = response.headers.get("x-ai-engine") || (response.url.includes("pollinations") ? "pollinations" : aiEngine);
+      const meta = engineMetaFromHeaders(response.headers, {
+        requestedEngine: baseImage ? null : aiEngine,
+        hadBaseImage: !!baseImage,
+      });
+      const usedEngine = meta.engine;
       const objectUrl = URL.createObjectURL(blob);
       setAiImageUrl(objectUrl);
       setAiUsedEngine(usedEngine);
+      setAiEngineMeta({ ...meta, inputMode });
       setAiLoading(false);
       return true;
     } catch (err) {
@@ -216,6 +226,7 @@ export function useRenderEngine({
     aiError,
     aiElapsed,
     aiUsedEngine,
+    aiEngineMeta,
     handleGenerateAiRender,
     resetAiImage,
   };

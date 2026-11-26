@@ -822,5 +822,10 @@
       "description": "Voor interviews, mediamateriaal, partnerverzoeken of investeerdersmateriaal, bereik ons direct:",
       "responseTime": "Typische reactietijd: binnen 24 uur op werkdagen."
     }
+  },
+  "render": {
+    "engineUsed": "Gerenderd met {engine}",
+    "fallback": "(alternatief: {failed} niet beschikbaar)",
+    "baseNotKept": "De 3D-weergave is niet behouden: deze engine werkt alleen met tekst."
   }
 }

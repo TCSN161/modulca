@@ -822,5 +822,10 @@
       "description": "Pentru interviuri, materiale media, parteneriate sau resurse pentru investitori, contactează-ne direct:",
       "responseTime": "Timp tipic de răspuns: sub 24 de ore în zilele lucrătoare."
     }
+  },
+  "render": {
+    "engineUsed": "Randat cu {engine}",
+    "fallback": "(alternativă: {failed} indisponibil)",
+    "baseNotKept": "Vederea 3D nu a fost păstrată: acest motor lucrează doar din text."
   }
 }
