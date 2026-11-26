@@ -113,12 +113,12 @@ sources: ["Legea 169/2026 (CATUC)", "Monitorul Oficial 661/10.08.2026", "Ministe
 difficulty: "intermediate"
 lastUpdated: "${today}"
 proOnly: false
-status: "draft-awaiting-vlad-review"
+status: "draft-awaiting-review"
 ---
 
 # CATUC — Codul Amenajării Teritoriului, Urbanismului și Construcțiilor (Legea 169/2026)
 
-> **⚠️ Draft**: generated ${today} from NotebookLM. Pending review by Arh. Vlad Ioniță before deploy.
+> **⚠️ Draft**: generated ${today} from NotebookLM. Pending review by the partner architect before deploy.
 
 ## 1. Context
 
@@ -144,7 +144,7 @@ ${
     .join("\n\n") || "_(NotebookLM Q&A will be integrated here after Phase 2 kickoff)_"
 }
 
-## 3. TBD — needs Vlad Ioniță review
+## 3. TBD — needs partner architect review
 
 - Transitory provisions for Legea 50/1991 projects in progress on 25.08.2026
 - Articles 415, 524 (flagged as parse-issue in catuc-169-2026-articole.json)
@@ -152,7 +152,7 @@ ${
 
 ---
 
-*This file is a \`.new.md\` draft. Deploy only after Vlad review per MCA-SPEC-CATUC-PHASE2-PLAN §Deploy Gate.*
+*This file is a \`.new.md\` draft. Deploy only after architect review per MCA-SPEC-CATUC-PHASE2-PLAN §Deploy Gate.*
 `;
 
 writeFileSync(catucChapterPath, catucChapter);
@@ -171,6 +171,6 @@ console.log("  1. Review docs/research/*.md consolidated file");
 console.log("  2. Review src/knowledge/.../catuc-169-2026.new.md chapter");
 console.log("  3. Update MCA-SPEC-CATUC-PHASE2-PLAN §4 article mapping table");
 console.log("  4. Run DeepSeek/Claude to fill F2, F3, F4, F9, F10 .new.md siblings");
-console.log("  5. Send to Vlad Ioniță for legal review");
+console.log("  5. Send to partner architect for legal review");
 console.log("  6. mv .new.md → .md after sign-off");
 console.log("━".repeat(60));
