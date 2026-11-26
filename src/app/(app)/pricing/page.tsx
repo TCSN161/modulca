@@ -25,7 +25,7 @@ const CATEGORY_KEYS: Record<string, string> = {
 type VisibleTierId = Exclude<AccountTier, "guest_free">;
 
 export default function PricingPage() {
-  const { userTier, userId, userEmail, betaPromoActive, betaPromoDaysLeft, setTier } = useAuthStore();
+  const { userTier, betaPromoActive, betaPromoDaysLeft, setTier } = useAuthStore();
   const [yearly, setYearly] = useState(false);
   const [upgrading, setUpgrading] = useState<string | null>(null);
   const t = useTranslations("pricing");
@@ -51,7 +51,7 @@ export default function PricingPage() {
       return;
     }
 
-    await redirectToCheckout(priceId, userId, userEmail);
+    await redirectToCheckout(priceId);
     setUpgrading(null);
   };
 

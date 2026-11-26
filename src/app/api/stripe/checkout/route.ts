@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import * as Sentry from "@sentry/nextjs";
+import { getAuthenticatedUser } from "@/shared/lib/api-auth";
 
 export const dynamic = "force-dynamic";
 
@@ -14,12 +15,24 @@ function getStripe() {
  * POST /api/stripe/checkout
  * Creates a Stripe Checkout Session for subscription upgrade.
  *
- * Body: { priceId: string, userId: string, userEmail: string }
+ * Auth (BUG-ST15): the user is resolved from `Authorization: Bearer <token>`
+ * (or the sb cookie). `userId` / `userEmail` in the body are IGNORED, so a
+ * subscription can never be attached to another account.
+ *
+ * Body: { priceId: string }
  * Returns: { url: string } — the Checkout Session URL
  */
 export async function POST(req: NextRequest) {
   try {
-    const { priceId, userId, userEmail } = await req.json();
+    const user = await getAuthenticatedUser(req);
+    if (!user) {
+      return NextResponse.json(
+        { error: "Authentication required", code: "auth_required" },
+        { status: 401 }
+      );
+    }
+
+    const { priceId } = (await req.json().catch(() => ({}))) as { priceId?: string };
 
     if (!priceId) {
       return NextResponse.json(
@@ -34,18 +47,18 @@ export async function POST(req: NextRequest) {
     const session = await stripe.checkout.sessions.create({
       mode: "subscription",
       payment_method_types: ["card"],
-      customer_email: userEmail || undefined,
-      client_reference_id: userId || undefined,
+      customer_email: user.email || undefined,
+      client_reference_id: user.id,
       line_items: [{ price: priceId, quantity: 1 }],
       success_url: `${origin}/dashboard?upgrade=success&session_id={CHECKOUT_SESSION_ID}`,
       cancel_url: `${origin}/pricing?upgrade=cancelled`,
       metadata: {
-        userId: userId || "",
+        userId: user.id,
         source: "modulca-pricing",
       },
       subscription_data: {
         metadata: {
-          userId: userId || "",
+          userId: user.id,
         },
       },
     });

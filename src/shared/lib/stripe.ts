@@ -1,6 +1,7 @@
 "use client";
 
 import { loadStripe } from "@stripe/stripe-js";
+import { authHeaders } from "@/shared/lib/authHeaders";
 
 /**
  * Stripe client singleton.
@@ -40,13 +41,11 @@ export const STRIPE_PRICES = {
 /**
  * Redirect to Stripe Checkout via server-side session.
  * Creates a Checkout Session on /api/stripe/checkout, then redirects to Stripe.
+ * The server identifies the user from the Bearer token (BUG-ST15); no user id
+ * or email is sent in the body.
  * In demo mode, simulates upgrade locally.
  */
-export async function redirectToCheckout(
-  priceId: string,
-  userId?: string | null,
-  userEmail?: string | null
-): Promise<void> {
+export async function redirectToCheckout(priceId: string): Promise<void> {
   if (!isStripeConfigured || !priceId) {
     // Demo mode — simulate upgrade
     console.log("[Stripe Demo] Would redirect to checkout for:", priceId);
@@ -56,9 +55,14 @@ export async function redirectToCheckout(
   try {
     const res = await fetch("/api/stripe/checkout", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ priceId, userId, userEmail }),
+      headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+      body: JSON.stringify({ priceId }),
     });
+
+    if (res.status === 401) {
+      window.location.href = "/login";
+      return;
+    }
 
     const data = await res.json();
 
