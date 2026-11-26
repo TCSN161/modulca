@@ -26,7 +26,6 @@ export default function robots(): MetadataRoute.Robots {
         disallow: [
           "/api/",
           "/admin/",
-          "/_next/",
           "/_internal/", // Dev-only routes (Sentry test, debug pages)
           "/dashboard/",
           "/project/*", // Private user projects; /project/demo is public via allow below
