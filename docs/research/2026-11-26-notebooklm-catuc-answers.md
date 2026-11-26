@@ -1,0 +1,674 @@
+# NotebookLM CATUC Answers — CATUC 169/2026
+
+**Exported**: 2026-11-26  
+**Queries**: 10  
+**Source**: CATUC 169/2026 notebook (CATUC MD + JSON + PDF)  
+**Raw input**: `docs/research/2026-11-26-notebooklm-raw-q11-q25.txt` (Q11–Q20; NotebookLM follow-up suggestions stripped). Q21–Q25 were not asked in NotebookLM; Claude answered them from the law text.  
+**⚠️ Read the verification and errata in `docs/research/2026-11-26-catuc-answers-q11-q25.md` before using any answer.**
+
+---
+
+## Q11 — What does Ministerul Dezvoltării's "Clarificări" PDF say are the 15 most common questions? Give the ...
+
+### Question
+What does Ministerul Dezvoltării's "Clarificări" PDF say are the 15 most common questions? Give the full answer for each. [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+Documentul oficial **„Clarificări privind aplicarea Legii nr. 169/2026 privind Codul amenajării teritoriului, urbanismului și construcțiilor”**, emis de Ministerul Dezvoltării, Lucrărilor Publice și Administrației (MDLPA), reprezintă un ghid de orientare administrativă menit să unifice practica autorităților locale în perioada de tranziție.
+
+Documentul conține **15 puncte principale de clarificare**, structurate sub formă de întrebări și răspunsuri detaliate:
+
+---
+
+### **1. Soluționarea cererilor înregistrate până la 24 august 2026**
+* **Întrebare:** *Cum se soluționează cererile înregistrate până la 24 august 2026, având în vedere că autoritățile locale au în lucru un număr mare de cereri înregistrate anterior intrării în vigoare a CATUC (certificate de urbanism, autorizații, avize de oportunitate, avize ale arhitectului-șef, documentații de urbanism aflate în avizare), unele incomplete?*
+* **Răspunsul MDLPA:** Toate cererile înregistrate până la data de **24.08.2026 inclusiv** se soluționează în baza legislației în vigoare la data înregistrării (Legea nr. 50/1991, Legea nr. 350/2001 și normele metodologice aferente), indiferent de obiect și de faza procedurii, utilizându-se formularele vechi, cu notă privind temeiul legal (**art. 582 din CATUC**). Cererile depuse începând cu **25.08.2026** se soluționează pe noile formulare aprobate prin Ordinele MDLPA nr. 975/2026 și nr. 1022/2026, invocând Codul, chiar dacă actul de bază (ex. Certificatul de Urbanism) a fost emis sub vechea legislație.
+
+---
+
+### **2. Formularele aplicabile în perioada tranzitorie**
+* **Întrebare:** *Care sunt formularele aplicabile în perioada tranzitorie în care va continua finalizarea procedurilor demarate pe legislația anterioară Codului? Ordinele nr. 839/2009 și nr. 233/2016, împreună cu formularele lor, sunt abrogate de la 25.08.2026, dar actele emise pe cererile vechi și actele subsecvente unor certificate de urbanism emise pe legea veche continuă să fie necesare încă cel puțin 2-4 ani.*
+* **Răspunsul MDLPA:** Cererile înregistrate până la 24.08.2026 inclusiv folosesc formularele vechi. Cererile noi (depuse din 25.08.2026) folosesc formularele noi; analiza pe fond se face în baza legislației aplicabile procedurii, cu menționarea art. 582 din CATUC. Prelungirile certificatelor de urbanism sau autorizațiilor existente se solicită pe noul formular de prelungire și se operează direct prin înscriere pe actul original.
+
+---
+
+### **3. Aprobarea PUD-urilor aflate în curs prin Dispoziție de Primar**
+* **Întrebare:** *Se poate aproba prin dispoziție de primar o documentație de urbanism elaborată anterior intrării în vigoare a Codului ca Plan urbanistic de detaliu sub regimul codului ca Proiect urbanistic de detaliu dacă au fost obținute toate avizele și acordurile necesare sau trebuie să urmeze procedura de adoptare prin hotărâre de consiliu local?*
+* **Răspunsul MDLPA:** Da, pot fi supuse aprobării prin dispoziție de primar (noul mecanism PUD din CATUC) Planurile urbanistice de detaliu analizate în CTATU anterior intrării în vigoare a Codului, dacă sunt complete, respectă prevederile Legii nr. 169/2026 și întrunesc toate condițiile de aprobare, cu excepția celor a căror aprobare este de competența președintelui Consiliului Județean.
+
+---
+
+### **4. Stabilirea datei de inițiere a procedurii (art. 582 alin. 6)**
+* **Întrebare:** *Cum se stabilește data inițierii procedurii în sensul art. 582 alin. (6) din CATUC?*
+* **Răspunsul MDLPA:** Pentru documentațiile de urbanism inițiate de persoane private, data inițierii procedurii este **data emiterii certificatului de urbanism**, ca act administrativ prin care solicitantul ia cunoștință oficial de necesitatea elaborării, avizării și aprobării documentației.
+
+---
+
+### **5. Condițiile de ocupare a funcției de Arhitect-Șef**
+* **Întrebare:** *Codul conține diferite prevederi referitoare la condițiile pe care trebuie să le îndeplinească arhitecții șefi sau personalul din cadrul structurilor de specialitate de la nivelul județelor, municipiilor, orașelor sau comunelor și competențele de autorizare în raport cu acestea. Ce se întâmplă cu persoanele care nu îndeplinesc la acest moment condițiile din noua legislație?*
+* **Răspunsul MDLPA:** Se aplică dispozițiile **art. 465^1 din Codul Administrativ** (OUG nr. 57/2019) privind stabilitatea în funcția publică. Arhitecții-șefi și funcționarii în funcție își continuă activitatea fără întrerupere sau reconfirmare, având la dispoziție un termen de **maximum 36 de luni** de la intrarea în vigoare a noilor condiții pentru a urma cursurile de specializare necesare.
+
+---
+
+### **6. Dreptul de semnătură OAR / RUR pentru Arhitecții-Șefi**
+* **Întrebare:** *Prevederile Codului amenajării teritoriului, urbanismului și construcțiilor obligă arhitecții-șefi să aibă drept de semnătură în arhitectură de la Ordinul Arhitecților din România sau să aibă atestare de coordonatori sau de elaboratori de documentații de amenajarea teritoriului sau de urbanism de către Registrul Urbaniștilor din România?*
+* **Răspunsul MDLPA:** **Nu.** Deținerea dreptului de semnătură acordat de RUR sau OAR nu este o condiție pentru exercitarea funcției publice de arhitect-șef. Dreptul de semnătură este necesar doar atunci când funcționarul public elaborează direct, în cadrul instituției, proiecte tehnice sau documentații de urbanism.
+
+---
+
+### **7. Aplicarea noii definiții a Procentului de Ocupare a Terenului (POT)**
+* **Întrebare:** *Definiția Procentului de ocupare a terenului (POT) prevăzută de CATUC se aplică în cazul documentațiilor de urbanism aprobate anterior datei de 25 august 2026 și aflate în vigoare?*
+* **Răspunsul MDLPA:** **Nu.** Noua definiție a POT din CATUC nu se aplică documentațiilor de urbanism (PUG, PUZ) aprobate anterior datei de 25 august 2026. Indicatorul POT aprobat anterior se calculează și se interpretează strict conform normelor legale în vigoare la data aprobării acelei documentații, pentru a evita modificarea retroactivă a drepturilor de construire.
+
+---
+
+### **8. Regimul autorizațiilor emise în baza Legii nr. 50/1991**
+* **Întrebare:** *Autorizațiile emise în baza Legii nr. 50/1991 privind autorizarea executării lucrărilor de construcții, republicată, cu modificările și completările ulterioare: prelungire, expirare, continuarea lucrărilor, modificarea de temă.*
+* **Răspunsul MDLPA:**
+  * **Prelungire**: Autorizațiile emise sub Legea 50/1991 neîncepute sau nefinalizate pot fi prelungite o singură dată, pentru maximum 12 luni, solicitarea depunându-se cu cel puțin 15 zile lucrătoare înainte de expirare pe noul formular (Ord. 975/2026).
+  * **Autorizații expirate**: În caz de expirare a duratei de execuție, se solicită o nouă autorizație pentru lucrările rămase de executat în baza **art. 310 alin. (7)** din Cod, **fără a fi necesar un nou certificat de urbanism sau avize noi**.
+  * **Modificare de temă**: Se solicită autorizație de modificare conform **art. 293** din CATUC.
+
+---
+
+### **9. Gestionarea mai multor intenții de PUZ pe aceeași zonă**
+* **Întrebare:** *Ce se întâmplă în situația în care există mai multe solicitări de Intenție PUZ pentru aceeași zonă, depuse la intervale scurte de timp și care pot propune lucruri contradictorii sau necorelate?*
+* **Răspunsul MDLPA:** Conform **art. 66 alin. (3)-(6) din CATUC**, primăria publică lista solicitărilor de PUZ și are dreptul legal de a amâna sau prioritiza cererile private pe baza unei grile de oportunitate și a unui plan de acțiune, ori de a propune realizarea unui singur PUZ de coordonare pentru întreaga zonă.
+
+---
+
+### **10. Certificatul de Urbanism pentru Operațiuni Cadastrale**
+* **Întrebare:** *Având în vedere caracterul de noutate al certificatelor de urbanism (CU) privind operațiunile cadastrale, se solicită clarificări pentru aplicarea unitară a Codului amenajării teritoriului, urbanismului și construcțiilor.*
+* **Răspunsul MDLPA (pe situații):**
+  * **Alipiri în intravilan**: CU pentru operațiuni cadastrale este **obligatoriu**.
+  * **Dezmembrări/Dezlipiri**: Este obligatoriu în intravilan.
+  * **Terenuri agricole în extravilan**: **Nu este necesar CU** dacă operațiunea nu urmărește realizarea de construcții (fapt menționat sub declarație pe propria răspundere a proprietarului).
+  * **CU anterioare**: Certificatele emise înainte de 25 august 2026 își păstrează valabilitatea.
+  * **Apartamentări / Preapartamentări**: Nu necesită CU cadastral (au la bază certificatul de edificare). Reapartamentările/subapartamentările fără lucrări autorizabile necesită CU.
+  * **Condominii**: Nu necesită CU pentru dezmembrare dacă operațiunea a fost prevăzută explicit în autorizația inițială și proiectul aprobat.
+
+---
+
+### **11. Delimitarea dintre dezlipire cadastrală, PUD și PUZ**
+* **Întrebare:** *Care este delimitarea dintre dezlipirea cadastrală, parcelarea pe bază de PUD și parcelarea pe bază de PUZ?*
+* **Răspunsul MDLPA:**
+  * **Dezlipirea cadastrală (art. 240)**: Divizarea unui teren în **două loturi**.
+  * **Parcelarea pe bază de PUD (art. 218 alin. 2 / art. 82)**: Divizarea în **3 până la 12 loturi** pentru locuințe individuale (o singură dată pe teren).
+  * **Parcelarea pe bază de PUZ (art. 216–219)**: Divizarea în **peste 12 loturi** sau pentru orice alte funcțiuni ne-rezidențiale.
+
+---
+
+### **12. Procedura de „legalizare” a construcțiilor neautorizate (art. 37 alin. 6 din Legea 50/1991)**
+* **Întrebare:** *Cum se abordează aplicarea prevederilor art. 37 alin. 6, privind legalizarea construcțiilor realizate fără autorizație de construire sau cu nerespectarea acesteia potrivit Legii nr. 50/1991 [...], în cazul cererilor înregistrate anterior datei de 25.08.2026, data la care a intrat în vigoare Codul [...], care nu mai permite acest tip de "legalizare"?*
+* **Răspunsul MDLPA:** CATUC a eliminat vechiul mecanism facil de „legalizare” prin adeverință de edificare și a introdus **Autorizația de Regularizare (art. 301)**. Cererile noi formulate după 25 august 2026 trebuie să urmeze obligatoriu procedura strictă a autorizației de regularizare (care presupune expertize pe toate cerințele fundamentale, încadrarea strictă în PUG și sancționarea contravențională).
+
+---
+
+### **13. Construcțiile neautorizate realizate înainte de 1 august 2001**
+* **Întrebare:** *Pentru clădirile realizate înainte de 1 august 2001 care au fost realizate fără autorizație de construire sau pentru care nu poate fi identificată o copie după aceasta, dat fiind vechimea lor, se impune aplicarea procedurii de regularizare sau se aplică în continuare mecanismul de intabulare stabilit de Legea 7/1996?*
+* **Răspunsul MDLPA:** Pentru construcțiile executate înainte de 1 august 2001 **se aplică în continuare mecanismul direct de intabulare** prevăzut de Legea cadastrului nr. 7/1996 (în baza certificatului de atestare fiscală), fără a fi necesară parcurgerea procedurii de regularizare din CATUC sau prezentarea certificatului de edificare.
+
+---
+
+### **14. Titularii dreptului de construire (art. 245 din CATUC)**
+* **Întrebare:** *ENUMERAREA DE LA ART. 245 ESTE LIMITATIVĂ SAU EXEMPLIFICATIVĂ în sensul că pot solicita execuția lucrărilor de construire/desființare doar titularii dreptului de proprietate și ai altor drepturi reale corespunzătoare proprietății publice, respectiv titularii unui drept de creanță [...], sau este doar exemplificativă, în sensul că pot solicita [...] și titularii unor dezmembrăminte ale dreptului de proprietate (cum ar fi superficie constituită în scopul construirii, conform art. 693 din Codul civil)?*
+* **Răspunsul MDLPA:** Enumerarea de la art. 245 **este exemplificativă (ne-limitativă)**. Titularii unui drept de **superficie** constituit în scopul construirii au dreptul deplin de a solicita și obține autorizații de construire/desființare.
+
+---
+
+### **15. Procedura de autorizare a branșamentelor la utilități pe domeniul public**
+* **Întrebare:** *Branșamentele la utilități urbane sunt menționate la mai multe articole dedicate unor proceduri distincte [...]. Care este procedura aplicabilă branșamentelor la utilități urbane solicitate pe domeniul public pentru construcții existente? Se realizează în baza acordului/autorizației administratorului drumului sau a unei autorizații de construire?*
+* **Răspunsul MDLPA:** Pentru lucrările de branșare pe domeniul public, racordarea se execută **direct în baza acordului/autorizației administratorului drumului**, fără a mai fi necesară o autorizație de construire separată. Branșamentele executate pe teren proprietate privată se realizează **în lipsa oricărei formalități** (art. 299).
+
+### Citations
+- CATUC art. 66
+- CATUC art. 82
+- CATUC art. 216
+- CATUC art. 217
+- CATUC art. 218
+- CATUC art. 219
+- CATUC art. 240
+- CATUC art. 245
+- CATUC art. 293
+- CATUC art. 299
+- CATUC art. 301
+- CATUC art. 310
+- CATUC art. 582
+
+---
+
+## Q12 — Is there any provision about digital submission of applications under CATUC? [question text from MCA...
+
+### Question
+Is there any provision about digital submission of applications under CATUC? [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+**Da, CATUC (Legea nr. 169/2026) include prevederi explicite și de detaliu care consacră dreptul solicitanților de a depune online cererile și documentațiile necesare, precum și obligația autorităților de a procesa și emite aceste acte în format digital.**
+
+Iată articolele exacte din CATUC care reglementează depunerea și procesarea electronică pentru fiecare categorie de act:
+
+---
+
+### **1. Cadrul general: Platforma Națională și Ghișeul Unic Național**
+* **Articolul 137 alin. (1) și (3) lit. b)**: Stabilește că digitalizarea activităților operaționale de autorizare este asigurată prin *Platforma națională de planificare urbană și teritorială și autorizare a construirii*, din care face parte **Ghișeul unic național de autorizare a construcțiilor**.
+* **Articolul 139 alin. (1) și (3)**: Definește Ghișeul unic național drept platforma digitală națională prin care se asigură:
+  * *„a) transmiterea și primirea documentației necesare pentru eliberarea actelor având ca obiect informarea cu privire la documentațiile de amenajare a teritoriului și documentațiile de urbanism;”*
+  * *„b) transmiterea și primirea documentației necesare pentru eliberarea actelor având ca obiect autorizarea lucrărilor de construcții;”*
+  * *„c) comunicarea directă cu privire la clarificările și/sau modificările necesare documentației transmise;”*
+  * *„e) emiterea și primirea autorizației de construire sau de desființare.”*
+
+---
+
+### **2. Depunerea electronică pentru Certificatul de Urbanism (CU)**
+* **Articolul 254 alin. (4), (5) și (8) (CU pentru informare)**: 
+  * *„(4) Certificatul de urbanism pentru informare se emite și se comunică solicitantului în format scris sau în format digital, în funcție de opțiunea solicitantului [...] Cererea-tip se poate formula și prin intermediul unei aplicații și/sau al unui sistem informatic.”*
+  * *„(5) În situația în care autoritatea publică locală deține un sistem informatic funcțional, certificatul de urbanism pentru informare se emite în mod automat.”*
+  * *„(8) Certificatul de urbanism pentru informare se generează automat printr-un sistem informatic cu sigiliul electronic calificat sau avansat al autorității emitente...”*
+* **Articolul 256 alin. (3) și (6) (CU pentru operațiuni cadastrale)**: 
+  * Permite comunicarea în format digital, stabilind că actul *„emis în format digital se semnează cu semnătura electronică calificată sau avansată [...] având aceeași valoare juridică cu certificatul [...] emis în format scris.”*
+* **Articolul 257 alin. (2) și (7) (CU pentru construire/desființare)**: 
+  * *„(2) Certificatul de urbanism pentru construire/desființare pentru clădiri și amenajări se emite și se comunică solicitantului în format scris sau în format digital, în funcție de opțiunea solicitantului...”*
+  * *„(7) Certificatul de urbanism [...] emis în format digital se semnează cu semnătura electronică calificată sau avansată...”*
+
+---
+
+### **3. Depunerea electronică pentru Autorizația de Construire / Desființare (AC/AD)**
+* **Articolul 270 alin. (1), (2) și (3)**:
+  * *„(1) Documentația necesară emiterii autorizației de construire se depune de către solicitant la autoritatea administrației publice competente sau Ghișeul unic național...”*
+  * *„(2) Documentația necesară emiterii autorizației de construire se depune în format scris sau în format digital. Partea documentației necesară publicării pe site-ul instituției se depune obligatoriu și în format digital.”*
+  * *„(3) În cazul în care solicitantul depune documentația necesară emiterii autorizației de construire în format digital, aceasta va fi semnată cu semnătură electronică profesională calificată sau avansată de către solicitant, precum și, după caz, de către toți specialiștii prevăzuți de lege...”*
+* **Articolul 273 alin. (2)**: Prevede că *„Autorizația de construire poate fi transmisă solicitantului în format digital și prin intermediul Ghișeului unic național.”*
+* **Articolul 278 alin. (4) și Articolul 280 alin. (10)**: Înștiințarea privind începerea lucrărilor și înștiințarea privind finalizarea lucrărilor se pot transmite în format digital.
+
+---
+
+### **4. Depunerea electronică pentru Notificare (Procedură simplificată)**
+* **Articolul 295 alin. (5) și (6)**:
+  * *„(5) Transmiterea formularului de notificare și a proiectului aferent către autoritatea administrației publice locale se realizează în format scris sau digital.”*
+  * *„(6) Autoritatea administrației publice locale confirmă automat recepționarea notificării transmise în format digital...”*
+* **Articolul 296 alin. (3) și (4)**:
+  * Răspunsurile sau informările emise de primărie se transmit în format scris sau digital (în funcție de opțiunea solicitantului), iar documentele emise în format digital se semnează cu semnătură electronică calificată sau avansată.
+
+---
+
+### **5. Depunerea electronică a avizelor și funcționarea Comisiei de Acord Unic**
+* **Articolul 306 lit. a) și Articolul 316 alin. (1) lit. f)**:
+  * Entitățile și furnizorii de utilități au obligația de a asigura depunerea cererilor, a documentațiilor și emiterea avizelor/acordurilor în format digital prin Ghișeul Unic Național sau prin poșta electronică.
+
+### Citations
+- CATUC art. 137
+- CATUC art. 139
+- CATUC art. 254
+- CATUC art. 256
+- CATUC art. 257
+- CATUC art. 270
+- CATUC art. 273
+- CATUC art. 278
+- CATUC art. 280
+- CATUC art. 295
+- CATUC art. 296
+- CATUC art. 306
+- CATUC art. 316
+
+---
+
+## Q13 — What are penalties under CATUC for building without authorization? (Compare to Legea 50/1991 penalti...
+
+### Question
+What are penalties under CATUC for building without authorization? (Compare to Legea 50/1991 penalties.) [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+**CATUC (Legea nr. 169/2026)** înăsprește semnificativ regimul sancțiunilor pentru lucrările executate fără autorizație de construire sau fără notificare prealabilă, introducând amenzi substanțial mai mari, măsuri fiscale punitive și proceduri mai stricte de desființare și regularizare.
+
+---
+
+### **1. Sancțiuni financiare (Amenzi contravenționale)**
+
+CATUC diferențiază clar faptele în funcție de regimul de autorizare încălcat:
+
+* **Construirea/executarea fără autorizație de construire/desființare/regularizare/modificare** (sau cu nerespectarea acesteia):
+  * **Amendă de la 50.000 lei la 1.000.000 lei**.
+  * **Sancțiune suplimentară pentru depășirea regimului de înălțime**: dacă se încalcă autorizația prin adăugarea de niveluri neautorizate, se aplică o amendă suplimentară de la **50.000 lei la 500.000 lei pentru fiecare nivel neautorizat în plus**.
+* **Executarea lucrărilor fără notificarea prealabilă** (sau cu nerespectarea proiectului notificat):
+  * **Amendă de la 5.000 lei la 50.000 lei**.
+* **Măsură fiscală punitivă (Majorarea impozitului)**:
+  * Pentru clădirile executate neautorizat și neregularizate, **impozitul pe clădiri se majorează cu 100%** de la data constatării până la obținerea autorizației de regularizare sau desființarea construcției.
+
+---
+
+### **2. Sancțiuni penale (Infracțiuni)**
+
+Fapta devine **infracțiune** și se pedepsește cu **închisoare de la 3 luni la 1 an sau cu amendă** în următoarele cazuri:
+* Executarea fără autorizație sau fără notificare a lucrărilor pe **monumente istorice**, în zone de protecție a acestora, în **zone construite protejate** sau pe clădiri cu valoare arhitecturală/istorică deosebită.
+* **Continuarea lucrărilor după ce oprirea lor a fost dispusă** de organele de control sau ruperea sigiliilor aplicate pe șantier.
+* Initierea sau aprobarea de către autorități a unor documentații de urbanism cu scopul intrării în legalitate a unor construcții neautorizate.
+
+---
+
+### **3. Măsurile complementare: Oprirea lucrărilor, Regularizarea și Desființarea (Demolarea)**
+
+* **Oprirea imediată a lucrărilor**: Organele de control (I.S.C. sau poliția locală) au obligația de a dispune oprirea executării lucrărilor, interzicerea accesului pe șantier, sigilarea acestuia și deconectarea de la utilități.
+* **Procedura de regularizare**: Intrarea în legalitate se poate face **exclusiv prin Autorizația de Regularizare** (art. 301), dovedind că lucrarea respectă reglementările urbanistice (PUG/PUZ) și toate cerințele fundamentale de calitate.
+* **Desființarea (Demolarea) construcțiilor neautorizate**:
+  * *Prin instanța de judecată*: Dacă lucrarea nu respectă PUG/PUZ sau cerințele de calitate (sau dacă nu s-a obținut regularizarea), primarul/I.S.C. sesizează instanța pentru a dispune desființarea. Acțiunea în instanță pentru desființare se prescrie în termen de **10 ani** de la finalizarea în fapt a lucrărilor.
+  * *Desființarea pe cale administrativă directă (fără instanță)*: Construcțiile neautorizate realizate pe **terenuri din domeniul public sau privat al statului ori al UAT** pot fi desființate direct pe cale administrativă, fără autorizație de desființare și fără sesizarea instanței, pe cheltuiala contravenientului.
+
+---
+
+### **4. Comparație directă: CATUC vs. Legea nr. 50/1991**
+
+| Criteriu | Legea nr. 50/1991 (Legea veche) | CATUC (Legea 169/2026) |
+| :--- | :--- | :--- |
+| **Limita amenzii pentru construire fără autorizație** | De la 1.000 lei la 100.000 lei. | **De la 50.000 lei la 1.000.000 lei** *(creștere de 10 ori a maximului)*. |
+| **Sancțiune pentru niveluri neautorizate în plus** | Inclusă în amenda generală. | **Amendă suplimentară de 50.000 – 500.000 lei/nivel**. |
+| **Sancțiune pentru lipsa notificării** | Nu exista procedura notificării. | **Amendă de la 5.000 lei la 50.000 lei**. |
+| **Majorarea impozitului pe clădire neautorizată** | Nu exista o astfel de prevedere. | **Majorare cu 100% a impozitului pe clădire** până la regularizare/desființare. |
+| **Intrarea în legalitate** | Facilă, prin adeverință de edificare/atestare (art. 37 alin. 6). | **Interzisă adeverința facilă**; PUZ-urile pentru intrare în legalitate sunt nule; obligatorie **autorizația de regularizare**. |
+| **Prescripția acțiunii de desființare în instanță** | Regim incert (uzual 3 ani conform prescripției contravenționale). | **Prescripție explicită de 10 ani** de la finalizarea în fapt. |
+
+### Citations
+- CATUC art. 301
+
+---
+
+## Q14 — What CATUC articles define "regulations" vs "procedures" for local municipalities? [question text fr...
+
+### Question
+What CATUC articles define "regulations" vs "procedures" for local municipalities? [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+În **CATUC (Legea nr. 169/2026)**, delimitarea dintre ceea ce este stabilit unitar la nivel național și ceea ce este lăsat la latitudinea reglementării autorităților locale (consilii locale, consilii județene, primari) este realizată prin articole specifice care împart competențele de normare, procedură și fiscalitate.
+
+---
+
+### **1. Ce este stabilit UNITAR LA NIVEL NAȚIONAL (Cadrul general)**
+
+La nivel național, statul (prin Guvern, MDLPA și ministerele de resort) stabilește cadrul normativ unic, instrumentele digitale centrale, formularele standardizate și reglementările tehnice obligatorii:
+
+* **Strategiile naționale și cadrul normativ general**:
+  * **Art. 18, 19, 21, 112, 113**: *Strategia de dezvoltare teritorială a României*, *Politica urbană a României* și *Planul de amenajare a teritoriului național (PATN)* se elaborează la nivel central și se aprobă prin lege organică sau hotărâre de Guvern, fiind obligatorii pentru toate autoritățile locale.
+  * **Art. 104 alin. (1) lit. d) & Art. 377**: **Regulamentul General de Urbanism (RGU)** și sistemul unitar de reglementări tehnice în construcții se aprobă prin ordin al ministrului dezvoltării și constituie sistemul de norme tehnice, juridice și economice de bază pe întreg teritoriul țării.
+* **Platformele informatice și registrele naționale unice**:
+  * **Art. 136, 137, 138, 139, 415**: *Platforma națională de planificare urbană și autorizare a construirii*, *Ghișeul Unic Național*, *Geoportalul Național de Urbanism* și *Registrul Național al Construcțiilor* sunt create și gestionate de MDLPA pentru asigurarea interoperabilității și digitalizării unitare pe tot teritoriul țării.
+* **Formularele-tip, conținutul-cadru și lista avizelor**:
+  * **Art. 257 alin. (5), Art. 295 alin. (10), Art. 316 alin. (1)**: Formularele oficiale de cerere (pentru certificatul de urbanism, autorizația de construire, notificare), conținutul-cadru al documentațiilor tehnice și lista națională a avizelor/acordurilor se stabilesc prin ordine ale ministrului dezvoltării (ex. Ordinul MDLPA nr. 975/2026 și nr. 1022/2026).
+* **Cerințele fundamentale de calitate și controlul de stat**:
+  * **Art. 143, 351, 376, 386, 465**: Cerințele esențiale de calitate în construcții, atestarea specialiștilor, normele de disciplină în construcții, plafoanele amenzilor contravenționale și controlul de stat prin **Inspectoratul de Stat în Construcții (I.S.C.)** sunt reglementate uniform prin lege.
+
+---
+
+### **2. Ce reglementează AUTORITĂȚILE LOCALE (Consilii Locale, Consilii Județene, CGMB)**
+
+Autoritățile administrației publice locale adaptează cadrul național la specificul teritorial prin regulamente, proceduri operaționale interne și instrumente fiscale locale:
+
+* **A. Regulamentele locale de urbanism (RLU)**:
+  * **Art. 46, 78, 119, 177**: **Regulamentul Local de Urbanism (RLU)** — parte integrantă din PUG și PUZ, aprobat prin Hotărâre de Consiliu Local (HCL) — stabilește prescripțiile concrete aplicabile parcelelor:
+    * Zonificarea funcțională locală și utilizarea dominantă a terenurilor.
+    * Indicatorii urbanistici locali maximali și minimali: Procentul de Ocupare a Terenului (POT) și Coeficientul de Utilizare a Terenului (CUT) *(cu precizarea din art. 46 alin. 5 că zonele cu CUT > 4 se pot stabili exclusiv prin PUG)*.
+    * Regimul de înălțime, retragerile față de limitele de proprietate și aliniamentele.
+    * Obligațiile locale privind asigurarea locurilor de parcare, spațiilor verzi, locurilor de joacă și adaptarea la cromatică/materiale specifice zonei.
+* **B. Procedurile administrative locale și comisiile de specialitate**:
+  * **Art. 91, 92**: Organizarea și regulamentul de funcționare ale *Comisiei locale de avizare integrată*.
+  * **Art. 128**: Componența nominală și regulamentul de funcționare ale *Comisiei Tehnice de Amenajare a Teritoriului și Urbanism (CTATU)*, înființată prin HCL/HCJ pentru sprijinirea arhitectului-șef.
+  * **Art. 305, 307**: Organizarea și funcționarea *Comisiei de Acord Unic (CAU)* la nivel local sau județean și încheierea protocoalelor cu furnizorii de utilități.
+  * **Art. 63 alin. (4), 227**: Aprobarea *contractelor de urbanizare* negociate de primărie cu investitorii privați și aprobarea programelor locale de regenerare sau restructurare urbană.
+* **C. Taxe locale și mecanisme financiare proprii**:
+  * **Art. 63 alin. (3) & Art. 576 alin. (4)**: **Taxa locală de echipare a teritoriului** — taxă specială instituită prin hotărâre a consiliului local/județean, destinată exclusiv finanțării din fonduri publice a infrastructurii rutiere, edilitare, educaționale și sociale necesare zonelor reglementate prin PUG/PUZ.
+  * **Art. 272 alin. (2)**: **Taxa specială pentru autorizarea în regim de urgență** (eliberare în termen de până la 7 zile lucrătoare).
+  * **Art. 308 alin. (3)**: **Taxa specială pentru funcționarea Comisiei de Acord Unic**.
+  * **Art. 517 alin. (3)**: **Taxa de ocupare temporară a domeniului public/privat** pentru organizarea de șantier.
+  * **Art. 253 alin. (10), Art. 313 alin. (1) & (4)**: Stabilește taxele standard pentru eliberarea certificatelor de urbanism, autorizațiilor de construire și notificărilor, calculate pe baza regulilor din Codul Fiscal (cu o reducere de 50% pentru notificările simplificate).
+  * **Art. 301 alin. (11)**: Decizia de **majorare cu 100% a impozitului pe clădirile neautorizate** până la regularizare sau desființare.
+
+### Citations
+- CATUC art. 18
+- CATUC art. 19
+- CATUC art. 21
+- CATUC art. 46
+- CATUC art. 63
+- CATUC art. 78
+- CATUC art. 91
+- CATUC art. 92
+- CATUC art. 104
+- CATUC art. 112
+- CATUC art. 113
+- CATUC art. 119
+- CATUC art. 128
+- CATUC art. 136
+- CATUC art. 137
+- CATUC art. 138
+- CATUC art. 139
+- CATUC art. 143
+- CATUC art. 177
+- CATUC art. 227
+- CATUC art. 253
+- CATUC art. 257
+- CATUC art. 272
+- CATUC art. 295
+- CATUC art. 301
+- CATUC art. 305
+- CATUC art. 307
+- CATUC art. 308
+- CATUC art. 313
+- CATUC art. 316
+- CATUC art. 351
+- CATUC art. 376
+- CATUC art. 377
+- CATUC art. 386
+- CATUC art. 415
+- CATUC art. 465
+- CATUC art. 517
+- CATUC art. 576
+
+---
+
+## Q15 — Does CATUC change the role of signatary architects (arhitect cu drept de semnătură)? [question text ...
+
+### Question
+Does CATUC change the role of signatary architects (arhitect cu drept de semnătură)? [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+Prin **Codul Amenajării Teritoriului, Urbanismului și Construcțiilor (CATUC / Legea nr. 169/2026)**, rolul arhitectului cu drept de semnătură (membru OAR) **nu este diminuat, ci este reconfirmat, sistematizat și consolidat**. Codul unifică cadrul legal anterior (Legea nr. 50/1991, Legea nr. 350/2001, Legea nr. 184/2001) și explicitează clar limitele de competență, atributele de coordonator de proiect și regimul de răspundere profesională.
+
+---
+
+### **1. Ce POATE semna un arhitect cu drept de semnătură**
+
+Conform **art. 264 alin. (8)**, **art. 317 alin. (1) lit. a)** și **art. 428 alin. (2)** din CATUC, participarea și semnătura arhitectului cu drept de semnătură (obținut de la Ordinul Arhitecților din România - OAR și înscris în Tabloul Național al Arhitecților - TNA) sunt obligatorii pentru:
+
+* **Proiectul pentru Autorizarea Construirii (PAC)** și **Proiectul pentru Autorizarea Desființării (PAD)** — secțiunea de arhitectură pentru toate clădirile civile (supraterane și subterane), indiferent de clasa de consecințe (CC1–CC4).
+* **Documentațiile din procedura simplificată a notificării** — proiectele individuale sau adaptările proiectelor-tip pentru locuințe rurale unifamiliale de până la 150 mp.
+* **Intervenții și remodelări de fațade** — lucrări asupra construcțiilor existente care afectează fațadele sau arhitectura exteriorului.
+* **Proiectul Tehnic de Execuție (PTh) și Detaliile de Execuție (DE)** — piese scrise și desenate de arhitectură.
+* **Coordonarea generală a proiectului (Șef de proiect / Manager de proiect)** — pentru toate clădirile civile, unde arhitectul cu drept de semnătură asigură integrarea și coordonarea proiectelor de specialitate de inginerie (structură, instalații).
+* **Documentații de urbanism (PUG, PUZ, PUD)** — dacă deține suplimentar drept de semnătură acordat de Registrul Urbaniștilor din România (RUR).
+
+---
+
+### **2. Ce NU POATE semna (limite de competență)**
+
+CATUC interzice explicit depășirea domeniului de calificare universitară și atestare profesională:
+
+* **Proiectele de inginerie de specialitate** — arhitectul nu poate semna proiectele de structură de rezistență, calculele seismice, proiectele de instalații electrice, sanitare, HVAC, gaze sau studiile geotehnice; acestea sunt rezervate exclusiv inginerilor proiectanți de profil.
+* **Verificarea tehnică a propriului proiect** — un arhitect proiectant nu își poate verifica propriul proiect în calitate de verificator tehnic atestat (NVP1–NVP4).
+* **Rapoarte de expertiză tehnică pe structură/seism** — expertizarea tehnică este rezervată experților tehnici atestați.
+* **Restaurarea monumentelor istorice de clasă A/B fără calificare suplimentară** — este necesară atestarea suplimentară eliberată de Ministerul Culturii.
+
+---
+
+### **3. Ce RĂSPUNDERE are arhitectul conform CATUC**
+
+CATUC stabilește un regim strict de răspundere pentru arhitecți și proiectanți:
+
+1. **Răspundere pentru vicii ascunse (10 ani)**: Proiectantul răspunde pentru părțile din proiect elaborate în cazul viciilor ascunse ale construcției ivite într-un interval de **10 ani de la recepția la terminarea lucrărilor**.
+2. **Răspundere pentru viciile structurii pe durata de existență**: Pentru erorile de proiectare care afectează structura de rezistență, răspunderea se extinde pe **întreaga durată de existență a construcției**.
+3. **Obligația asigurării de răspundere civilă profesională**: Este **obligatorie** încheierea și menținerea unei polițe de asigurare de răspundere civilă profesională pe durata derulării contractului și exercitării dreptului de practică.
+4. **Răspundere în caz de înlocuire**: În cazul înlocuirii proiectantului pe parcursul investiției, proiectantul inițial răspunde doar pentru ce a prestat și semnat până la înlocuire, iar noul proiectant preia în scris responsabilitatea integrării și finalizării proiectului.
+5. **Sancțiuni contravenționale și suspendarea dreptului de practică**:
+   * Neprecizarea clasei de consecințe (CC1–CC4) sau nestabilirea fazelor determinante se sancționează cu amendă de la **10.000 lei la 20.000 lei**.
+   * Semnarea de proiecte neconforme, utilizarea de date eronate sau lipsa asigurării profesionale se sancționează cu amenzi de la **20.000 lei la 50.000 lei**.
+   * În caz de abateri repetate, I.S.C. și ministerul de resort pot dispune **suspendarea dreptului de practică** pentru o perioadă între 6 și 12 luni.
+
+### Citations
+- CATUC art. 264
+- CATUC art. 317
+- CATUC art. 428
+
+---
+
+## Q16 — What CATUC provisions apply for rural (sat) vs urban (oraș) areas regarding modular homes? [question...
+
+### Question
+What CATUC provisions apply for rural (sat) vs urban (oraș) areas regarding modular homes? [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+Principalele diferențe stabilite de **CATUC (Legea nr. 169/2026)** între zona rurală și cea urbană în ceea ce privește o casă unifamilială (indiferent dacă este realizată din zidărie tradițională, panouri prefabricate sau structuri modulare) vizează **regimul de autorizare, conținutul proiectului, suprafața parcelei și facilitățile pentru anexe**:
+
+---
+
+### **1. Regimul de autorizare (Notificare simplificată vs. Autorizație clasică)**
+* **În mediul rural**: O locuință unifamilială nouă (parter sau demisol + parter, fără subsol) cu o suprafață construită desfășurată de maximum **150 mp** pe lot propriu se poate realiza prin **procedura simplificată a notificării** prealabile. Notificarea se aprobă tacit în termen de **15 zile lucrătoare**.
+  * *Condiție de amplasament*: Terenul trebuie să fie în intravilan, în afara zonelor protejate și **în afara localităților rurale aflate în zone metropolitane**.
+  * *Proiecte permise*: Se pot folosi fie proiecte-tip furnizate de autorități (rezultate din concursuri MDLPA/OAR), fie proiecte individuale întocmite conform Ghidului de arhitectură rurală al OAR și avizate de arhitectul-șef de județ.
+* **În mediul urban**: (Precum și în comunele din zone metropolitane sau pentru case de peste 150 mp / cu mai multe niveluri), edificarea unei locuințe unifamiliale necesită parcurgerea procedurii clasice de obținere a **Autorizației de Construire (PAC)**.
+
+---
+
+### **2. Regimul anexelor gospodărești și al modulelor mici**
+* **În mediul rural**: 
+  * **Fără nicio formalitate** (fără autorizație și fără notificare): Se pot construi anexe noi (terasă acoperită, pergolă, bucătărie de vară, chioșc, magazie, grup sanitar, module) de **maximum 20 mp** și înălțime de **2,5 m**, fără fundație, demontabile, pe structură de lemn sau metal.
+  * **Prin notificare**: Se pot executa anexe noi/clădiri exterioare de până la **50 mp** cumulat (inclusiv sub 20 mp cu fundație).
+* **În mediul urban**: Toate anexele noi necesită obținerea unei **autorizații de construire**, nefiind prevăzute scutiri de formalități pentru construcții noi.
+
+---
+
+### **3. Suprafața minimă a parcelei și definirea „gospodăriei rurale”**
+* **In mediul rural**: CATUC introduce definiția legală a „gospodăriei rurale”, condiționând aplicarea facilă a normelor de amplasarea pe o **parcelă cu o suprafață de minimum 1.000 mp**.
+* **În mediul urban**: Suprafața minimă a parcelei construibile nu este fixată prin legea generală, ci se stabilește prin Regulamentul Local de Urbanism (RLU) aferent PUG sau PUZ pentru fiecare zonă.
+
+---
+
+### **4. Conținutul proiectului și verificarea tehnică**
+* **În mediul rural**: Pentru locuința unifamilială de max. 150 mp se depune un proiect cu **conținut-cadru simplificat** (Anexa nr. 3) și **nu este necesară verificarea tehnică** pe cerințele fundamentale de calitate (cu excepția studiilor geotehnic și topografic pentru adaptarea la teren).
+* **În mediul urban**: Proiectul trebuie să respecte conținutul-cadru complet pentru autorizare (Anexa nr. 2) și este obligatorie verificarea tehnică a proiectului pe cerințele fundamentale de către verificatori atestați.
+
+---
+
+### **5. Execuția în regie proprie**
+* **În mediul rural**: Este permisă expres executarea în regie proprie a locuințelor unifamiliale parter și a anexelor parter.
+* **În mediul urban**: Execuția în regie proprie este interzisă pentru majoritatea categoriilor de clădiri, fiind necesară contractarea unor antreprenori/constructori autorizați.
+
+---
+
+### **6. Încadrarea caselor modulare și prefabricate**
+CATUC **nu face nicio diferență juridică după tehnologia de construcție** (modulară, prefabricată sau zidărie). Prin urmare, o casă modulară amplasată în rural beneficiază de notificarea simplificată dacă respectă limita de 150 mp și regimul P sau D+P, în timp ce în urban se supune autorizării clasice.
+
+
+---
+
+## Q17 — Is the "autorizație de construire" terminology preserved, or renamed under CATUC? [question text fro...
+
+### Question
+Is the "autorizație de construire" terminology preserved, or renamed under CATUC? [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+În **Codul Amenajării Teritoriului, Urbanismului și Construcțiilor (CATUC / Legea nr. 169/2026)**, terminologia privind actele și documentațiile din procesul de autorizare a fost modernizată și unificată, înlocuind acronimele vechi din Legea nr. 50/1991 și introducând noi tipuri de acte administrative.
+
+---
+
+### **1. Termenii din Legea nr. 50/1991 care au fost înlocuiți**
+
+* **D.T.A.C.** *(Documentația Tehnică pentru Autorizarea Executării Lucrărilor de Construire)* a fost înlocuită de **P.A.C. (**Proiectul pentru Autorizarea Construirii**)**.
+* **D.T.A.D.** *(Documentația Tehnică pentru Autorizarea Executării Lucrărilor de Desființare)* a fost înlocuită de **P.A.D. (**Proiectul pentru Autorizarea Desființării**)**.
+* **D.T.O.E.** *(Documentația Tehnică pentru Organizarea Execuției Lucrărilor)* a fost înlocuită de **P.O.E. (**Proiectul pentru Organizarea Execuției Lucrărilor**)**.
+* **Adeverința / Certificatul de edificare** *(procedura facilă de „legalizare” de la art. 37 alin. 6 din Legea 50/1991)* a fost eliminată și înlocuită formal cu **Autorizația de Regularizare**.
+* **Excepțiile generale de autorizare** *(lucrările exceptate de la art. 11 din Legea 50/1991)* au fost reorganizate în două categorii distincte: **Procedura simplificată a notificării** și **Executarea lucrărilor în lipsa oricărei formalități**.
+
+---
+
+### **2. Denumirile oficiale ale actelor și documentațiilor din CATUC**
+
+#### **A. Certificatul de Urbanism (CU)**
+Denumirea generală se păstrează, însă CATUC clasifică certificatul de urbanism în **5 tipuri specifice** în funcție de scopul solicitării:
+1. **Certificat de urbanism pentru informare** — furnizează informații generale privind regimul juridic, economic și tehnic.
+2. **Certificat de urbanism pentru operațiuni cadastrale** — obligatoriu pentru alipiri, dezmembrări sau înscrieri de servituți în intravilan.
+3. **Certificat de urbanism pentru construire/desființare pentru clădiri și amenajări** — stabilește condițiile și lista de avize necesare autorizării.
+4. **Certificat de urbanism pentru construire/desființare de lucrări inginerești** — dedicat infrastructurii și rețelelor.
+5. **Certificat de urbanism pentru construcții cu caracter special** — emis pentru obiectivele din sistemul național de apărare și securitate.
+
+#### **B. Documentațiile tehnice de proiectare**
+* **P.A.C. (Proiectul pentru Autorizarea Construirii)** — proiectul tehnic elaborat de colective de specialitate pe baza căruia se emite autorizația de construire.
+* **P.A.D. (Proiectul pentru Autorizarea Desființării)** — proiectul tehnic depus în vederea autorizării demolării.
+* **P.Th. (Proiectul Tehnic de Execuție)** — documentația detaliată elaborată ulterior obținerii autorizației, fără de care este interzisă începerea efectivă a lucrărilor.
+* **D.E. (Detaliile de Execuție)** — completările tehnice de detaliu aferente Proiectului Tehnic.
+
+#### **C. Tipologia Autorizațiilor administrative emise în CATUC**
+1. **Autorizația de Construire (AC)** — actul administrativ individual care permite executarea lucrărilor noi sau a intervențiilor.
+2. **Autorizația de Desființare (AD)** — permite executarea lucrărilor de demolare parțială sau totală.
+3. **Autorizația de Modificare** — actul necesar în cazul în care pe parcursul execuției survin modificări de temă față de proiectul autorizat inițial.
+4. **Autorizația de Regularizare** — actul emis pentru clădirile sau lucrările executate neautorizat sau cu abateri, în urma verificării stricte a cerințelor fundamentale și a încadrării în urbanism.
+5. **Autorizația de construire pentru lucrări de amenajări** — eliberată pentru lucrările care afectează utilizarea solului (campinguri, spații publice, platforme).
+
+#### **D. Notificarea (Procedura simplificată)**
+* **Formularul de Notificare** — documentul transmis autorității locale (însoțit de un proiect tehnic cu conținut simplificat) pentru executarea lucrărilor rurale de mică dimensiune (case sub 150 mp, anexe sub 50 mp, reparații) care beneficiază de aprobare tacită în 15 zile lucrătoare.
+
+#### **E. Acordul Unic**
+* **Acordul Unic** — actul administrativ integrat emis de **Comisia de Acord Unic (CAU)** de la nivel local sau județean, care sintetizează toate avizele și acordurile exprimate de furnizorii de utilități și instituțiile publice într-o singură procedură.
+
+
+---
+
+## Q18 — What documents MUST include the signatary architect's seal under CATUC? [question text from MCA-SPEC...
+
+### Question
+What documents MUST include the signatary architect's seal under CATUC? [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+Conform **CATUC (Legea nr. 169/2026)**, dreptul de semnătură oferă arhitectului autoritatea și responsabilitatea profesională de a elabora, însuși și semna (olograf sau prin semnătură electronică profesională calificată) piesa grafică și scrisă aferentă domeniului arhitecturii și de a coordona proiecte complexe.
+
+Iată categoriile de documente care trebuie să poarte semnătura (și ștampila/atestarea TNA) a arhitectului cu drept de semnătură:
+
+### **1. Documentațiile pentru autorizarea lucrărilor de construire și desființare**
+* **Proiectul pentru Autorizarea Construirii (P.A.C.)** — secțiunea de arhitectură pentru toate clădirile civile (supraterane și subterane), indiferent de clasa de consecințe.
+* **Proiectul pentru Autorizarea Desființării (P.A.D.)** — partea de arhitectură și memoriile tehnice pentru demolări parțiale sau totale ale clădirilor.
+* **Proiectul pentru Organizarea Execuției Lucrărilor (P.O.E.)** — pentru organizarea de șantier, când este elaborat în cadrul echipei de proiectare.
+* **Coordonarea generală a Proiectului (Șef de Proiect / Manager de Proiect)** — pentru clădirile civile, arhitectul cu drept de semnătură semnează în calitate de șef de proiect, asigurând integrarea și coordonarea tuturor proiectelor de inginerie (structură, instalații).
+
+---
+
+### **2. Documentațiile tehnice de execuție și șantier**
+* **Proiectul Tehnic de Execuție (P.Th.) și Detaliile de Execuție (D.E.)** — piese scrise și desenate de arhitectură necesare pentru începerea și derularea efectivă a lucrărilor.
+* **Dispozițiile de șantier** — elaborate de arhitect pentru modificări locale ale soluțiilor tehnice sau arhitecturale pe parcursul execuției.
+* **Releveele clădirilor existente** — piese desenate detaliate ale situației existente în cazul intervențiilor, extinderilor sau reabilitărilor.
+
+---
+
+### **3. Documentațiile aferente procedurii simplificate (Notificare)**
+* **Proiectul tehnic cu conținut simplificat** — transmis autorităților locale pentru notificarea prealabilă a locuințelor unifamiliale rurale de maximum 150 mp (proiecte individuale sau adaptări ale proiectelor-tip conform Ghidului OAR).
+* **Proiectele pentru intervenții/remodelări de fațade** — reparații, finisaje și reabilitări ale elementelor exterioare.
+
+---
+
+### **4. Studiile preliminare, de fezabilitate și amenajări interioare**
+* **Studiile de Fezabilitate (S.F.) și Documentațiile de Avizare a Lucrărilor de Intervenții (D.A.L.I.)** — concepția arhitecturală și memoriile de specialitate.
+* **Proiectele de arhitectură de interior** — pentru lucrări complexe de reconfigurare/amenajare interioară a clădirilor existente (pot fi semnate de arhitect cu drept de semnătură sau arhitect de interior cu drept de semnătură).
+
+---
+
+### **5. Documentațiile de urbanism și operațiuni cadastrale**
+* **Proiectul Urbanistic de Detaliu (P.U.D.)** și alte documentații de urbanism (P.U.Z., P.U.G.) — în măsura în care arhitectul deține și dreptul de semnătură acordat de Registrul Urbaniștilor din România (RUR).
+* **Propunerile de dezmembrare / comasare (parcelare)** — planul cu propunerea de dezmembrare/alipire ce stă la baza documentației cadastrale pentru operațiuni urbanistice.
+
+---
+
+### **6. Documentele de recepție și post-execuție**
+* **Punctul de vedere al proiectantului la recepție** — dovedirea conformității lucrărilor executate cu autorizația și proiectul tehnic.
+* **Proiectul real executat (As-Built)** — planurile de arhitectură actualizate la data finalizării lucrărilor, pentru introducerea în Cartea Tehnică a construcției.
+
+
+---
+
+## Q19 — What CATUC provisions apply for change of use (schimbarea destinației)? [question text from MCA-SPEC...
+
+### Question
+What CATUC provisions apply for change of use (schimbarea destinației)? [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+În **CATUC (Legea nr. 169/2026)**, schimbarea de destinație a unei construcții este încadrată drept o **lucrare de intervenție asupra clădirilor existente** și este reglementată în funcție de prezența sau absența unor lucrări de construire/desființare asociate.
+
+Iată principalele prevederi aplicabile:
+
+---
+
+### **1. Regula generală: Autorizația de construire**
+* Schimbarea de destinație este clasificată ca lucrare de intervenție/refuncționalizare asupra construcțiilor existente.
+* De regulă, dacă schimbarea de destinație implică lucrări de construire, consolidare, reconfigurare sau modificare structurală/neinterioară autorizabilă, aceasta se realizează în baza unei **Autorizații de Construire pentru lucrări de intervenție**.
+
+---
+
+### **2. Excepția: Procedura simplificată a NOTIFICĂRII (fără autorizație de construire)**
+CATUC permite realizarea schimbării de destinație **exclusiv pe baza notificării prealabile** transmise autorității administrației publice locale în următoarele cazuri specifice:
+1. **Pentru spații comerciale sau de birouri cu acces public**: Atunci când pentru schimbarea de destinație **nu sunt necesare lucrări de construire sau desființare** pentru care legea prevede emiterea unei autorizații și cu condiția încadrării în prevederile documentațiilor de urbanism aprobate (PUG/PUZ).
+2. **Pentru grupuri sanitare și camere tehnice**: Extinderile sau schimbările de destinație ale unor încăperi aparținând clădirilor existente în vederea amenajării de grupuri sanitare sau camere tehnice cu suprafețe de **maximum 25 mp**.
+3. **În zone de protecție a monumentelor sau zone construite protejate** (pentru clădiri care nu sunt monumente istorice clasate): Schimbarea de destinație fără lucrări de construire/desființare autorizabile, în încadrarea strictă cu documentațiile de urbanism.
+
+---
+
+### **3. Condiția de compatibilitate cu Regulamentul de Urbanism (PUG/PUZ)**
+* Orice schimbare de destinație trebuie să respecte **zonificarea funcțională** a terenului/clădirii stabilită prin Planul Urbanistic General (PUG) sau Planul Urbanistic Zonal (PUZ).
+* Autorizarea sau notificarea schimbării de destinație este permisă **numai sub condiția asigurării compatibilității** dintre noua destinație și zona funcțională în care se află imobilul.
+
+---
+
+### **4. Reevaluarea Clasei de Consecințe a clădirii**
+* În cazul lucrărilor de intervenție la construcțiile existente care presupun schimbarea destinației sau refuncționalizarea, proiectantul are dreptul și obligația de a **schimba motivat clasa de consecințe** (CC1–CC4) a construcției, dacă noua funcțiune modifică gradul de risc sau numărul de utilizatori ai clădirii.
+
+---
+
+### **5. Sancțiuni și contravenții**
+* Schimbarea destinației unui imobil fără notificarea autorității publice locale cu privire la acordurile obținute de la vecini (în cazurile în care obținerea acestora este obligatorie prin lege sau regulamentul de urbanism) constituie contravenție și se sancționează cu amendă.
+* De asemenea, organele de control (I.S.C. sau poliția locală) pot dispune **oprirea executării lucrărilor de schimbare neautorizată a destinației**.
+
+
+---
+
+## Q20 — Summary: Top 10 changes a Romanian homeowner/developer needs to know about CATUC vs old law. [questi...
+
+### Question
+Summary: Top 10 changes a Romanian homeowner/developer needs to know about CATUC vs old law. [question text from MCA-SPEC-CATUC-PHASE2-PLAN §5; the wording typed into NotebookLM may differ]
+
+### Answer (from NotebookLM)
+Iată cele mai importante **10 schimbări de fond** aduse de **CATUC (Legea nr. 169/2026)** pe care trebuie să le cunoască orice proprietar sau dezvoltator imobiliar din România, comparativ cu legislația anterioară (Legea nr. 50/1991 și Legea nr. 350/2001):
+
+---
+
+### **1. Notificarea simplificată pentru case rurale sub 150 mp** (**Art. 294, Art. 296**)
+* **Ce se schimbă:** În intravilanul din mediul rural (în afara zonelor protejate și a zonelor metropolitane), locuințele unifamiliale P sau D+P de maximum 150 mp desfășurați nu mai necesită autorizație clasică de construire. Proiectul se depune prin notificare prealabilă și beneficiază de **aprobare tacită în 15 zile lucrătoare**.
+
+### **2. Construirea de anexe mici fără nicio formalitate** (**Art. 299**)
+* **Ce se schimbă:** În mediul rural, anexe noi (terasă acoperită, bucătărie de vară, magazie, chioșc, grup sanitar) de **maximum 20 mp și înălțime de 2,5 m**, fără fundație și demontabile, se pot edifica **în lipsa oricărei autorizații sau notificări**.
+
+### **3. Plafonarea derogărilor urbanistice prin PUZ** (**Art. 46, Art. 66**)
+* **Ce se schimbă:** S-a eliminat practica „PUZ-urilor derogatorii” nelimitate. Prin PUZ private se pot majora coeficienții POT și CUT cu **maximum 20%** față de PUG, o singură dată. De asemenea, indicii CUT mai mari de 4 se pot stabili **exclusiv prin PUG**.
+
+### **4. Aprobarea Proiectelor Urbanistice de Detaliu (PUD) prin Dispoziție de Primar** (**Art. 85**)
+* **Ce se schimbă:** PUD-urile nu se mai supun votului politic din Consiliul Local. Ele se aprobă direct prin **dispoziție de primar** în termen de maximum 15 zile calendaristice de la obținerea avizului tehnic al arhitectului-șef.
+
+### **5. Reguli stricte privind avansurile și promisiunile de vânzare** (**Art. 422**)
+* **Ce se schimbă:** Pentru protecția cumpărătorilor de locuințe viitoare, convențiile de rezervare se limitează la maximum 60 de zile (avans de max. 5%). Avansurile din promisiunile autentificate se depun într-un **cont bancar dedicat proiectului** și pot fi cheltuite eșalonat (max. 25% la finalizarea structurii de rezistență și max. 20% la instalații) doar cu viză de la dirigintele de șantier.
+
+### **6. Autorizația de construire în regim de urgență în 7 zile** (**Art. 273**)
+* **Ce se schimbă:** Pe lângă procedura standard de 30 de zile, beneficiarii pot solicita eliberarea autorizației de construire **în regim de urgență în maximum 7 zile lucrătoare**, contra achitării unei taxe speciale locale.
+
+### **7. Ghișeul Unic Național și Comisia de Acord Unic (CAU)** (**Art. 139, Art. 269, Art. 305**)
+* **Ce se schimbă:** Solicitantul nu mai merge individual la fiecare furnizor de utilități. Toate avizele și acordurile cerute prin certificatul de urbanism se obțin integrat printr-un singur **Acord Unic** emis de Comisia de Acord Unic, iar depunerea dosarelor se face digital prin **Ghișeul Unic Național**.
+
+### **8. Interzicerea intabulării facile și Autorizația de Regularizare** (**Art. 301, Art. 358**)
+* **Ce se schimbă:** A fost eliminată adeverința facilă de edificare pentru clădiri neautorizate. Intrarea în legalitate se face obligatoriu prin **Autorizația de Regularizare** (cu expertize pe cerințele fundamentale și încadrare strictă în PUG), iar până la regularizare **impozitul pe clădire se majorează cu 100%**.
+
+### **9. Amenzi drastice și penalizare directă pe nivel neautorizat** (**Art. 357, Art. 570**)
+* **Ce se schimbă:** Limita maximă a amenzilor pentru construire fără autorizație a crescut la **1.000.000 lei**. În plus, pentru supraetajările neautorizate se aplică o amendă suplimentară cuprinsă între **50.000 și 500.000 lei pentru fiecare nivel neautorizat în plus**.
+
+### **10. Taxa locală de echipare și Contractul de urbanizare** (**Art. 63, Art. 576**)
+* **Ce se schimbă:** Consiliile locale pot institui **taxa locală de echipare a teritoriului** pentru noile ansambluri imobiliare și pot încheia **contracte de urbanizare** prin care dezvoltatorii privați finanțează direct extinderea drumurilor, utilităților și infrastructurii școlare/sociale necesare proiectului.
+
+### Citations
+- CATUC art. 46
+- CATUC art. 63
+- CATUC art. 66
+- CATUC art. 85
+- CATUC art. 139
+- CATUC art. 269
+- CATUC art. 273
+- CATUC art. 294
+- CATUC art. 296
+- CATUC art. 299
+- CATUC art. 301
+- CATUC art. 305
+- CATUC art. 357
+- CATUC art. 358
+- CATUC art. 422
+- CATUC art. 570
+- CATUC art. 576
+
+---

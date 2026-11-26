@@ -48,3 +48,13 @@ Both files cite one or more CATUC articles on every legal line. A script check a
 ## 4. After the review (Chat 2)
 
 Chat 2 integrates the edits into both `.new.md` files, updates the spec §4 rows (the 🟨 transitional row, the ⚠️ order numbers, the metropolitan note) and fixes F2 §3.2/§4.6 if question 1 changes the answer. The swap to `.md` happens only after sign-off (W49).
+
+## 5. Update from session 2.07 (Thu 26, after this list was written)
+
+Chat 7: please package this section with the list. It changes three questions and adds one file.
+
+- **Q9 (metropolitan exclusion)**: re-checked word by word. The exclusion sits inside art. 294(2)(a) pct. (i), before the semicolon; pct. (ii) has its own location test ("în intravilanul din mediul rural") without it; none of art. 295–298 adds it. The spec §4c row is already corrected to the literal reading. The question stays: is the literal reading applied in practice (relevant for the Cornetu pilot in Ilfov)?
+- **Q11 (transitional rule)**: the MDLPA Clarificări are now transcribed (`docs/references/catuc/catuc-clarificari-ocr.md`). Pct. 8 bases the extension of Law 50/1991 permits on **art. 310(5)** (once, ≤ 12 months, ≥ 15 working days before, fee), and F2 §8 now says so, marked as ministry guidance. New sub-question: pct. 8 cites art. 310 **alin. (7)** for a new permit after non-completion, while the law text has that rule in **alin. (6)**. Numbering slip in the Clarificări?
+- **Q8 (309 vs 310)**: proposed reading in the new chapter §4: the 3-year start window cannot be extended (309(5)); the execution period can be extended once by ≤ 12 months (309(6), 310(5)). Can 310(5) ("nu pot fi începute") push back the start of a CATUC permit, as the ministry allows for Law 50/1991 permits?
+- **Q12 (order numbers)**: answered. Ord. 975/2026 and Ord. 1.022/2026 are named in the MDLPA Clarificări as well as in the Portal notes. No confirmation needed.
+- **New file (optional reading)**: `src/knowledge/06-regulations/RO/catuc-169-2026.new.md` — overview of CATUC (RO + EN, every legal sentence cited, 0 missing articles). Lower priority than F3 and F2.

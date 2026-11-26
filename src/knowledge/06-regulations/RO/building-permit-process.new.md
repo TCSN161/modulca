@@ -216,8 +216,8 @@ Detalii: articolul *Modular & Prefabricated Construction Regulations* (ro-modula
 
 - Certificatele de urbanism emise înainte de 25.08.2026 **își păstrează valabilitatea**; autorizația se emite pe baza lor, de autoritatea competentă (art. 582 alin. (4)–(5)).
 - Procedurile de urbanism (PUG, PUZ etc.) începute înainte de intrarea în vigoare rămân supuse legii de la data inițierii (art. 582 alin. (1)).
-- CATUC **nu stabilește o dată-limită de depunere** după care cererile se soluționează după legea veche; art. 582 nu conține o asemenea prevedere.
-- Prelungirea autorizațiilor emise sub Legea 50/1991 și neîncepute: CATUC nu are o regulă tranzitorie expresă. Verificați cu primăria emitentă (aspect în curs de verificare de arhitectul partener).
+- Legea **nu stabilește o dată-limită de depunere** după care cererile se soluționează după legea veche; art. 582 nu conține o asemenea prevedere. Ministerul (Clarificări MDLPA, pct. 1–2 — orientare administrativă, nu lege) precizează: cererile înregistrate **până la 24.08.2026 inclusiv** se soluționează după legislația de la data înregistrării, pe formularele vechi; cele depuse **de la 25.08.2026**, pe formularele noi aprobate prin **Ord. MDLPA nr. 975/2026**, chiar dacă certificatul de urbanism a fost emis sub legea veche.
+- **Autorizații emise sub Legea 50/1991:** legea nu are o regulă tranzitorie expresă. Potrivit Clarificărilor MDLPA (pct. 8): dacă lucrările nu au început, dar autorizația nu a expirat, sau au început, dar nu pot fi finalizate la termen, puteți cere **o singură dată** prelungirea duratei de execuție cu **maximum 12 luni**, cu cel puțin 15 zile lucrătoare înainte de expirare și cu plata taxei (art. 310 alin. (5)), pe formularul nou; dacă lucrările nu se finalizează în termenul de valabilitate, cereți o **autorizație nouă, fără certificat de urbanism nou și fără avize noi**; pentru modificarea de temă, autorizație de modificare (art. 293). Confirmați cu primăria emitentă.
 
 ## 9. Greșeli frecvente
 
@@ -453,8 +453,8 @@ More: the article *Modular & Prefabricated Construction Regulations* (ro-modular
 
 - Urban planning certificates issued before 25.08.2026 **remain valid**; the permit is issued on their basis by the competent authority (art. 582(4)–(5)).
 - Planning procedures (PUG, PUZ, etc.) started before entry into force remain subject to the law in force when they were initiated (art. 582(1)).
-- CATUC **sets no filing cut-off date** after which applications are decided under the old law; art. 582 contains no such rule.
-- Extending permits issued under Law 50/1991 where works have not started: CATUC has no express transitional rule. Check with the issuing town hall (point under review by the partner architect).
+- The law **sets no filing cut-off date** after which applications are decided under the old law; art. 582 contains no such rule. The ministry (MDLPA Clarifications, items 1–2 — administrative guidance, not law) states: applications registered **up to and including 24.08.2026** are decided under the law in force at registration, on the old forms; those filed **from 25.08.2026** use the new forms approved by **MDLPA Order no. 975/2026**, even if the urbanism certificate was issued under the old law.
+- **Permits issued under Law 50/1991:** the law has no express transitional rule. According to the MDLPA Clarifications (item 8): if works have not started but the permit has not expired, or have started but cannot be finished on time, you may ask **once** for the execution period to be extended by **up to 12 months**, at least 15 working days before expiry, paying the fee (art. 310(5)), on the new form; if works are not finished within the validity period, apply for a **new permit, without a new urbanism certificate and without new approvals**; for a change of brief, an amendment permit (art. 293). Confirm with the issuing town hall.
 
 ### 9. Common mistakes
 
@@ -491,10 +491,10 @@ Add designers' fees, studies (geotechnical, topographic) and approvals.
 
 **Content written**: 2026-11-26, session 2.03 (Chat 2 Neufert), by Claude. RO is the primary text; EN translated by Claude.
 **Source of truth**: `docs/references/catuc/catuc-169-2026-text.md` / `catuc-169-2026-articole.json`. Every article cited above was checked against the law text. NotebookLM answers (`docs/research/2026-11-25-notebooklm-catuc-answers.md`) used only for orientation; its errata (AC validity, art. 272 → 273, the "24 Aug 2026" cut-off) are not carried over.
-**Not stated as fact (unverified)**: the ministerial orders approving the forms (notification, CU, AC) are referred to only as "ordin al ministrului" (art. 295(10), art. 262(1)(a)); their numbers and dates stay out until confirmed on legislatie.just.ro.
+**Ministerial orders (updated 2.07, 2026-11-26)**: Ord. MDLPA nr. 975/25.08.2026 (forms; M.Of. nr. 711/26.08.2026) is now confirmed by two sources — the Portal Legislativ note under art. 262 and the MDLPA Clarificări (pct. 1, 8; transcribed in `docs/references/catuc/catuc-clarificari-ocr.md`) — and is named in §8. §8 also uses the Clarificări (pct. 1, 2, 8), marked as ministry guidance. Details: `docs/research/2026-11-26-catuc-answers-q11-q25.md`.
 **Points for the partner architect**:
 1. Art. 309(5) (validity extension prohibited) vs. 309(6) (extension ≤ 12 months when works cannot be completed) vs. 310(5) (execution period extension, 30% fee) — is the reading in §6.1 correct?
-2. Art. 294(2)(a)(ii): the metropolitan-area exclusion is written only in pct. (i) (outbuildings), not in pct. (ii) (the house). Does it apply to the house in practice?
+2. Art. 294(2)(a)(ii): the metropolitan-area exclusion is written only in pct. (i) (outbuildings), not in pct. (ii) (the house); no article in 295–298 adds it (2.07, Q21). Is the literal reading applied in practice?
 3. Art. 294(2)(a)(ii): does "avizate de arhitectul-șef de județ" cover only individual designs, or standard designs too?
-4. Transitional: extension of unstarted Law 50/1991 permits (MDLPA Clarificări, pct. 8) — still to confirm.
+4. Transitional: the Clarificări pct. 8 extend unstarted Law 50/1991 permits under art. 310(5) (now in §8). Can art. 310(5) ("nu pot fi începute") also push back the start of a CATUC permit despite art. 309(5)? And pct. 8 cites art. 310 alin. (7) for the new permit, while the law text has that rule in alin. (6).
 **Deploy gate**: `docs/MCA-SPEC-CATUC-PHASE2-PLAN.md` §8 — `.new.md` → `.md` only after the partner architect's sign-off. `id` matches the live file (`ro-building-permit`) so the swap keeps the URL.

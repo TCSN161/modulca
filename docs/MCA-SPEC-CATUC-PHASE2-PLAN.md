@@ -297,7 +297,7 @@ Every CATUC article below was checked to exist in `docs/references/catuc/catuc-1
 | L.50 art. 9 + L.184/2001 (signatory architect) | art. 264 alin. (8) (arhitect cu drept de semnătură obligatoriu la PAC și la procedura simplificată), art. 317 alin. (1) lit. a) (incl. conductor arhitect/urbanist pentru CC1 în afara zonelor protejate), art. 427–428, art. 434 (șef de proiect) | 🟩 Verified | Q10 + law text |
 | L.50 — modificare AC | art. 293 (autorizația de modificare) | 🟩 Verified (exists, title) | Q8 |
 | Transitory: AC/CU issued under L.50 | art. 582 alin. (4)–(5) (CU issued before 25.08.2026 keep validity; AC issued on their basis); art. 574 (recepții parțiale) | 🟩 Verified | Q8 + law text |
-| Transitory: prelungire AC emise sub L.50 neîncepute | "o singură dată, ≤ 12 luni" — only in MDLPA Clarificări pct. 8 (scanned PDF); art. 309(5) prohibits validity extension for CATUC ACs | 🟨 UNVERIFIED → architect review (F2) | Q8 |
+| Transitory: prelungire AC emise sub L.50 neîncepute/nefinalizate | **art. 310 alin. (5)** (prelungirea duratei de execuție: o singură dată, ≤ 12 luni, cerere ≥ 15 zile lucrătoare înainte, taxă 30%) — applied to L.50 permits by MDLPA Clarificări pct. 8 (OCR 2.07); nefinalizare → AC nouă fără CU/avize noi (Clarificări pct. 8; law: art. 310(6)); modificare de temă → art. 293. Law has no express transitional article | 🟨 Wording verified (2.07); 309(5) vs 310(5) interplay → architect review | Q8, Q25, OCR |
 
 ### 4b. Legea 350/2001 → CATUC
 
@@ -309,13 +309,13 @@ Every CATUC article below was checked to exist in `docs/references/catuc/catuc-1
 | L.350 — PUD (Plan → **Proiect** urbanistic de detaliu) | art. 81–85 (aprobare prin **dispoziția primarului** ≤ 15 zile calendaristice de la avizul arhitectului-șef: art. 85) | 🟩 Verified | Q3 + law text |
 | L.350 — certificat de urbanism | art. 253–258 (see 4a) | 🟩 Verified | Q3 |
 | L.350 — RUR / urbanist cu drept de semnătură | art. 141, 142 | 🟩 Verified (exists, title) | Q10 |
-| Ord. 233/2016 (norme L.350) | abrogated (art. 576(3) lit. d)); replacement procedure "Ord. MDLPA nr. 1.022/2026" appears only as a Portal Legislativ note | ⚠️ UNVERIFIED (ITEM-7) — do not publish | Q9 + Portal note |
+| Ord. 233/2016 (norme L.350) | abrogated (art. 576(3) lit. d)); replacement: **Ord. nr. 1.022/28.08.2026** (M.Of. 724/28.08.2026) — procedura de elaborare/aprobare a documentațiilor AT/U, formulare, lista avizelor | 🟩 Confirmed 2.07 (Portal notes art. 31/55/87 + MDLPA Clarificări pct. 1) | Q9, Q23, OCR |
 
 ### 4c. Topic-level (no 1:1 old article)
 
 | Topic | CATUC article | Confidence | Source |
 |---|---|---|---|
-| Notification — small house | art. 294 alin. (2) lit. a) pct. (ii): 1 locuință unifamilială, P sau D+P, fără subsol, ≤ 150 mp desfășurată, intravilan rural, nu în zone metropolitane / protejate; proiect-tip sau proiect individual avizat de arhitectul-șef de județ | 🟩 Verified (verbatim) | Q1 |
+| Notification — small house | art. 294 alin. (2) lit. a) pct. (ii): 1 locuință unifamilială, P sau D+P, fără subsol, ≤ 150 mp desfășurată, intravilan rural, în afara zonelor protejate; proiect-tip sau proiect individual avizat de arhitectul-șef de județ. **Excepția „localități rurale din zone metropolitane” este scrisă doar la pct. (i) (anexe ≤ 50 mp), nu la pct. (ii)** (corrected 2.07, Q21) | 🟩 Verified (verbatim) · practice → architect | Q1, Q21 |
 | Notification — anexe ≤ 50 mp cumulat | art. 294 alin. (2) lit. a) pct. (i) | 🟩 Verified (verbatim) | Q1 |
 | Notification procedure | art. 295 (transmitere), art. 296 (aprobare tacită la 15 zile lucrătoare; start +15 zile calendaristice; valabil 3 ani), art. 297 (răspundere), art. 298 (geo + topo obligatorii pt. pct. (ii); recepție cu reprezentant UAT; RNC) | 🟩 Verified (verbatim) | Q1, Q4 |
 | Notification fee | art. 313 alin. (4): ½ din taxa de autorizare (L.227/2015). (art. 143 alin. (5) = ISC share, not the local fee) | 🟩 Verified | Q4 + law text |
@@ -324,13 +324,13 @@ Every CATUC article below was checked to exist in `docs/references/catuc/catuc-1
 | Modular / prefab | **No specific provisions** ("modular" 0, "industrializ" 0; "prefabricat" 6× only in technical specs: art. 408, 412, 517, Anexa 1) — same rules as traditional | 🟩 Verified (term counts) | Q5 |
 | Registrul Național al Construcțiilor | art. 415 | 🟩 Verified (verbatim, text.md) | Q6 |
 | Urmărirea costurilor de execuție | art. 524 | 🟩 Verified (verbatim, text.md) | Q6 |
-| Forms (CU, AC, notificare…) | "Ord. MDLPA nr. 975/2026" — Portal note on art. 262 only | ⚠️ UNVERIFIED (ITEM-7) | Q8, Q9 |
+| Forms (CU, AC, notificare…) | **Ord. MDLPA nr. 975/25.08.2026** (M.Of. 711/26.08.2026); legal basis art. 262(1) lit. a), art. 295(10) | 🟩 Confirmed 2.07 (Portal note art. 262 + MDLPA Clarificări pct. 1, 8) | Q8, Q9 |
 | Secondary legislation | art. 578 alin. (2) (minister may issue orders/norms); authorities align ROF by 31.12.2026 (art. 578 alin. (1)) | 🟩 Verified | Q9 + law text |
 | HG 766/1997 (calitatea) | Annexes 1–5 stay in force until amended (art. 577 alin. (3)); also HG 925/1995, HG 273/1994 referenced in art. 577 | 🟩 Verified (location) | Q9 + law text |
 
 **Legend**: 🟩 Verified = article exists and the claim was checked in the law text · 🟨 = plausible, needs architect review · ⚠️ UNVERIFIED = act number/source outside the law text; do not publish.
 
-**Open for deploy gate (§8)**: 1 🟨 row (transitory L.50 extension) + 2 ⚠️ act numbers (Ord. 1.022/2026, Ord. 975/2026) need confirmation on legislatie.just.ro or by the reviewing architect.
+**Open for deploy gate (§8)**: 1 🟨 row (transitory L.50 extension — 309(5) vs 310(5) interplay) for the reviewing architect. Act numbers Ord. 975/2026 and Ord. 1.022/2026 confirmed in 2.07 (two independent local sources; see `docs/research/2026-11-26-catuc-answers-q11-q25.md` Part A). Q11–Q25 verification + errata: same file.
 
 **Update triggers**: Each NotebookLM Q&A session updates this table.
 
