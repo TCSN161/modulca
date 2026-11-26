@@ -4,6 +4,7 @@
 **Owner**: Chat 1 MAIN (update at every Friday wrap)
 **Sources**: [[MCA-STRAT-2026-11-19-reboot]] §3 phases · [[MCA-DOC-BLOCKERS-ACTIVE-2026-11-21]] · [[MCA-SPEC-CATUC-PHASE2-PLAN]] · [[MCA-SPEC-CATUC-PHASE3-PLATFORM]] · [[MCA-DOC-PHASE4-BETA-PREP-CHECKLIST]] · [[MCA-SPEC-WALKTHROUGH-VIDEO-2026-11-21]] · all `docs/handoffs/*` (every ITEM there is closed as of today)
 **This week in detail**: [[MCA-DOC-WEEK-2026-W48-SCHEDULE]]
+**Sprint Thu 26–Fri 27**: [[MCA-DOC-SPRINT-2026-11-26-27]] (beta-functional + full account + smoke test)
 
 ---
 
