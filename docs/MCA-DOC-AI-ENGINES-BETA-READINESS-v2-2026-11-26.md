@@ -100,7 +100,7 @@ Sources: Cloudflare Workers AI pricing (2026-11-18) and the klein 4B model page 
 
 **Model ID in one place:** `CF_KLEIN_MODEL` in `engines/cloudflareKlein.ts`. `engines-model-check` sees it (✓, no leak).
 
-⚠️ **Dependency on Chat 4:** `creditManager.ts` gives unknown engine IDs `dailyLimit: 0`, so `canUseEngine()` returns false. Until Chat 4 adds `"cloudflare-klein": { totalBudgetUsd: -1, dailyLimit: 10000 }` to `ENGINE_LIMITS`, klein is **skipped** and the chain falls through as before. Nothing breaks. With that line, local e2e gave: free img2img → `cloudflare-klein-img2img` 6.4 s $0; explicit klein t2i 6.8 s $0. The request was sent to Chat 4 at 13:45.
+✅ **Resolved (Chat 4 added the row on master; prod check 14:00: `engine=cloudflare-klein` → 200, `X-AI-Engine: cloudflare-klein`, cost 0).** Background: `creditManager.ts` gives unknown engine IDs `dailyLimit: 0`, so `canUseEngine()` returns false. Until Chat 4 adds `"cloudflare-klein": { totalBudgetUsd: -1, dailyLimit: 10000 }` to `ENGINE_LIMITS`, klein is **skipped** and the chain falls through as before. Nothing breaks. With that line, local e2e gave: free img2img → `cloudflare-klein-img2img` 6.4 s $0; explicit klein t2i 6.8 s $0. The request was sent to Chat 4 at 13:45.
 
 ---
 
@@ -127,7 +127,7 @@ Note: the capture size counts too (5.4 neurons per input tile). A 1920×1080 cap
 | BUG-E13 | Render, ultra-cheap | Prodia key returns 403 "token is invalid: revoked". Prodia is out of all chains (benched), so there is no user impact. Remove it from the registry or issue a new key | Costin / Chat 3 | low |
 | BUG-E14 | img2img cost | The 3D capture is POSTed at native canvas size. Each 512² input tile costs 5.4 CF neurons. Downscale to ≤ 1024 px client-side | render UI owner (MAIN to assign) | low |
 | BUG-E15 | Security/cost | OpenAI, Stability, Leonardo and WaveSpeed are **funded**. `/api/ai-render` still trusts the client tier, and beta = premium has openai in its chain. Until `getServerTier` is wired: `AI_ENGINES_DISABLED=openai,stability,leonardo,wavespeed` in Vercel (Costin action A) | Costin + MAIN | **high** |
-| BUG-E16 | Registry | `creditManager.ENGINE_LIMITS` lacks `cloudflare-klein` (unknown → dailyLimit 0) | Chat 4 | med (blocks the new engine) |
+| BUG-E16 | Registry | `creditManager.ENGINE_LIMITS` lacked `cloudflare-klein` (unknown → dailyLimit 0). **Fixed by Chat 4**, verified in prod | Chat 4 | done |
 | BUG-E12 | — | **Fixed**: Horde timeout 120 s → 75 s (below the client's 90 s abort) | Chat 3 | done |
 
 ---
