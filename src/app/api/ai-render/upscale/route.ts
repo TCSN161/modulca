@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { prodiaUpscale, prodiaRemoveBackground } from "../engines/prodia";
+import { getServerTier } from "@/shared/server/serverTier";
+import { checkAndConsumeQuota, refundQuota, quotaExceededResponse } from "@/shared/server/quota";
 
 import { devLog } from "@/shared/lib/devLog";
 export const dynamic = "force-dynamic";
@@ -14,7 +16,8 @@ export const dynamic = "force-dynamic";
  * Returns: image/png
  *
  * Uses Prodia HypIR for upscaling, Prodia remove-background for bg removal.
- * Architect tier only (premium gets basic upscale).
+ * Server tier + 1 render unit from the per-user quota (429 when exhausted;
+ * refunded when Prodia returns nothing). No extra tier gate yet.
  */
 export async function POST(req: NextRequest) {
   try {
@@ -30,6 +33,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Image too small" }, { status: 400 });
     }
 
+    // BUG-SEC-02: verified session decides; one render unit per upscale/remove-bg.
+    const ctx = await getServerTier(req);
+    const quota = await checkAndConsumeQuota(ctx, "render");
+    if (!quota.allowed) return quotaExceededResponse(quota);
+
     devLog(`[upscale] Processing ${mode}, input: ${imageBuffer.length} bytes`);
 
     let result: { buffer: Buffer; contentType: string } | null = null;
@@ -41,6 +49,7 @@ export async function POST(req: NextRequest) {
     }
 
     if (!result) {
+      await refundQuota(ctx, "render", quota.source);
       return NextResponse.json(
         { error: `${mode} failed. Prodia may be unavailable.` },
         { status: 503 }

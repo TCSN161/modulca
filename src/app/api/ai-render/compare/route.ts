@@ -20,6 +20,9 @@ import { novitaEngine } from "../engines/novita";
 import { wavespeedEngine } from "../engines/wavespeed";
 import { runwayEngine } from "../engines/runway";
 import type { AiRenderEngine, AiRenderRequest, PolicyFlags } from "../engines/types";
+import { getServerTier } from "@/shared/server/serverTier";
+import { quotaExceededResponse } from "@/shared/server/quota";
+import { engineTierFor, consumeRenderUnits, refundRenderUnits } from "../engines/renderTier";
 
 import { devLog } from "@/shared/lib/devLog";
 export const dynamic = "force-dynamic";
@@ -84,7 +87,13 @@ export async function GET(req: NextRequest) {
   const height = Number(searchParams.get("height") || "288");
   const seed = searchParams.get("seed") || String(Date.now());
   const enginesParam = searchParams.get("engines"); // comma-separated filter
-  const tierFilter = (searchParams.get("tier") || "all").toLowerCase(); // "free" | "paid" | "all"
+  // `?tier=` is only an engine-group FILTER ("free" | "paid" | "all"), never the account tier.
+  const tierFilter = (searchParams.get("tier") || "all").toLowerCase();
+
+  // BUG-SEC-02: the account tier comes from the verified session only.
+  const ctx = await getServerTier(req);
+  const engineTier = engineTierFor(ctx);
+  const payingTier = engineTier !== "free" && engineTier !== "guest_free";
 
   let selectedEngines = enginesParam
     ? ALL_ENGINES.filter((e) => enginesParam.split(",").includes(e.id))
@@ -95,13 +104,24 @@ export async function GET(req: NextRequest) {
   } else if (tierFilter === "paid") {
     selectedEngines = selectedEngines.filter((e) => !e.freeTier);
   }
+  // Non-paying callers (guests, free, beta promo) never reach paid engines.
+  if (!payingTier) selectedEngines = selectedEngines.filter((e) => e.freeTier);
+
+  if (selectedEngines.length === 0) {
+    return NextResponse.json({ error: "No engines available for your tier/filter." }, { status: 400 });
+  }
+
+  // One render unit per engine, all-or-nothing → 429 before any engine runs.
+  const quota = await consumeRenderUnits(ctx, selectedEngines.length);
+  if (!quota.allowed) return quotaExceededResponse(quota.result);
 
   const renderReq: AiRenderRequest = {
     prompt,
     width,
     height,
     seed,
-    tier: "free",
+    tier: engineTier,
+    userId: ctx.userId ?? undefined,
     policyFlags: DEFAULT_POLICY,
   };
 
@@ -163,6 +183,10 @@ export async function GET(req: NextRequest) {
   const output = results.map((r) =>
     r.status === "fulfilled" ? r.value : { status: "error", error: "Promise rejected" }
   );
+
+  // Failed engines produced no image → give those units back.
+  const failed = output.filter((o) => o.status !== "success").length;
+  if (failed > 0) await refundRenderUnits(ctx, quota.result.source, failed);
 
   return NextResponse.json({
     prompt,
