@@ -2,6 +2,8 @@ export type LightingMode = "daylight" | "evening" | "night";
 export type CameraAngle = "interior" | "corner" | "detail";
 export type RenderMode = "template" | "ai";
 export type ViewMode = "single" | "all";
+/** AI input: prompt only, 3D view + prompt, uploaded image + prompt (BUG-ST03) */
+export type RenderInputMode = "text" | "scene" | "upload";
 export type PromptTemplate = "magazine" | "cozy" | "realestate" | "blueprint" | "custom";
 export type RenderResolution = "draft" | "standard" | "high";
 export type AiEngine =

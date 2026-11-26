@@ -1,15 +1,19 @@
 import { useState, useRef, useCallback } from "react";
-import type { AiEngine, RenderResolution } from "./renderConstants";
+import type { AiEngine, RenderInputMode, RenderResolution } from "./renderConstants";
 import { RENDER_RESOLUTIONS } from "./renderConstants";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
 import { authHeaders } from "@/shared/lib/authHeaders";
+import { toJpegDataUrl, BASE_IMAGE_QUALITY, STORED_RENDER_MAX_SIDE } from "./renderImage";
 
 interface UseRenderEngineParams {
   aiEngine: AiEngine;
   renderResolution: RenderResolution;
-  useSceneAsBase: boolean;
+  /** text = GET text2img; scene / upload = POST img2img with a base image (BUG-ST03) */
+  inputMode: RenderInputMode;
   captureRef: React.MutableRefObject<(() => string | null) | null>;
+  /** Data URI of the uploaded image (inputMode "upload") */
+  uploadImage?: string | null;
 }
 
 interface UseRenderEngineReturn {
@@ -18,7 +22,8 @@ interface UseRenderEngineReturn {
   aiError: string | null;
   aiElapsed: number;
   aiUsedEngine: string | null;
-  handleGenerateAiRender: (prompt: string) => Promise<void>;
+  /** Resolves true when an image was produced */
+  handleGenerateAiRender: (prompt: string) => Promise<boolean>;
   resetAiImage: () => void;
 }
 
@@ -38,8 +43,9 @@ function sanitizePrompt(prompt: string): string {
 export function useRenderEngine({
   aiEngine,
   renderResolution,
-  useSceneAsBase,
+  inputMode,
   captureRef,
+  uploadImage = null,
 }: UseRenderEngineParams): UseRenderEngineReturn {
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
@@ -56,7 +62,7 @@ export function useRenderEngine({
   }, []);
 
   const handleGenerateAiRender = useCallback(async (prompt: string) => {
-    if (!prompt.trim()) return;
+    if (!prompt.trim()) return false;
 
     const sanitized = sanitizePrompt(prompt);
     const res = RENDER_RESOLUTIONS[renderResolution];
@@ -64,15 +70,21 @@ export function useRenderEngine({
     const tier = useAuthStore.getState().userTier;
     const maxCostUsd = getTierConfig(tier).features.maxCostUsdPerImage;
 
-    // Capture 3D scene as base image if img2img is enabled
+    // img2img base (BUG-ST03): the 3D canvas or the uploaded image, sent as a
+    // JPEG data URI ≤1024 px (contract: MCA-DOC-AI-ENGINES-CLIENT-CONTRACT §2)
     let baseImage: string | null = null;
-    if (useSceneAsBase && captureRef.current) {
-      const dataUrl = captureRef.current();
-      if (dataUrl) {
-        // Extract base64 from data URL (remove "data:image/png;base64," prefix)
-        baseImage = dataUrl.replace(/^data:image\/\w+;base64,/, "");
-        isDev && console.log("[AI Render] Captured 3D scene for img2img, base64 length:", baseImage.length);
+    if (inputMode !== "text") {
+      const raw = inputMode === "scene" ? captureRef.current?.() ?? null : uploadImage;
+      if (!raw) {
+        setAiError(
+          inputMode === "scene"
+            ? "The 3D view is not available. Switch to Single Module and wait for the scene to load."
+            : "Choose an image first.",
+        );
+        return false;
       }
+      baseImage = await toJpegDataUrl(raw, STORED_RENDER_MAX_SIDE, BASE_IMAGE_QUALITY);
+      isDev && console.log("[AI Render] img2img base:", inputMode, "length:", baseImage.length);
     }
 
     setAiError(null);
@@ -107,7 +119,8 @@ export function useRenderEngine({
             width: res.width,
             height: res.height,
             seed,
-            engine: aiEngine !== "auto" ? aiEngine : null,
+            // The img2img chain puts cloudflare-klein first for every tier
+            engine: null,
             baseImage,
             maxCostUsd,
           }),
@@ -133,7 +146,7 @@ export function useRenderEngine({
         } catch { /* non-JSON body */ }
         setAiError(message);
         setAiLoading(false);
-        return;
+        return false;
       }
 
       // If proxy failed (503, static export, etc.), try direct client-side Pollinations call
@@ -146,12 +159,12 @@ export function useRenderEngine({
           console.error("[AI Render] Direct Pollinations also failed:", directErr);
           setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
           setAiLoading(false);
-          return;
+          return false;
         }
         if (!response.ok) {
           setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
           setAiLoading(false);
-          return;
+          return false;
         }
       }
 
@@ -164,7 +177,7 @@ export function useRenderEngine({
         console.error("[AI Render] Unexpected content type:", contentType);
         setAiError("Unexpected response from AI. Try again.");
         setAiLoading(false);
-        return;
+        return false;
       }
 
       const blob = await response.blob();
@@ -173,7 +186,7 @@ export function useRenderEngine({
       if (blob.size < 500) {
         setAiError("AI returned an empty image. Try a shorter prompt.");
         setAiLoading(false);
-        return;
+        return false;
       }
 
       const usedEngine = response.headers.get("x-ai-engine") || (response.url.includes("pollinations") ? "pollinations" : aiEngine);
@@ -181,6 +194,7 @@ export function useRenderEngine({
       setAiImageUrl(objectUrl);
       setAiUsedEngine(usedEngine);
       setAiLoading(false);
+      return true;
     } catch (err) {
       if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
       console.error("[AI Render] Error:", err);
@@ -190,10 +204,11 @@ export function useRenderEngine({
         setAiError("Network error. Please try again.");
       }
       setAiLoading(false);
+      return false;
     } finally {
       clearTimeout(timeoutId);
     }
-  }, [renderResolution, aiEngine, useSceneAsBase, captureRef]);
+  }, [renderResolution, aiEngine, inputMode, captureRef, uploadImage]);
 
   return {
     aiImageUrl,

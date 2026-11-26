@@ -12,11 +12,12 @@ import { MODULE_TYPES } from "@/shared/types";
 import StepNav from "../shared/StepNav";
 import MobileStepFooter from "../shared/MobileStepFooter";
 
-import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, RenderResolution, AiEngine } from "./renderConstants";
+import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, RenderResolution, AiEngine, RenderInputMode } from "./renderConstants";
 import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
 import { useRenderEngine } from "./useRenderEngine";
 import { persistSavedRender } from "../../renderPersistence";
 import RenderGallery from "./RenderGallery";
+import RenderInputModeSelector from "./RenderInputModeSelector";
 import { useAuthStore } from "@/features/auth/store";
 import PublishButton from "@/features/gallery/components/PublishButton";
 import { getTierConfig } from "@/features/auth/types";
@@ -55,7 +56,9 @@ export default function RenderPage() {
   const [includePeople, setIncludePeople] = useState(false);
   const [includePlants, setIncludePlants] = useState(false);
   const [aiEngine, setAiEngine] = useState<AiEngine>("auto");
-  const [useSceneAsBase, setUseSceneAsBase] = useState(false);
+  const [inputMode, setInputMode] = useState<RenderInputMode>("text");
+  const [uploadImage, setUploadImage] = useState<string | null>(null);
+  const useSceneAsBase = inputMode !== "text";
   const captureRef = useRef<(() => string | null) | null>(null);
 
   const {
@@ -66,7 +69,7 @@ export default function RenderPage() {
     aiUsedEngine,
     handleGenerateAiRender: generateAiRender,
     resetAiImage,
-  } = useRenderEngine({ aiEngine, renderResolution, useSceneAsBase, captureRef });
+  } = useRenderEngine({ aiEngine, renderResolution, inputMode, captureRef, uploadImage });
 
   // Tier-based render limits
   const userTier = useAuthStore((s) => s.userTier);
@@ -97,6 +100,11 @@ export default function RenderPage() {
   const handleSceneReady = useCallback((capture: () => string | null) => {
     captureRef.current = capture;
   }, []);
+
+  // "All Modules" view has no capturable canvas: drop the stale single-module capture
+  useEffect(() => {
+    if (viewMode === "all") captureRef.current = null;
+  }, [viewMode]);
 
   // Hydrate from localStorage first (preserves furnitureOverrides from Step 6),
   // then fall back to land store if localStorage had nothing.
@@ -433,38 +441,8 @@ export default function RenderPage() {
                 <p className="mt-1 text-[10px] text-gray-400">{AI_ENGINES[aiEngine].description}</p>
               </div>
 
-              {/* Render Mode Selector — text2img / img2img / text+img */}
-              <div className="mb-3">
-                <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Render Mode</label>
-                <div className="grid grid-cols-3 gap-1">
-                  <button
-                    onClick={() => setUseSceneAsBase(false)}
-                    className={`rounded-lg px-2 py-2.5 text-center transition-colors ${!useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                  >
-                    <div className="text-[10px] font-bold">Text → Image</div>
-                    <div className="text-[8px] mt-0.5 opacity-75">From prompt only</div>
-                  </button>
-                  <button
-                    onClick={() => setUseSceneAsBase(true)}
-                    className={`rounded-lg px-2 py-2.5 text-center transition-colors ${useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}
-                  >
-                    <div className="text-[10px] font-bold">3D + Text → Image</div>
-                    <div className="text-[8px] mt-0.5 opacity-75">3D scene as base</div>
-                  </button>
-                  <button
-                    disabled
-                    className="rounded-lg px-2 py-2.5 text-center bg-gray-50 text-gray-300 cursor-not-allowed"
-                  >
-                    <div className="text-[10px] font-bold">Image → Image</div>
-                    <div className="text-[8px] mt-0.5 opacity-75">Coming soon</div>
-                  </button>
-                </div>
-                {useSceneAsBase && (
-                  <p className="mt-1.5 text-[10px] text-brand-teal-600 bg-brand-teal-50 border border-brand-teal-200 rounded-md px-2 py-1.5">
-                    The 3D scene will be captured and used as a structural base. The AI will apply your style prompt while preserving the room layout.
-                  </p>
-                )}
-              </div>
+              {/* Render input — text2img / 3D img2img / uploaded img2img (BUG-ST03) */}
+              <RenderInputModeSelector value={inputMode} onChange={setInputMode} uploadImage={uploadImage} onUploadImage={setUploadImage} />
 
               {/* Include People / Plants toggles */}
               <div className="mb-3 space-y-2">
@@ -553,7 +531,7 @@ export default function RenderPage() {
                       // Auto-generate description for presentation
                       const styleName = style?.label || "Modern";
                       const moduleName = currentMod?.label || "Module";
-                      const modeLabel = useSceneAsBase ? "3D scene conversion" : "AI text-to-image";
+                      const modeLabel = inputMode === "scene" ? "3D scene conversion" : inputMode === "upload" ? "photo conversion" : "AI text-to-image";
                       const engineName = aiUsedEngine || "AI";
                       const resLabel = RENDER_RESOLUTIONS[renderResolution]?.label || "Standard";
                       const autoDescription = [
@@ -572,6 +550,7 @@ export default function RenderPage() {
                         description: autoDescription,
                         prompt: aiPrompt,
                         mode: useSceneAsBase ? "img2img" : "text2img",
+                        baseSource: inputMode === "scene" ? "scene" : inputMode === "upload" ? "upload" : undefined,
                         resolution: resLabel,
                       };
                       // BUG-ST27: compressed + saved to the project row at once
@@ -957,22 +936,7 @@ export default function RenderPage() {
                         </div>
                       </div>
                       {/* Render Mode selector (mobile) */}
-                      <div className="mb-3">
-                        <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Render Mode</label>
-                        <div className="grid grid-cols-3 gap-1">
-                          <button onClick={() => setUseSceneAsBase(false)}
-                            className={`rounded-lg px-2 py-2 text-center transition-colors ${!useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600"}`}>
-                            <div className="text-[10px] font-bold">Text→Img</div>
-                          </button>
-                          <button onClick={() => setUseSceneAsBase(true)}
-                            className={`rounded-lg px-2 py-2 text-center transition-colors ${useSceneAsBase ? "bg-brand-teal-700 text-white" : "bg-gray-100 text-gray-600"}`}>
-                            <div className="text-[10px] font-bold">3D+Text→Img</div>
-                          </button>
-                          <button disabled className="rounded-lg px-2 py-2 text-center bg-gray-50 text-gray-300 cursor-not-allowed">
-                            <div className="text-[10px] font-bold">Img→Img</div>
-                          </button>
-                        </div>
-                      </div>
+                      <RenderInputModeSelector compact value={inputMode} onChange={setInputMode} uploadImage={uploadImage} onUploadImage={setUploadImage} />
                       {/* AI Engine selector (mobile) */}
                       <div className="mb-3">
                         <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Engine</label>
