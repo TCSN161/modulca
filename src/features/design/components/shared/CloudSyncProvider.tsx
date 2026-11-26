@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/features/auth/store";
 import { useDesignStore } from "../../store";
 import { useLandStore } from "@/features/land/store";
+import { getSelectedProducts, setSelectedProducts, parseSelectedProducts } from "@/features/design/productSelection";
 import { landToProjectData, landFromProjectData } from "@/features/land/persistence";
 import { loadProject, saveProject, listProjects } from "@/features/auth/projectService";
 import { useProjectId } from "@/shared/hooks/useProjectId";
@@ -66,6 +67,7 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
 
         // Hydrate land store (polygon, grid cells, rotation, map) — BUG-X02
         useLandStore.getState().hydrate(landFromProjectData(d));
+        if (Array.isArray(d.selectedProducts)) setSelectedProducts(parseSelectedProducts(d.selectedProducts));
 
         setHydrated(true);
       })
@@ -150,6 +152,7 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
         savedRenders: state.savedRenders,
         moduleFixtures: state.moduleFixtures,
         ...landToProjectData(useLandStore.getState().getSnapshot()),
+        selectedProducts: getSelectedProducts(),
       };
 
       // Get project name from localStorage

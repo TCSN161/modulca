@@ -6,6 +6,7 @@ import { useAuthStore } from "@/features/auth/store";
 import { saveProject, loadProject } from "@/features/auth/projectService";
 import { useProjectId } from "@/shared/hooks/useProjectId";
 import { useLandStore } from "@/features/land/store";
+import { getSelectedProducts, setSelectedProducts, parseSelectedProducts } from "@/features/design/productSelection";
 import { landToProjectData, landFromProjectData } from "@/features/land/persistence";
 
 /**
@@ -49,6 +50,7 @@ export function useSaveDesign() {
           savedRenders: state.savedRenders,
           moduleFixtures: state.moduleFixtures,
           ...landToProjectData(useLandStore.getState().getSnapshot()),
+          selectedProducts: getSelectedProducts(),
         };
 
         const result = await saveProject(userId, {
@@ -131,6 +133,7 @@ export function useCloudLoad() {
             useDesignStore.setState(patch);
           }
           useLandStore.getState().hydrate(landFromProjectData(d));
+          if (Array.isArray(d.selectedProducts)) setSelectedProducts(parseSelectedProducts(d.selectedProducts));
         } else {
           // No cloud data — fall back to localStorage
           loadFromLocalStorage();

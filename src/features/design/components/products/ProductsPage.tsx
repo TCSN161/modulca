@@ -14,6 +14,11 @@ import MobileStepFooter from "../shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
 import FeatureGate from "@/shared/components/FeatureGate";
 import {
+  getSelectedProducts,
+  setSelectedProducts as persistSelectedProducts,
+  type SelectedProduct,
+} from "../../productSelection";
+import {
   Layers,
   Sofa,
   Wrench,
@@ -32,30 +37,7 @@ import type { LucideIcon } from "lucide-react";
 
 type CategoryId = "finishing" | "furniture" | "plumbing";
 
-interface SelectedProduct {
-  productId: string;
-  quantity: number;
-}
-
-// ─── Storage ─────────────────────────────────────────────────
-
-const STORAGE_KEY = "modulca-selected-products";
-
-function loadSelectedProducts(): SelectedProduct[] {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return [];
-    return JSON.parse(raw) as SelectedProduct[];
-  } catch {
-    return [];
-  }
-}
-
-function saveSelectedProducts(selected: SelectedProduct[]) {
-  if (typeof window === "undefined") return;
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(selected));
-}
+// ─── Storage: see ../../productSelection (public API, BUG-X03) ───
 
 // ─── Category Definitions ────────────────────────────────────
 
@@ -281,7 +263,7 @@ export default function ProductsPage() {
 
   // Load from localStorage on mount
   useEffect(() => {
-    const loaded = loadSelectedProducts();
+    const loaded = getSelectedProducts();
     setSelectedProducts(loaded);
     setInitialized(true);
   }, []);
@@ -289,7 +271,7 @@ export default function ProductsPage() {
   // Save to localStorage on change
   useEffect(() => {
     if (initialized) {
-      saveSelectedProducts(selectedProducts);
+      persistSelectedProducts(selectedProducts);
     }
   }, [selectedProducts, initialized]);
 

@@ -23,6 +23,10 @@ export interface ProjectDesignData {
   moodboardPins?: unknown[];
   savedRenders?: unknown[];
   moduleFixtures?: Record<string, unknown>;
+  /** Step 11 selection, shape {productId, quantity}[] (BUG-X03) */
+  selectedProducts?: { productId: string; quantity: number }[];
+  /** Land state beyond gridCells/gridRotation (BUG-X02) */
+  land?: Record<string, unknown>;
   [key: string]: unknown; // forward compat
 }
 

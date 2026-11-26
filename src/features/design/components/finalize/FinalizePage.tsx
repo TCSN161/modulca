@@ -6,6 +6,7 @@ import { useDesignStore } from "../../store";
 import { useAuthStore } from "@/features/auth/store";
 import { saveProject, listProjects } from "@/features/auth/projectService";
 import { useLandStore } from "@/features/land/store";
+import { getSelectedProducts } from "@/features/design/productSelection";
 import { landToProjectData } from "@/features/land/persistence";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import DesignHeader from "../shared/DesignHeader";
@@ -80,6 +81,7 @@ export default function FinalizePage() {
 
     // Land state (polygon, gridCells, mapCenter…) — BUG-X02
     Object.assign(designData, landToProjectData(useLandStore.getState().getSnapshot()));
+    designData.selectedProducts = getSelectedProducts(); // BUG-X03
 
     // Check if we're updating an existing project
     let existingId: string | undefined;
