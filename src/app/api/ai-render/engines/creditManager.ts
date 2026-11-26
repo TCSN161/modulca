@@ -162,6 +162,7 @@ const ENGINE_LIMITS: Record<string, EngineLimitConfig> = {
   pollinations: { totalBudgetUsd: -1, dailyLimit: -1 },
   "ai-horde": { totalBudgetUsd: -1, dailyLimit: -1 },
   cloudflare: { totalBudgetUsd: -1, dailyLimit: 10000 },
+  "cloudflare-klein": { totalBudgetUsd: -1, dailyLimit: 10000 }, // CF FLUX.2 klein 4B img2img (Chat 3, $0)
   together: { totalBudgetUsd: -1, dailyLimit: -1 },
   huggingface: { totalBudgetUsd: -1, dailyLimit: -1 },
   gemini: { totalBudgetUsd: -1, dailyLimit: 1500 },
