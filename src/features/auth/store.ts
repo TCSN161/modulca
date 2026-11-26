@@ -22,6 +22,8 @@ interface AuthStore {
   userAvatar: string | null;
   loading: boolean;
   error: string | null;
+  /** True once loadSession() has finished at least once (signed in or not). Gates wait for it. */
+  sessionChecked: boolean;
 
   // Usage tracking
   projectCount: number;
@@ -101,6 +103,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   userAvatar: null,
   loading: false,
   error: null,
+  sessionChecked: false,
   projectCount: 0,
   storageUsedMb: 0,
   aiCallsToday: 0,
@@ -400,6 +403,16 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   /* ── Load Session (on page load) ── */
   loadSession: async () => {
+    try {
+      await loadSessionInner(set);
+    } finally {
+      // ST09/ST11: tier-gated UI waits for this instead of deciding on the default guest tier.
+      set({ sessionChecked: true });
+    }
+  },
+}));
+
+async function loadSessionInner(set: (partial: Partial<AuthStore>) => void): Promise<void> {
     const sb = getSupabase();
 
     if (!sb) {
@@ -495,8 +508,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
     // Attach user context to error reports (persists across reloads via session)
     setSentryUser({ id: session.user.id, email: session.user.email ?? undefined });
-  },
-}));
+}
 
 // Auto-hydrate on client + listen for auth changes (OAuth callbacks, token refresh)
 if (typeof window !== "undefined") {

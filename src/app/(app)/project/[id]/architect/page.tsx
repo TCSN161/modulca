@@ -7,11 +7,15 @@ import ArchitectWorkspace from "@/features/architect/components/ArchitectWorkspa
 import FeatureGate from "@/shared/components/FeatureGate";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import Link from "next/link";
+import { useAuthReady } from "@/features/design/hooks/useAuthReady";
+import AuthLoading from "@/features/design/components/AuthLoading";
 
 export default function ArchitectPage() {
   const params = useParams();
   const projectId = (params?.id as string) || "demo";
   const initProject = useArchitectStore((s) => s.initProject);
+  // BUG-ST09: on a full page load the tier is still the default guest one; wait for the session.
+  const authReady = useAuthReady();
 
   useEffect(() => {
     initProject(projectId, `Project ${projectId}`);
@@ -42,9 +46,13 @@ export default function ArchitectPage() {
       </header>
 
       {/* Gate to Architect+ tier */}
-      <FeatureGate requires="projectCollaboration">
-        <ArchitectWorkspace />
-      </FeatureGate>
+      {authReady ? (
+        <FeatureGate requires="projectCollaboration">
+          <ArchitectWorkspace />
+        </FeatureGate>
+      ) : (
+        <AuthLoading />
+      )}
     </div>
   );
 }
