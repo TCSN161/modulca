@@ -17,7 +17,7 @@ Use single-word English short names. No RO/EN mixing, no spaces, no slashes.
 | 2 | **Neufert** | NeufertAI consultant, legal text, RAG | "NeufertAI" (too long for session name prefix) |
 | 3 | **Engines** | AI engines + rendering + video + visuals | "AI Engines & Rendering", "render_ai", "render_AI" |
 | 4 | **Billing** | Pricing, subscriptions, credit manager, Stripe, bank, CUI, API-key signup | "Prices/Accounts", "Preturi, conturi", "Preturi conturi" |
-| 5 | **Drawings** | Technical drawings, DWG/PDF export, CAD standards | "Technical Drawings", "desen tehnic" |
+| 5 | **Design + Drawings** | Configurator core (wizard, design, land, products, project save) + technical drawings, DWG/PDF export, CAD standards (renamed 2026-11-26) | "Technical Drawings", "desen tehnic" |
 | 6 | **Marketing** | Communication, content strategy, YouTube/social, NotebookLM Studio outputs, CATUC service positioning | — (registered 2026-11-25) |
 | 7 | **Partners** | Collaborators + partners: Vlad engagement, engineers, module producers, DPAs, startup programs, journalists, strategic partners | "Colaboratori si parteneri" |
 | 8 | **Express** | Automated wizard (prompt/questions → full project, renders, presentation) + golden-brief E2E tests | — (registered 2026-11-26) |
