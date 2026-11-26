@@ -98,7 +98,8 @@ Every public piece (video, audio, infographic, quiz) passes:
 4. Correct terms: **PAC** (not DTAC), notificare, certificat de urbanism.
 5. Brand check: logo, tone, call-to-action to modulca.eu.
 
-Open check: confirm Google's terms allow commercial use of NotebookLM-generated audio/video (expected OK, not yet verified).
+~~Open check: confirm Google's terms allow commercial use of NotebookLM-generated audio/video.~~ → Checked 2026-11-26: OK with 3 house rules (AI disclosure, disclaimer, no AI voice posing as a real professional). See §10.1.
+6. AI disclosure: tick „AI use" on YouTube plus a caption line (§10.1).
 
 ---
 
@@ -124,10 +125,37 @@ Face/voice: AI voices are fine for drafts and audio overviews; **your own voice 
 
 ---
 
-## 10. Open questions (not blocking now)
+## 10. Open questions — answered 2026-11-26 (session 6.01.Marketing_Strategy-Kickoff_20261126)
 
-1. Channel name: under ModulCA, or a separate "CATUC explained" brand? (Default: ModulCA — one brand, per D2.)
-2. Are you OK to appear on camera / voice? Would Vlad?
-3. Social handles reserved? (Weekend plan option C — still open.)
-4. Google terms for commercial use of NotebookLM outputs (§7).
-5. OAR rule on platform fees for architect referrals (asked in Vlad call).
+| # | Question | Answer (Costin, 2026-11-26) | Status |
+|---|---|---|---|
+| 1 | Channel name: ModulCA or a separate "CATUC explained" brand? | **ModulCA** channel, with a dedicated series / playlist **„CATUC pe înțelesul tuturor"**. One brand, matches D2. A separate brand stays possible later via the §4 spin-out trigger. | ✅ Closed |
+| 2 | On camera / voice? The partner architect? | **Phased**. Dec pilot Shorts use the NotebookLM AI voice + AI disclosure, and Costin checks every piece. From Jan, flagship long videos use **Costin's own voice**, and his face only when he is comfortable. The partner architect appears only if they agree, and Chat 7 asks. | ✅ Closed (architect part → Chat 7) |
+| 3 | Social handles reserved? | Costin reserves them himself (no account creation by Claude). Try **@modulca** on YouTube, Instagram, TikTok, Facebook and LinkedIn (company page). Fallbacks: **@modulca_eu**, the same handle on every platform and the one already listed in [[MCA-STRAT-MARKETING-2026-11-19]] §2A, then **@modulca.eu** (where a dot is allowed), then **@modulca_ro**. Reserve them before the Dec pilot. Bio is minimal and nothing gets posted until the pilot. €0. | 🟡 Costin action |
+| 4 | Google terms for commercial use of NotebookLM outputs | Checked on the web 2026-11-26 (see below). **OK for commercial use, with 3 house rules.** Re-check before the full channel goes live in January, because the product changes often (it was renamed „Gemini Notebook" in 2026). | ✅ Closed (re-check Jan) |
+| 5 | OAR rule on platform fees for architect referrals | **Pending the partner-architect call** (Chat 7). Until then the §5 ladder shows no platform fee on the „checked by an architect" level. | ⏳ Pending |
+
+### 10.1 NotebookLM terms — what we found (2026-11-26)
+
+- **Governing terms**: on a free personal Google account, the **Google Terms of Service** apply to NotebookLM / Gemini Notebook (help article 16164461). Workspace accounts have their own terms.
+- **Ownership**: the Google ToS (effective 2026-07-30) and the NotebookLM help page both say Google won't claim ownership over content you generate. Neither page explicitly allows or forbids commercial use. In practice it is allowed, because nothing restricts it.
+- **Generative AI Prohibited Use Policy** (2024-12-17) applies via the ToS. Relevant for us:
+  - 4.5: don't present AI content as made solely by a human.
+  - 4.3: don't make misleading claims of expertise in sensitive areas, including the law.
+  - 4.2: no impersonation without disclosure.
+  - The ToS also forbids using generated output to train ML models. We don't do that.
+- **YouTube**: creators must disclose realistic AI-generated or altered content (help 14328491) by ticking „AI use" in YouTube Studio. Disclosure doesn't affect reach or monetization. Synthetic narration isn't explicitly covered, so we always disclose.
+- **NotebookLM caveat**: the help page itself says to always consult a qualified professional for legal advice. This matches our disclaimer rule.
+
+**House rules (binding for every NotebookLM output we publish):**
+1. **Always disclose AI**: tick YouTube „AI use" and add a caption line, e.g. „Narat cu voce generată AI (NotebookLM), verificat de echipa ModulCA."
+2. **Always include the disclaimer**: „informativ, nu înlocuiește consultanța de specialitate" plus a link to the source article (§7 gate).
+3. **Never present an AI voice as an architect, a lawyer or any real person.** Never say „un arhitect vă explică" over an AI voice.
+
+Sources: policies.google.com/terms · policies.google.com/terms/generative-ai/use-policy · support.google.com/notebooklm/answer/16164461 · support.google.com/youtube/answer/14328491
+
+### 10.2 Follow-ups created by these answers
+
+- Brand voice: [[MCA-BRAND-VOICE-v0]] (`docs/brand/MCA-BRAND-VOICE-v0.md`)
+- Content pillars: [[MCA-DOC-CONTENT-PILLARS-v0]]
+- Chat 7: ask the partner architect (a) whether they would appear on video or voice, and (b) the OAR rule on platform fees (Q5).
