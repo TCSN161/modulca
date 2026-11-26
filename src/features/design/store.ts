@@ -34,8 +34,10 @@ export interface MoodboardPin {
 
 export interface SavedRender {
   id: string;
-  imageUrl: string; // base64 data URL
+  /** JPEG data URI (≤1024 px, see renderPersistence.ts) or an http(s) URL */
+  imageUrl: string;
   label: string;
+  /** Engine that produced the image (server `X-AI-Engine`) */
   engine: string;
   moduleType: string;
   createdAt: string;
@@ -43,10 +45,14 @@ export interface SavedRender {
   description?: string;
   /** The prompt used to generate this render */
   prompt?: string;
-  /** Render mode: text2img or img2img */
+  /** text2img = prompt only, img2img = a base image was sent (see baseSource) */
   mode?: "text2img" | "img2img";
+  /** img2img base: the captured 3D view or an uploaded photo (BUG-ST03) */
+  baseSource?: "scene" | "upload";
   /** Resolution used */
   resolution?: string;
+  /** Engines that failed before `engine` answered (BUG-ST29) */
+  fallbackFrom?: string[];
 }
 
 export interface WallConfigs {
@@ -533,7 +539,15 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
     try {
       localStorage.setItem("modulca-design", JSON.stringify(data));
     } catch {
-      // storage full or unavailable
+      // Storage full (BUG-ST27): renders are the big part. Keep the design
+      // saved without them; the cloud project still holds the renders.
+      try {
+        const { savedRenders: _omit, ...rest } = data;
+        void _omit;
+        localStorage.setItem("modulca-design", JSON.stringify(rest));
+      } catch {
+        // storage unavailable
+      }
     }
   },
 
@@ -612,7 +626,8 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
         styleDescription: data.styleDescription ?? "",
         stylePhoto: data.stylePhoto ?? null,
         moodboardPins: data.moodboardPins ?? [],
-        savedRenders: data.savedRenders ?? [],
+        // Missing key = written without renders (quota): keep what we have
+        savedRenders: Array.isArray(data.savedRenders) ? data.savedRenders : get().savedRenders,
         moduleFixtures: data.moduleFixtures ?? {},
       });
     } catch {

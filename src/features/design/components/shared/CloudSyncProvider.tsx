@@ -111,6 +111,8 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
   const modules = useDesignStore((s) => s.modules);
   const finishLevel = useDesignStore((s) => s.finishLevel);
   const styleDirection = useDesignStore((s) => s.styleDirection);
+  // BUG-ST27: a new or removed render must reach the project row too
+  const savedRenders = useDesignStore((s) => s.savedRenders);
 
   useEffect(() => {
     // Skip if not authenticated or demo project
@@ -142,7 +144,7 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [isAuthenticated, userId, projectId, hydrated, modules, finishLevel, styleDirection]);
+  }, [isAuthenticated, userId, projectId, hydrated, modules, finishLevel, styleDirection, savedRenders]);
 
   return <>{children}</>;
 }

@@ -15,6 +15,7 @@ import MobileStepFooter from "../shared/MobileStepFooter";
 import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, RenderResolution, AiEngine } from "./renderConstants";
 import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
 import { useRenderEngine } from "./useRenderEngine";
+import { persistSavedRender } from "../../renderPersistence";
 import RenderGallery from "./RenderGallery";
 import { useAuthStore } from "@/features/auth/store";
 import PublishButton from "@/features/gallery/components/PublishButton";
@@ -549,44 +550,35 @@ export default function RenderPage() {
                   </button>
                   <button
                     onClick={async () => {
-                      try {
-                        const resp = await fetch(aiImageUrl);
-                        const blob = await resp.blob();
-                        const reader = new FileReader();
-                        reader.onloadend = () => {
-                          const base64 = reader.result as string;
-                          // Auto-generate description for presentation
-                          const styleName = style?.label || "Modern";
-                          const moduleName = currentMod?.label || "Module";
-                          const modeLabel = useSceneAsBase ? "3D scene conversion" : "AI text-to-image";
-                          const engineName = aiUsedEngine || "AI";
-                          const resLabel = RENDER_RESOLUTIONS[renderResolution]?.label || "Standard";
-                          const autoDescription = [
-                            `${styleName} interior design visualization of ${moduleName}.`,
-                            `Generated via ${modeLabel} using ${engineName} engine at ${resLabel} resolution.`,
-                            aiPrompt ? `Style prompt: "${aiPrompt.slice(0, 150)}${aiPrompt.length > 150 ? "..." : ""}"` : "",
-                          ].filter(Boolean).join(" ");
+                      // Auto-generate description for presentation
+                      const styleName = style?.label || "Modern";
+                      const moduleName = currentMod?.label || "Module";
+                      const modeLabel = useSceneAsBase ? "3D scene conversion" : "AI text-to-image";
+                      const engineName = aiUsedEngine || "AI";
+                      const resLabel = RENDER_RESOLUTIONS[renderResolution]?.label || "Standard";
+                      const autoDescription = [
+                        `${styleName} interior design visualization of ${moduleName}.`,
+                        `Generated via ${modeLabel} using ${engineName} engine at ${resLabel} resolution.`,
+                        aiPrompt ? `Style prompt: "${aiPrompt.slice(0, 150)}${aiPrompt.length > 150 ? "..." : ""}"` : "",
+                      ].filter(Boolean).join(" ");
 
-                          const render: SavedRender = {
-                            id: `render-${Date.now()}`,
-                            imageUrl: base64,
-                            label: `${moduleName} — ${styleName} AI Render`,
-                            engine: engineName,
-                            moduleType: currentMod?.moduleType || "unknown",
-                            createdAt: new Date().toISOString(),
-                            description: autoDescription,
-                            prompt: aiPrompt,
-                            mode: useSceneAsBase ? "img2img" : "text2img",
-                            resolution: resLabel,
-                          };
-                          useDesignStore.getState().addSavedRender(render);
-                          useDesignStore.getState().saveToLocalStorage();
-                          alert("Render saved to your presentation!");
-                        };
-                        reader.readAsDataURL(blob);
-                      } catch {
-                        alert("Failed to save render.");
-                      }
+                      const render: SavedRender = {
+                        id: `render-${Date.now()}`,
+                        imageUrl: aiImageUrl,
+                        label: `${moduleName} — ${styleName} AI Render`,
+                        engine: engineName,
+                        moduleType: currentMod?.moduleType || "unknown",
+                        createdAt: new Date().toISOString(),
+                        description: autoDescription,
+                        prompt: aiPrompt,
+                        mode: useSceneAsBase ? "img2img" : "text2img",
+                        resolution: resLabel,
+                      };
+                      // BUG-ST27: compressed + saved to the project row at once
+                      const res = await persistSavedRender(render, projectId);
+                      if (res.ok) alert("Render saved to your presentation!");
+                      else if (res.reason === "limit") alert(`Your plan keeps up to ${res.limit} renders. Remove one in the presentation or upgrade.`);
+                      else alert("Failed to save render.");
                     }}
                     className="block w-full rounded-lg bg-brand-teal-800 px-4 py-2 text-center text-xs font-semibold text-white hover:bg-brand-teal-700 transition-colors"
                   >
