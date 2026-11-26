@@ -96,3 +96,58 @@ ModulCA
 6. **Arhivare**: o sesiune ✅ verificată de MAIN se poate arhiva; harta și commit-urile păstrează istoria.
 7. **În bara laterală**: o sesiune nouă stă sub MAIN cât lucrează (așa raportul vine automat la MAIN). Când e ✅ și verificată, MAIN o detașează și o mută în grupul chat-ului ei („2 · Neufert” etc.). Sesiunile din aprilie stau în „0 · Arhivă”.
 8. **MAIN nou la fiecare săptămână** (sau când contextul se umple): 1.02 → 1.03 → … Harta asta e memoria comună, nu chat-ul.
+
+---
+
+## 4. Prognoza: sesiunile care urmează (flexibilă)
+
+Numărul final se dă la pornire (următorul liber din chat). Stare: **📅 planificată** (are dată) · **⏳ condiționată** (pornește când se îndeplinește condiția) · **💡 opțională** (doar dacă e nevoie) · **❌ renunțat**. MAIN revizuiește lista vinerea: adaugă, mută sau taie.
+
+### 4.1 Propuse de chat-uri (din rapoartele lor)
+| Sesiune | Propusă de | Ce face | Când | Stare |
+|---|---|---|---|---|
+| 2.04 F3 modular-prefab | 2.03 | Fișierul juridic critic, fiecare frază cu articol | Vin 27 | 📅 |
+| 2.05 F4+F6 | 2.03 / plan | Urbanism PUG/PUZ + ghidul de autorizare | Lun 30 | 📅 |
+| 3.04 compare/upscale + bug-uri randare | 3.03 | Protecție pe cele 2 rute rămase + ce iese din testul complet | Sâm 28 | 📅 |
+| 4.04 promo beta + 8 probleme | 4.02 | Promo calculat pe server, cele 8 BUG-uri minore | Sâm 5 dec | 📅 |
+| 5.02 audit export → spec PermitTracker | 5.01 | Audit read-only al exportului PDF | Mar 1 dec | 📅 |
+| 6.04 revizuire scripturi după Vlad | 6.03 | Ajustează Shorts și scripturile după review-ul juridic | După semnătura Vlad (~5 dec) | ⏳ |
+| 8.02 Express MVP | 8.01 | Întrebări → proiect complet → 3 randări → prezentare | Mie 2 – Joi 3 dec | 📅 |
+| 9.02 raport săptămânal | 9.01 | Top 3 noutăți „merită făcut” | Vin 27 și apoi în fiecare vineri | 📅 |
+| Test Haiku 5.5 pentru traduceri | 9.01 (Radar) | Înlocuiește DeepSeek, cost mic | W49, în sesiunea 2.07 | 📅 |
+| Foaie de buget (limita de €50) | 9.01 (Radar) | Tabel lunar de costuri AI/hosting | 1.04 vineri | 📅 |
+
+### 4.2 Din plan (roadmap §2), până la beta
+| Sesiune | Ce | Când | Stare |
+|---|---|---|---|
+| 1.03 test complet platformă | Browser, cont Constructor → lista BUG-xx | Vin 27 dim. | 📅 |
+| 1.04 închidere W48 | Hartă, plan, Radar, bug-uri pe chat-uri | Vin 27 seara | 📅 |
+| 1.05 retrospectivă noiembrie | | Dum 29 | 📅 |
+| 7.02 acord Vlad + DPA | Draft acord + emailuri furnizori | Lun 30 | 📅 |
+| 2.07 capitol CATUC nou | Din NotebookLM Q11–Q25 | Mar 1 dec | ⏳ (după Q11–Q25 de la Costin) |
+| 1.0x upgrade securitate B15 | sharp 0.34→0.35 | Mie 2 dec | ⏳ (OK Costin) |
+| 2.08 corecturi Vlad | | Joi 3 dec | ⏳ (după review) |
+| 2.09 publicare Faza 2 | `.new.md` → live | Vin 4 dec | ⏳ (după semnătură) |
+| 7.03 email către cei 10 utilizatori | Chestionar + cont gratuit 1–3 luni | Sâm 5 dec | ⏳ (OK Costin înainte de trimitere) |
+| 2.1x `/catuc-check` + Profile Engine | | W50 | 📅 |
+| 5.0x PermitTracker 3 PDF-uri | | W50 (11–12 dec) | 📅 |
+| 8.03 teste automate Playwright | 3 briefuri de test | W50 | 📅 |
+| 4.0x insignă BETA + feedback | | W50 | 📅 |
+| 3.0x walkthrough v0 + compresie GLB | | W50 | 📅 |
+| 2.1x Privacy + ToS beta | | W50 | 📅 |
+| 7.0x lista de invitați + email | | până pe 10 dec | 📅 |
+| 1.0x pre-flight beta | | 14 dec | 📅 |
+| 3.0x LTX video wire-up | (din docs Chat 3) | după beta, dacă avem buget | 💡 |
+
+### 4.3 După beta (ianuarie)
+Stripe live (4) · canal YouTube (6) · presă + Cornetu (7) · Blender pipeline (3) · DWG export (5) · Express prompt liber (8) · bibliotecă în batch cu Haiku (2) · triaj săptămânal feedback (1).
+
+### 4.4 Chat-uri noi posibile (doar dacă apare nevoia)
+| Chat candidat | Când l-am porni (declanșator) | Până atunci se ocupă |
+|---|---|---|
+| **10 Support / Feedback beta** | Dacă feedback-ul de la beta depășește ~1 oră/zi de triaj | 1 MAIN |
+| **11 SEO / Analytics** | Când pornim conținut regulat (ian) și vrem rapoarte săptămânale GA4 / Search Console | 1 MAIN + 6 Marketing |
+| **12 Producători / Supply** | Când avem primii producători de module în discuții concrete | 7 Partners |
+| **13 Mobile / AR** | Dacă după lansare vrem aplicație sau „casa pe terenul tău” în AR | 3 Engines |
+
+Regula: un chat nou apare doar când un grup existent nu mai poate duce sarcina fără să-și încarce contextul. Altfel e doar o sesiune nouă într-un chat existent.
