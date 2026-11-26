@@ -109,3 +109,48 @@ describe("useRenderEngine — BUG-ST03 img2img contract", () => {
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
+
+describe("useRenderEngine — BUG-ST02 server errors, no client fallback", () => {
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  it("503 shows the server message with Retry-After and never calls image.pollinations.ai", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(JSON.stringify({ error: "All AI engines are currently busy", code: "ENGINES_UNAVAILABLE" }), {
+        status: 503,
+        headers: { "Retry-After": "60" },
+      }),
+    );
+    const { result } = setup();
+    let ok: boolean | undefined;
+    await act(async () => { ok = await result.current.handleGenerateAiRender("kitchen"); });
+    expect(ok).toBe(false);
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock.mock.calls.some(([u]) => String(u).includes("pollinations"))).toBe(false);
+    expect(result.current.aiError).toBe("All AI engines are currently busy");
+    expect(result.current.aiErrorInfo).toEqual({ status: 503, code: "ENGINES_UNAVAILABLE", retryAfterSec: 60 });
+  });
+
+  it("non-JSON 500 gets a status message, still no fallback", async () => {
+    fetchMock.mockResolvedValue(new Response("oops", { status: 500 }));
+    const { result } = setup();
+    await act(() => result.current.handleGenerateAiRender("kitchen"));
+    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(result.current.aiError).toMatch(/500/);
+  });
+
+  it("success returns true and reports the engine", async () => {
+    fetchMock.mockResolvedValue(
+      new Response(new Uint8Array(2000), { status: 200, headers: { "Content-Type": "image/jpeg", "X-AI-Engine": "cloudflare-klein" } }),
+    );
+    vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: () => "blob:x" }));
+    const { result } = setup("AAAA", "scene");
+    let ok: boolean | undefined;
+    await act(async () => { ok = await result.current.handleGenerateAiRender("kitchen"); });
+    expect(ok).toBe(true);
+    expect(result.current.aiEngineMeta).toMatchObject({ engine: "cloudflare-klein", fallbackFrom: [], inputMode: "scene" });
+  });
+});

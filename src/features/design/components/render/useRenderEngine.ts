@@ -21,6 +21,8 @@ interface UseRenderEngineReturn {
   aiImageUrl: string | null;
   aiLoading: boolean;
   aiError: string | null;
+  /** Status / code / Retry-After of the last failed request (BUG-ST02) */
+  aiErrorInfo: AiErrorInfo | null;
   aiElapsed: number;
   aiUsedEngine: string | null;
   /** Engine + failed engines of the last image, and the input it was made from (BUG-ST29) */
@@ -31,6 +33,33 @@ interface UseRenderEngineReturn {
 }
 
 const isDev = process.env.NODE_ENV === "development";
+
+export interface AiErrorInfo {
+  status: number;
+  /** Server code, e.g. ENGINES_UNAVAILABLE (503) or QUOTA_EXCEEDED (429) */
+  code?: string;
+  /** From Retry-After: "Try again" is offered only after this (503) */
+  retryAfterSec?: number;
+}
+
+const DEFAULT_ERRORS: Record<number, string> = {
+  429: "Render limit reached for your plan. Try again tomorrow or upgrade.",
+  503: "All AI engines are busy right now. Please try again in a minute.",
+};
+
+/** Contract §3: body { error, code }, 503 also Retry-After. */
+export async function readApiError(response: Response): Promise<{ message: string; code?: string; retryAfterSec?: number }> {
+  let message = DEFAULT_ERRORS[response.status] ?? `AI generation failed (${response.status}). Please try again.`;
+  let code: string | undefined;
+  try {
+    const body = await response.json();
+    if (body && typeof body.error === "string") message = body.error;
+    else if (body && typeof body.message === "string") message = body.message;
+    if (body && typeof body.code === "string") code = body.code;
+  } catch { /* non-JSON body */ }
+  const ra = Number(response.headers.get("retry-after"));
+  return { message, code, retryAfterSec: Number.isFinite(ra) && ra > 0 ? ra : undefined };
+}
 
 /** Build sanitized prompt with architectural context to avoid API false-positive content filters */
 function sanitizePrompt(prompt: string): string {
@@ -53,6 +82,7 @@ export function useRenderEngine({
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
   const [aiError, setAiError] = useState<string | null>(null);
+  const [aiErrorInfo, setAiErrorInfo] = useState<AiErrorInfo | null>(null);
   const [aiElapsed, setAiElapsed] = useState(0);
   const [aiUsedEngine, setAiUsedEngine] = useState<string | null>(null);
   const [aiEngineMeta, setAiEngineMeta] = useState<UseRenderEngineReturn["aiEngineMeta"]>(null);
@@ -63,6 +93,7 @@ export function useRenderEngine({
   const resetAiImage = useCallback(() => {
     setAiImageUrl(null);
     setAiError(null);
+    setAiErrorInfo(null);
   }, []);
 
   const handleGenerateAiRender = useCallback(async (prompt: string) => {
@@ -92,6 +123,7 @@ export function useRenderEngine({
     }
 
     setAiError(null);
+    setAiErrorInfo(null);
     setAiImageUrl(null);
     setAiUsedEngine(null);
     setAiEngineMeta(null);
@@ -141,44 +173,19 @@ export function useRenderEngine({
 
       if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
 
-      // Quota exhausted: show the server message, never bypass the quota via Pollinations
-      if (response.status === 429) {
-        let message = "Daily render limit reached for your plan. Try again tomorrow or upgrade.";
-        try {
-          const body = await response.json();
-          if (body && typeof body.message === "string") message = body.message;
-          else if (body && typeof body.error === "string") message = body.error;
-        } catch { /* non-JSON body */ }
-        setAiError(message);
+      // BUG-ST02: show the server message as is. No client-side fallback:
+      // a direct image.pollinations.ai call has no auth, bypasses quota and
+      // tier, returns 402, and hides the real cause.
+      if (!response.ok) {
+        const err = await readApiError(response);
+        setAiError(err.message);
+        setAiErrorInfo({ status: response.status, code: err.code, retryAfterSec: err.retryAfterSec });
         setAiLoading(false);
         return false;
       }
 
-      // If proxy failed (503, static export, etc.), try direct client-side Pollinations call
-      if (!response.ok) {
-        console.warn("[AI Render] Proxy error:", response.status, "— falling back to direct Pollinations call");
-        const directUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(sanitized)}?width=${res.width}&height=${res.height}&seed=${seed}&nologo=true&safe=true`;
-        try {
-          response = await fetch(directUrl);
-        } catch (directErr) {
-          console.error("[AI Render] Direct Pollinations also failed:", directErr);
-          setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
-          setAiLoading(false);
-          return false;
-        }
-        if (!response.ok) {
-          setAiError(`AI generation failed (${response.status}). Try again or use a simpler prompt.`);
-          setAiLoading(false);
-          return false;
-        }
-      }
-
       const contentType = response.headers.get("content-type") || "";
-      // Direct Pollinations returns image/* or may vary — accept any image type
-      if (!contentType.startsWith("image/") && !contentType.includes("octet-stream") && response.url.includes("pollinations")) {
-        // Pollinations usually returns image even without proper content type — try blob anyway
-        console.warn("[AI Render] Non-image content-type, but Pollinations — trying blob anyway");
-      } else if (!contentType.startsWith("image/")) {
+      if (!contentType.startsWith("image/")) {
         console.error("[AI Render] Unexpected content type:", contentType);
         setAiError("Unexpected response from AI. Try again.");
         setAiLoading(false);
@@ -224,6 +231,7 @@ export function useRenderEngine({
     aiImageUrl,
     aiLoading,
     aiError,
+    aiErrorInfo,
     aiElapsed,
     aiUsedEngine,
     aiEngineMeta,

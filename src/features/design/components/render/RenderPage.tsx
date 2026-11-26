@@ -14,8 +14,9 @@ import MobileStepFooter from "../shared/MobileStepFooter";
 
 import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, RenderResolution, AiEngine, RenderInputMode } from "./renderConstants";
 import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
-import { useRenderEngine } from "./useRenderEngine";
+import { useRenderEngine, readApiError } from "./useRenderEngine";
 import { persistSavedRender } from "../../renderPersistence";
+import { authHeaders } from "@/shared/lib/authHeaders";
 import RenderGallery from "./RenderGallery";
 import RenderInputModeSelector from "./RenderInputModeSelector";
 import RenderEngineBadge from "./RenderEngineBadge";
@@ -65,6 +66,7 @@ export default function RenderPage() {
     aiImageUrl,
     aiLoading,
     aiError,
+    aiErrorInfo,
     aiElapsed,
     aiUsedEngine,
     aiEngineMeta,
@@ -92,11 +94,22 @@ export default function RenderPage() {
   const atRenderLimit = !canRender;
   const incrementMonthlyRenders = useAuthStore((s) => s.incrementMonthlyRenders);
 
-  const handleGenerateAiRender = useCallback(() => {
+  const handleGenerateAiRender = useCallback(async () => {
     if (atRenderLimit) return;
-    generateAiRender(aiPrompt);
-    incrementMonthlyRenders();
+    // BUG-ST04: count only renders that produced an image (the server refunds failures)
+    if (await generateAiRender(aiPrompt)) incrementMonthlyRenders();
   }, [generateAiRender, aiPrompt, atRenderLimit, incrementMonthlyRenders]);
+
+  // BUG-ST02: after a 503, offer "Try again" only once Retry-After has passed
+  const [retryWait, setRetryWait] = useState(0);
+  useEffect(() => {
+    const wait = aiErrorInfo?.status === 503 ? aiErrorInfo.retryAfterSec ?? 0 : 0;
+    setRetryWait(wait);
+    if (wait <= 0) return;
+    const id = setInterval(() => setRetryWait((w) => (w <= 1 ? (clearInterval(id), 0) : w - 1)), 1000);
+    return () => clearInterval(id);
+  }, [aiErrorInfo]);
+  const quotaError = aiErrorInfo?.status === 429;
 
   const handleSceneReady = useCallback((capture: () => string | null) => {
     captureRef.current = capture;
@@ -595,10 +608,10 @@ export default function RenderPage() {
                             const base64 = (reader.result as string).split(",")[1];
                             const upRes = await fetch("/api/ai-render/upscale", {
                               method: "POST",
-                              headers: { "Content-Type": "application/json" },
+                              headers: { "Content-Type": "application/json", ...(await authHeaders()) },
                               body: JSON.stringify({ image: base64, mode: "upscale" }),
                             });
-                            if (!upRes.ok) { alert("Upscale failed. Try again later."); return; }
+                            if (!upRes.ok) { alert((await readApiError(upRes)).message); return; }
                             const upBlob = await upRes.blob();
                             const url = URL.createObjectURL(upBlob);
                             const a = document.createElement("a");
@@ -623,10 +636,10 @@ export default function RenderPage() {
                             const base64 = (reader.result as string).split(",")[1];
                             const bgRes = await fetch("/api/ai-render/upscale", {
                               method: "POST",
-                              headers: { "Content-Type": "application/json" },
+                              headers: { "Content-Type": "application/json", ...(await authHeaders()) },
                               body: JSON.stringify({ image: base64, mode: "remove-bg" }),
                             });
-                            if (!bgRes.ok) { alert("Background removal failed."); return; }
+                            if (!bgRes.ok) { alert((await readApiError(bgRes)).message); return; }
                             const bgBlob = await bgRes.blob();
                             const url = URL.createObjectURL(bgBlob);
                             const a = document.createElement("a");
@@ -715,10 +728,16 @@ export default function RenderPage() {
                         <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl max-w-sm">
                           <span className="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-700 uppercase tracking-wider">Error</span>
                           <p className="text-center text-sm text-gray-600">{aiError}</p>
-                          <button onClick={handleGenerateAiRender} className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600">
-                            Try Again
-                          </button>
-                          <p className="text-[10px] text-gray-400 text-center">Tip: try &quot;Draft&quot; resolution for faster results</p>
+                          {quotaError ? (
+                            <Link href="/pricing" className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600">
+                              Upgrade
+                            </Link>
+                          ) : (
+                            <button onClick={handleGenerateAiRender} disabled={retryWait > 0} className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white hover:bg-brand-amber-600 disabled:opacity-50 disabled:cursor-wait">
+                              {retryWait > 0 ? `Try Again (${retryWait}s)` : "Try Again"}
+                            </button>
+                          )}
+                          {!quotaError && <p className="text-[10px] text-gray-400 text-center">Tip: try &quot;Draft&quot; resolution for faster results</p>}
                         </div>
                       ) : (
                         <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl">
