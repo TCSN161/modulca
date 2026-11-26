@@ -31,4 +31,9 @@ describe("engineMetaFromHeaders (BUG-ST29)", () => {
     );
     expect(m.fallbackFrom).toEqual(["cloudflare-klein", "gemini"]);
   });
+
+  it("img2img with a chosen engine: that engine is the expected one (BUG-ST33)", () => {
+    expect(engineMetaFromHeaders(h({ "X-AI-Engine": "ai-horde" }), { requestedEngine: "ai-horde", hadBaseImage: true }).fallbackFrom).toEqual([]);
+    expect(engineMetaFromHeaders(h({ "X-AI-Engine": "cloudflare-klein" }), { requestedEngine: "ai-horde", hadBaseImage: true }).fallbackFrom).toEqual(["ai-horde"]);
+  });
 });

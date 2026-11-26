@@ -12,15 +12,15 @@ vi.mock("./renderImage", async (orig) => ({
 }));
 
 import { useRenderEngine } from "./useRenderEngine";
-import type { RenderInputMode } from "./renderConstants";
+import type { AiEngine, RenderInputMode } from "./renderConstants";
 
 const fetchMock = vi.fn();
 
-function setup(base: string | null = null, mode?: RenderInputMode, uploadImage: string | null = null) {
+function setup(base: string | null = null, mode?: RenderInputMode, uploadImage: string | null = null, aiEngine: AiEngine = "together") {
   const captureRef = { current: base ? () => `data:image/png;base64,${base}` : null };
   return renderHook(() =>
     useRenderEngine({
-      aiEngine: "together",
+      aiEngine,
       renderResolution: "draft",
       inputMode: mode ?? (base ? "scene" : "text"),
       captureRef,
@@ -78,7 +78,7 @@ describe("useRenderEngine — BUG-ST03 img2img contract", () => {
   });
   afterEach(() => vi.unstubAllGlobals());
 
-  it("3D + Text POSTs the canvas capture as a JPEG data URI with engine null", async () => {
+  it("3D + Text POSTs the canvas capture as a JPEG data URI with the chosen engine (BUG-ST33)", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
     const { result } = setup("AAAA", "scene");
     await act(() => result.current.handleGenerateAiRender("kitchen"));
@@ -87,15 +87,24 @@ describe("useRenderEngine — BUG-ST03 img2img contract", () => {
     expect(init.method).toBe("POST");
     const body = JSON.parse(init.body);
     expect(body.baseImage).toBe("data:image/jpeg;base64,AAAA");
-    expect(body.engine).toBeNull();
+    expect(body.engine).toBe("together");
     expect(body).toMatchObject({ width: expect.any(Number), height: expect.any(Number) });
   });
 
-  it("Image → Image POSTs the uploaded image", async () => {
+  it("img2img with AI engine \"auto\" sends engine null (klein first)", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
+    const { result } = setup("AAAA", "scene", null, "auto");
+    await act(() => result.current.handleGenerateAiRender("kitchen"));
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body).engine).toBeNull();
+  });
+
+  it("Image → Image POSTs the uploaded image with the chosen engine", async () => {
     fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
     const { result } = setup(null, "upload", "data:image/png;base64,UPLD");
     await act(() => result.current.handleGenerateAiRender("kitchen"));
-    expect(JSON.parse(fetchMock.mock.calls[0][1].body).baseImage).toBe("data:image/jpeg;base64,UPLD");
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.baseImage).toBe("data:image/jpeg;base64,UPLD");
+    expect(body.engine).toBe("together");
   });
 
   it("no capture / no upload: error, no request, never a silent text-only render", async () => {
@@ -147,7 +156,7 @@ describe("useRenderEngine — BUG-ST02 server errors, no client fallback", () =>
       new Response(new Uint8Array(2000), { status: 200, headers: { "Content-Type": "image/jpeg", "X-AI-Engine": "cloudflare-klein" } }),
     );
     vi.stubGlobal("URL", Object.assign(URL, { createObjectURL: () => "blob:x" }));
-    const { result } = setup("AAAA", "scene");
+    const { result } = setup("AAAA", "scene", null, "auto");
     let ok: boolean | undefined;
     await act(async () => { ok = await result.current.handleGenerateAiRender("kitchen"); });
     expect(ok).toBe(true);

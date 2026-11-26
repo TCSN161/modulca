@@ -32,8 +32,9 @@ export function engineMetaFromHeaders(
 
   let fallbackFrom = fromHeader;
   if (fallbackFrom.length === 0) {
-    const expected = req.hadBaseImage ? IMG2IMG_PRIMARY : req.requestedEngine;
-    if (expected && expected !== "auto" && expected !== engine) fallbackFrom = [expected];
+    const chosen = req.requestedEngine && req.requestedEngine !== "auto" ? req.requestedEngine : null;
+    const expected = chosen ?? (req.hadBaseImage ? IMG2IMG_PRIMARY : null);
+    if (expected && expected !== engine) fallbackFrom = [expected];
   }
   fallbackFrom = fallbackFrom.filter((e) => e !== engine);
 

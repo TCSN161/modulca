@@ -156,8 +156,8 @@ export function useRenderEngine({
             width: res.width,
             height: res.height,
             seed,
-            // The img2img chain puts cloudflare-klein first for every tier
-            engine: null,
+            // BUG-ST33: honour the chosen engine; "auto" → null (the img2img chain starts with cloudflare-klein)
+            engine: aiEngine !== "auto" ? aiEngine : null,
             baseImage,
             maxCostUsd,
           }),
@@ -202,7 +202,7 @@ export function useRenderEngine({
       }
 
       const meta = engineMetaFromHeaders(response.headers, {
-        requestedEngine: baseImage ? null : aiEngine,
+        requestedEngine: aiEngine,
         hadBaseImage: !!baseImage,
       });
       const usedEngine = meta.engine;
