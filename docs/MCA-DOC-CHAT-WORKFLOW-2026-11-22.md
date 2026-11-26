@@ -19,6 +19,7 @@
 | **6. Marketing** | Communication + content strategy: brand voice, YouTube/Shorts/social, NotebookLM Studio outputs (video, audio, infographics, quizzes), lead magnets, content calendar, positioning + monetization of the CATUC permit service, press kit content (with Chat 7 for outreach) | Code, legal text content (Chat 2 writes, Marketing reuses verified facts), pricing enforcement (Chat 4) |
 | **7. Partners** | Collaborator + partner relationships: Vlad engagement docs, engineers/module producers coordination, DPA vendor outreach, startup program applications, press/journalist contacts, strategic partner conversations | Code, legal text content, pricing logic |
 | **8. Express** | Automated "Express" wizard: questions/prompt → ExpressBrief (Claude structured output) → fills the 14 steps via public module interfaces → N renders → presentation/PDF. Also owns golden-brief automated E2E tests | Editing other modules (asks the owner chat for missing interfaces), engine code, pricing enforcement, legal text |
+| **9. Radar** | AI/tools news intake: Costin pastes links (YouTube, posts, docs); Radar summarizes, classifies and updates the AI radar; sends MAIN a weekly "worth doing" list on Fridays; runs the monthly AI upgrade-day sweep | Code, decisions for other chats (it proposes, MAIN routes) |
 
 **Rule**: If a message starts in the wrong chat, the receiving chat redirects with one line: *"This belongs in Chat [N] — ask there: [1-sentence prompt]"*. No multi-paragraph explanation, no duplicated work.
 
@@ -174,6 +175,7 @@ Each chat writes only within its ownership paths. Prevents accidental cross-chat
 | **6. Marketing** | `docs/MCA-STRAT-CATUC-SERVICE-*`, `docs/MCA-DOC-MARKETING-*`, `docs/MCA-DOC-CONTENT-*`, `docs/content/**`, `docs/brand/**` | Code anywhere, legal text, pricing logic |
 | **7. Partners** | `docs/MCA-DOC-VLAD-*`, `docs/MCA-DOC-PARTNERS-*`, DPA templates, startup app docs, press kit docs, email outreach drafts | Code anywhere, pricing logic |
 | **8. Express** | `src/features/express/**`, `src/app/api/express/**`, `src/app/(app)/express/**`, `tests/e2e/express*`, `docs/MCA-SPEC-EXPRESS-*` | Other features' internals, engines, creditManager, legal text |
+| **9. Radar** | `docs/MCA-DOC-AI-RADAR.md`, `docs/radar/**` | Code anywhere, other chats' docs |
 
 **Shared infrastructure** (everyone can touch, with explicit intention):
 - `.gitignore`, `README.md`, `supabase/migrations/**` (coordinate via handoff first — never two chats editing migrations)
@@ -245,3 +247,4 @@ Antifragility compounds: each retro's lessons update this workflow doc. Over tim
 | 2026-11-23 | §10: new write paths — Neufert (catuc checker/Profile Engine, privacy/terms), Billing (beta badge/feedback), Drawings (PermitTracker) | Phase 3 ownership decided in MCA-DOC-ROADMAP-ALL-CHATS-2026-11-23 §3 |
 | 2026-11-25 | Chat 6 registered as **Marketing** (§1 scope, §10 write paths) | Costin: separate chat for CATUC service + communication strategy |
 | 2026-11-26 | Chat 8 registered as **Express** (§1 scope, §10 write paths); spec [[MCA-SPEC-EXPRESS-MODE-v0]] | Costin: automated wizard for users + automated testing |
+| 2026-11-26 | Chat 9 registered as **Radar** (§1, §10); owns [[MCA-DOC-AI-RADAR]] | Costin: keep news links out of MAIN |

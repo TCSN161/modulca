@@ -1,7 +1,7 @@
 # MCA-DOC-AI-RADAR — what's new in Claude / AI tools and what we do with it
 
 **Status**: Living doc. MAIN triages it every Friday and does a full sweep on the monthly "AI upgrade day" (first Monday of the month).
-**Owner**: Chat 1 MAIN. Every chat may propose rows through handoffs.
+**Owner**: Chat 9 Radar (registered 2026-11-26). MAIN routes what it proposes. Every chat may propose rows through handoffs.
 **Related**: [[MCA-DOC-SPRINT-2026-11-26-27]] §4
 
 Status legend: ✅ using · 🧪 try next · 📅 planned (with date) · 👀 watch · ⛔ not for us

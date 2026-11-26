@@ -21,6 +21,7 @@ Use single-word English short names. No RO/EN mixing, no spaces, no slashes.
 | 6 | **Marketing** | Communication, content strategy, YouTube/social, NotebookLM Studio outputs, CATUC service positioning | — (registered 2026-11-25) |
 | 7 | **Partners** | Collaborators + partners: Vlad engagement, engineers, module producers, DPAs, startup programs, journalists, strategic partners | "Colaboratori si parteneri" |
 | 8 | **Express** | Automated wizard (prompt/questions → full project, renders, presentation) + golden-brief E2E tests | — (registered 2026-11-26) |
+| 9 | **Radar** | AI/tools news intake, AI radar, monthly upgrade-day sweep | — (registered 2026-11-26) |
 
 **Rule**: Use the canonical name in session titles, commits, handoff filenames, and docs. Old names are deprecated.
 
