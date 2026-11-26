@@ -103,7 +103,7 @@ export function useCloudLoad() {
         if (result.ok && result.value?.data) {
           const d = result.value.data as Record<string, unknown>;
           // Hydrate design + land + products (single restore path)
-          applyProjectSnapshot(d);
+          applyProjectSnapshot(d, { projectId });
         } else {
           // No cloud data — fall back to localStorage
           loadFromLocalStorage();

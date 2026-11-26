@@ -12,7 +12,13 @@
  */
 
 import { useDesignStore } from "./store";
-import { getSelectedProducts, setSelectedProducts, parseSelectedProducts } from "./productSelection";
+import {
+  getSelectedProducts,
+  setSelectedProducts,
+  parseSelectedProducts,
+  hasPendingSelectedProducts,
+  clearPendingSelectedProducts,
+} from "./productSelection";
 import { useLandStore } from "@/features/land/store";
 import { landToProjectData, landFromProjectData } from "@/features/land/persistence";
 import {
@@ -41,8 +47,15 @@ export function getProjectSnapshot(): ProjectDesignData {
   };
 }
 
-/** Inverse of getProjectSnapshot: hydrate design + land + products from projects.data. */
-export function applyProjectSnapshot(data: Record<string, unknown>): void {
+/**
+ * Inverse of getProjectSnapshot: hydrate design + land + products from projects.data.
+ * BUG-ST06: products edited locally and not yet saved for `opts.projectId` are kept
+ * (the cloud copy is older); the next auto-save sends them up.
+ */
+export function applyProjectSnapshot(
+  data: Record<string, unknown>,
+  opts: { projectId?: string } = {},
+): void {
   const patch: Record<string, unknown> = {};
   if (Array.isArray(data.modules) && data.modules.length > 0) patch.modules = data.modules;
   if (typeof data.finishLevel === "string") patch.finishLevel = data.finishLevel;
@@ -56,7 +69,9 @@ export function applyProjectSnapshot(data: Record<string, unknown>): void {
   if (Object.keys(patch).length > 0) useDesignStore.setState(patch);
 
   useLandStore.getState().hydrate(landFromProjectData(data));
-  if (Array.isArray(data.selectedProducts)) setSelectedProducts(parseSelectedProducts(data.selectedProducts));
+  if (Array.isArray(data.selectedProducts) && !hasPendingSelectedProducts(opts.projectId)) {
+    setSelectedProducts(parseSelectedProducts(data.selectedProducts), { source: "cloud" });
+  }
 }
 
 export interface ActiveProjectRef {
@@ -88,12 +103,14 @@ export async function saveActiveProject(
   name: string,
   id?: string,
 ): Promise<ProjectResult<ProjectRecord>> {
+  const startedAt = Date.now();
   const result = await saveProject(userId, {
     id: id ?? getActiveProject().id,
     name,
     data: getProjectSnapshot(),
   });
   if (result.ok && typeof window !== "undefined") {
+    clearPendingSelectedProducts(startedAt);
     try {
       localStorage.setItem(
         ACTIVE_PROJECT_KEY,

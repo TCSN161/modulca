@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/features/auth/store";
 import { useDesignStore } from "../../store";
 import { applyProjectSnapshot, saveActiveProject } from "../../projectSnapshot";
+import { hasPendingSelectedProducts, subscribeSelectedProducts } from "../../productSelection";
 import { loadProject, saveProject, listProjects } from "@/features/auth/projectService";
 import { useProjectId } from "@/shared/hooks/useProjectId";
 
@@ -49,7 +50,9 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
         const d = result.value.data as Record<string, unknown>;
 
         // Hydrate design + land + products (single restore path)
-        applyProjectSnapshot(d);
+        applyProjectSnapshot(d, { projectId });
+        // BUG-ST06: local product edits newer than the cloud copy were kept; send them up.
+        if (hasPendingSelectedProducts(projectId)) setProductsVersion((v) => v + 1);
 
         setHydrated(true);
       })
@@ -113,6 +116,15 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
   const styleDirection = useDesignStore((s) => s.styleDirection);
   // BUG-ST27: a new or removed render must reach the project row too
   const savedRenders = useDesignStore((s) => s.savedRenders);
+  // BUG-ST06: products live outside the design store; a user change bumps this
+  const [productsVersion, setProductsVersion] = useState(0);
+  useEffect(
+    () =>
+      subscribeSelectedProducts((source) => {
+        if (source === "user") setProductsVersion((v) => v + 1);
+      }),
+    [],
+  );
 
   useEffect(() => {
     // Skip if not authenticated or demo project
@@ -144,7 +156,7 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
     return () => {
       if (saveTimerRef.current) clearTimeout(saveTimerRef.current);
     };
-  }, [isAuthenticated, userId, projectId, hydrated, modules, finishLevel, styleDirection, savedRenders]);
+  }, [isAuthenticated, userId, projectId, hydrated, modules, finishLevel, styleDirection, savedRenders, productsVersion]);
 
   return <>{children}</>;
 }

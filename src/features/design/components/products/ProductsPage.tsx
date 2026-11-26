@@ -16,6 +16,7 @@ import FeatureGate from "@/shared/components/FeatureGate";
 import {
   getSelectedProducts,
   setSelectedProducts as persistSelectedProducts,
+  subscribeSelectedProducts,
   type SelectedProduct,
 } from "../../productSelection";
 import {
@@ -266,14 +267,18 @@ export default function ProductsPage() {
     const loaded = getSelectedProducts();
     setSelectedProducts(loaded);
     setInitialized(true);
+    // BUG-ST06: the cloud load may finish after mount; show what it restored
+    return subscribeSelectedProducts((source) => {
+      if (source === "cloud") setSelectedProducts(getSelectedProducts());
+    });
   }, []);
 
-  // Save to localStorage on change
+  // Save on change: localStorage now, cloud via CloudSyncProvider auto-save (no-op if unchanged)
   useEffect(() => {
     if (initialized) {
-      persistSelectedProducts(selectedProducts);
+      persistSelectedProducts(selectedProducts, { projectId });
     }
-  }, [selectedProducts, initialized]);
+  }, [selectedProducts, initialized, projectId]);
 
   const stats = getStats();
 
