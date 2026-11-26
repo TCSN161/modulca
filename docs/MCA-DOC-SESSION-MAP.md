@@ -89,7 +89,7 @@ ModulCA
 
 1. **Numerotare**: `{chat}.{NN}.{Eticheta}_{subiect}_{YYYYMMDD}`. `NN` = următorul număr liber **din acel chat**. MAIN îl alege când pornește sesiunea. Sesiunile vechi, dinainte de reboot, contează ca `.01`.
    *(Pe 26 nov am folosit greșit `3.0x`, `4.0y` etc. când pornisem mai multe deodată; le-am redenumit: 3.02, 3.03, 4.02, 4.03.)*
-2. **Doar MAIN pornește sesiuni.** O sesiune nu pornește altă sesiune; dacă vrea o continuare, scrie promptul următoarei sesiuni la final, iar MAIN decide când o pornește. (Marketing a pornit singur 6.02 și 6.03; de acum nu se mai face.)
+2. **Doar MAIN pornește sesiuni.** O sesiune nu pornește altă sesiune; dacă vrea o continuare, scrie promptul următoarei sesiuni la final, iar MAIN decide când o pornește. (Marketing a pornit singur 6.02 și 6.03; de acum nu se mai face.) MAIN le pornește singur, după plan (harta §0 + roadmap), fără să mai întrebe. Îl întreabă pe Costin doar dacă sesiunea cheltuie bani, trimite ceva în afară (emailuri, postări), schimbă ceva juridic sau de preț, ori iese din planul aprobat. Seara și vinerea, Costin primește lista cu ce s-a pornit și ce a livrat.
 3. **O sesiune = o sarcină.** Se termină cu: commit + push, un rând în jurnalul săptămânii, promptul pentru sesiunea următoare.
 4. **Rapoartele vin automat la MAIN.** Costin nu trebuie să verifice fiecare chat: MAIN primește raportul, verifică commit-urile pe master și actualizează harta asta. Costin se uită doar la §0.
 5. **Maximum 2 sesiuni în paralel** (limita de utilizare și memoria PC-ului), niciodată două pe aceleași fișiere.
