@@ -9,6 +9,7 @@
 
 | Date | Decision | Driver | Supersedes |
 |---|---|---|---|
+| 2026-11-26 | No DeepSeek top-up for Phase 2: Claude does RO→EN translation (F2, F4, F6); revisit DeepSeek for bulk work later | Costin: small extra Claude cost, keeps €50 cap headroom | DeepSeek $5 top-up for Phase 2 translation |
 | 2026-11-25 | CATUC permit service = detachable module inside modulca.eu (/autorizare), spin-out only on data; Chat 6 registered as Marketing | Costin: future standalone service + content channel | "Chat 6 not needed before beta" |
 | 2026-11-23 | Vlad pre-beta review: max €150 cash (founding-partner deal, mostly deferred + in-kind), scope narrowed to F2, F3, notification PDFs; no retainer before revenue | €50/mo cap, pre-revenue | Template €300–500/mo retainer |
 | 2026-11-23 | Phase 3 owners: Neufert = /catuc-check + Profile Engine + Privacy/ToS text; Drawings = PermitTracker PDFs; Billing = beta badge + feedback widget | Phase 3 spec had no chat owners | — |
