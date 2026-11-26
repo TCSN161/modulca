@@ -30,6 +30,7 @@ import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, Polic
 import { canUseEngine, recordSuccess, recordFailure, type Tier } from "./engines/creditManager";
 import { logRender } from "./engines/renderLogger";
 import { makeCacheKey, getCachedRender, cacheResult } from "./engines/renderCache";
+import { getFallbackChain } from "./engines/chains";
 
 /**
  * Must be force-dynamic so Vercel runs this as a serverless function
@@ -167,174 +168,8 @@ const DEFAULT_POLICY: PolicyFlags = {
   safeMode: true,
 };
 
-/**
- * Fallback chains — tier-aware, ordered by quality/cost trade-off.
- * Credit manager auto-skips depleted engines.
- * Cost ceiling in tryEngines() auto-skips engines over per-image budget.
- */
-
-/**
- * Fallback chains — PROFIT-FIRST ordering (reviewed 2026-04-17).
- *
- * Business rules driving the order:
- *   1. Free tier: only use HERO engines (free-forever or renewing free quotas).
- *      Never touch paid engines on free-tier users — they are cost centers.
- *   2. Premium tier: €29/mo covers ~1500 image generations at $0.02 each.
- *      Use free HERO first to maximize margin, then low-cost paid ($0.0014–0.003),
- *      then premium quality ($0.02) only if user explicitly wants it.
- *   3. Architect tier: €79/mo covers €79 / $0.065 ≈ 1200 premium images.
- *      Here we CAN lead with premium quality because the revenue covers it.
- *   4. Prodia: benched (113s latency ruins UX). Kept in registry for audit.
- *
- * Real production latency (same prompt, 2026-04-17):
- *   openai: 2s | cloudflare: 3s | pollinations: 5s | huggingface: 9s
- *   leonardo: 17s | runway: 39s | blackforest: 43s | together: 49s
- *   deepinfra/gemini: 51s | fal/replicate/segmind/stability: 52-53s
- *   fireworks: 54s | novita: 60s | wavespeed: 62s | ai-horde: 110s | prodia: 113s
- */
-
-/**
- * guest_free / free tier — STRICTLY free engines only. Ever.
- * If all 6 fail we return 503 rather than spend money on a non-paying user.
- */
-const FALLBACK_FREE = [
-  // Order reviewed 2026-11-26 (Chat 3 live test, MCA-DOC-AI-ENGINES-BETA-READINESS v2)
-  "cloudflare",       // 2.7s — FLUX.1 schnell, ≈96 neurons/img of the 10K/day free
-  "cloudflare-klein", // 7s   — FLUX.2 klein 4B, same 10K pool; model diversity if schnell breaks
-  "pollinations",     // 2.5s — free; anonymous = 1 img/45s per IP, more with POLLINATIONS_API_KEY
-  "huggingface",      // <0.5s fail today — $0.10/mo credits (resets Dec 1)
-  "gemini",           // <0.5s fail — image free tier is limit 0 (BUG-E01)
-  "together",         // <0.5s fail — promo ended (BUG-E03)
-  "ai-horde",         // 6–75s — volunteer GPUs, last resort
-];
-
-/**
- * premium tier — free HERO first, then cheap paid, premium as last upgrade.
- * Revenue: €29/mo. Target per-image cost ≤ $0.005 for healthy margin.
- * Key rule: cost ceiling in tryEngines() auto-skips anything over budget.
- */
-const FALLBACK_PREMIUM = [
-  // HERO — free, use always
-  "cloudflare",     // 3s,   $0
-  "cloudflare-klein", // 7s, $0 (same CF 10K-neuron pool)
-  "gemini",         // 51s,  $0
-  "together",       // 49s,  $0
-  "huggingface",    // 9s,   $0
-  // Cheap paid — only when free depleted, still healthy margin
-  "fireworks",      // 54s,  $0.0014 (EU/GDPR)
-  "blackforest",    // 43s,  $0.003  (FLUX authors, EU)
-  "fal",            // 52s,  $0.003  (fast img2img)
-  "replicate",      // 53s,  $0.003  (big ecosystem)
-  // Premium quality — only if cheaper options failed
-  "openai",         // 2s,   $0.02   (flagship, fast)
-  "leonardo",       // 17s,  $0.03   (photoreal alchemy)
-  // Final fallbacks — always available
-  "pollinations",   // 5s,   $0
-  "ai-horde",       // 110s, $0
-];
-
-/**
- * architect tier — revenue (€79/mo) supports premium-first ordering.
- * These users pay for quality; we deliver quality. But we still
- * layer in free options as backup for depleted premium budgets.
- */
-const FALLBACK_ARCHITECT = [
-  // Premium quality lead — revenue covers cost
-  "openai",         // 2s,   $0.02
-  "blackforest",    // 43s,  $0.003 (FLUX Pro authors, EU)
-  "stability",      // 52s,  $0.065 (img2img specialist)
-  "leonardo",       // 17s,  $0.03
-  "runway",         // 39s,  $0.02  (cinematic)
-  // Mid-cost professional tier
-  "fal",            // 52s,  $0.003
-  "fireworks",      // 54s,  $0.0014 (GDPR)
-  "replicate",      // 53s,  $0.003
-  "deepinfra",      // 51s,  $0.015
-  "wavespeed",      // 62s,  $0.003 (Seedream edit)
-  "segmind",        // 52s,  $0.005 (upscale specialist)
-  // Free backup — no cost, keeps the tier functional if everything else fails
-  "gemini",         // 51s,  $0
-  "cloudflare",     // 3s,   $0
-  "cloudflare-klein", // 7s, $0
-  "together",       // 49s,  $0
-  "huggingface",    // 9s,   $0
-  "pollinations",   // 5s,   $0
-  "ai-horde",       // 110s, $0
-];
-
-/**
- * Default when tier unknown (guest, misconfig, admin tools) — behave like free
- * but allow cheap paid backup if credits exist.
- */
-const FALLBACK_ORDER = [
-  "cloudflare",     // 3s,  $0 — fastest & free
-  "cloudflare-klein", // 7s, $0
-  "pollinations",   // 5s,  $0
-  "gemini",         // 51s, $0
-  "huggingface",    // 9s,  $0
-  "together",       // 49s, $0
-  "fireworks",      // 54s, $0.0014 (tiny cost, EU/GDPR)
-  "blackforest",    // 43s, $0.003
-  "fal",            // 52s, $0.003
-  "ai-horde",       // 110s, $0
-];
-
-/**
- * img2img — engines that respect baseImage come FIRST regardless of cost,
- * because without structure preservation the 3D scene is wasted.
- * Only stability + wavespeed + fal + replicate are true img2img.
- * The rest fall back to text2img (ignoring the 3D base).
- */
-const IMG2IMG_FALLBACK = [
-  // Free, structure-preserving, 4s (2026-11-26) — profit-first: try before paid
-  "cloudflare-klein",
-  // True img2img specialists
-  "stability",      // 52s,  $0.065 (best structure preservation)
-  "fal",            // 52s,  $0.003 (Flux Kontext img2img)
-  "replicate",      // 53s,  $0.003 (ControlNet + SDXL)
-  "wavespeed",      // 62s,  $0.003 (Seedream edit, China — gated)
-  // Text2img fallback (loses 3D structure but keeps prompt)
-  "blackforest",    // 43s,  $0.003
-  "openai",         // 2s,   $0.02
-  "fireworks",      // 54s,  $0.0014 (GDPR)
-  "runway",         // 39s,  $0.02
-  "leonardo",       // 17s,  $0.03
-  "gemini",         // 51s,  $0
-  "together",       // 49s,  $0
-  "cloudflare",     // 3s,   $0
-  "huggingface",    // 9s,   $0
-  "pollinations",   // 5s,   $0
-  "ai-horde",       // 6–75s, $0 (img2img since 2026-11-26)
-];
-
-/**
- * img2img for guest_free / free (beta) — €0 only. Geometry-preserving engines
- * first; text2img engines after them only so the user still gets an image.
- */
-const IMG2IMG_FREE = [
-  "cloudflare-klein", // 4s,  $0 — FLUX.2 klein 4B reference-image edit (keeps the 3D view)
-  "ai-horde",         // 11s+, $0 — SD img2img, weak quality but keeps geometry
-  "cloudflare",       // 3s,  $0 — text2img fallback (loses the 3D structure)
-  "pollinations",     // 3s,  $0 — text2img fallback
-];
-
-/** Get the best fallback chain for a tier + mode combination */
-function getFallbackChain(tier: string, hasBaseImage: boolean): string[] {
-  if (hasBaseImage) {
-    return tier === "free" || tier === "guest_free" ? IMG2IMG_FREE : IMG2IMG_FALLBACK;
-  }
-  switch (tier) {
-    case "guest_free":
-    case "free":
-      return FALLBACK_FREE;
-    case "premium":
-      return FALLBACK_PREMIUM;
-    case "architect":
-      return FALLBACK_ARCHITECT;
-    default:
-      return FALLBACK_ORDER;
-  }
-}
+// Fallback chains per tier + mode live in ./engines/chains.ts (BUG-ST01):
+// every tier keeps the free engines as a floor.
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
@@ -490,9 +325,11 @@ async function tryEngines(
     devLog(`[ai-render] Engine "${engineId}" failed, trying next...`);
   }
 
+  // Client contract (MCA-DOC-AI-ENGINES-CLIENT-CONTRACT): show `error` as-is,
+  // do NOT fall back to a client-side engine (BUG-ST02).
   return NextResponse.json(
-    { error: "All AI engines are currently busy. Please try again in a minute." },
-    { status: 503 }
+    { error: "All AI engines are currently busy. Please try again in a minute.", code: "ENGINES_UNAVAILABLE" },
+    { status: 503, headers: { "Retry-After": "60" } }
   );
 }
 

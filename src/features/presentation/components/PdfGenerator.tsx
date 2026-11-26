@@ -13,6 +13,7 @@ import {
 import type { ModuleConfig, SavedRender } from "@/features/design/store";
 import type { StyleDirection } from "@/features/design/styles";
 import { resolveSelectedProducts } from "../hooks/selectedProducts";
+import { presentationFileName } from "../hooks/projectName";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -643,7 +644,7 @@ export default function PdfDownloadButton({
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${projectName.replace(/\s+/g, "_")}_Presentation.pdf`;
+      a.download = presentationFileName(projectName); // BUG-ST07
       document.body.appendChild(a);
       a.click();
       document.body.removeChild(a);

@@ -27,6 +27,7 @@ import MaterialsSlide from "./slides/MaterialsSlide";
 import ProductsSlide from "./slides/ProductsSlide";
 import CostSlide from "./slides/CostSlide";
 import { resolveSelectedProducts, type ResolvedProduct } from "../hooks/selectedProducts";
+import { useProjectName, presentationFileName } from "../hooks/projectName";
 
 type PresentationTemplate = "minimal" | "bold" | "classic" | "luxury" | "architect";
 type SlideId =
@@ -132,7 +133,7 @@ export default function PresentationPage() {
   const userTier = useAuthStore((s) => s.userTier);
   const [template, setTemplate] = useState<PresentationTemplate>("minimal");
   const [slides, setSlides] = useState<SlideConfig[]>(DEFAULT_SLIDES);
-  const [projectName, setProjectName] = useState("My Modular Home");
+  const [projectName, setProjectName] = useProjectName(projectId); // BUG-ST07
   const [clientName, setClientName] = useState("");
   const [activeSlide, setActiveSlide] = useState<SlideId>("cover");
   const [coverRenderIndex, setCoverRenderIndex] = useState(0);
@@ -186,7 +187,7 @@ export default function PresentationPage() {
         format: "pdf",
         scale: 2,
         orientation: "landscape",
-        filename: projectName || "ModulCA-Presentation",
+        filename: presentationFileName(projectName).replace(/\.pdf$/, ""),
       });
     } finally {
       setExporting(false);

@@ -39,10 +39,25 @@ function hordeSourceImage(b64?: string): string | undefined {
   return b64.replace(/^data:[^;]+;base64,/, "");
 }
 
-/** AI Horde requires multiples of 64, max 768 */
-function clampHorde(d: number): number {
-  const clamped = Math.min(Math.max(d, 256), 768);
-  return Math.round(clamped / 64) * 64;
+/**
+ * Anonymous Horde limit (live 2026-11-26, BUG-ST01): requests over 576×576
+ * pixels get an instant 403 "KudosUpfront". The old clamp sent 1024×576 as
+ * 768×576, so Horde, the last free fallback, failed in under 1 s for EVERY
+ * default-size render. Fit inside 576² pixels, keep the aspect, multiples of 64.
+ */
+export const HORDE_MAX_PIXELS = 576 * 576;
+
+export function hordeSize(width: number, height: number): { width: number; height: number } {
+  const w0 = Number.isFinite(width) && width > 0 ? width : 1024;
+  const h0 = Number.isFinite(height) && height > 0 ? height : 576;
+  const scale = Math.min(1, Math.sqrt(HORDE_MAX_PIXELS / (w0 * h0)));
+  const snap = (d: number) => Math.max(256, Math.floor((d * scale) / 64) * 64);
+  let w = snap(w0), h = snap(h0);
+  // Extreme aspect ratios: the 256 floor can push us over — trim the long side.
+  while (w * h > HORDE_MAX_PIXELS && (w > 256 || h > 256)) {
+    if (w >= h) w -= 64; else h -= 64;
+  }
+  return { width: w, height: h };
 }
 
 export const aiHordeEngine: AiRenderEngine = async (
@@ -62,8 +77,7 @@ export const aiHordeEngine: AiRenderEngine = async (
       body: JSON.stringify({
         prompt: `${sanitizeForContentFilter(req.prompt)} ### professional photograph, 8k, photorealistic, architectural interior design, empty room`,
         params: {
-          width: clampHorde(req.width),
-          height: clampHorde(req.height),
+          ...hordeSize(req.width, req.height),
           steps: 25,
           cfg_scale: 7,
           sampler_name: "k_euler_a",
@@ -77,7 +91,7 @@ export const aiHordeEngine: AiRenderEngine = async (
     });
 
     if (!submitRes.ok) {
-      console.error("[ai-horde] Submit failed:", submitRes.status);
+      console.error("[ai-horde] Submit failed:", submitRes.status, (await submitRes.text().catch(() => "")).slice(0, 160));
       return null;
     }
 

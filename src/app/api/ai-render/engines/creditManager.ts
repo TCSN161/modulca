@@ -57,6 +57,8 @@ export interface EngineBudget {
   avgLatencyMs: number;
   /** Health score 0-100 (based on recent success rate) */
   healthScore: number;
+  /** Epoch ms of the last failure (0 = never). Drives the health cooldown. */
+  lastFailureMs: number;
 }
 
 export interface TierSpendState {
@@ -223,6 +225,7 @@ function getOrCreateBudget(engineId: string): EngineBudget {
       lastError: null,
       avgLatencyMs: 0,
       healthScore: 100,
+      lastFailureMs: 0,
     };
     budgets.set(engineId, budget);
   }
@@ -251,9 +254,19 @@ function engineHasCredit(engineId: string): boolean {
     if (budget.spentUsd + cost > budget.totalBudgetUsd) return false;
   }
 
-  if (budget.healthScore < 10) return false;
+  if (budget.healthScore < 10) {
+    // BUG-ST01 (Chat 3, 2026-11-26): health only recovered on success, and an
+    // unhealthy engine was never tried again, so 5 failures (e.g. the CF daily
+    // quota) blocked it on a warm instance FOREVER, even after the quota reset.
+    // After the cooldown, allow one probe at low health.
+    if (Date.now() - budget.lastFailureMs < HEALTH_COOLDOWN_MS) return false;
+    budget.healthScore = 10;
+  }
   return true;
 }
+
+/** Time an unhealthy engine (score < 10) is skipped before one probe is allowed. */
+export const HEALTH_COOLDOWN_MS = 5 * 60_000;
 
 /* ------------------------------------------------------------------ */
 /*  Per-tier state helpers                                             */
@@ -430,6 +443,7 @@ export function recordFailure(
   const budget = getOrCreateBudget(engineId);
   budget.failCount += 1;
   budget.lastError = error;
+  budget.lastFailureMs = Date.now();
   budget.healthScore = Math.max(0, budget.healthScore - 20);
 
   // Failed calls still count against the tier's daily call cap to prevent
