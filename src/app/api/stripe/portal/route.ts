@@ -3,6 +3,7 @@ import Stripe from "stripe";
 import * as Sentry from "@sentry/nextjs";
 import { getAuthenticatedUserId } from "@/shared/lib/api-auth";
 import { getSupabaseServer } from "@/shared/lib/supabase-server";
+import { isCompAccount } from "../billing";
 
 export const dynamic = "force-dynamic";
 
@@ -20,8 +21,11 @@ function getStripe() {
  * Ownership: verifies the `customerId` belongs to the authenticated user
  *            via profiles.stripe_customer_id, preventing cross-account access.
  *
- * Body (optional): { customerId?: string } — ignored unless it matches user's actual Stripe ID
+ * Body: ignored (the customer comes from the profile, never from the client).
  * Returns: { url: string } — the Portal URL
+ *   or 200 { code: "comp" } — comp account (free full access, no Stripe subscription)
+ *   or 200 { code: "no_subscription" } — no Stripe customer yet (BUG-ST14)
+ * The client must send `Authorization: Bearer` (session is in localStorage).
  */
 export async function POST(req: NextRequest) {
   // Authenticate
@@ -45,7 +49,7 @@ export async function POST(req: NextRequest) {
 
     const { data: profile, error: profileErr } = await sb
       .from("profiles")
-      .select("stripe_customer_id")
+      .select("tier, stripe_customer_id, stripe_subscription_id")
       .eq("id", userId)
       .maybeSingle();
 
@@ -54,12 +58,21 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Profile lookup failed" }, { status: 500 });
     }
 
-    const customerId = (profile as { stripe_customer_id?: string } | null)?.stripe_customer_id;
+    const row = profile as {
+      tier: string | null;
+      stripe_customer_id: string | null;
+      stripe_subscription_id: string | null;
+    } | null;
+
+    // Comp accounts have nothing to manage in Stripe, even if an old TEST
+    // customer is still attached. Answer with a code the UI turns into text.
+    if (row && isCompAccount(row)) {
+      return NextResponse.json({ code: "comp" });
+    }
+
+    const customerId = row?.stripe_customer_id;
     if (!customerId) {
-      return NextResponse.json(
-        { error: "No Stripe customer record — upgrade to a paid plan first" },
-        { status: 404 }
-      );
+      return NextResponse.json({ code: "no_subscription" });
     }
 
     const origin = req.headers.get("origin") || "https://www.modulca.eu";

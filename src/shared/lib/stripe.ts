@@ -93,28 +93,86 @@ export async function redirectToCheckout(priceId: string): Promise<CheckoutResul
 
 /**
  * Open Stripe Customer Portal for subscription management.
+ * Sends the Bearer token (BUG-ST14). The server picks the customer from the
+ * profile; nothing is sent in the body.
+ * Returns "comp" / "no_subscription" when there is nothing to manage in
+ * Stripe, so the caller can show a message instead of an error.
  */
-export async function openCustomerPortal(customerId?: string | null): Promise<void> {
+export type PortalResult = "redirected" | "comp" | "no_subscription" | "auth_required" | "error";
+
+/**
+ * Fallback texts for callers that don't render the result themselves (the
+ * dashboard "Manage" button). Pages with next-intl use pricing.portal.* instead.
+ */
+const PORTAL_FALLBACK: Record<"ro" | "en" | "nl", Record<Exclude<PortalResult, "redirected">, string>> = {
+  ro: {
+    comp: "Cont gratuit (comp), fără abonament Stripe. Nu ai nimic de gestionat sau de plătit.",
+    no_subscription: "Nu ai încă un abonament plătit. Alege un plan pe pagina de prețuri.",
+    auth_required: "Te rugăm să te autentifici din nou pentru a-ți gestiona abonamentul.",
+    error: "Nu am putut deschide gestionarea abonamentului. Încearcă din nou.",
+  },
+  en: {
+    comp: "Free account (comp), no Stripe subscription. Nothing to manage or pay.",
+    no_subscription: "You have no paid subscription yet. Choose a plan on the pricing page.",
+    auth_required: "Please sign in again to manage your subscription.",
+    error: "Could not open subscription management. Please try again.",
+  },
+  nl: {
+    comp: "Gratis account (comp), geen Stripe-abonnement. Er is niets te beheren of te betalen.",
+    no_subscription: "Je hebt nog geen betaald abonnement. Kies een plan op de prijspagina.",
+    auth_required: "Log opnieuw in om je abonnement te beheren.",
+    error: "Kon abonnementsbeheer niet openen. Probeer het opnieuw.",
+  },
+};
+
+export function portalFallbackMessage(result: Exclude<PortalResult, "redirected">): string {
+  const lang = (typeof document !== "undefined" ? document.documentElement.lang : "en").slice(0, 2);
+  const table = PORTAL_FALLBACK[(lang in PORTAL_FALLBACK ? lang : "en") as keyof typeof PORTAL_FALLBACK];
+  return table[result];
+}
+
+/**
+ * @param _legacyCustomerId ignored (old signature; the server reads the profile)
+ * @param opts.notify default true: show an alert for non-redirect results.
+ *   Pass false when the caller renders the result itself.
+ */
+export async function openCustomerPortal(
+  _legacyCustomerId?: string | null,
+  opts: { notify?: boolean } = {},
+): Promise<PortalResult> {
+  const result = await requestPortal();
+  if (result !== "redirected" && opts.notify !== false) {
+    alert(portalFallbackMessage(result));
+  }
+  return result;
+}
+
+async function requestPortal(): Promise<PortalResult> {
   try {
     const res = await fetch("/api/stripe/portal", {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ customerId }),
+      headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+      body: "{}",
     });
+
+    if (res.status === 401) return "auth_required";
 
     const data = await res.json();
 
+    if (data.code === "comp" || data.code === "no_subscription") return data.code;
+
     if (data.error) {
       console.error("[Stripe] Portal error:", data.error);
-      alert("Could not open subscription management. Please try again.");
-      return;
+      return "error";
     }
 
     if (data.url) {
       window.location.href = data.url;
+      return "redirected";
     }
+    return "error";
   } catch (err) {
     console.error("[Stripe] Portal error:", err);
-    alert("Could not connect to subscription service. Please try again.");
+    return "error";
   }
 }

@@ -307,6 +307,15 @@
       "usePortal": "You already have a subscription. Plan changes are made in the billing portal — opening it now.",
       "notAnUpgrade": "Your current plan already includes this tier. Nothing to buy."
     },
+    "portal": {
+      "title": "Subscription",
+      "manage": "Manage",
+      "loading": "Loading...",
+      "comp": "Free account (comp), no Stripe subscription. Nothing to manage or pay.",
+      "noSubscription": "You have no paid subscription yet. Choose a plan on the pricing page.",
+      "authRequired": "Please sign in again to manage your subscription.",
+      "error": "Could not open subscription management. Please try again."
+    },
     "features": {
       "free": {
         "0": "Up to 6 modules per project",

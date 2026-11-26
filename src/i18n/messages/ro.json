@@ -307,6 +307,15 @@
       "usePortal": "Ai deja un abonament. Schimbarea planului se face în portalul de facturare — îl deschidem acum.",
       "notAnUpgrade": "Planul tău actual include deja acest nivel. Nu e nimic de cumpărat."
     },
+    "portal": {
+      "title": "Abonament",
+      "manage": "Gestionează",
+      "loading": "Se încarcă...",
+      "comp": "Cont gratuit (comp), fără abonament Stripe. Nu ai nimic de gestionat sau de plătit.",
+      "noSubscription": "Nu ai încă un abonament plătit. Alege un plan pe pagina de prețuri.",
+      "authRequired": "Te rugăm să te autentifici din nou pentru a-ți gestiona abonamentul.",
+      "error": "Nu am putut deschide gestionarea abonamentului. Încearcă din nou."
+    },
     "features": {
       "free": {
         "0": "Până la 6 module per proiect",

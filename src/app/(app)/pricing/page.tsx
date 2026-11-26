@@ -36,6 +36,14 @@ export default function PricingPage() {
   const [notice, setNotice] = useState<string | null>(null);
   const t = useTranslations("pricing");
 
+  /** BUG-ST14: portal with a clear message for comp / no-subscription accounts. */
+  const handlePortal = async () => {
+    const result = await openCustomerPortal(null, { notify: false });
+    if (result === "redirected") return;
+    const key = { comp: "comp", no_subscription: "noSubscription", auth_required: "authRequired", error: "error" }[result];
+    setNotice(t(`portal.${key}` as "portal.comp"));
+  };
+
   const handleUpgrade = async (tierId: AccountTier) => {
     if (tierId === "free" || tierId === "guest_free") return;
     if (rank(tierId) <= rank(effectiveTier)) return; // never checkout same/lower (BUG-ST16)
@@ -63,7 +71,7 @@ export default function PricingPage() {
     if (result === "use_portal") {
       // Already a paying subscriber: plan changes go through the Stripe portal.
       setNotice(t("notice.usePortal"));
-      await openCustomerPortal();
+      await handlePortal();
     } else if (result === "not_an_upgrade") {
       setNotice(t("notice.notAnUpgrade"));
     }
@@ -223,7 +231,7 @@ export default function PricingPage() {
                     {tier.id !== "free" && (
                       stripeCustomerId ? (
                         <button
-                          onClick={() => openCustomerPortal()}
+                          onClick={handlePortal}
                           className="block w-full rounded-lg border border-gray-200 px-3 py-2 text-center text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
                         >
                           {t("cta.manageSubscription")}

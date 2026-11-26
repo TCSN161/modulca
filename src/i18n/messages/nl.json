@@ -307,6 +307,15 @@
       "usePortal": "Je hebt al een abonnement. Plannen wijzig je in het facturatieportaal — we openen het nu.",
       "notAnUpgrade": "Je huidige abonnement bevat dit niveau al. Er is niets te kopen."
     },
+    "portal": {
+      "title": "Abonnement",
+      "manage": "Beheren",
+      "loading": "Laden...",
+      "comp": "Gratis account (comp), geen Stripe-abonnement. Er is niets te beheren of te betalen.",
+      "noSubscription": "Je hebt nog geen betaald abonnement. Kies een plan op de prijspagina.",
+      "authRequired": "Log opnieuw in om je abonnement te beheren.",
+      "error": "Kon abonnementsbeheer niet openen. Probeer het opnieuw."
+    },
     "features": {
       "free": {
         "0": "Tot 6 modules per project",
