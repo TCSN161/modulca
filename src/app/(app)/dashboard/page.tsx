@@ -1,10 +1,11 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store";
-import { listProjects, deleteProject, type ProjectRecord } from "@/features/auth/projectService";
+import { listProjectsSettled, deleteProject, type ProjectRecord } from "@/features/auth/projectService";
+import { useAuthReady } from "@/features/design/hooks/useAuthReady";
 import { getTierConfig } from "@/features/auth/types";
 import { openCustomerPortal } from "@/shared/lib/stripe";
 import { BUILDING_PRESETS } from "@/shared/types";
@@ -31,6 +32,9 @@ export default function DashboardPage() {
   } = useAuthStore();
   const [projects, setProjects] = useState<ProjectRecord[]>([]);
   const [loaded, setLoaded] = useState(false);
+  // BUG-ST11: don't decide "0 projects" before the auth session is known
+  const authReady = useAuthReady();
+  const loadSeqRef = useRef(0);
   const [upgradeMsg, setUpgradeMsg] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
 
@@ -58,21 +62,25 @@ export default function DashboardPage() {
   }, [searchParams, loadSession]);
 
   const loadProjects = useCallback(async () => {
+    if (!authReady) return; // keep the "--" / loading state
+    const seq = ++loadSeqRef.current;
     if (!userId) {
       setProjects([]);
       setLoaded(true);
       return;
     }
+    setLoaded(false);
     try {
-      const list = await listProjects(userId);
+      const list = await listProjectsSettled(userId);
+      if (seq !== loadSeqRef.current) return; // a newer load is running
       setProjects(list);
     } catch (err) {
       console.error("[Dashboard] Failed to load projects:", err);
-      setProjects([]);
+      if (seq === loadSeqRef.current) setProjects([]);
     } finally {
-      setLoaded(true);
+      if (seq === loadSeqRef.current) setLoaded(true);
     }
-  }, [userId]);
+  }, [userId, authReady]);
 
   useEffect(() => {
     loadProjects();

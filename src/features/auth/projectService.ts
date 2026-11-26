@@ -145,6 +145,22 @@ export async function listProjects(userId: string): Promise<ProjectRecord[]> {
   return loadLocalProjects().filter((p) => !p.deleted_at); // final fallback
 }
 
+/**
+ * BUG-ST11: the first list right after a full page load can come back empty
+ * while the client session is still settling (RLS answers [] instead of an
+ * error). Retry once after `retryDelayMs` before reporting "no projects".
+ */
+export async function listProjectsSettled(
+  userId: string,
+  opts: { retryDelayMs?: number; list?: typeof listProjects } = {},
+): Promise<ProjectRecord[]> {
+  const list = opts.list ?? listProjects;
+  const first = await list(userId);
+  if (first.length > 0) return first;
+  await new Promise((r) => setTimeout(r, opts.retryDelayMs ?? 1200));
+  return list(userId);
+}
+
 /** List soft-deleted projects (trash) — requires migration 008 */
 export async function listDeletedProjects(userId: string): Promise<ProjectRecord[]> {
   const sb = getSupabase();

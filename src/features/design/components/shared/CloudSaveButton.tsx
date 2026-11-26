@@ -5,6 +5,7 @@ import { useAuthStore } from "@/features/auth/store";
 import { saveActiveProject } from "../../projectSnapshot";
 import { useDesignStore } from "../../store";
 import { Cloud, CloudOff, Check, Loader2 } from "lucide-react";
+import { useAuthReady } from "../../hooks/useAuthReady";
 
 /**
  * Cloud Save Button — shows in the design flow header.
@@ -17,6 +18,7 @@ type SaveStatus = "idle" | "saving" | "saved" | "error" | "offline";
 export default function CloudSaveButton() {
   const { isAuthenticated, userId } = useAuthStore();
   const designStore = useDesignStore();
+  const authReady = useAuthReady();
 
   const [status, setStatus] = useState<SaveStatus>("idle");
   const [projectId, setProjectId] = useState<string | null>(null);
@@ -70,6 +72,9 @@ export default function CloudSaveButton() {
     }, 60000);
     return () => clearInterval(interval);
   }, [isAuthenticated, userId, doSave, designStore.modules.length]);
+
+  // BUG-ST11: while the session is still loading, show nothing (not "Sign in to save")
+  if (!isAuthenticated && !authReady) return null;
 
   // Not authenticated — show nothing or a subtle "sign in to save" hint
   if (!isAuthenticated) {
