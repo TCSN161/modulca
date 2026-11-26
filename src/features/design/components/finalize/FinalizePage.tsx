@@ -5,6 +5,8 @@ import Link from "next/link";
 import { useDesignStore } from "../../store";
 import { useAuthStore } from "@/features/auth/store";
 import { saveProject, listProjects } from "@/features/auth/projectService";
+import { useLandStore } from "@/features/land/store";
+import { landToProjectData } from "@/features/land/persistence";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
@@ -76,15 +78,8 @@ export default function FinalizePage() {
       moduleFixtures: useDesignStore.getState().moduleFixtures,
     };
 
-    // Get grid data from land store
-    try {
-      const landRaw = localStorage.getItem("modulca-land");
-      if (landRaw) {
-        const landData = JSON.parse(landRaw);
-        designData.gridCells = landData.gridCells;
-        designData.gridRotation = landData.gridRotation;
-      }
-    } catch { /* ignore */ }
+    // Land state (polygon, gridCells, mapCenter…) — BUG-X02
+    Object.assign(designData, landToProjectData(useLandStore.getState().getSnapshot()));
 
     // Check if we're updating an existing project
     let existingId: string | undefined;

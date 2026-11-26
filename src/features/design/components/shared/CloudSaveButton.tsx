@@ -5,6 +5,7 @@ import { useAuthStore } from "@/features/auth/store";
 import { saveProject } from "@/features/auth/projectService";
 import { useDesignStore } from "../../store";
 import { useLandStore } from "@/features/land/store";
+import { landToProjectData } from "@/features/land/persistence";
 import { Cloud, CloudOff, Check, Loader2 } from "lucide-react";
 
 /**
@@ -56,7 +57,7 @@ export default function CloudSaveButton() {
       moodboardPins,
       savedRenders,
       moduleFixtures,
-      gridCells: gridCells.filter((c) => c.moduleType !== null),
+      ...landToProjectData(useLandStore.getState().getSnapshot()),
     };
 
     try {

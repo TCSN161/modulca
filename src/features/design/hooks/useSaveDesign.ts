@@ -5,6 +5,8 @@ import { useDesignStore } from "../store";
 import { useAuthStore } from "@/features/auth/store";
 import { saveProject, loadProject } from "@/features/auth/projectService";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import { useLandStore } from "@/features/land/store";
+import { landToProjectData, landFromProjectData } from "@/features/land/persistence";
 
 /**
  * Hook that provides save-button state and handler.
@@ -46,6 +48,7 @@ export function useSaveDesign() {
           moodboardPins: state.moodboardPins,
           savedRenders: state.savedRenders,
           moduleFixtures: state.moduleFixtures,
+          ...landToProjectData(useLandStore.getState().getSnapshot()),
         };
 
         const result = await saveProject(userId, {
@@ -127,6 +130,7 @@ export function useCloudLoad() {
           if (Object.keys(patch).length > 0) {
             useDesignStore.setState(patch);
           }
+          useLandStore.getState().hydrate(landFromProjectData(d));
         } else {
           // No cloud data — fall back to localStorage
           loadFromLocalStorage();

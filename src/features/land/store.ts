@@ -1,19 +1,16 @@
 "use client";
 
 import { create } from "zustand";
+import type { LatLng, GridCell, MapLayer, LandPhase } from "./types";
+import {
+  isLandEmpty,
+  readLandFromStorage,
+  writeLandToStorage,
+  type LandSnapshot,
+} from "./persistence";
 
-export interface LatLng {
-  lat: number;
-  lng: number;
-}
-
-export interface GridCell {
-  row: number;
-  col: number;
-  moduleType: string | null;
-}
-
-export type MapLayer = "satellite" | "streets" | "hybrid";
+export type { LatLng, GridCell, MapLayer, LandPhase } from "./types";
+export type { LandSnapshot } from "./persistence";
 
 interface LandStore {
   // Map state
@@ -49,11 +46,17 @@ interface LandStore {
   clearAllModules: () => void;
 
   // Phase
-  phase: "map" | "draw" | "grid" | "modules";
-  setPhase: (phase: "map" | "draw" | "grid" | "modules") => void;
+  phase: LandPhase;
+  setPhase: (phase: LandPhase) => void;
+
+  // Persistence (BUG-X02)
+  /** The persisted subset — what goes into localStorage and projects.data.land */
+  getSnapshot: () => LandSnapshot;
+  /** Replace persisted fields from a (validated) snapshot, e.g. cloud load */
+  hydrate: (snapshot: Partial<LandSnapshot>) => void;
 }
 
-export const useLandStore = create<LandStore>((set) => ({
+export const useLandStore = create<LandStore>((set, get) => ({
   // Default center: Bucharest
   mapCenter: { lat: 44.4268, lng: 26.1025 },
   mapZoom: 17,
@@ -118,4 +121,50 @@ export const useLandStore = create<LandStore>((set) => ({
 
   phase: "map",
   setPhase: (phase) => set({ phase }),
+
+  getSnapshot: () => {
+    const s = get();
+    return {
+      polygon: s.polygon,
+      gridCells: s.gridCells,
+      gridOrigin: s.gridOrigin,
+      gridRotation: s.gridRotation,
+      mapCenter: s.mapCenter,
+      mapZoom: s.mapZoom,
+      mapLayer: s.mapLayer,
+      phase: s.phase,
+    };
+  },
+
+  hydrate: (snapshot) => set({ ...snapshot }),
 }));
+
+/* ------------------------------------------------------------------ */
+/*  Auto-persistence (mirrors the design store): save on change,      */
+/*  hydrate once on startup if the in-memory store is still empty.    */
+/* ------------------------------------------------------------------ */
+
+if (typeof window !== "undefined") {
+  useLandStore.subscribe((state, prev) => {
+    if (
+      state.polygon !== prev.polygon ||
+      state.gridCells !== prev.gridCells ||
+      state.gridOrigin !== prev.gridOrigin ||
+      state.gridRotation !== prev.gridRotation ||
+      state.mapCenter !== prev.mapCenter ||
+      state.mapZoom !== prev.mapZoom ||
+      state.mapLayer !== prev.mapLayer ||
+      state.phase !== prev.phase
+    ) {
+      writeLandToStorage(state.getSnapshot());
+    }
+  });
+
+  const stored = readLandFromStorage();
+  if (Object.keys(stored).length > 0) {
+    queueMicrotask(() => {
+      const s = useLandStore.getState();
+      if (isLandEmpty(s)) s.hydrate(stored);
+    });
+  }
+}

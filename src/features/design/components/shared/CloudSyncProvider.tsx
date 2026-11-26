@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/features/auth/store";
 import { useDesignStore } from "../../store";
 import { useLandStore } from "@/features/land/store";
+import { landToProjectData, landFromProjectData } from "@/features/land/persistence";
 import { loadProject, saveProject, listProjects } from "@/features/auth/projectService";
 import { useProjectId } from "@/shared/hooks/useProjectId";
 
@@ -63,13 +64,8 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
           useDesignStore.setState(designPatch);
         }
 
-        // Hydrate land store (grid cells, rotation)
-        if (Array.isArray(d.gridCells) && d.gridCells.length > 0) {
-          useLandStore.getState().setGridCells(d.gridCells as { row: number; col: number; moduleType: string | null }[]);
-        }
-        if (typeof d.gridRotation === "number") {
-          useLandStore.getState().setGridRotation(d.gridRotation);
-        }
+        // Hydrate land store (polygon, grid cells, rotation, map) — BUG-X02
+        useLandStore.getState().hydrate(landFromProjectData(d));
 
         setHydrated(true);
       })
@@ -144,19 +140,16 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
     // Debounced save
     saveTimerRef.current = setTimeout(() => {
       const state = useDesignStore.getState();
-      const { gridCells, gridRotation } = useLandStore.getState();
-
       const data: Record<string, unknown> = {
         modules: state.modules,
         finishLevel: state.finishLevel,
-        gridRotation,
         styleDirection: state.styleDirection,
         styleDescription: state.styleDescription,
         stylePhoto: state.stylePhoto,
         moodboardPins: state.moodboardPins,
         savedRenders: state.savedRenders,
         moduleFixtures: state.moduleFixtures,
-        gridCells: gridCells.filter((c) => c.moduleType !== null),
+        ...landToProjectData(useLandStore.getState().getSnapshot()),
       };
 
       // Get project name from localStorage
