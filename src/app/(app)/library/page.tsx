@@ -10,6 +10,7 @@ import { getFreeBooks, getPaidBooks } from "@/knowledge/15-books/_registry";
 import { AuthNav } from "@/features/auth/components/AuthNav";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig, type AccountTier } from "@/features/auth/types";
+import { authHeaders } from "@/features/consultant/authHeaders";
 
 /* ------------------------------------------------------------------ */
 /*  Bookmarks (localStorage)                                           */
@@ -193,7 +194,9 @@ function ArticleDetail({
   useEffect(() => {
     setLoading(true);
     setContent(null);
-    fetch(`/api/knowledge?id=${encodeURIComponent(article.id)}&tier=${tier}`)
+    // Tier is resolved on the server from the session token (BUG-SEC-02)
+    authHeaders()
+      .then((headers) => fetch(`/api/knowledge?id=${encodeURIComponent(article.id)}`, { headers }))
       .then((res) => res.json())
       .then((data) => {
         if (data.content) {

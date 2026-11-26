@@ -9,6 +9,10 @@ import { getTierConfig as getAuthTierConfig, type AccountTier } from "@/features
 import { devLog } from "@/shared/lib/devLog";
 import { CONSULTANT_CLAUDE_MODEL } from "./models";
 import { callClaude, getAnthropicKey, isAnthropicDisabled, type ClaudeChatInput } from "./anthropic";
+import { expandQuery } from "./queryExpansion";
+import { consumeAiCallQuota, refundAiCall } from "./quotaGuard";
+import { getServerTier } from "@/shared/server/serverTier";
+import { quotaExceededResponse } from "@/shared/server/quota";
 export const dynamic = "force-dynamic";
 
 /**
@@ -167,7 +171,7 @@ const REGION_HINTS: Record<string, string[]> = {
 };
 
 function detectRegion(question: string): string | null {
-  const q = question.toLowerCase();
+  const q = expandQuery(question);
   let bestRegion: string | null = null;
   let bestScore = 0;
   for (const [region, hints] of Object.entries(REGION_HINTS)) {
@@ -184,7 +188,8 @@ function detectRegion(question: string): string | null {
 }
 
 function scoreArticle(article: KBDocumentMeta, question: string, detectedRegion: string | null): number {
-  const q = question.toLowerCase();
+  // Diacritics stripped + CATUC/permit aliases expanded to KB tag vocabulary
+  const q = expandQuery(question);
   const words = q.split(/\s+/).filter((w) => w.length > 2);
   let score = 0;
 
@@ -283,13 +288,12 @@ const CONSULTANT_DEPTH: Record<string, ConsultantTierConfig> = {
  * Resolve consultant config for a given user tier.
  * Uses the canonical FeatureAccess.aiConsultantTier to pick the right depth.
  */
-function getConsultantConfig(tier: string): ConsultantTierConfig {
-  // Look up the canonical tier config to find aiConsultantTier
-  const validTiers: AccountTier[] = ["guest_free", "free", "premium", "architect", "constructor"];
-  const accountTier = validTiers.includes(tier as AccountTier) ? (tier as AccountTier) : "free";
-  const authCfg = getAuthTierConfig(accountTier);
-  const consultantLevel = authCfg.features.aiConsultantTier; // "free" | "premium" | "architect"
-  return CONSULTANT_DEPTH[consultantLevel] ?? CONSULTANT_DEPTH.free;
+function getConsultantLevel(tier: AccountTier): string {
+  return getAuthTierConfig(tier).features.aiConsultantTier; // "free" | "premium" | "architect"
+}
+
+function getConsultantConfig(tier: AccountTier): ConsultantTierConfig {
+  return CONSULTANT_DEPTH[getConsultantLevel(tier)] ?? CONSULTANT_DEPTH.free;
 }
 
 interface RAGResult { context: string; articlesUsed: string[] }
@@ -529,14 +533,23 @@ async function getLocalAnswer(question: string): Promise<string> {
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages, tier, quizProfile } = await req.json();
+    // BUG-SEC-02: tier comes ONLY from the verified session; any `tier` in the body is ignored.
+    const ctx = await getServerTier(req);
+    const tier = ctx.effectiveTier; // beta users (free < 3 months) → premium
+    const consultantLevel = getConsultantLevel(tier);
+
+    const { messages, quizProfile } = await req.json();
 
     if (!messages || !Array.isArray(messages)) {
       return NextResponse.json({ error: "Messages array required" }, { status: 400 });
     }
 
+    // BUG-E08: one ai_call per user message. Fails safe (in-memory limits) if the RPC is down.
+    const quota = await consumeAiCallQuota(ctx);
+    if (!quota.allowed) return quotaExceededResponse(quota);
+
     // Tier-aware context depth
-    const tierCfg = getConsultantConfig(tier || "free");
+    const tierCfg = getConsultantConfig(tier);
 
     // Extract the latest user question for RAG context retrieval
     const lastUserMsg = messages.filter((m: { role: string }) => m.role === "user").pop();
@@ -545,17 +558,18 @@ export async function POST(req: NextRequest) {
     // Check cache for single-turn questions (no conversation history beyond system+user)
     const userMessages = messages.filter((m: { role: string }) => m.role === "user");
     const isSimpleQuery = userMessages.length === 1 && !quizProfile;
-    const cacheKey = isSimpleQuery ? getCacheKey(question, tier || "free") : null;
+    const cacheKey = isSimpleQuery ? getCacheKey(question, consultantLevel) : null;
 
     if (cacheKey) {
       const cached = getCachedResponse(cacheKey);
       if (cached) {
         devLog(`[consultant] Cache hit for "${question.slice(0, 50)}..."`);
+        await refundAiCall(ctx, quota); // no LLM call made
         return NextResponse.json({
           reply: cached.reply,
           provider: cached.provider,
           model: cached.model,
-          tier: tier || "free",
+          tier,
           articlesUsed: cached.articlesUsed,
           cached: true,
         });
@@ -581,7 +595,7 @@ export async function POST(req: NextRequest) {
     }
 
     // Stable part (cacheable for Claude) vs. per-request part (quiz profile + RAG articles)
-    const stableSystem = getSystemPrompt(tier || "free");
+    const stableSystem = getSystemPrompt(consultantLevel);
     const volatileSystem = quizContext + ragContext + tierNote;
     const systemPrompt = stableSystem + volatileSystem;
 
@@ -608,7 +622,7 @@ export async function POST(req: NextRequest) {
       }
 
       try {
-        devLog(`[consultant] Trying ${provider.id} (${tier || "free"} tier)...`);
+        devLog(`[consultant] Trying ${provider.id} (${tier} tier)...`);
         let reply: string | null;
         if (provider.call) {
           reply = await provider.call({
@@ -659,7 +673,7 @@ export async function POST(req: NextRequest) {
             reply: trimmedReply,
             provider: provider.id,
             model: provider.model,
-            tier: tier || "free",
+            tier,
             articlesUsed,
           });
         }
@@ -672,7 +686,8 @@ export async function POST(req: NextRequest) {
     // All cloud providers failed — use local knowledge base (133 articles)
     const localReply = await getLocalAnswer(question);
     devLog("[consultant] All cloud providers failed, using local KB");
-    return NextResponse.json({ reply: localReply, provider: "local-kb", model: "keyword-match", tier: tier || "free", articlesUsed });
+    await refundAiCall(ctx, quota); // no LLM answer produced
+    return NextResponse.json({ reply: localReply, provider: "local-kb", model: "keyword-match", tier, articlesUsed });
   } catch (error) {
     console.error("Consultant API error:", error);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

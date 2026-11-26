@@ -2,13 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { readFile } from "fs/promises";
 import { join } from "path";
 import { ARTICLES } from "@/knowledge/_index";
+import { getServerTier } from "@/shared/server/serverTier";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Full-text Knowledge Search API
  *
- * GET /api/knowledge/search?q=kitchen+dimensions&tier=free&limit=10
+ * GET /api/knowledge/search?q=kitchen+dimensions&limit=10  (tier from session)
  *
  * Search modes by tier:
  *   Free     → title + tags only
@@ -72,7 +73,8 @@ export async function GET(req: NextRequest) {
   try {
   const { searchParams } = new URL(req.url);
   const query = searchParams.get("q")?.trim();
-  const tier = searchParams.get("tier") || "free";
+  // BUG-SEC-02: tier from the verified session only; ?tier= is ignored.
+  const { effectiveTier: tier } = await getServerTier(req);
   const limit = Math.min(parseInt(searchParams.get("limit") || "10"), 50);
 
   if (!query || query.length < 2) {
@@ -83,7 +85,7 @@ export async function GET(req: NextRequest) {
   const queryWords = queryLower.split(/\s+/).filter((w) => w.length > 1);
 
   // Determine if we do full-text search (Premium+) or just metadata (Free)
-  const fullText = tier !== "free";
+  const fullText = tier !== "free" && tier !== "guest_free";
   const bodies = fullText ? await getBodyIndex() : null;
 
   const results: SearchResult[] = [];

@@ -3,6 +3,7 @@ import { readFile } from "fs/promises";
 import { join } from "path";
 import { ARTICLES } from "@/knowledge/_index";
 import { trackView } from "./_viewTracker";
+import { getServerTier } from "@/shared/server/serverTier";
 
 export const dynamic = "force-dynamic";
 
@@ -16,15 +17,18 @@ export const dynamic = "force-dynamic";
 const KB_ROOT = join(process.cwd(), "src", "knowledge");
 
 const TIER_LIMITS: Record<string, number> = {
+  guest_free: 800, // guests = free
   free: 800,       // ~first section only
   premium: 0,      // 0 = no limit
   architect: 0,
+  constructor: 0,
 };
 
 export async function GET(req: NextRequest) {
   const { searchParams } = new URL(req.url);
   const articleId = searchParams.get("id");
-  const tier = searchParams.get("tier") || "free";
+  // BUG-SEC-02: tier from the verified session only; ?tier= is ignored.
+  const { effectiveTier: tier } = await getServerTier(req);
 
   if (!articleId) {
     return NextResponse.json({ error: "Article ID required" }, { status: 400 });
@@ -36,7 +40,7 @@ export async function GET(req: NextRequest) {
   }
 
   // Pro-only articles require premium+
-  if (article.proOnly && tier === "free") {
+  if (article.proOnly && (tier === "free" || tier === "guest_free")) {
     return NextResponse.json({
       error: "Premium required",
       title: article.title,

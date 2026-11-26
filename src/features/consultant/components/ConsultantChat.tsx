@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import StepNav from "@/features/design/components/shared/StepNav";
 import { getLocalAnswer } from "../neufertKB";
+import { authHeaders } from "../authHeaders";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig, type AccountTier } from "@/features/auth/types";
 import { useQuizStore } from "@/features/quiz/store";
@@ -70,12 +71,12 @@ export default function ConsultantChat() {
           ? updated
           : updated.slice(-Math.max(2, historyLimit)); // always keep at least last exchange
 
+        // Tier is resolved on the server from the session token (BUG-SEC-02)
         const res = await fetch("/api/consultant", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: { "Content-Type": "application/json", ...(await authHeaders()) },
           body: JSON.stringify({
             messages: limitedMessages,
-            tier: userTier,
             ...(quizProfile ? { quizProfile: {
               primaryStyle: quizProfile.primaryStyle,
               totalModules: quizProfile.totalModules,
@@ -88,6 +89,16 @@ export default function ConsultantChat() {
             }} : {}),
           }),
         });
+
+        if (res.status === 429) {
+          // Daily AI limit reached — show the server's message, no local fallback
+          const data = await res.json().catch(() => ({}));
+          setMessages([...updated, {
+            role: "assistant",
+            content: data.error || "Daily AI assistant limit reached. Try again tomorrow.",
+          }]);
+          return;
+        }
 
         if (!res.ok) {
           const localReply = getLocalAnswer(text);
