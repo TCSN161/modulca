@@ -92,7 +92,7 @@ Legendă: 🟡 = de verificat la producție pe textul legii (gate §7) · ✅ = 
 |---|---|---|
 | **Review F2/F3** de către arhitectul partener (28 nov → 15 dec) | toate piesele; S6 depinde de F3 | Fără review, nimic nu se publică. Fiecare piesă pornește din F2/F3 aprobate. |
 | **4 video-uri lungi 🔒** = flagship (gate §7 pasul 3) | L1–L4 | Trimitem **toate cele 4 scripturi într-un singur bloc de review**, în jur de 18 dec, ca să încăpem într-un singur bloc din stratul B (vezi handoff-ul de engagement). Chat 7 confirmă costul. Dacă blocul nu e acceptat, L2 (cel mai riscant, pentru profesioniști) trece în februarie. |
-| **Checker live** (Phase 3, W50) | S8 (P4), CTA-urile | Verificăm pe 25 ian. Dacă nu e live, intră rezerva P1. URL-ul public e deschis (Shorts v0 §7, Q1). |
+| **Checker live** (Phase 3, W50) | S8 (P4), CTA-urile | Verificăm pe 25 ian. Dacă nu e live, intră rezerva P1. URL public: `modulca.eu/autorizare`, cu redirect spre `/catuc-check` (decis 2026-11-26). Redirect-ul îl face Chat 2 / MAIN. |
 | **Re-check termeni NotebookLM** (strategia §10 Q4) | tot ce e generat cu AI | Luni 4 ian, înainte de primul post |
 | **Handle-uri rezervate** (Costin) | toate canalele | Înainte de pilotul din decembrie |
 | **Lead magnet „Ghid CATUC" PDF** | P2 | În afara ritmului. Doar după review-ul flagship. Ținta: februarie, odată cu lansarea. |
