@@ -134,10 +134,12 @@ async function handleSubscriptionUpdate(sub: Stripe.Subscription) {
   const tier = mapPriceToTier(priceId);
   const status = sub.status; // active, past_due, canceled, etc.
 
+  if (!(await isCurrentSubscription(userId, sub.id))) return;
+
   console.log("[Stripe Webhook] Subscription updated:", { userId, tier, status });
 
   await supabase.from("profiles").update({
-    tier: status === "active" ? tier : "free",
+    tier: PAID_STATUSES.has(status) ? tier : "free",
     subscription_status: status,
   }).eq("id", userId);
 }
@@ -145,6 +147,8 @@ async function handleSubscriptionUpdate(sub: Stripe.Subscription) {
 async function handleSubscriptionCancel(sub: Stripe.Subscription) {
   const userId = sub.metadata?.userId;
   if (!userId || !supabase) return;
+
+  if (!(await isCurrentSubscription(userId, sub.id))) return;
 
   console.log("[Stripe Webhook] Subscription cancelled:", { userId });
 
@@ -177,6 +181,36 @@ async function handleSubscriptionCancel(sub: Stripe.Subscription) {
     console.error("[Stripe Webhook] Could not send cancel email:", e);
     Sentry.captureException(e, { tags: { source: "stripe-webhook", action: "cancel-email" } });
   }
+}
+
+/** Stripe statuses that keep the paid tier. `trialing` = paid plan in trial. */
+const PAID_STATUSES = new Set<string>(["active", "trialing"]);
+
+/**
+ * Comp-account guard (B1, 2026-11-26): only the subscription currently stored
+ * on the profile may change its tier. Events for an older/replaced subscription,
+ * or for a profile with no subscription at all (comp accounts granted with
+ * `scripts/stripe-comp-account.mjs`, see docs/MCA-DOC-PRICING-COMP-ACCOUNTS.md),
+ * are ignored, so they can never downgrade a manually granted tier.
+ */
+async function isCurrentSubscription(userId: string, subscriptionId: string): Promise<boolean> {
+  if (!supabase) return false;
+  const { data: profile, error } = await supabase
+    .from("profiles")
+    .select("stripe_subscription_id")
+    .eq("id", userId)
+    .maybeSingle();
+  if (error) throw error; // → 500, Stripe retries later
+  const current = (profile as { stripe_subscription_id?: string | null } | null)?.stripe_subscription_id ?? null;
+  if (current !== subscriptionId) {
+    console.warn("[Stripe Webhook] Ignoring event for non-current subscription:", {
+      userId,
+      subscriptionId,
+      current,
+    });
+    return false;
+  }
+  return true;
 }
 
 function mapPriceToTier(priceId: string | undefined): string {
