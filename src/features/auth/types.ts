@@ -58,6 +58,8 @@ export interface FeatureAccess {
 
   // Step 7 — AI Render
   aiRendersPerMonth: number;        // monthly AI render quota (-1 = unlimited)
+  aiRendersPerDay: number;          // per-user daily render cap, enforced server-side (-1 = unlimited)
+  aiConsultantMessagesPerDay: number; // per-user daily AI consultant/knowledge calls, server-side (-1 = unlimited)
   maxCostUsdPerImage: number;       // max cost per single render (USD) — controls which engines are allowed
   renderResolution: "sd" | "hd" | "4k";
   savedRenders: number;             // max saved renders (-1 = unlimited)
@@ -136,6 +138,8 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       partnerPricing: false,
       directPurchase: false,
       aiRendersPerMonth: 3,
+      aiRendersPerDay: 2,
+      aiConsultantMessagesPerDay: 5,
       maxCostUsdPerImage: 0.005,
       renderResolution: "sd",
       savedRenders: 3,
@@ -197,6 +201,8 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       partnerPricing: false,
       directPurchase: false,
       aiRendersPerMonth: 5,
+      aiRendersPerDay: 3,
+      aiConsultantMessagesPerDay: 20,
       maxCostUsdPerImage: 0.005,
       renderResolution: "sd",
       savedRenders: 10,
@@ -257,6 +263,8 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       partnerPricing: true,
       directPurchase: true,
       aiRendersPerMonth: 50,
+      aiRendersPerDay: 5, // beta users run as premium → 5/day (Chat 3 CF budget)
+      aiConsultantMessagesPerDay: 60,
       maxCostUsdPerImage: 0.05,
       renderResolution: "hd",
       savedRenders: 30,
@@ -317,6 +325,8 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       partnerPricing: true,
       directPurchase: true,
       aiRendersPerMonth: 200,
+      aiRendersPerDay: 20,
+      aiConsultantMessagesPerDay: 200,
       maxCostUsdPerImage: 0.10,
       renderResolution: "4k",
       savedRenders: 100,
@@ -377,6 +387,8 @@ export const ACCOUNT_TIERS: AccountTierConfig[] = [
       partnerPricing: true,
       directPurchase: true,
       aiRendersPerMonth: -1, // unlimited
+      aiRendersPerDay: 100, // anti-abuse ceiling
+      aiConsultantMessagesPerDay: 1000,
       maxCostUsdPerImage: 0.15,
       renderResolution: "4k",
       savedRenders: -1,
