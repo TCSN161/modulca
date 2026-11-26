@@ -1,7 +1,7 @@
 # MCA-STRAT-REVENUE-STREAMS-2026-11-26: toate sursele de venit, pe grupuri și perioade
 
 **Status**: Direcție propusă de MAIN din ideile lui Costin (26 nov). De validat cu date din beta înainte de orice investiție.
-**Owner**: MAIN (strategie) · execuție pe grupurile din §2
+**Owner**: Chat 10 Business (cercetare, plan) · MAIN (decizii) · execuție pe grupurile din §2
 **Legat de**: [[MCA-DOC-ROADMAP-ALL-CHATS-2026-11-26]] · [[MCA-STRAT-CATUC-SERVICE-CONTENT-2026-11-25]] §5 · [[MCA-DOC-SESSION-MAP]]
 
 Principiu: **un singur utilizator, mai multe momente în care plătește sau aduce un comision**. Funnel-ul: conținut / checker CATUC → cont gratuit → design → randări → plan plătit → teren, produse, constructor, finanțare → casa modulară.
@@ -19,7 +19,7 @@ Principiu: **un singur utilizator, mai multe momente în care plătește sau adu
 | R5 | **Mobilier și materiale: afiliere** | Magazinul / producătorul | 3–10% comision pe vânzare (programe de afiliere: eMAG, Dedeman, IKEA, 2Performant etc.) | pe fiecare listă de produse din proiect | marcaj „link afiliat” (lege + încredere) |
 | R6 | **Teren: marketplace** | Vânzătorul / agentul | listare plătită (€10–50) sau comision la vânzare (1–2%) | teren + proiect posibil = argument unic | contract de intermediere; verificat juridic |
 | R7 | **Constructori / executanți: director** | Firma | cont lunar (€29–99) + taxă pe lead sau % din lucrare | lead-uri calificate (au deja proiect + buget) | contracte, verificare firme, recenzii |
-| R8 | **Producători de module** | Producătorul | % din comandă sau taxă pe lead | cea mai mare valoare/tranzacție | grup 12 când apar parteneri concreți |
+| R8 | **Producători de module** | Producătorul | % din comandă sau taxă pe lead | cea mai mare valoare/tranzacție | grup 13 când apar parteneri concreți |
 | R9 | **Finanțare și asigurări** | Banca / brokerul | comision de recomandare (credit ipotecar, asigurare locuință) | | parteneriat cu broker autorizat |
 | R10 | **Energie** (fotovoltaice, pompe de căldură) | Instalatorul | lead fee / comision | se leagă de „casa pasivă” | |
 | R11 | **Conținut și educație** | Arhitecți / public | webinare, cursuri CATUC, sponsorizări pe canal | | după canal (ian) |
@@ -36,7 +36,7 @@ Principiu: **un singur utilizator, mai multe momente în care plătește sau adu
 | 6 Marketing | R11, funnel-ul de conținut, comunicarea fiecărei surse |
 | 7 Partners | R4, R5 (programe de afiliere), R6–R10 (contracte cu parteneri) |
 | 8 Express | Express ca intrare rapidă în funnel (R1, R2) |
-| **12 Marketplace & Parteneri** (candidat) | Pornește când avem primii parteneri concreți pentru R6–R10: un singur loc pentru teren, constructori, producători, finanțare |
+| **13 Marketplace & Parteneri** (candidat) | Pornește când avem primii parteneri concreți pentru R6–R10: un singur loc pentru teren, constructori, producători, finanțare |
 | 1 MAIN | Prioritizare, verificare juridică pe fiecare sursă înainte de lansare |
 
 ## 3. Rezerva de randări (R2): cum ne asigurăm că avem mereu bani pentru ce am promis

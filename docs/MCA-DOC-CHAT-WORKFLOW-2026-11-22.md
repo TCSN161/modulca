@@ -20,6 +20,7 @@
 | **7. Partners** | Collaborator + partner relationships: Vlad engagement docs, engineers/module producers coordination, DPA vendor outreach, startup program applications, press/journalist contacts, strategic partner conversations | Code, legal text content, pricing logic |
 | **8. Express** | Automated "Express" wizard: questions/prompt → ExpressBrief (Claude structured output) → fills the 14 steps via public module interfaces → N renders → presentation/PDF. Also owns golden-brief automated E2E tests | Editing other modules (asks the owner chat for missing interfaces), engine code, pricing enforcement, legal text |
 | **9. Radar** | AI/tools news intake: Costin pastes links (YouTube, posts, docs); Radar summarizes, classifies and updates the AI radar; sends MAIN a weekly "worth doing" list on Fridays; runs the monthly AI upgrade-day sweep | Code, decisions for other chats (it proposes, MAIN routes) |
+| **10. Business** | Business plan, unit economics, pricing strategy, revenue streams R1–R12 research + prioritization, market sizing (RO + EU), competitor analysis, investor/grant docs, financial model | Code, pricing enforcement (Chat 4), partner contracts (Chat 7) |
 
 **Rule**: If a message starts in the wrong chat, the receiving chat redirects with one line: *"This belongs in Chat [N] — ask there: [1-sentence prompt]"*. No multi-paragraph explanation, no duplicated work.
 
@@ -176,6 +177,7 @@ Each chat writes only within its ownership paths. Prevents accidental cross-chat
 | **7. Partners** | `docs/MCA-DOC-VLAD-*`, `docs/MCA-DOC-PARTNERS-*`, DPA templates, startup app docs, press kit docs, email outreach drafts | Code anywhere, pricing logic |
 | **8. Express** | `src/features/express/**`, `src/app/api/express/**`, `src/app/(app)/express/**`, `tests/e2e/express*`, `docs/MCA-SPEC-EXPRESS-*` | Other features' internals, engines, creditManager, legal text |
 | **9. Radar** | `docs/MCA-DOC-AI-RADAR.md`, `docs/radar/**` | Code anywhere, other chats' docs |
+| **10. Business** | `docs/MCA-STRAT-REVENUE-*`, `docs/MCA-STRAT-BUSINESS-*`, `docs/business/**` | Code anywhere |
 
 **Shared infrastructure** (everyone can touch, with explicit intention):
 - `.gitignore`, `README.md`, `supabase/migrations/**` (coordinate via handoff first — never two chats editing migrations)
@@ -251,3 +253,4 @@ Antifragility compounds: each retro's lessons update this workflow doc. Over tim
 | 2026-11-26 | Chat 5 renamed **Design + Drawings**: takes ownership of the unowned configurator core (wizard, design, land, marketplace, project save) found by the Express audit | Costin: accepted MAIN proposal |
 | 2026-11-26 | Session map [[MCA-DOC-SESSION-MAP]] created; rule: only MAIN starts sessions; max 2 in parallel; sessions numbered per chat | Costin: wants a clear tree of all chats |
 | 2026-11-26 | Roadmap v2 [[MCA-DOC-ROADMAP-ALL-CHATS-2026-11-26]] (phases, weeks, per-group backlog, Costin list, efficiency rules); every chat may write its own `docs/sessions/NEXT-{N}.md` | Costin: one clear plan |
+| 2026-11-26 | Chat 10 registered as **Business** (§1, §10); candidate groups renumbered 11 Support, 12 SEO/Analytics, 13 Marketplace & Partners, 14 Mobile/AR | Costin: business plan + revenue research |
