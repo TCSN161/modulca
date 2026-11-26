@@ -14,8 +14,8 @@ Legendă: 🟢 lucrează acum · 🟡 așteaptă (pe cine scrie) · ✅ terminat
 | Chat | Ultima sesiune | Stare | Următorul pas | Când |
 |---|---|---|---|---|
 | 1 MAIN | 1.02 (asta) | 🟢 | Testul complet al platformei (1.03) + închiderea săptămânii (1.04) | Vin 27 |
-| 2 Neufert | 2.06 | ✅ | **2.04 F3** (fișierul juridic critic) | Vin 27 |
-| 3 Engines | 3.03 | ✅ | 3.04: protecție `/compare` + `/upscale` | Vin 27 |
+| 2 Neufert | 2.04 | ✅ F3 gata (1cf7a76) | 2.07 capitol nou (după Q11–Q25) · 2.05 F4+F6 | Lun 30 |
+| 3 Engines | 3.04 | ✅ compare/upscale protejate (33f0682) | 3.05 compresie GLB + bug-uri din test (NEXT-3) | după testul complet |
 | 4 Billing | 4.03 | ✅ | 4.04: promo beta cap-coadă în Stripe TEST | W49 |
 | 5 Design + Drawings | 5.01 | ✅ | 5.02: audit export PDF → spec PermitTracker | W49 |
 | 6 Marketing | 6.03 | ✅ (pauză până la beta) | — | după review-ul lui Vlad |
@@ -37,13 +37,15 @@ ModulCA
 │   ├── 2.01 (vechi) Expand Neufert AI KB (19 nov) ✅
 │   ├── 2.02 NotebookLM-Ingest (25 nov) ✅  răspunsuri Q1–Q10, tabel articole, DTAC→PAC
 │   ├── 2.03 F2-Content (26 nov) ✅  procesul de autorizare RO+EN (5533ec3)
-│   └── 2.06 Consultant-Claude-Fix (26 nov) ✅  Claude merge din nou, plan citit pe server, căutare CATUC (70db407, a9f5004)
+│   ├── 2.06 Consultant-Claude-Fix (26 nov) ✅  Claude merge din nou, plan citit pe server, căutare CATUC (70db407, a9f5004)
+│   └── 2.04 F3-Content (26 nov) ✅  case modulare sub CATUC RO+EN, 43 articole verificate + lista pentru Vlad (1cf7a76)
 │       (2.04 = F3 vineri, 2.05 = F4+F6 luni: numere rezervate din planul inițial, de aceea 2.06 a venit înaintea lor)
 │
 ├── 3 Engines — randări, video, 3D, prezentare
 │   ├── 3.01 (vechi) Research unified AI API (22 nov) ✅
 │   ├── 3.02 Beta-Render-Readiness (26 nov) ✅  raport motoare + verificare modele (8c57cc6)
-│   └── 3.03 Free-Engines + SEC-02 + Products-PDF (26 nov) ✅  motor gratuit nou cloudflare-klein, AI Horde, kill switch (f3b2fd8), securitate randări (eb21bba), produse în PDF (b691f8b)
+│   ├── 3.03 Free-Engines + SEC-02 + Products-PDF (26 nov) ✅  motor gratuit nou cloudflare-klein, AI Horde, kill switch (f3b2fd8), securitate randări (eb21bba), produse în PDF (b691f8b)
+│   └── 3.04 Compare-Upscale-Auth (26 nov) ✅  ultimele 2 rute protejate (33f0682); clienții încă fără Bearer → Chat 5 + admin
 │
 ├── 4 Billing — planuri, Stripe, cote
 │   ├── 4.01 (vechi) Prețuri, conturi (19 nov) ✅
