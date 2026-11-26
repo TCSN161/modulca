@@ -23,6 +23,14 @@ export interface WizardInput {
   wantsTerrace?: boolean;
   /** Optional: user wants a home office */
   wantsOffice?: boolean;
+  /**
+   * Optional: exact number of 3x3m modules wanted (Express: area / 9).
+   * Overrides the household-size sizing; clamped to [4, 20]
+   * (living + kitchen + 1 bedroom + 1 bathroom is the minimum).
+   */
+  targetModuleCount?: number;
+  /** Optional: exact number of bedrooms wanted (clamped to [1, 6]). */
+  bedroomsRequested?: number;
 }
 
 /** Room allocation computed from WizardInput */

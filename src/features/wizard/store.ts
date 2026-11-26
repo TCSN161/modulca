@@ -6,7 +6,7 @@ import { generateDesign, generateFromQuizProfile } from "./generator";
 import { useDesignStore } from "@/features/design/store";
 import { useQuizStore } from "@/features/quiz/store";
 import type { StyleDirectionId } from "@/features/design/store";
-import type { GridCell } from "@/features/land/store";
+import { useLandStore, type GridCell } from "@/features/land/store";
 
 /**
  * Wizard Store — orchestrates auto-design generation and application.
@@ -36,8 +36,12 @@ interface WizardStore {
   generate: () => void;
   /** Generate directly from the quiz profile (if available) */
   generateFromQuiz: () => boolean;
-  /** Apply the generated design to the project (design + land stores) */
-  applyToProject: () => void;
+  /**
+   * Apply the generated design to the project (design store).
+   * `syncLand: true` also mirrors the modules into the land store grid
+   * (gridCells + rotation 0) — used by Express. Default false = manual wizard behaviour.
+   */
+  applyToProject: (opts?: { syncLand?: boolean }) => void;
   /** Reset wizard state */
   reset: () => void;
 }
@@ -112,7 +116,7 @@ export const useWizardStore = create<WizardStore>((set, get) => ({
     }
   },
 
-  applyToProject: () => {
+  applyToProject: (opts) => {
     const { generatedDesign } = get();
     if (!generatedDesign) return;
 
@@ -139,6 +143,12 @@ export const useWizardStore = create<WizardStore>((set, get) => ({
 
     // Save to localStorage
     designStore.saveToLocalStorage();
+
+    if (opts?.syncLand) {
+      const land = useLandStore.getState();
+      land.setGridCells(gridCells);
+      land.setGridRotation(0);
+    }
   },
 
   reset: () => {

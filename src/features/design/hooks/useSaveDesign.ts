@@ -3,11 +3,9 @@
 import { useState, useCallback, useRef, useEffect } from "react";
 import { useDesignStore } from "../store";
 import { useAuthStore } from "@/features/auth/store";
-import { saveProject, loadProject } from "@/features/auth/projectService";
+import { loadProject } from "@/features/auth/projectService";
 import { useProjectId } from "@/shared/hooks/useProjectId";
-import { useLandStore } from "@/features/land/store";
-import { getSelectedProducts, setSelectedProducts, parseSelectedProducts } from "@/features/design/productSelection";
-import { landToProjectData, landFromProjectData } from "@/features/land/persistence";
+import { applyProjectSnapshot, saveActiveProject, getActiveProject } from "../projectSnapshot";
 
 /**
  * Hook that provides save-button state and handler.
@@ -38,26 +36,13 @@ export function useSaveDesign() {
     if (isCloudEligible && userId) {
       setSaving(true);
       try {
+        // Single save path: snapshot (design + land + products) + active-project binding
         const state = useDesignStore.getState();
-        const data: Record<string, unknown> = {
-          modules: state.modules,
-          finishLevel: state.finishLevel,
-          gridRotation: state.gridRotation,
-          styleDirection: state.styleDirection,
-          styleDescription: state.styleDescription,
-          stylePhoto: state.stylePhoto,
-          moodboardPins: state.moodboardPins,
-          savedRenders: state.savedRenders,
-          moduleFixtures: state.moduleFixtures,
-          ...landToProjectData(useLandStore.getState().getSnapshot()),
-          selectedProducts: getSelectedProducts(),
-        };
-
-        const result = await saveProject(userId, {
-          id: cloudProjectIdRef.current ?? (projectId !== "demo" ? projectId : undefined),
-          name: `Project ${state.modules.length} modules`,
-          data,
-        });
+        const result = await saveActiveProject(
+          userId,
+          getActiveProject().name ?? `Project ${state.modules.length} modules`,
+          cloudProjectIdRef.current ?? (projectId !== "demo" ? projectId : undefined),
+        );
 
         if (result.ok) {
           cloudProjectIdRef.current = result.value.id;
@@ -117,23 +102,8 @@ export function useCloudLoad() {
       .then((result) => {
         if (result.ok && result.value?.data) {
           const d = result.value.data as Record<string, unknown>;
-          // Hydrate store with cloud data via Zustand setState
-          const patch: Record<string, unknown> = {};
-          if (Array.isArray(d.modules) && d.modules.length > 0) patch.modules = d.modules;
-          if (typeof d.finishLevel === "string") patch.finishLevel = d.finishLevel;
-          if (typeof d.gridRotation === "number") patch.gridRotation = d.gridRotation;
-          if (typeof d.styleDirection === "string") patch.styleDirection = d.styleDirection;
-          if (typeof d.styleDescription === "string") patch.styleDescription = d.styleDescription;
-          if (typeof d.stylePhoto === "string") patch.stylePhoto = d.stylePhoto;
-          if (Array.isArray(d.moodboardPins)) patch.moodboardPins = d.moodboardPins;
-          if (Array.isArray(d.savedRenders)) patch.savedRenders = d.savedRenders;
-          if (d.moduleFixtures && typeof d.moduleFixtures === "object") patch.moduleFixtures = d.moduleFixtures;
-
-          if (Object.keys(patch).length > 0) {
-            useDesignStore.setState(patch);
-          }
-          useLandStore.getState().hydrate(landFromProjectData(d));
-          if (Array.isArray(d.selectedProducts)) setSelectedProducts(parseSelectedProducts(d.selectedProducts));
+          // Hydrate design + land + products (single restore path)
+          applyProjectSnapshot(d);
         } else {
           // No cloud data — fall back to localStorage
           loadFromLocalStorage();

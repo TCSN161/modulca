@@ -2,11 +2,8 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { useAuthStore } from "@/features/auth/store";
-import { saveProject } from "@/features/auth/projectService";
+import { saveActiveProject } from "../../projectSnapshot";
 import { useDesignStore } from "../../store";
-import { useLandStore } from "@/features/land/store";
-import { getSelectedProducts } from "@/features/design/productSelection";
-import { landToProjectData } from "@/features/land/persistence";
 import { Cloud, CloudOff, Check, Loader2 } from "lucide-react";
 
 /**
@@ -20,7 +17,6 @@ type SaveStatus = "idle" | "saving" | "saved" | "error" | "offline";
 export default function CloudSaveButton() {
   const { isAuthenticated, userId } = useAuthStore();
   const designStore = useDesignStore();
-  const { gridCells, gridRotation } = useLandStore();
 
   const [status, setStatus] = useState<SaveStatus>("idle");
   const [projectId, setProjectId] = useState<string | null>(null);
@@ -45,40 +41,14 @@ export default function CloudSaveButton() {
 
     setStatus("saving");
 
-    // Gather full design state
-    const { modules, finishLevel, styleDirection, styleDescription, stylePhoto, moodboardPins, savedRenders, moduleFixtures } = designStore;
-
-    const projectData: Record<string, unknown> = {
-      modules,
-      finishLevel,
-      gridRotation,
-      styleDirection,
-      styleDescription,
-      stylePhoto,
-      moodboardPins,
-      savedRenders,
-      moduleFixtures,
-      ...landToProjectData(useLandStore.getState().getSnapshot()),
-      selectedProducts: getSelectedProducts(),
-    };
-
     try {
-      const result = await saveProject(userId, {
-        id: projectId ?? undefined,
-        name: projectName,
-        data: projectData,
-      });
+      // Single save path: snapshot (design + land + products) + active-project binding
+      const result = await saveActiveProject(userId, projectName, projectId ?? undefined);
 
       if (result.ok) {
         setProjectId(result.value.id);
         setStatus("saved");
         setLastSaved(new Date());
-
-        // Persist active project reference
-        localStorage.setItem(
-          "modulca-active-project",
-          JSON.stringify({ id: result.value.id, name: projectName })
-        );
       } else {
         setStatus("error");
       }
@@ -88,7 +58,7 @@ export default function CloudSaveButton() {
 
     // Reset status after 3s
     setTimeout(() => setStatus((s) => (s === "saved" || s === "error" ? "idle" : s)), 3000);
-  }, [userId, projectId, projectName, designStore, gridCells, gridRotation]);
+  }, [userId, projectId, projectName]);
 
   // Auto-save every 60 seconds when authenticated
   useEffect(() => {

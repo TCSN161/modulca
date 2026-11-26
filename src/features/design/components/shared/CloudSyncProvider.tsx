@@ -3,9 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useAuthStore } from "@/features/auth/store";
 import { useDesignStore } from "../../store";
-import { useLandStore } from "@/features/land/store";
-import { getSelectedProducts, setSelectedProducts, parseSelectedProducts } from "@/features/design/productSelection";
-import { landToProjectData, landFromProjectData } from "@/features/land/persistence";
+import { applyProjectSnapshot, saveActiveProject } from "../../projectSnapshot";
 import { loadProject, saveProject, listProjects } from "@/features/auth/projectService";
 import { useProjectId } from "@/shared/hooks/useProjectId";
 
@@ -50,24 +48,8 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
 
         const d = result.value.data as Record<string, unknown>;
 
-        // Hydrate design store
-        const designPatch: Record<string, unknown> = {};
-        if (Array.isArray(d.modules) && d.modules.length > 0) designPatch.modules = d.modules;
-        if (typeof d.finishLevel === "string") designPatch.finishLevel = d.finishLevel;
-        if (typeof d.styleDirection === "string") designPatch.styleDirection = d.styleDirection;
-        if (typeof d.styleDescription === "string") designPatch.styleDescription = d.styleDescription;
-        if (typeof d.stylePhoto === "string") designPatch.stylePhoto = d.stylePhoto;
-        if (Array.isArray(d.moodboardPins)) designPatch.moodboardPins = d.moodboardPins;
-        if (Array.isArray(d.savedRenders)) designPatch.savedRenders = d.savedRenders;
-        if (d.moduleFixtures && typeof d.moduleFixtures === "object") designPatch.moduleFixtures = d.moduleFixtures;
-
-        if (Object.keys(designPatch).length > 0) {
-          useDesignStore.setState(designPatch);
-        }
-
-        // Hydrate land store (polygon, grid cells, rotation, map) — BUG-X02
-        useLandStore.getState().hydrate(landFromProjectData(d));
-        if (Array.isArray(d.selectedProducts)) setSelectedProducts(parseSelectedProducts(d.selectedProducts));
+        // Hydrate design + land + products (single restore path)
+        applyProjectSnapshot(d);
 
         setHydrated(true);
       })
@@ -141,20 +123,6 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
 
     // Debounced save
     saveTimerRef.current = setTimeout(() => {
-      const state = useDesignStore.getState();
-      const data: Record<string, unknown> = {
-        modules: state.modules,
-        finishLevel: state.finishLevel,
-        styleDirection: state.styleDirection,
-        styleDescription: state.styleDescription,
-        stylePhoto: state.stylePhoto,
-        moodboardPins: state.moodboardPins,
-        savedRenders: state.savedRenders,
-        moduleFixtures: state.moduleFixtures,
-        ...landToProjectData(useLandStore.getState().getSnapshot()),
-        selectedProducts: getSelectedProducts(),
-      };
-
       // Get project name from localStorage
       let projectName = "Untitled Project";
       try {
@@ -165,11 +133,8 @@ export default function CloudSyncProvider({ children }: { children: React.ReactN
         }
       } catch { /* */ }
 
-      saveProject(userId, {
-        id: projectId,
-        name: projectName,
-        data,
-      }).catch((err) => {
+      // Single save path: snapshot (design + land + products) + active-project binding
+      saveActiveProject(userId, projectName, projectId).catch((err) => {
         console.warn("[CloudSync] Auto-save failed:", err);
       });
     }, DEBOUNCE_MS);

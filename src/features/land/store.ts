@@ -25,6 +25,8 @@ interface LandStore {
   polygon: LatLng[];
   isDrawing: boolean;
   addPolygonPoint: (point: LatLng) => void;
+  /** Replace the whole polygon at once (Express). Invalid points are dropped. */
+  setPolygon: (points: LatLng[]) => void;
   removeLastPoint: () => void;
   clearPolygon: () => void;
   setIsDrawing: (drawing: boolean) => void;
@@ -69,6 +71,12 @@ export const useLandStore = create<LandStore>((set, get) => ({
   isDrawing: false,
   addPolygonPoint: (point) =>
     set((state) => ({ polygon: [...state.polygon, point] })),
+  setPolygon: (points) =>
+    set({
+      polygon: points
+        .filter((p) => Number.isFinite(p?.lat) && Number.isFinite(p?.lng))
+        .map((p) => ({ lat: p.lat, lng: p.lng })),
+    }),
   removeLastPoint: () =>
     set((state) => ({ polygon: state.polygon.slice(0, -1) })),
   clearPolygon: () =>

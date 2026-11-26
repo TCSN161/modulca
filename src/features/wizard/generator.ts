@@ -77,20 +77,54 @@ export function computeRoomAllocation(input: WizardInput): RoomAllocation {
     if (householdSize >= 3 && !wantsOffice) storage = 1;
   }
 
-  const totalModules =
-    bedrooms + bathrooms + living + kitchen + office + hallway + terrace + storage;
+  // Explicit bedroom count (Express Q: "câte dormitoare?")
+  if (input.bedroomsRequested !== undefined && Number.isFinite(input.bedroomsRequested)) {
+    bedrooms = clampInt(input.bedroomsRequested, 1, 6);
+    bathrooms = Math.max(bathrooms, bedrooms >= 3 ? 2 : 1);
+  }
 
-  return {
-    bedrooms,
-    bathrooms,
-    living,
-    kitchen,
-    office,
-    hallway,
-    terrace,
-    storage,
-    totalModules,
-  };
+  const alloc = { bedrooms, bathrooms, living, kitchen, office, hallway, terrace, storage, totalModules: 0 };
+  if (input.targetModuleCount !== undefined && Number.isFinite(input.targetModuleCount)) {
+    fitToModuleCount(alloc, clampInt(input.targetModuleCount, 4, 20), input.bedroomsRequested !== undefined);
+  }
+  alloc.totalModules = sumRooms(alloc);
+  return alloc;
+}
+
+function clampInt(n: number, min: number, max: number): number {
+  return Math.min(max, Math.max(min, Math.round(n)));
+}
+
+function sumRooms(r: Omit<RoomAllocation, "totalModules">): number {
+  return r.bedrooms + r.bathrooms + r.living + r.kitchen + r.office + r.hallway + r.terrace + r.storage;
+}
+
+/**
+ * Grow or shrink an allocation to hit an exact module count.
+ * Living + kitchen are fixed; a requested bedroom count is kept whenever possible.
+ */
+function fitToModuleCount(r: RoomAllocation, target: number, lockBedrooms: boolean): void {
+  // Shrink: drop extras first, private rooms last
+  const shrinkOrder: (() => boolean)[] = [
+    () => r.storage > 0 && !!r.storage--,
+    () => r.office > 0 && !!r.office--,
+    () => r.terrace > 0 && !!r.terrace--,
+    () => r.hallway > 0 && !!r.hallway--,
+    () => r.bathrooms > 1 && !!r.bathrooms--,
+    () => !lockBedrooms && r.bedrooms > 1 && !!r.bedrooms--,
+    () => r.bedrooms > 1 && !!r.bedrooms--,
+  ];
+  while (sumRooms(r) > target && shrinkOrder.some((step) => step())) { /* loop */ }
+
+  // Grow: circulation + wet rooms first, then bedrooms (if free) / storage
+  while (sumRooms(r) < target) {
+    if (r.hallway === 0 && target >= 6) r.hallway++;
+    else if (r.bathrooms < Math.ceil(r.bedrooms / 2)) r.bathrooms++;
+    else if (!lockBedrooms && r.bedrooms < 6) r.bedrooms++;
+    else if (r.office === 0) r.office++;
+    else if (r.terrace === 0) r.terrace++;
+    else r.storage++;
+  }
 }
 
 // ─── 2. Layout Shape Selection ───────────────────────────────

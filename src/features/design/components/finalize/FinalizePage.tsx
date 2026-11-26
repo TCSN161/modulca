@@ -4,10 +4,8 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useDesignStore } from "../../store";
 import { useAuthStore } from "@/features/auth/store";
-import { saveProject, listProjects } from "@/features/auth/projectService";
-import { useLandStore } from "@/features/land/store";
-import { getSelectedProducts } from "@/features/design/productSelection";
-import { landToProjectData } from "@/features/land/persistence";
+import { listProjects } from "@/features/auth/projectService";
+import { saveActiveProject, getActiveProject } from "../../projectSnapshot";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import DesignHeader from "../shared/DesignHeader";
 import MobileStepFooter from "../shared/MobileStepFooter";
@@ -67,41 +65,11 @@ export default function FinalizePage() {
 
     setSaving(true);
 
-    // Build full design data to persist
-    const designData: Record<string, unknown> = {
-      modules: useDesignStore.getState().modules,
-      finishLevel: useDesignStore.getState().finishLevel,
-      styleDirection: useDesignStore.getState().styleDirection,
-      styleDescription: useDesignStore.getState().styleDescription,
-      stylePhoto: useDesignStore.getState().stylePhoto,
-      moodboardPins: useDesignStore.getState().moodboardPins,
-      savedRenders: useDesignStore.getState().savedRenders,
-      moduleFixtures: useDesignStore.getState().moduleFixtures,
-    };
-
-    // Land state (polygon, gridCells, mapCenter…) — BUG-X02
-    Object.assign(designData, landToProjectData(useLandStore.getState().getSnapshot()));
-    designData.selectedProducts = getSelectedProducts(); // BUG-X03
-
-    // Check if we're updating an existing project
-    let existingId: string | undefined;
-    try {
-      const active = localStorage.getItem("modulca-active-project");
-      if (active) existingId = JSON.parse(active)?.id;
-    } catch { /* ignore */ }
-
-    const result = await saveProject(userId ?? "", {
-      id: existingId,
-      name: projectName,
-      data: designData,
-    });
+    // Single save path: snapshot (design + land + products) + active-project binding
+    const existingId = getActiveProject().id;
+    const result = await saveActiveProject(userId ?? "", projectName);
 
     if (result.ok) {
-      // Store active project reference
-      localStorage.setItem("modulca-active-project", JSON.stringify({
-        id: result.value.id,
-        name: result.value.name,
-      }));
       setSaved(true);
       setProjectCount((c) => existingId ? c : c + 1);
     }
