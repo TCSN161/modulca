@@ -113,3 +113,4 @@ Legendă: 🟡 = de verificat la producție pe textul legii (gate §7) · ✅ = 
 | Data | Schimbare |
 |---|---|
 | 2026-11-26 | v0 schiță: 16 piese, ponderi pe piloni, dependențe (Chat 6, sesiunea 6.02) |
+| 2026-11-26 | Scripturile L1–L4 sunt scrise, într-un singur pachet de review pentru arhitectul partener (~18 dec): [[MCA-DOC-CONTENT-LONG-JAN-2027-v0]]. Toate articolele L1–L4 au fost verificate în text, deci 🟡 → ✅ text, iar 🔒 review rămâne (sesiunea 6.03) |

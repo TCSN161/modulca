@@ -285,8 +285,8 @@ Ce măsurăm după 7 zile (strategia §9): vizualizări, timp de vizionare, clic
 | # | Întrebare | Propunere |
 |---|---|---|
 | Q1 | URL-ul checker-ului: brand voice spune `modulca.eu/autorizare`, iar roadmap-ul (Phase 3) spune `/catuc-check`. Care rămâne public? | ✅ **Închis 2026-11-26 (Costin)**: URL public `/autorizare`, cu redirect spre `/catuc-check`. Redirect-ul e cod (Chat 2 / MAIN, Phase 3), iar Chat 6 doar îl folosește în CTA. |
-| Q2 | Brand voice §3.2 spune „≤ 150 mp built area". Legea spune „suprafață desfășurată". | Corectez în brand voice v1 (Chat 6, după pilot). Scripturile folosesc deja termenul din lege. |
-| Q3 | Brand voice §4 dă exemplul „formularul de notificare încă nu e publicat prin ordin (art. 295(10))". Textul din `catuc-169-2026-text.md` are însă o notă de portal care pomenește un ordin din 25.08.2026 pentru formulare, neverificat (Chat 2). | Nu afirmăm nimic despre formular în nicio direcție până nu verifică Chat 2 sau arhitectul partener. Scot exemplul din brand voice v1. |
+| Q2 | Brand voice §3.2 spune „≤ 150 mp built area". Legea spune „suprafață desfășurată". | ✅ **Închis 2026-11-26 (6.03)**: brand voice v1 §3.2 spune „suprafață desfășurată max. 150 mp". |
+| Q3 | Brand voice §4 dă exemplul „formularul de notificare încă nu e publicat prin ordin (art. 295(10))". Textul din `catuc-169-2026-text.md` are însă o notă de portal care pomenește un ordin din 25.08.2026 pentru formulare, neverificat (Chat 2). | ✅ **Închis 2026-11-26 (6.03)**: exemplul e scos din brand voice v1 §4, iar statutul formularului e pe lista „never publish" (§3.2). |
 | Q4 | Pilotul e postat în decembrie, înainte de lansarea canalului în ianuarie? | Da, cu bio minimal (strategia §10 Q3). Handle-urile trebuie rezervate de Costin înainte. |
 
 ---
@@ -297,3 +297,4 @@ Ce măsurăm după 7 zile (strategia §9): vizualizări, timp de vizionare, clic
 |---|---|
 | 2026-11-26 | v0: 5 Shorts DRAFT, cu articole verificate în text (Chat 6, sesiunea 6.02) |
 | 2026-11-26 | Q1 închis: CTA = `modulca.eu/autorizare` (redirect spre `/catuc-check`) |
+| 2026-11-26 | Re-verificare review (sesiunea 6.03): F2 încă `draft-content-awaiting-architect-review`, F3 încă schelet, fără handoff Chat 7 nou după 2026-11-23. Toate Shorts rămân 🟡 DRAFT. Q2 și Q3 sunt închise în brand voice v1. |

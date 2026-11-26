@@ -1,7 +1,7 @@
-# MCA-BRAND-VOICE-v0
+# MCA-BRAND-VOICE (v1)
 
-**Status**: Draft v0. Costin reviews it; v1 comes after the Dec pilot (3–5 Shorts).
-**Owner**: Chat 6 Marketing · session `6.01.Marketing_Strategy-Kickoff_20261126`
+**Status**: **v1** (2026-11-26, session 6.03): three fact fixes from the 6.02 law-text check (§3.2, §4, §6). The filename stays `-v0` so existing `[[MCA-BRAND-VOICE-v0]]` links keep working. Costin reviews it; v2 comes after the Dec pilot metrics.
+**Owner**: Chat 6 Marketing · sessions `6.01.Marketing_Strategy-Kickoff_20261126` (v0), `6.03.Marketing_Pilot-Production_20261126` (v1)
 **Related**: [[MCA-STRAT-CATUC-SERVICE-CONTENT-2026-11-25]] (§7 quality gate, §10 answers) · [[MCA-DOC-CONTENT-PILLARS-v0]] · [[MCA-STRAT-MARKETING-2026-11-19]] §2B (this doc replaces the planned `docs/BRAND_VOICE.md`)
 **Languages**: RO first (primary market), EN second. NL later, per the i18n principle.
 
@@ -67,9 +67,9 @@ EN glossary (first mention keeps the RO term in italics): *certificat de urbanis
 Use only figures that passed the §7 gate against `docs/references/catuc/catuc-169-2026-text.md` (see also `docs/research/2026-11-25-notebooklm-catuc-answers.md` → Verification). Examples, always with their conditions:
 
 - Annex **without** any formality: ≤ 20 m² cumulated, ≤ 2,5 m height, **no foundation**, temporary and demountable, rural, wood or metal structure, respecting PUG/RLU (art. 299). Never say just „anexa sub 20 m² nu cere nimic".
-- House by notification: **one** single-family house, P or D+P, no basement, ≤ 150 mp built area, rural intravilan, **only** on standard projects or individual projects by specialist teams, following the OAR rural architecture guide and approved by the county chief architect (art. 294). Never say just „casa de 150 mp fără autorizație".
+- House by notification: **one** single-family house, P or D+P, no basement, **suprafață desfășurată max. 150 mp** (all floors added up; art. 294 alin. (2) lit. a) pct. (ii)), rural intravilan, outside protected areas, **only** on standard projects or individual projects by specialist teams, following the OAR rural architecture guide and approved by the county chief architect (art. 294). Never say just „casa de 150 mp fără autorizație". Never write „suprafață construită" / „built area" for this limit. EN: *gross floor area* / *total floor area*.
 
-**Never publish** (known NotebookLM errors, per Chat 2): AC validity „12–36 luni" (wrong: AC = 3 years, art. 309) · „art. 272" for the AC · „art. 143" as a local fee · a „24 aug 2026 cut-off" · order numbers Ord. 1022/2026 and 975/2026 (unverified).
+**Never publish** (known NotebookLM errors, per Chat 2): AC validity „12–36 luni" (wrong: AC = 3 years, art. 309; 12–36 months is the **CU** validity, art. 257(15)) · „art. 272" for issuing the AC (correct: art. 273) · „art. 143" as a local fee (correct: art. 313(4)) · a „24 aug 2026 cut-off" (art. 582 has none) · order numbers Ord. 1022/2026 and 975/2026 (unverified) · any claim about whether the notification form has or has not been published by order (unverified in either direction).
 
 ---
 
@@ -81,7 +81,7 @@ Use only figures that passed the §7 gate against `docs/references/catuc/catuc-1
 | Give the article number on screen or in the caption | Give a limit without its conditions |
 | Say „depinde de…" and list the 2–3 factors | Promise an outcome („sigur nu-ți trebuie autorizație") |
 | Recommend the free checker and a real architect for anything that needs a signature | Suggest that ModulCA or AI replaces the architect (D4) |
-| Admit uncertainty: „Formularul oficial de notificare încă nu e publicat prin ordin (art. 295(10))." | Invent forms, order numbers or fees |
+| Admit uncertainty: „CATUC nu are o regulă tranzitorie expresă pentru prelungirea autorizațiilor emise sub Legea 50/1991. Întreabă la primăria care ți-a emis autorizația." (F2 §8) | Invent forms, order numbers or fees, or say whether an official form exists |
 | Disclose AI: „Narat cu voce generată AI, verificat de echipa ModulCA." | Present an AI voice as „arhitectul nostru" or any real person (§10.1 house rule 3) |
 | Use concrete RO examples: rural plot, summer kitchen, attic conversion | Use fear: „Amenzi de mii de lei dacă nu știi asta!" |
 | End with one CTA | Stack 3 CTAs, or use pushy sales copy in legal content |
@@ -127,6 +127,8 @@ Plus: tick **„AI use"** in YouTube Studio (§10.1).
 
 The bridge to modular houses appears **at most once per piece**, at the end. Legal content stays useful even for someone who never buys a house.
 
+**CTA URL (decided by Costin, 2026-11-26)**: the public checker URL is **`modulca.eu/autorizare`**, in every homeowner CTA, caption and video. It redirects to the technical route `/catuc-check` (Phase 3; the redirect is built by Chat 2 / MAIN). Never print `/catuc-check` in public copy. If the checker is not live on the publish date, the CTA points to the F2 article (`modulca.eu/library/ro-building-permit`) instead.
+
 ---
 
 ## 7. Checklist înainte de publicare / Pre-publish checklist
@@ -147,3 +149,4 @@ The bridge to modular houses appears **at most once per piece**, at the end. Leg
 | Date | Change |
 |---|---|
 | 2026-11-26 | v0 draft (Chat 6, session 6.01) |
+| 2026-11-26 | **v1** (session 6.03): §3.2 „built area" → „suprafață desfășurată max. 150 mp" (art. 294(2)(a)(ii)); never-publish list extended (CU vs AC validity, notification-form status); §4 unverified notification-form example replaced by a verified uncertainty (F2 §8); §6 CTA `modulca.eu/autorizare` fixed, with redirect and fallback rule |
