@@ -35,8 +35,10 @@ async function generateImage(
   req: AiRenderRequest,
   startMs: number
 ): Promise<AiRenderResult | null> {
-  // Use FLUX.1-schnell for speed, fall back to SDXL-base if unavailable
-  const model = "black-forest-labs/FLUX.1-schnell";
+  // 2026-11-26 (E1): FLUX.1-schnell was removed from the hf-inference
+  // provider (HTTP 410 "deprecated"). SD3-medium is the only text-to-image
+  // model still live on hf-inference. Billed from HF monthly free credits.
+  const model = "stabilityai/stable-diffusion-3-medium-diffusers";
   devLog(`[huggingface] Using ${model}`);
 
   const url = `https://router.huggingface.co/hf-inference/models/${model}`;
@@ -52,7 +54,7 @@ async function generateImage(
       parameters: {
         width: clampDimension(req.width),
         height: clampDimension(req.height),
-        num_inference_steps: 4,
+        num_inference_steps: 20, // SD3 needs ~20+ steps (4 was tuned for schnell)
         seed: Number(req.seed) % 4294967295 || undefined,
       },
     }),
@@ -81,7 +83,7 @@ async function generateImage(
   return {
     buffer,
     contentType: "image/png",
-    engine: "huggingface-flux",
+    engine: "huggingface-sd3",
     costUsd: 0.001, // Minimal cost on free tier
     latencyMs: Date.now() - startMs,
   };

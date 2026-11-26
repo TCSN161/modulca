@@ -14,8 +14,10 @@ import { devLog } from "@/shared/lib/devLog";
  */
 
 const API_KEY = process.env.BFL_API_KEY || "";
-/** BFL has multiple API domains — api.bfl.ml (.ml TLD) is blocked by some ISPs */
-const API_URL = process.env.BFL_API_URL || "https://api.us1.bfl.ai/v1";
+/** BFL has multiple API domains — api.bfl.ml (.ml TLD) is blocked by some ISPs.
+ *  2026-11-26 (E1): api.us1.bfl.ai no longer connects (UND_ERR_CONNECT_TIMEOUT);
+ *  the global api.bfl.ai answers. Override with BFL_API_URL if needed. */
+const API_URL = process.env.BFL_API_URL || "https://api.bfl.ai/v1";
 const POLL_INTERVAL_MS = 2000;
 const TIMEOUT_MS = 120_000;
 const CONNECT_TIMEOUT_MS = 10_000;

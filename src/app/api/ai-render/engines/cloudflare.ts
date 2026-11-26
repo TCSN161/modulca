@@ -49,11 +49,13 @@ async function generateImage(
       Authorization: `Bearer ${API_TOKEN}`,
       "Content-Type": "application/json",
     },
+    // 2026-11-26 (E1): CF changed the flux-1-schnell input schema to
+    // { prompt (≤2048), steps (≤8) } with additionalProperties:false.
+    // Sending num_steps/width/height now returns 400 (code 5006). Output is
+    // a fixed 1024x1024 JPEG; the aspect hint goes into the prompt instead.
     body: JSON.stringify({
-      prompt: req.prompt.slice(0, 500),
-      num_steps: 8, // 8 steps = good quality for FLUX Schnell (4 was too blurry)
-      width: clampToSupported(req.width),
-      height: clampToSupported(req.height),
+      prompt: `${req.prompt.slice(0, 1900)}\nAspect ratio ${clampToSupported(req.width)}x${clampToSupported(req.height)}.`,
+      steps: 8, // 8 = max; good quality for FLUX Schnell (4 was too blurry)
     }),
   });
 
@@ -66,7 +68,9 @@ async function generateImage(
   const contentType = response.headers.get("content-type") || "";
 
   let buffer: Buffer;
+  let outType = "image/png";
   if (contentType.includes("application/json")) {
+    outType = "image/jpeg"; // flux-1-schnell returns base64 JPEG in JSON
     // Some CF models return JSON with base64 image
     const json = await response.json() as { result?: { image?: string }; image?: string };
     const b64 = json.result?.image || json.image;
@@ -87,7 +91,7 @@ async function generateImage(
 
   return {
     buffer,
-    contentType: "image/png",
+    contentType: outType,
     engine: "cloudflare-flux",
     costUsd: 0, // Free tier: 10K neurons/day
     latencyMs: Date.now() - startMs,

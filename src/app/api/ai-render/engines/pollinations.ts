@@ -13,6 +13,9 @@
 import type { AiRenderEngine, AiRenderRequest, AiRenderResult } from "./types";
 
 import { devLog } from "@/shared/lib/devLog";
+/** Optional (E1, 2026-11-26). Anonymous calls are capped at 1 image / 45 s
+ *  per IP (HTTP 402 FREE_LIMIT). A key from enter.pollinations.ai lifts it. */
+const API_KEY = process.env.POLLINATIONS_API_KEY || "";
 const MAX_RETRIES = 3;
 const RETRY_DELAY_MS = 4000;
 
@@ -54,7 +57,10 @@ export const pollinationsEngine: AiRenderEngine = async (
       devLog(`[pollinations] Attempt ${attempt + 1}: ${url.slice(0, 100)}...`);
       const response = await fetch(url, {
         method: "GET",
-        headers: { "User-Agent": "ModulCA/1.0" },
+        headers: {
+          "User-Agent": "ModulCA/1.0",
+          ...(API_KEY ? { Authorization: `Bearer ${API_KEY}` } : {}),
+        },
         // 90s hard timeout prevents hanging on Pollinations' slow queue
         signal: AbortSignal.timeout(90_000),
       });
@@ -62,6 +68,13 @@ export const pollinationsEngine: AiRenderEngine = async (
       if (response.status === 429) {
         devLog("[pollinations] Rate limited (429), will retry...");
         continue;
+      }
+
+      if (response.status === 402) {
+        // FREE_LIMIT: anonymous = 1 image / 45 s per IP. A 4 s retry cannot
+        // clear it, so hand off to the next engine at once.
+        console.warn("[pollinations] 402 free limit (anonymous: 1 img/45s/IP) — set POLLINATIONS_API_KEY");
+        return null;
       }
 
       if (!response.ok) {
