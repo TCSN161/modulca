@@ -23,6 +23,12 @@ const ENGINE_LIST: EngineInfo[] = [
     speed: "slow",
   },
   {
+    id: "cloudflare-klein",
+    label: "Cloudflare FLUX.2 klein",
+    description: "Free, ~5s, keeps your 3D view's geometry (img2img)",
+    speed: "fast",
+  },
+  {
     id: "stability",
     label: "Stability AI (img2img)",
     description: "Uses 3D scene as base. Requires API key.",

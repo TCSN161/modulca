@@ -6,6 +6,8 @@ import { togetherEngine } from "./engines/together";
 import { leonardoEngine } from "./engines/leonardo";
 import { falEngine } from "./engines/fal";
 import { cloudflareEngine } from "./engines/cloudflare";
+import { cloudflareKleinEngine } from "./engines/cloudflareKlein";
+import { isEngineDisabled } from "./engines/killSwitch";
 import { replicateEngine } from "./engines/replicate";
 import { huggingfaceEngine } from "./engines/huggingface";
 import { segmindEngine } from "./engines/segmind";
@@ -69,6 +71,11 @@ const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo; estimatedC
   cloudflare: {
     fn: cloudflareEngine,
     info: { id: "cloudflare", label: "Cloudflare AI", description: "10K neurons/day free FOREVER. FLUX Schnell.", speed: "fast" },
+    estimatedCostUsd: 0,
+  },
+  "cloudflare-klein": {
+    fn: cloudflareKleinEngine,
+    info: { id: "cloudflare-klein", label: "Cloudflare FLUX.2 klein", description: "Free (shared 10K neurons/day). text2img + img2img that keeps the 3D geometry.", speed: "fast" },
     estimatedCostUsd: 0,
   },
   huggingface: {
@@ -187,12 +194,14 @@ const DEFAULT_POLICY: PolicyFlags = {
  * If all 6 fail we return 503 rather than spend money on a non-paying user.
  */
 const FALLBACK_FREE = [
-  "cloudflare",     // 3s  — 10K neurons/day FOREVER (primary workhorse)
-  "pollinations",   // 5s  — unlimited forever, no auth
-  "huggingface",    // 9s  — monthly free credits
-  "gemini",         // 51s — 1500 req/day free (Google)
-  "together",       // 49s — FREE FLUX Schnell (promo ends ~July 2026)
-  "ai-horde",       // 110s — volunteer GPUs, last resort
+  // Order reviewed 2026-11-26 (Chat 3 live test, MCA-DOC-AI-ENGINES-BETA-READINESS v2)
+  "cloudflare",       // 2.7s — FLUX.1 schnell, ≈96 neurons/img of the 10K/day free
+  "cloudflare-klein", // 7s   — FLUX.2 klein 4B, same 10K pool; model diversity if schnell breaks
+  "pollinations",     // 2.5s — free; anonymous = 1 img/45s per IP, more with POLLINATIONS_API_KEY
+  "huggingface",      // <0.5s fail today — $0.10/mo credits (resets Dec 1)
+  "gemini",           // <0.5s fail — image free tier is limit 0 (BUG-E01)
+  "together",         // <0.5s fail — promo ended (BUG-E03)
+  "ai-horde",         // 6–75s — volunteer GPUs, last resort
 ];
 
 /**
@@ -203,6 +212,7 @@ const FALLBACK_FREE = [
 const FALLBACK_PREMIUM = [
   // HERO — free, use always
   "cloudflare",     // 3s,   $0
+  "cloudflare-klein", // 7s, $0 (same CF 10K-neuron pool)
   "gemini",         // 51s,  $0
   "together",       // 49s,  $0
   "huggingface",    // 9s,   $0
@@ -241,6 +251,7 @@ const FALLBACK_ARCHITECT = [
   // Free backup — no cost, keeps the tier functional if everything else fails
   "gemini",         // 51s,  $0
   "cloudflare",     // 3s,   $0
+  "cloudflare-klein", // 7s, $0
   "together",       // 49s,  $0
   "huggingface",    // 9s,   $0
   "pollinations",   // 5s,   $0
@@ -253,6 +264,7 @@ const FALLBACK_ARCHITECT = [
  */
 const FALLBACK_ORDER = [
   "cloudflare",     // 3s,  $0 — fastest & free
+  "cloudflare-klein", // 7s, $0
   "pollinations",   // 5s,  $0
   "gemini",         // 51s, $0
   "huggingface",    // 9s,  $0
@@ -270,6 +282,8 @@ const FALLBACK_ORDER = [
  * The rest fall back to text2img (ignoring the 3D base).
  */
 const IMG2IMG_FALLBACK = [
+  // Free, structure-preserving, 4s (2026-11-26) — profit-first: try before paid
+  "cloudflare-klein",
   // True img2img specialists
   "stability",      // 52s,  $0.065 (best structure preservation)
   "fal",            // 52s,  $0.003 (Flux Kontext img2img)
@@ -286,12 +300,25 @@ const IMG2IMG_FALLBACK = [
   "cloudflare",     // 3s,   $0
   "huggingface",    // 9s,   $0
   "pollinations",   // 5s,   $0
-  "ai-horde",       // 110s, $0
+  "ai-horde",       // 6–75s, $0 (img2img since 2026-11-26)
+];
+
+/**
+ * img2img for guest_free / free (beta) — €0 only. Geometry-preserving engines
+ * first; text2img engines after them only so the user still gets an image.
+ */
+const IMG2IMG_FREE = [
+  "cloudflare-klein", // 4s,  $0 — FLUX.2 klein 4B reference-image edit (keeps the 3D view)
+  "ai-horde",         // 11s+, $0 — SD img2img, weak quality but keeps geometry
+  "cloudflare",       // 3s,  $0 — text2img fallback (loses the 3D structure)
+  "pollinations",     // 3s,  $0 — text2img fallback
 ];
 
 /** Get the best fallback chain for a tier + mode combination */
 function getFallbackChain(tier: string, hasBaseImage: boolean): string[] {
-  if (hasBaseImage) return IMG2IMG_FALLBACK;
+  if (hasBaseImage) {
+    return tier === "free" || tier === "guest_free" ? IMG2IMG_FREE : IMG2IMG_FALLBACK;
+  }
   switch (tier) {
     case "guest_free":
     case "free":
@@ -401,7 +428,9 @@ async function tryEngines(
   // If a specific engine is requested, try it first (if within budget), then fall back
   if (engineParam && ENGINES[engineParam]) {
     const eng = ENGINES[engineParam];
-    if (eng.estimatedCostUsd > maxCostUsd) {
+    if (isEngineDisabled(engineParam)) {
+      devLog(`[ai-render] Engine "${engineParam}" disabled by kill switch, skipping to fallback`);
+    } else if (eng.estimatedCostUsd > maxCostUsd) {
       devLog(`[ai-render] Engine "${engineParam}" exceeds cost ceiling ($${eng.estimatedCostUsd} > $${maxCostUsd}), skipping to fallback`);
     } else if (!canUseEngine(engineParam, creditCtx)) {
       devLog(`[ai-render] Engine "${engineParam}" blocked (tier/band/cap/credits), skipping to fallback`);
@@ -429,6 +458,10 @@ async function tryEngines(
     if (engineId === engineParam) continue; // already tried
     const engine = ENGINES[engineId];
     if (!engine) continue;
+    if (isEngineDisabled(engineId)) {
+      devLog(`[ai-render] Skipping "${engineId}" — kill switch`);
+      continue;
+    }
     if (engine.estimatedCostUsd > maxCostUsd) {
       devLog(`[ai-render] Skipping "${engineId}" — over cost ceiling ($${engine.estimatedCostUsd} > $${maxCostUsd})`);
       continue;

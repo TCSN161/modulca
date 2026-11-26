@@ -6,6 +6,7 @@ import { togetherEngine } from "../engines/together";
 import { leonardoEngine } from "../engines/leonardo";
 import { falEngine } from "../engines/fal";
 import { cloudflareEngine } from "../engines/cloudflare";
+import { cloudflareKleinEngine } from "../engines/cloudflareKlein";
 import { replicateEngine } from "../engines/replicate";
 import { huggingfaceEngine } from "../engines/huggingface";
 import { segmindEngine } from "../engines/segmind";
@@ -40,8 +41,9 @@ interface EngineEntry {
 const ALL_ENGINES: EngineEntry[] = [
   // ── FREE tier ── (costPerImage=0 OR has large free quota we can use safely)
   { id: "pollinations", label: "Pollinations AI", fn: pollinationsEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Unlimited forever", freeTier: true },
-  { id: "ai-horde", label: "AI Horde", fn: aiHordeEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 768, maxHeight: 768, freeQuota: "Unlimited (community GPUs)", freeTier: true },
+  { id: "ai-horde", label: "AI Horde", fn: aiHordeEngine, costPerImage: 0, capabilities: ["text2img", "img2img"], maxWidth: 768, maxHeight: 768, freeQuota: "Unlimited (community GPUs)", freeTier: true },
   { id: "cloudflare", label: "Cloudflare AI", fn: cloudflareEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "10K neurons/day forever", freeTier: true },
+  { id: "cloudflare-klein", label: "Cloudflare FLUX.2 klein 4B", fn: cloudflareKleinEngine, costPerImage: 0, capabilities: ["text2img", "img2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Shares CF 10K neurons/day (~80 img2img/day at 1024×576)", freeTier: true },
   { id: "gemini", label: "Google Gemini (Nano Banana)", fn: geminiEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1536, maxHeight: 1536, freeQuota: "~1500 req/day free", freeTier: true },
   { id: "together", label: "Together.ai (FLUX Schnell)", fn: togetherEngine, costPerImage: 0, capabilities: ["text2img", "img2img"], maxWidth: 1440, maxHeight: 1440, freeQuota: "Free FLUX Schnell (promo)", freeTier: true },
   { id: "huggingface", label: "Hugging Face", fn: huggingfaceEngine, costPerImage: 0, capabilities: ["text2img"], maxWidth: 1024, maxHeight: 1024, freeQuota: "Free tier monthly", freeTier: true },

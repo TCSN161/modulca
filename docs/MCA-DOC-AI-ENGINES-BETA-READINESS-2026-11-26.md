@@ -1,6 +1,7 @@
 # MCA-DOC-AI-ENGINES-BETA-READINESS-2026-11-26
 
 **Status**: E1 + E2 done (Chat 3 Engines, sprint Nov 26–27)
+**⇒ Superseded in §0, §3, §4 by [[MCA-DOC-AI-ENGINES-BETA-READINESS-v2-2026-11-26]]** (free img2img via CF FLUX.2 klein; funded paid engines found).
 **Owner**: Chat 3 Engines
 **Related**: [[MCA-DOC-SPRINT-2026-11-26-27]] §2 Chat 3, §4.2 U8, §6 · [[MCA-DOC-AI-ENGINES-EXTENDED-2026-11]] · [[MCA-DOC-PRICING-COMP-ACCOUNTS]] (Chat 4 BUG list)
 
