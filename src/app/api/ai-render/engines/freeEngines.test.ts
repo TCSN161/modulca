@@ -78,3 +78,24 @@ describe("cloudflareKleinEngine", () => {
     expect(await cloudflareKleinEngine({ prompt: "x", width: 512, height: 512, seed: "1" })).toBeNull();
   });
 });
+
+describe("ai-horde censored output (3.06 bake-off)", () => {
+  afterEach(() => { vi.unstubAllGlobals(); vi.useRealTimers(); });
+
+  it("returns null instead of the black CENSORED placeholder", async () => {
+    vi.useFakeTimers();
+    const fetchMock = vi.fn(async (url: string) => {
+      if (url.endsWith("/generate/async")) return new Response(JSON.stringify({ id: "job1" }), { status: 202 });
+      if (url.includes("/generate/check/")) return new Response(JSON.stringify({ done: true }));
+      if (url.includes("/generate/status/"))
+        return new Response(JSON.stringify({ done: true, faulted: false, generations: [{ img: "https://x/y.webp", censored: true }] }));
+      throw new Error(`unexpected fetch ${url}`);
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const { aiHordeEngine } = await import("./aihorde");
+    const p = aiHordeEngine({ prompt: "kitchen", width: 512, height: 512, seed: "1" } as never);
+    await vi.runAllTimersAsync();
+    expect(await p).toBeNull();
+    expect(fetchMock.mock.calls.some(([u]) => String(u) === "https://x/y.webp")).toBe(false);
+  });
+});

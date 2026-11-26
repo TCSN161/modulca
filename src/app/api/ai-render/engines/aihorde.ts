@@ -109,11 +109,18 @@ export const aiHordeEngine: AiRenderEngine = async (
       const status = (await statusRes.json()) as {
         done: boolean;
         faulted: boolean;
-        generations?: Array<{ img: string }>;
+        generations?: Array<{ img: string; censored?: boolean }>;
       };
 
       if (status.faulted) {
         console.error("[ai-horde] Job faulted");
+        return null;
+      }
+
+      // 3.06 bake-off: Horde's filter false-positives on room renders and returns a
+      // black "CENSORED" placeholder with censored=true. Never ship that as a render.
+      if (status.done && status.generations?.[0]?.censored) {
+        console.error("[ai-horde] Output censored by Horde filter, skipping");
         return null;
       }
 
