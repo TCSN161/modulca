@@ -80,7 +80,13 @@ Owner of the upgrades: Chat 3 Engines (renders, video, 3D) · Chat 6 Marketing (
 | Image renders | Cloudflare FLUX.2 klein 4B: ~95 free 1024² images/day; takes input images — [note](radar/2026-11-26-cloudflare-flux2-klein.md) | Better free renders, and render from our 3D view | 🧪 (Chat 3) |
 | Image renders | Cloudflare FLUX.2 klein 9B: only ~7 free images/day | Admin / hero shots at most | 👀 |
 | Image renders | Cloudflare retired 24 models on 20 Nov (incl. SDXL) | None of our model IDs is on the list | ✅ nothing to do |
-| Image renders | Image-to-image / ControlNet-style "render this exact 3D view" | Renders that match the real design, not a random house | 🧪 W50 (Chat 3) |
+| Image renders | Image-to-image / ControlNet-style "render this exact 3D view" — [comparison](radar/2026-11-26-render-3d-engines.md) | Renders that match the real design, not a random house | ✅ klein 4B live · 🧪 bake-off 3.06 |
+| 3D → photo | AI Horde ControlNet (canny / depth), free | Real structure control at €0, quality unknown | 🧪 (Chat 3) |
+| 3D → photo | Stability Control Structure, $0.05, 25 credits ≈ 5 renders | Quality benchmark with a strength setting | 🧪 (Chat 3) |
+| 3D → photo | fal FLUX.2 klein edit $0.01/MP · BFL klein ≈$0.015 | Cheap paid overflow | 👀 after revenue |
+| 3D → photo | Replicate FLUX depth / canny (≈$0.025, secondary source) | Strict geometry from our own depth map | 🧪 if free options fail |
+| 3D → photo | Vercel AI Gateway free credit (amount and image coverage unconfirmed) | Second free klein pool | 👀 |
+| 3D → photo | Gemini image edit ($0.0336, no free tier) | Paid alternative | 👀 |
 | Image renders | Qwen-Image 2.1, MiniMax H3-Image (open weights; licenses restrictive or conflicting) | Self-hosting would need a GPU | 👀 |
 | Image renders | Gendo, RenderAI and similar sketch-to-render (free starts, vendor claims) | Compare quality against ours | 👀 |
 | Upscaling | AI upscalers (already have `/api/ai-render/upscale`) | Print-quality images for PDF | 👀 |
