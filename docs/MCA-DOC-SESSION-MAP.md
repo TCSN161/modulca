@@ -151,3 +151,21 @@ Stripe live (4) · canal YouTube (6) · presă + Cornetu (7) · Blender pipeline
 | **13 Mobile / AR** | Dacă după lansare vrem aplicație sau „casa pe terenul tău” în AR | 3 Engines |
 
 Regula: un chat nou apare doar când un grup existent nu mai poate duce sarcina fără să-și încarce contextul. Altfel e doar o sesiune nouă într-un chat existent.
+
+### 4.5 Pe fiecare grup existent: sesiunile previzibile, până după lansare
+(Fiecare rând = o sesiune probabilă. Ordinea contează, datele sunt orientative.)
+
+| Grup | Până la beta (dec) | Pre-lansare (ian) | După lansare (feb →) |
+|---|---|---|---|
+| **1 MAIN** | 1.03 test complet · 1.04 închidere W48 · 1.05 retro nov · închideri W49–W51 · upgrade securitate B15 · pre-flight beta · ziua beta (15 dec) | Triaj feedback săptămânal · Go/No-Go 15 ian · checklist lansare · retro dec + ian | MAIN nou săptămânal · ziua lunară de upgrade AI · retro lunare · planul trimestrial (Q1/Q2 2027) |
+| **2 Neufert** | 2.04 F3 · 2.05 F4+F6 · 2.07 capitol nou + test Haiku · 2.08 corecturi Vlad · 2.09 publicare · `/catuc-check` + Profile Engine · Privacy/ToS beta | Citări de articole în consultant (Citations API) · biblioteca tradusă în batch · Codul Fiscal / alte legi | Actualizări la fiecare schimbare de lege · alte țări (bibliotecă pe țări) · consultant cu vizualizare (citește planuri și poze) |
+| **3 Engines** | 3.04 compare/upscale + bug-uri · compresie GLB · walkthrough v0 · postprocessing 3 | Blender pipeline (variante de module, lumină) · randări care respectă exact vederea 3D · prezentări pptx cu Agent Skills | Video AI (LTX/altele, cu buget) · AR/VR (dacă nu devine grup separat 13) · motoare noi din Radar |
+| **4 Billing** | 4.04 promo beta + 8 probleme · insignă BETA + widget feedback | Stripe LIVE · CUI/bancă · facturare · prețuri finale după beta | Pachete one-off (documente CATUC €9–29) · reînnoiri, retenție · conturi pentru firme |
+| **5 Design + Drawings** | 5.02 audit export · PermitTracker 3 PDF-uri · bug-uri din testul complet | Export DWG v0 · îmbunătățiri wizard din feedback | Desene tehnice complete (planuri, secțiuni) · pachet PAC pentru arhitect · cote și standarde CAD |
+| **6 Marketing** | (pauză) · 6.04 ajustări după Vlad · pilot 3–5 Shorts | Canal YouTube live · ritm de postare · lead magnet „Ghid CATUC” · quiz pe site · campanie lansare | Conținut săptămânal · studii de caz (Cornetu) · webinare pentru arhitecți |
+| **7 Partners** | 7.02 acord Vlad + DPA · 7.03 email utilizatori · lista invitaților beta | 3 jurnaliști + kit de presă · programe startup · primii producători de module | Rețea de arhitecți parteneri · producători (sau grup 12) · investitori |
+| **8 Express** | 8.02 MVP · 8.03 teste automate Playwright | Prompt liber · mai multe randări · alegere de produse | Express pentru arhitecți (propunere pentru client în 5 min) · Express din poza terenului |
+| **9 Radar** | 9.02 raport vineri (în fiecare săptămână) · sweep lunar 7 dec | Sweep 4 ian · raport lansare (ce unelte noi folosim) | Raport săptămânal + lunar, pe aceeași regulă |
+| **0 Arhivă** | — (doar istoric) | — | — |
+
+Grupurile noi 10–13 (§4.4) preiau sarcini din tabelul de mai sus doar când declanșatorul lor se activează. Exemple: 10 Support preia triajul de la MAIN, 12 Producători preia de la Partners, 13 Mobile/AR preia AR de la Engines.
