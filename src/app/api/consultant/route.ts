@@ -10,6 +10,7 @@ import { devLog } from "@/shared/lib/devLog";
 import { CONSULTANT_CLAUDE_MODEL } from "./models";
 import { callClaude, getAnthropicKey, isAnthropicDisabled, type ClaudeChatInput } from "./anthropic";
 import { expandQuery } from "./queryExpansion";
+import { CATUC_FACTS, CATUC_RANK_BOOST, PRE_CATUC_NOTE, isCatucAware, isCatucQuestion, isPreCatucContent } from "./catucFacts";
 import { consumeAiCallQuota, refundAiCall } from "./quotaGuard";
 import { getServerTier } from "@/shared/server/serverTier";
 import { quotaExceededResponse } from "@/shared/server/quota";
@@ -152,8 +153,9 @@ ${CORE_FACTS}
 12. You may suggest follow-up questions the architect should investigate with local authorities`,
 };
 
+/** Stable (cached) prompt: tier prompt + verified CATUC facts (BUG-ST13). */
 function getSystemPrompt(tier: string): string {
-  return TIER_SYSTEM_PROMPTS[tier] || TIER_SYSTEM_PROMPTS.free;
+  return `${TIER_SYSTEM_PROMPTS[tier] || TIER_SYSTEM_PROMPTS.free}\n\n${CATUC_FACTS}`;
 }
 
 /* ------------------------------------------------------------------ */
@@ -300,11 +302,12 @@ interface RAGResult { context: string; articlesUsed: string[] }
 
 async function buildRAGContext(question: string, maxArticles = 4, maxChars = 6000): Promise<RAGResult> {
   const detectedRegion = detectRegion(question);
+  const catucQ = isCatucQuestion(question);
 
-  // Score all articles
+  // Score all articles; on CATUC/permit questions CATUC-aware articles rank first (BUG-ST13)
   const scored = ARTICLES.map((a) => ({
     article: a,
-    score: scoreArticle(a, question, detectedRegion),
+    score: scoreArticle(a, question, detectedRegion) + (catucQ && isCatucAware(a) ? CATUC_RANK_BOOST : 0),
   }))
     .filter((s) => s.score > 0)
     .sort((a, b) => b.score - a.score)
@@ -328,7 +331,8 @@ async function buildRAGContext(question: string, maxArticles = 4, maxChars = 600
     // Trim to fit within budget
     const trimmed = content.slice(0, Math.min(content.length, maxChars - totalChars));
     if (trimmed.length < 100) break; // Not enough room for meaningful content
-    sections.push(`## [${article.title}]\n${trimmed}`);
+    const legacyNote = isPreCatucContent(article, content) ? `\n> ${PRE_CATUC_NOTE}\n` : "";
+    sections.push(`## [${article.title}]${legacyNote}\n${trimmed}`);
     totalChars += trimmed.length;
     if (totalChars >= maxChars) break;
   }

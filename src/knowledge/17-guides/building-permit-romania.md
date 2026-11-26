@@ -11,6 +11,10 @@ proOnly: false
 
 # How to Get a Building Permit in Romania (Step-by-Step)
 
+> **⚠️ Actualizare în curs: Legea 169/2026 (CATUC) înlocuiește Legea 50/1991 de la 25.08.2026.** Acest articol descrie încă legea veche (DTAC = acum PAC) și este în curs de revizuire. Informativ, nu consultanță juridică.
+>
+> **⚠️ Update in progress: Law 169/2026 (CATUC) replaces Law 50/1991 from 25.08.2026.** This article still describes the old law (DTAC is now PAC) and is under review. Informational only, not legal advice.
+
 Building a home in Romania requires navigating a well-defined but multi-step permitting process. This guide walks you through every stage, from the initial urbanism certificate to the final construction permit, with realistic timelines, costs, and practical advice for 2026.
 
 ## Overview of the Process

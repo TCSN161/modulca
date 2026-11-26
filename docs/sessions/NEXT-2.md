@@ -1,7 +1,7 @@
 # NEXT-2 — proposed next Chat 2 Neufert session
 
 **Session:** `2.05.Neufert_Phase2-F4-F6-Content_20261130` (Mon 30)
-**Written by:** 2.04 (2026-11-26), updated by 2.07 (2026-11-26) · **Model:** Opus (legal content) · Keep it lean.
+**Written by:** 2.04 (2026-11-26), updated by 2.07 and 2.08 (2026-11-26) · **Model:** Opus (legal content) · Keep it lean.
 
 ## Prompt
 
@@ -37,6 +37,13 @@ Finish:
 - One line in §6 of the current week's schedule doc.
 - Write the next prompt into `docs/sessions/NEXT-2.md`. Candidates: integrate the architect's F2/F3 edits after Sat 28 review; F7 `choosing-land-modular-home`; ~~ingest NotebookLM Q11–Q25~~ (done in 2.07); integrate the architect's answers on the 2.07 addendum (§5 of the partner review list); separate `catuc-clarificari-2026.new.md` chapter (spec §1) from `docs/references/catuc/catuc-clarificari-ocr.md`.
 - Do not start any other session.
+
+## Context carried over from 2.08 (consultant CATUC awareness, ST13 + ST22)
+- `src/app/api/consultant/catucFacts.ts` = the verified CATUC facts the consultant uses until F2/F3 go live (cached system block, all tiers). If F4/F6 or the architect's review changes a fact (e.g. CC1 / art. 440(3) technical checking, metropolitan exclusion), update this block in the same session and re-run `catucFacts.test.ts`.
+- Retrieval: articles tagged `catuc` / `legea-169-2026` rank first on permit/CATUC questions, so the `.new.md` → `.md` swaps must keep those tags. Articles that still cite Legea 50/1991 / 350/2001 / DTAC get a PRE-CATUC note in the RAG context.
+- ST22 banners ("Actualizare în curs …", RO+EN) are in 4 live library files (building-permit-process, modular-prefab-regulations, urban-planning-pug-puz, 17-guides/building-permit-romania) and 4 blog posts (`src/features/blog/catucBanner.ts`; RO casa-modulara-romania, permis-constructie-romania; EN building-regulations-romania-2026, choosing-architect-romania). **Remove each banner when its CATUC version goes live.** F6 replaces `building-permit-romania.md` → drop its banner then.
+- RO blog `casa-modulara-romania` still says "Nu exista procedura simplificata" and AC valid 12 luni — wrong under CATUC; needs a content rewrite (after review).
+- Golden test (5 questions, $0.15): `docs/research/2026-11-26-consultant-catuc-golden-test.md`.
 
 ## Context carried over from 2.07 (Q11–Q25, OCR, CATUC chapter)
 - MDLPA Clarificări transcribed: `docs/references/catuc/catuc-clarificari-ocr.md` (pct. 3 = PUD via mayor's order for pre-CATUC PUDs; pct. 7 = new POT definition does not apply to PUG/PUZ approved before 25.08.2026; pct. 9 = PUZ intentions list, art. 66(3)–(6); pct. 11 = dezlipire 2 lots / PUD 3–12 lots / PUZ > 12 lots, art. 216–219, 240). Useful for F4.

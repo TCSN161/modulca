@@ -14,6 +14,10 @@ relatedArticles: ["ro-building-permit", "ro-land-registry"]
 
 # Urban Planning — PUG, PUZ, PUD (Romania)
 
+> **⚠️ Actualizare în curs: Legea 169/2026 (CATUC) înlocuiește Legea 50/1991 de la 25.08.2026.** Acest articol descrie încă legea veche (DTAC = acum PAC) și este în curs de revizuire. Informativ, nu consultanță juridică.
+>
+> **⚠️ Update in progress: Law 169/2026 (CATUC) replaces Law 50/1991 from 25.08.2026.** This article still describes the old law (DTAC is now PAC) and is under review. Informational only, not legal advice.
+
 ## Overview
 Romanian urban planning operates through a hierarchy of plans that determine what can be built where. Understanding these is essential before purchasing land or designing.
 

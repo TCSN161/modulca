@@ -9,6 +9,7 @@
  */
 
 import type { BlogArticle } from "./articles";
+import { CATUC_BANNER_RO } from "./catucBanner";
 
 export const BLOG_ARTICLES_RO: BlogArticle[] = [
   {
@@ -21,6 +22,7 @@ export const BLOG_ARTICLES_RO: BlogArticle[] = [
     readMinutes: 8,
     tags: ["case-modulare", "romania", "ghid", "constructii-modulare", "2026"],
     sections: [
+      CATUC_BANNER_RO, // BUG-ST22: remove when the CATUC version goes live
       {
         body: "Casele modulare au trecut in Romania din stadiul de curiozitate de nisa in solutie reala pentru zeci de mii de familii care vor sa construiasca rapid, predictibil si la un cost controlat. Acest ghid explica, fara marketing inutil, ce este o casa modulara, cat costa in 2026, ce avize sunt necesare si cum iti alegi constructorul ca sa eviti cele mai frecvente capcane.",
       },
@@ -111,6 +113,7 @@ export const BLOG_ARTICLES_RO: BlogArticle[] = [
     readMinutes: 9,
     tags: ["permis-constructie", "autorizatie-construire", "certificat-urbanism", "romania", "reglementari"],
     sections: [
+      CATUC_BANNER_RO, // BUG-ST22: remove when the CATUC version goes live
       {
         body: "Procesul de obtinere a autorizatiei de construire in Romania are reputatia de a fi lent si imprevizibil. Reputatia este doar partial meritata: in realitate, parcursul este bine definit de CATUC (Legea 169/2026, in vigoare din 25.08.2026), care consolideaza vechile Lege 50/1991 si 350/2001, iar intarzierile apar aproape intotdeauna in acelasi loc. Acest ghid parcurge fiecare etapa, cu timpi reali masurati pe 340 proiecte urmarite de echipa ModulCA in perioada 2023-2025, costuri actualizate pentru 2026 si lista de greseli care prelungesc dosarul cu luni intregi.",
       },

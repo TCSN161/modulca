@@ -14,6 +14,10 @@ relatedArticles: ["eu-construction-products-regulation", "ro-urban-planning"]
 
 # Building Permit Process (Romania)
 
+> **⚠️ Actualizare în curs: Legea 169/2026 (CATUC) înlocuiește Legea 50/1991 de la 25.08.2026.** Acest articol descrie încă legea veche (DTAC = acum PAC) și este în curs de revizuire. Informativ, nu consultanță juridică.
+>
+> **⚠️ Update in progress: Law 169/2026 (CATUC) replaces Law 50/1991 from 25.08.2026.** This article still describes the old law (DTAC is now PAC) and is under review. Informational only, not legal advice.
+
 ## Overview
 Steps and documents required for Autorizație de Construire in Romania.
 

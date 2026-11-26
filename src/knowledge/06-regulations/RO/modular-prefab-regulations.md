@@ -14,6 +14,10 @@ relatedArticles: ["ro-building-permit", "ro-structural-standards", "quality-assu
 
 # Modular & Prefabricated Building Regulations (Romania)
 
+> **⚠️ Actualizare în curs: Legea 169/2026 (CATUC) înlocuiește Legea 50/1991 de la 25.08.2026.** Acest articol descrie încă legea veche (DTAC = acum PAC) și este în curs de revizuire. Informativ, nu consultanță juridică.
+>
+> **⚠️ Update in progress: Law 169/2026 (CATUC) replaces Law 50/1991 from 25.08.2026.** This article still describes the old law (DTAC is now PAC) and is under review. Informational only, not legal advice.
+
 ## Overview
 
 Romania does not have a separate regulatory framework for modular or prefabricated buildings. Instead, modular construction must comply with the same building codes as traditional construction, with additional requirements for factory-produced elements. This is actually an advantage — modular homes have the same legal status as any permanent building.

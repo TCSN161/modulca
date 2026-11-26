@@ -4,6 +4,8 @@
  * Add articles here; they auto-appear on /blog and generate static pages.
  */
 
+import { CATUC_BANNER_EN } from "./catucBanner";
+
 export interface BlogArticle {
   slug: string;
   title: string;
@@ -172,6 +174,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     readMinutes: 7,
     tags: ["regulations", "Romania", "permits", "codes"],
     sections: [
+      CATUC_BANNER_EN, // BUG-ST22: remove when the CATUC version goes live
       {
         heading: "Overview of Romanian Building Regulations",
         body: "Romania's building regulatory framework is governed by Law 50/1991 (amended) for construction permits and a series of technical normatives that cover structural safety, energy performance, fire protection, and accessibility. Understanding these regulations is essential before starting any building project, whether traditional or modular.\n\nThe permitting process involves several stages: obtaining an urbanism certificate (certificat de urbanism), preparing project documentation through an authorized architect, getting approvals from utility providers and relevant authorities, and finally receiving the building permit (autorizatie de construire). The entire process typically takes 3-6 months, though ModulCA's platform helps streamline documentation preparation significantly.",
@@ -256,6 +259,7 @@ export const BLOG_ARTICLES: BlogArticle[] = [
     readMinutes: 5,
     tags: ["architect", "Romania", "tips", "process"],
     sections: [
+      CATUC_BANNER_EN, // BUG-ST22: remove when the CATUC version goes live
       {
         heading: "Why Your Architect Choice Matters",
         body: "In Romania, an authorized architect is legally required to sign off on building permit documentation for any new construction or major renovation. But beyond the legal requirement, your architect is the person who translates your vision into a buildable, code-compliant design. The right architect saves you money by avoiding costly mistakes, navigating regulations efficiently, and optimizing your layout for your specific needs and plot conditions.\n\nThe architect's role in Romania covers the full project lifecycle: from the initial feasibility study (studiu de fezabilitate) through the building permit project (DTAC/PAC), to the detailed execution project (PTh/DE) and construction supervision (dirigentie de santier, though this can also be a separate specialist). Understanding this scope helps you evaluate what you're getting for your investment.",
