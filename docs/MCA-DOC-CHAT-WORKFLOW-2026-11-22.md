@@ -249,3 +249,4 @@ Antifragility compounds: each retro's lessons update this workflow doc. Over tim
 | 2026-11-26 | Chat 8 registered as **Express** (§1 scope, §10 write paths); spec [[MCA-SPEC-EXPRESS-MODE-v0]] | Costin: automated wizard for users + automated testing |
 | 2026-11-26 | Chat 9 registered as **Radar** (§1, §10); owns [[MCA-DOC-AI-RADAR]] | Costin: keep news links out of MAIN |
 | 2026-11-26 | Chat 5 renamed **Design + Drawings**: takes ownership of the unowned configurator core (wizard, design, land, marketplace, project save) found by the Express audit | Costin: accepted MAIN proposal |
+| 2026-11-26 | Session map [[MCA-DOC-SESSION-MAP]] created; rule: only MAIN starts sessions; max 2 in parallel; sessions numbered per chat | Costin: wants a clear tree of all chats |
