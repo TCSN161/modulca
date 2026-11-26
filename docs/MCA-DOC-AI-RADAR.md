@@ -57,18 +57,39 @@ Links can be YouTube, X, blogs or Anthropic posts. MAIN reads or summarizes each
 | Artifacts (pages / apps made by Claude, shareable) | Investor one-pager, internal dashboards (sprint board, budget) | 🧪 |
 | Gmail / Calendar connectors | Draft partner emails, schedule the Vlad call | 👀 (always with your approval before sending) |
 
-## 4. Outside Claude (3D, video, design)
+## 4. Visuals: renders, video, 3D, presentation, promotion
+
+Owner of the upgrades: Chat 3 Engines (renders, video, 3D) · Chat 6 Marketing (promotion) · Chat 5 Drawings (technical docs).
+
+| Area | Tool / tech | Use | Status |
+|---|---|---|---|
+| Image renders | Our ~19 engines (Cloudflare free today; FLUX / Gemini / OpenAI image paid) | Concept renders in the wizard and Express | ✅ Cloudflare · 👀 paid ones after revenue |
+| Image renders | Image-to-image / ControlNet-style "render this exact 3D view" | Renders that match the real design, not a random house | 🧪 W50 (Chat 3) |
+| Upscaling | AI upscalers (already have `/api/ai-render/upscale`) | Print-quality images for PDF | 👀 |
+| Video | Canvas recording of AutoTour (no AI, €0) | Walkthrough video v0 | 📅 W50 |
+| Video | AI video (LTX, Wan OSS, others) | Short animated flythroughs | 👀 Jan (with revenue) |
+| Video | NotebookLM "Scurt" / "Explicații" | CATUC explainers, Shorts | ✅ (Chat 6 pilot) |
+| 3D web | Three.js + React Three Fiber + postprocessing | Live 3D in the browser | ✅ · 📅 postprocessing 3 (W50) |
+| 3D assets | gltf-transform | Compress the 20 GLB models (faster loads) | 📅 W49 |
+| 3D assets | Blender (+ Python, optionally a Blender MCP so Claude drives it) | Asset pipeline, module variants, baked light | 📅 Jan |
+| 3D capture | Gaussian splats / photogrammetry | Scans of built houses (investors: "show real houses") | 👀 after Cornetu |
+| AR / VR | `@react-three/xr` (already a dependency) | "Place the house on your land" on a phone | 👀 after beta |
+| Presentation | Claude Agent Skills (pptx / pdf) | Polished client presentation, investor deck | 📅 Jan |
+| Design | Figma / Claude design artifacts | UI polish, marketing visuals | 👀 |
+| Promotion | Canva / CapCut-style editors, infographics from NotebookLM | Social posts, Shorts editing | 👀 (Chat 6) |
+
+## 5. Other software that could help
 
 | Tool | Use | Status |
 |---|---|---|
-| gltf-transform | Compress the 20 GLB models | 📅 W49 |
-| Blender (+ Python scripting, optionally a Blender MCP so Claude can drive it) | Asset pipeline, module variants, baked light | 📅 Jan |
-| NotebookLM Studio | CATUC content, internal QA (see the CATUC strategy doc §6) | ✅ |
-| Gaussian splats | Scans of built houses | 👀 after Cornetu |
+| Google Analytics 4 + Microsoft Clarity + Vercel Analytics (all already installed) | Where visitors come from, what they click, where they drop off | ✅ installed · 🧪 read them weekly |
+| Playwright (already a dev dependency) | Automated browser tests (Express golden briefs) | 📅 W50 |
+| Resend (already used) | Product-update emails to users who opt in | 🧪 |
+| NotebookLM | CATUC content, internal QA (see the CATUC strategy doc §6) | ✅ |
 
 ---
 
-## 5. Sources MAIN checks on upgrade day
+## 6. Sources MAIN checks on upgrade day
 
 - Anthropic news + Claude API release notes + Claude Code changelog
 - Our own checks: `engines-model-check.mjs` (render engines + Anthropic models)
