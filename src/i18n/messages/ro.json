@@ -298,7 +298,14 @@
       "upgrade": "Upgrade",
       "getStarted": "Începe",
       "contactSales": "Contactează vânzări",
-      "demoMode": "Mod demo — upgrade instant, fără plată"
+      "demoMode": "Mod demo — upgrade instant, fără plată",
+      "included": "Inclus în planul tău",
+      "manageSubscription": "Gestionează abonamentul",
+      "contactUs": "Contactează-ne"
+    },
+    "notice": {
+      "usePortal": "Ai deja un abonament. Schimbarea planului se face în portalul de facturare — îl deschidem acum.",
+      "notAnUpgrade": "Planul tău actual include deja acest nivel. Nu e nimic de cumpărat."
     },
     "features": {
       "free": {

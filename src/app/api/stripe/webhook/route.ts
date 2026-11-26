@@ -7,6 +7,7 @@ import {
   sendPaymentFailedEmail,
   sendSubscriptionCancelledEmail,
 } from "@/shared/lib/email";
+import { resolveCheckoutTier, tierForPriceId, type PaidTier } from "../billing";
 
 export const dynamic = "force-dynamic";
 
@@ -108,9 +109,33 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
 
   const subscription = await getStripe().subscriptions.retrieve(subscriptionId);
   const priceId = subscription.items.data[0]?.price?.id;
-  const tier = mapPriceToTier(priceId);
+  const purchased = mapPriceToTier(priceId);
 
-  console.log("[Stripe Webhook] Checkout complete:", { userId, tier, subscriptionId });
+  // BUG-ST16: never lower a comp account (paid tier, no subscription id).
+  const { data: current, error: currentErr } = await supabase
+    .from("profiles")
+    .select("tier, stripe_subscription_id")
+    .eq("id", userId)
+    .maybeSingle();
+  if (currentErr) throw currentErr; // → 500, Stripe retries later
+  const { tier, keepTier } = resolveCheckoutTier(
+    (current as { tier: string | null; stripe_subscription_id: string | null } | null) ?? null,
+    purchased,
+  );
+
+  console.log("[Stripe Webhook] Checkout complete:", { userId, tier, purchased, keepTier, subscriptionId });
+
+  if (keepTier) {
+    // The checkout guard should make this impossible. If it happens, keep the
+    // comp tier, do NOT bind the subscription (it stays orphaned, so its later
+    // events are ignored) and alert so the payment can be refunded by hand.
+    Sentry.captureMessage("Comp account bought a lower plan; tier kept, refund needed", {
+      level: "warning",
+      tags: { source: "stripe-webhook", action: "comp-lower-checkout" },
+      extra: { userId, compTier: tier, purchased, subscriptionId },
+    });
+    return;
+  }
 
   await supabase.from("profiles").update({
     tier,
@@ -213,19 +238,6 @@ async function isCurrentSubscription(userId: string, subscriptionId: string): Pr
   return true;
 }
 
-function mapPriceToTier(priceId: string | undefined): string {
-  if (!priceId) return "free";
-
-  const premiumMonthly = process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_MONTHLY;
-  const premiumYearly = process.env.NEXT_PUBLIC_STRIPE_PRICE_PREMIUM_YEARLY;
-  const architectMonthly = process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_MONTHLY;
-  const architectYearly = process.env.NEXT_PUBLIC_STRIPE_PRICE_ARCHITECT_YEARLY;
-  const constructorMonthly = process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUCTOR_MONTHLY;
-  const constructorYearly = process.env.NEXT_PUBLIC_STRIPE_PRICE_CONSTRUCTOR_YEARLY;
-
-  if (priceId === premiumMonthly || priceId === premiumYearly) return "premium";
-  if (priceId === architectMonthly || priceId === architectYearly) return "architect";
-  if (priceId === constructorMonthly || priceId === constructorYearly) return "constructor";
-
-  return "free";
+function mapPriceToTier(priceId: string | undefined): PaidTier | "free" {
+  return tierForPriceId(priceId) ?? "free";
 }

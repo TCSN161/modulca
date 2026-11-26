@@ -298,7 +298,14 @@
       "upgrade": "Upgrade",
       "getStarted": "Begin nu",
       "contactSales": "Contact sales",
-      "demoMode": "Demo-modus — directe upgrade, geen betaling"
+      "demoMode": "Demo-modus — directe upgrade, geen betaling",
+      "included": "Inbegrepen in je abonnement",
+      "manageSubscription": "Abonnement beheren",
+      "contactUs": "Neem contact op"
+    },
+    "notice": {
+      "usePortal": "Je hebt al een abonnement. Plannen wijzig je in het facturatieportaal — we openen het nu.",
+      "notAnUpgrade": "Je huidige abonnement bevat dit niveau al. Er is niets te kopen."
     },
     "features": {
       "free": {

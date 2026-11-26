@@ -298,7 +298,14 @@
       "upgrade": "Upgrade",
       "getStarted": "Get started",
       "contactSales": "Contact sales",
-      "demoMode": "Demo mode — instant upgrade, no payment"
+      "demoMode": "Demo mode — instant upgrade, no payment",
+      "included": "Included in your plan",
+      "manageSubscription": "Manage subscription",
+      "contactUs": "Contact us"
+    },
+    "notice": {
+      "usePortal": "You already have a subscription. Plan changes are made in the billing portal — opening it now.",
+      "notAnUpgrade": "Your current plan already includes this tier. Nothing to buy."
     },
     "features": {
       "free": {

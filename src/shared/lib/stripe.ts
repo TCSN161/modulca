@@ -45,11 +45,13 @@ export const STRIPE_PRICES = {
  * or email is sent in the body.
  * In demo mode, simulates upgrade locally.
  */
-export async function redirectToCheckout(priceId: string): Promise<void> {
+export type CheckoutResult = "redirected" | "use_portal" | "not_an_upgrade" | "demo" | "error";
+
+export async function redirectToCheckout(priceId: string): Promise<CheckoutResult> {
   if (!isStripeConfigured || !priceId) {
     // Demo mode — simulate upgrade
     console.log("[Stripe Demo] Would redirect to checkout for:", priceId);
-    return;
+    return "demo";
   }
 
   try {
@@ -61,30 +63,38 @@ export async function redirectToCheckout(priceId: string): Promise<void> {
 
     if (res.status === 401) {
       window.location.href = "/login";
-      return;
+      return "redirected";
     }
 
     const data = await res.json();
 
+    // BUG-ST16: the server refuses same/lower tiers and second subscriptions.
+    if (data.code === "use_portal" || data.code === "not_an_upgrade") {
+      return data.code;
+    }
+
     if (data.error) {
       console.error("[Stripe]", data.error);
       alert(`Payment error: ${data.error}`);
-      return;
+      return "error";
     }
 
     if (data.url) {
       window.location.href = data.url;
+      return "redirected";
     }
+    return "error";
   } catch (err) {
     console.error("[Stripe] Checkout error:", err);
     alert("Could not connect to payment service. Please try again.");
+    return "error";
   }
 }
 
 /**
  * Open Stripe Customer Portal for subscription management.
  */
-export async function openCustomerPortal(customerId: string): Promise<void> {
+export async function openCustomerPortal(customerId?: string | null): Promise<void> {
   try {
     const res = await fetch("/api/stripe/portal", {
       method: "POST",

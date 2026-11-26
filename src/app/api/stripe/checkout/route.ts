@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import Stripe from "stripe";
 import * as Sentry from "@sentry/nextjs";
 import { getAuthenticatedUser } from "@/shared/lib/api-auth";
+import { getSupabaseServer } from "@/shared/lib/supabase-server";
+import { decideCheckout, type BillingProfile } from "../billing";
 
 export const dynamic = "force-dynamic";
 
@@ -39,6 +41,26 @@ export async function POST(req: NextRequest) {
         { error: "Missing priceId" },
         { status: 400 }
       );
+    }
+
+    // BUG-ST16: no checkout for the same or a lower tier, and no second
+    // subscription for someone who already pays (that goes via the portal).
+    const sb = getSupabaseServer();
+    if (!sb) {
+      return NextResponse.json({ error: "Supabase not configured" }, { status: 503 });
+    }
+    const { data: profile, error: profileErr } = await sb
+      .from("profiles")
+      .select("tier, created_at, stripe_subscription_id, subscription_status")
+      .eq("id", user.id)
+      .maybeSingle();
+    if (profileErr) {
+      Sentry.captureException(profileErr, { tags: { source: "stripe-checkout" } });
+      return NextResponse.json({ error: "Profile lookup failed" }, { status: 500 });
+    }
+    const decision = decideCheckout((profile as BillingProfile | null) ?? null, priceId);
+    if (!decision.ok) {
+      return NextResponse.json({ error: decision.error, code: decision.code }, { status: decision.status });
     }
 
     const origin = req.headers.get("origin") || "https://www.modulca.eu";

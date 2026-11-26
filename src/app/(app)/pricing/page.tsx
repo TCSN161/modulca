@@ -6,7 +6,11 @@ import { useTranslations } from "next-intl";
 import { useAuthStore } from "@/features/auth/store";
 import { ACCOUNT_TIERS, FEATURE_COMPARISON_ROWS, type AccountTier, type FeatureAccess } from "@/features/auth/types";
 import { AuthNav } from "@/features/auth/components/AuthNav";
-import { STRIPE_PRICES, redirectToCheckout, isStripeConfigured } from "@/shared/lib/stripe";
+import { STRIPE_PRICES, redirectToCheckout, openCustomerPortal, isStripeConfigured } from "@/shared/lib/stripe";
+
+/** Tier order — a checkout is only offered for a tier above the effective one (BUG-ST16). */
+const TIER_ORDER: AccountTier[] = ["guest_free", "free", "premium", "architect", "constructor"];
+const rank = (t: AccountTier) => TIER_ORDER.indexOf(t);
 
 /** Tiers visible on the pricing page (skip guest) */
 const VISIBLE_TIERS = ACCOUNT_TIERS.filter((t) => t.id !== "guest_free");
@@ -25,14 +29,18 @@ const CATEGORY_KEYS: Record<string, string> = {
 type VisibleTierId = Exclude<AccountTier, "guest_free">;
 
 export default function PricingPage() {
-  const { userTier, betaPromoActive, betaPromoDaysLeft, setTier } = useAuthStore();
+  const { userTier, isAuthenticated, stripeCustomerId, betaPromoActive, betaPromoDaysLeft, setTier, getEffectiveTier } = useAuthStore();
+  const effectiveTier = getEffectiveTier();
   const [yearly, setYearly] = useState(false);
   const [upgrading, setUpgrading] = useState<string | null>(null);
+  const [notice, setNotice] = useState<string | null>(null);
   const t = useTranslations("pricing");
 
   const handleUpgrade = async (tierId: AccountTier) => {
     if (tierId === "free" || tierId === "guest_free") return;
+    if (rank(tierId) <= rank(effectiveTier)) return; // never checkout same/lower (BUG-ST16)
     setUpgrading(tierId);
+    setNotice(null);
 
     if (!isStripeConfigured) {
       // Demo mode — instant upgrade
@@ -51,7 +59,14 @@ export default function PricingPage() {
       return;
     }
 
-    await redirectToCheckout(priceId);
+    const result = await redirectToCheckout(priceId);
+    if (result === "use_portal") {
+      // Already a paying subscriber: plan changes go through the Stripe portal.
+      setNotice(t("notice.usePortal"));
+      await openCustomerPortal();
+    } else if (result === "not_an_upgrade") {
+      setNotice(t("notice.notAnUpgrade"));
+    }
     setUpgrading(null);
   };
 
@@ -88,6 +103,12 @@ export default function PricingPage() {
             </div>
           )}
 
+          {notice && (
+            <div role="status" className="mb-6 mx-auto max-w-lg rounded-lg border border-brand-teal-200 bg-brand-teal-50 px-4 py-2 text-sm text-brand-teal-800">
+              {notice}
+            </div>
+          )}
+
           {/* Billing toggle */}
           <div className="inline-flex items-center gap-3 rounded-full bg-gray-100 p-1">
             <button
@@ -115,9 +136,11 @@ export default function PricingPage() {
             const tierId = tier.id as VisibleTierId;
             const price = yearly ? tier.priceYearly : tier.priceMonthly;
             const monthlyEquiv = yearly && tier.priceYearly ? Math.round(tier.priceYearly / 12) : price;
-            const isCurrent = tier.id === userTier;
             const isBetaCurrent = betaPromoActive && tier.id === "premium" && userTier === "free";
-            const isUpgrade = !isCurrent && tier.id !== "free";
+            const isCurrent = !isBetaCurrent && tier.id === effectiveTier;
+            // BUG-ST16: tiers below the user's effective tier are already included.
+            const isIncluded = isAuthenticated && rank(tierId) < rank(effectiveTier);
+            const isUpgrade = !isCurrent && !isIncluded && tier.id !== "free";
             const isPremiumHighlight = tier.id === "premium";
             const isConstructor = tier.id === "constructor";
             const tierLabel = t(`tier.${tierId}.label`);
@@ -191,6 +214,29 @@ export default function PricingPage() {
                 {isCurrent || isBetaCurrent ? (
                   <div className="w-full rounded-lg border-2 border-brand-teal-800 px-3 py-2 text-center text-xs font-semibold text-brand-teal-800">
                     {isBetaCurrent ? t("cta.activeBeta") : t("cta.current")}
+                  </div>
+                ) : isIncluded ? (
+                  <div className="space-y-1.5">
+                    <div className="w-full rounded-lg bg-gray-50 px-3 py-2 text-center text-xs font-semibold text-gray-500">
+                      {t("cta.included")}
+                    </div>
+                    {tier.id !== "free" && (
+                      stripeCustomerId ? (
+                        <button
+                          onClick={() => openCustomerPortal()}
+                          className="block w-full rounded-lg border border-gray-200 px-3 py-2 text-center text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                          {t("cta.manageSubscription")}
+                        </button>
+                      ) : (
+                        <a
+                          href="mailto:contact@modulca.eu?subject=ModulCA%20plan"
+                          className="block w-full rounded-lg border border-gray-200 px-3 py-2 text-center text-xs font-semibold text-gray-600 hover:bg-gray-50 transition-colors"
+                        >
+                          {t("cta.contactUs")}
+                        </a>
+                      )
+                    )}
                   </div>
                 ) : tier.id === "free" ? (
                   <Link
