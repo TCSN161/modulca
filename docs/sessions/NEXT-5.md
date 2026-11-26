@@ -9,7 +9,7 @@ You are Chat 5 Design + Drawings, session `5.03.DesignDrawings_Project-Save-Bugs
 
 Read first:
 - The §9 read-first files in `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md`. Write only in Chat 5 paths (§10).
-- `docs/MCA-DOC-BETA-SMOKE-TEST.md`, rows ST06, ST08, ST09, ST10, ST11, ST12 and ST31.
+- `docs/MCA-DOC-BETA-SMOKE-TEST.md`, rows ST06, ST08, ST09, ST10, ST11, ST12, ST31 and ST35.
 - W48 live log §6 (`docs/MCA-DOC-WEEK-2026-W48-SCHEDULE.md`), the 5.01 and 5.02 lines.
 - `src/features/design/projectSnapshot.ts` (single save/restore path) and `src/features/design/renderPersistence.ts` (5.02 pattern: write the store, then save at once).
 
@@ -20,6 +20,7 @@ Fix, in this order, one commit each:
 4. **ST12 + ST31**: there is one cost function. The dashboard card (€43,200) differs from Design/Finalize (€39,096). Products (EUR 65) are not in the Total Estimate. Per-m² products (XPS, gypsum) are quantity 1. Make the dashboard use `getStats()` (or a pure shared function). Add products to the total. Add a unit (`pcs` | `m2`) and quantity from the module area for per-m² items. Add tests.
 5. **ST10**: the `/project/new` template choice ("Compact House") is ignored. Apply the template's modules (via `applyProjectSnapshot` or the wizard's `applyToProject`). Add accessible names to the template buttons.
 6. **ST08** (low, high-collision file `FinalizePage.tsx`; check `git log` for the last hour first): add the products section, and make "N projects saved" use the same source as the dashboard.
+7. **ST35** (low): the render page "Design Inspiration" cards (`src/features/design/components/render/RenderGallery.tsx`, `STYLE_PINS` in `renderConstants.ts`) show flat colour blocks, no images. Wire real images, either curated ones from the `src/assets/` registry or `public/`, with the colour as fallback.
 
 Finish:
 - `npx vitest run src/features/design src/features/wizard` + `npx tsc --noEmit` + `npm run test:run`.
