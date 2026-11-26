@@ -3,6 +3,7 @@ import type { AiEngine, RenderResolution } from "./renderConstants";
 import { RENDER_RESOLUTIONS } from "./renderConstants";
 import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
+import { authHeaders } from "@/shared/lib/authHeaders";
 
 interface UseRenderEngineParams {
   aiEngine: AiEngine;
@@ -99,7 +100,8 @@ export function useRenderEngine({
         isDev && console.log("[AI Render] Using POST (img2img) mode");
         response = await fetch("/api/ai-render", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          // Bearer token: the server resolves the tier itself (SEC-02); the session lives in localStorage
+          headers: { "Content-Type": "application/json", ...(await authHeaders()) },
           body: JSON.stringify({
             prompt: sanitized,
             width: res.width,
@@ -107,7 +109,6 @@ export function useRenderEngine({
             seed,
             engine: aiEngine !== "auto" ? aiEngine : null,
             baseImage,
-            tier,
             maxCostUsd,
           }),
           signal: controller.signal,
@@ -115,12 +116,25 @@ export function useRenderEngine({
       } else {
         // GET mode: text-to-image
         const engineParam = aiEngine !== "auto" ? `&engine=${aiEngine}` : "";
-        const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}&tier=${tier}&maxCostUsd=${maxCostUsd}`;
+        const proxyUrl = `/api/ai-render?prompt=${encodeURIComponent(sanitized)}&width=${res.width}&height=${res.height}&seed=${seed}${engineParam}&maxCostUsd=${maxCostUsd}`;
         isDev && console.log("[AI Render] Using GET (text-to-image):", proxyUrl.slice(0, 80) + "...");
-        response = await fetch(proxyUrl, { signal: controller.signal });
+        response = await fetch(proxyUrl, { headers: await authHeaders(), signal: controller.signal });
       }
 
       if (tickerRef.current) { clearInterval(tickerRef.current); tickerRef.current = null; }
+
+      // Quota exhausted: show the server message, never bypass the quota via Pollinations
+      if (response.status === 429) {
+        let message = "Daily render limit reached for your plan. Try again tomorrow or upgrade.";
+        try {
+          const body = await response.json();
+          if (body && typeof body.message === "string") message = body.message;
+          else if (body && typeof body.error === "string") message = body.error;
+        } catch { /* non-JSON body */ }
+        setAiError(message);
+        setAiLoading(false);
+        return;
+      }
 
       // If proxy failed (503, static export, etc.), try direct client-side Pollinations call
       if (!response.ok) {
