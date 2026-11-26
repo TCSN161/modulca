@@ -22,6 +22,7 @@ import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getStyleDirection } from "@/features/design/styles";
+import { resolveSelectedProducts } from "./selectedProducts";
 
 export interface SlideProduct {
   id: string;
@@ -87,12 +88,12 @@ export interface SlideData {
 interface Options {
   projectName: string;
   clientName: string;
-  /** Lookup of productId → { name, price } from PRODUCT_CATALOG */
-  productCatalog: Record<string, { name: string; price: number }>;
+  /** @deprecated ignored — products resolve via @/assets (BUG-X01) */
+  productCatalog?: Record<string, { name: string; price: number }>;
 }
 
 export function useSlideData(opts: Options): SlideData {
-  const { projectName, clientName, productCatalog } = opts;
+  const { projectName, clientName } = opts;
 
   const { gridRotation, polygon, mapCenter } = useLandStore();
   const {
@@ -104,27 +105,11 @@ export function useSlideData(opts: Options): SlideData {
     savedRenders,
   } = useDesignStore();
 
-  /* ── Products from localStorage (loaded once on mount) ── */
+  /* ── Products: {productId, quantity} resolved via @/assets (BUG-X01) ── */
   const [products, setProducts] = useState<SlideProduct[]>([]);
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("modulca-selected-products");
-      if (!raw) return;
-      const items: { id: string; quantity: number }[] = JSON.parse(raw);
-      setProducts(
-        items
-          .map((item) => {
-            const p = productCatalog[item.id];
-            return p
-              ? { id: item.id, name: p.name, quantity: item.quantity, price: p.price }
-              : null;
-          })
-          .filter((x): x is SlideProduct => x !== null)
-      );
-    } catch {
-      /* ignore */
-    }
-  }, [productCatalog]);
+    setProducts(resolveSelectedProducts());
+  }, []);
 
   /* ── Derived values ── */
   const stats = getStats();

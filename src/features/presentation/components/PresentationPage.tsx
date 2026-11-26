@@ -26,6 +26,7 @@ import RendersSlide from "./slides/RendersSlide";
 import MaterialsSlide from "./slides/MaterialsSlide";
 import ProductsSlide from "./slides/ProductsSlide";
 import CostSlide from "./slides/CostSlide";
+import { resolveSelectedProducts, type ResolvedProduct } from "../hooks/selectedProducts";
 
 type PresentationTemplate = "minimal" | "bold" | "classic" | "luxury" | "architect";
 type SlideId =
@@ -120,38 +121,6 @@ const MATERIAL_TEXTURES: Record<string, string> = {
   // alabaster, sage, slate: clean solid colors render better than forcing a photo
 };
 
-/** Product catalog for matching localStorage IDs — must match IDs from ProductsPage */
-const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
-  // Finishing Materials
-  "fin-01": { name: "Engineered Oak Flooring", price: 42 },
-  "fin-02": { name: "Gypsum Wall Panels", price: 18 },
-  "fin-03": { name: "XPS Underfloor Insulation", price: 12 },
-  "fin-04": { name: "Triple-Glazed Window Unit", price: 385 },
-  "fin-05": { name: "Interior Flush Door", price: 145 },
-  "fin-06": { name: "Mineral Wool Insulation Roll", price: 8 },
-  "fin-07": { name: "Interior Wall Paint", price: 35 },
-  "fin-08": { name: "Porcelain Floor Tiles", price: 28 },
-  // Furniture & Decor
-  "fur-01": { name: "Modular Sofa 3-Seat", price: 1290 },
-  "fur-02": { name: "Wool Area Rug 200\u00D7300", price: 420 },
-  "fur-03": { name: "Blackout Curtain Pair", price: 95 },
-  "fur-04": { name: "Ceramic Vase Collection", price: 65 },
-  "fur-05": { name: "Wall-Mounted Shelving Unit", price: 280 },
-  "fur-06": { name: "Pendant Light Fixture", price: 175 },
-  "fur-07": { name: "Round Wall Mirror", price: 210 },
-  "fur-08": { name: "Upholstered Dining Chair", price: 195 },
-  // Plumbing & Electrical
-  "plm-01": { name: "Freestanding Bathtub", price: 890 },
-  "plm-02": { name: "Single-Lever Basin Faucet", price: 125 },
-  "plm-03": { name: "Ceramic Countertop Sink", price: 185 },
-  "plm-04": { name: "Wall-Hung Toilet", price: 320 },
-  "plm-05": { name: "Thermostatic Shower Set", price: 295 },
-  "plm-06": { name: "Flush-Mount Outlet Pack", price: 48 },
-  "plm-07": { name: "Modular Light Switch Set", price: 36 },
-  "plm-08": { name: "LED Ceiling Downlight Pack", price: 85 },
-  "plm-09": { name: "Electric Water Heater 80 L", price: 340 },
-};
-
 export default function PresentationPage() {
   const projectId = useProjectId();
   const { gridCells, gridRotation, polygon, mapCenter } = useLandStore();
@@ -190,19 +159,10 @@ export default function PresentationPage() {
   const finishInfo = FINISH_LEVELS.find((f) => f.id === finishLevel);
   const enabledSlides = slides.filter((s) => s.enabled);
 
-  // Load products from localStorage
-  const [products, setProducts] = useState<{ id: string; name: string; quantity: number; price: number }[]>([]);
+  // Selected products — {productId, quantity} resolved via @/assets (BUG-X01)
+  const [products, setProducts] = useState<ResolvedProduct[]>([]);
   useEffect(() => {
-    try {
-      const raw = localStorage.getItem("modulca-selected-products");
-      if (raw) {
-        const items: { id: string; quantity: number }[] = JSON.parse(raw);
-        setProducts(items.map((item) => {
-          const p = PRODUCT_CATALOG[item.id];
-          return p ? { id: item.id, name: p.name, quantity: item.quantity, price: p.price } : null;
-        }).filter((x): x is { id: string; name: string; quantity: number; price: number } => x !== null));
-      }
-    } catch { /* ignore */ }
+    setProducts(resolveSelectedProducts());
   }, []);
 
   const toggleSlide = useCallback((id: SlideId) => {

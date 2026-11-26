@@ -12,6 +12,7 @@ import {
 } from "@react-pdf/renderer";
 import type { ModuleConfig, SavedRender } from "@/features/design/store";
 import type { StyleDirection } from "@/features/design/styles";
+import { resolveSelectedProducts } from "../hooks/selectedProducts";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -590,54 +591,11 @@ function PresentationDocument(props: PdfGeneratorProps) {
 }
 
 /* ------------------------------------------------------------------ */
-/*  Product catalog (for matching localStorage IDs)                    */
+/*  Products — {productId, quantity} resolved via @/assets (BUG-X01)   */
 /* ------------------------------------------------------------------ */
 
-const PRODUCT_CATALOG: Record<string, { name: string; price: number }> = {
-  // Finishing Materials
-  "fin-01": { name: "Engineered Oak Flooring", price: 42 },
-  "fin-02": { name: "Gypsum Wall Panels", price: 18 },
-  "fin-03": { name: "XPS Underfloor Insulation", price: 12 },
-  "fin-04": { name: "Triple-Glazed Window Unit", price: 385 },
-  "fin-05": { name: "Interior Flush Door", price: 145 },
-  "fin-06": { name: "Mineral Wool Insulation Roll", price: 8 },
-  "fin-07": { name: "Interior Wall Paint", price: 35 },
-  "fin-08": { name: "Porcelain Floor Tiles", price: 28 },
-  // Furniture & Decor
-  "fur-01": { name: "Modular Sofa 3-Seat", price: 1290 },
-  "fur-02": { name: "Wool Area Rug 200\u00D7300", price: 420 },
-  "fur-03": { name: "Blackout Curtain Pair", price: 95 },
-  "fur-04": { name: "Ceramic Vase Collection", price: 65 },
-  "fur-05": { name: "Wall-Mounted Shelving Unit", price: 280 },
-  "fur-06": { name: "Pendant Light Fixture", price: 175 },
-  "fur-07": { name: "Round Wall Mirror", price: 210 },
-  "fur-08": { name: "Upholstered Dining Chair", price: 195 },
-  // Plumbing & Electrical
-  "plm-01": { name: "Freestanding Bathtub", price: 890 },
-  "plm-02": { name: "Single-Lever Basin Faucet", price: 125 },
-  "plm-03": { name: "Ceramic Countertop Sink", price: 185 },
-  "plm-04": { name: "Wall-Hung Toilet", price: 320 },
-  "plm-05": { name: "Thermostatic Shower Set", price: 295 },
-  "plm-06": { name: "Flush-Mount Outlet Pack", price: 48 },
-  "plm-07": { name: "Modular Light Switch Set", price: 36 },
-  "plm-08": { name: "LED Ceiling Downlight Pack", price: 85 },
-  "plm-09": { name: "Electric Water Heater 80 L", price: 340 },
-};
-
 function loadProducts(): { name: string; quantity: number; price: number }[] {
-  try {
-    const raw = localStorage.getItem("modulca-selected-products");
-    if (!raw) return [];
-    const items: { id: string; quantity: number }[] = JSON.parse(raw);
-    return items
-      .map((item) => {
-        const p = PRODUCT_CATALOG[item.id];
-        return p ? { name: p.name, quantity: item.quantity, price: p.price } : null;
-      })
-      .filter((x): x is { name: string; quantity: number; price: number } => x !== null);
-  } catch {
-    return [];
-  }
+  return resolveSelectedProducts().map(({ name, quantity, price }) => ({ name, quantity, price }));
 }
 
 /* ------------------------------------------------------------------ */
