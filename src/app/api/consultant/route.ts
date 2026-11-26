@@ -7,12 +7,15 @@ import { searchBooks, BOOK_REGISTRY } from "@/knowledge/15-books/_registry";
 import { getTierConfig as getAuthTierConfig, type AccountTier } from "@/features/auth/types";
 
 import { devLog } from "@/shared/lib/devLog";
+import { CONSULTANT_CLAUDE_MODEL } from "./models";
+import { callClaude, getAnthropicKey, isAnthropicDisabled, type ClaudeChatInput } from "./anthropic";
 export const dynamic = "force-dynamic";
 
 /**
  * Neufert AI Architectural Consultant — API route
  * RAG-powered: scores user question → fetches top KB articles → injects into LLM context.
- * Fallback chain: Groq → Together → Pollinations → Local KB.
+ * Fallback chain (tier-specific): Anthropic → OpenAI → Groq → Pollinations → Local KB.
+ * Kill switch: CONSULTANT_DISABLE_ANTHROPIC=1 skips Claude (see ./models.ts).
  * Includes an in-memory LRU cache (1h TTL, 100 entries) to reduce API costs.
  */
 
@@ -365,7 +368,7 @@ async function buildRAGContext(question: string, maxArticles = 4, maxChars = 600
  *   - Groq:         console.groq.com      — Free: 30 req/min, 14.4K tokens/min
  *   - Together:     api.together.xyz       — Free: $1 credit, then pay-as-you-go
  *   - OpenAI:       platform.openai.com    — Pay-as-you-go (~$0.25/1M input tokens for gpt-5.4-mini)
- *   - Anthropic:    console.anthropic.com  — Pay-as-you-go (~$3/1M input tokens for claude-sonnet)
+ *   - Anthropic:    console.anthropic.com  — Pay-as-you-go (Sonnet 5.5: $2/1M in, $0.10/1M cache read)
  *   - Pollinations: text.pollinations.ai   — Free, no key needed (fallback)
  *
  * Set API keys in .env.local:
@@ -375,53 +378,43 @@ async function buildRAGContext(question: string, maxArticles = 4, maxChars = 600
  *   ANTHROPIC_API_KEY=sk-ant-...
  */
 
-interface Provider {
+interface FetchProvider {
   id: string;
   url: string;
   model: string;
   keyEnv?: string;
   /** Override key resolution (e.g. when system env shadows .env.local) */
   getKey?: () => string | undefined;
+  /** Kill switch: when it returns true the provider is skipped */
+  isDisabled?: () => boolean;
+  call?: undefined;
   buildHeaders: (apiKey?: string) => Record<string, string>;
   buildBody: (messages: { role: string; content: string }[], maxTokens: number) => object;
   extractReply: (data: unknown) => string | null;
 }
 
+/** Provider called through its own SDK wrapper instead of raw fetch */
+interface SdkProvider {
+  id: string;
+  model: string;
+  keyEnv?: string;
+  getKey?: () => string | undefined;
+  isDisabled?: () => boolean;
+  call: (input: ClaudeChatInput) => Promise<string | null>;
+}
+
+type Provider = FetchProvider | SdkProvider;
+
 const ALL_PROVIDERS: Record<string, Provider> = {
   anthropic: {
+    // Official SDK (see ./anthropic.ts): no temperature (400 on Sonnet 5.5),
+    // effort "low", prompt caching on the stable tier prompt, stop_reason checks.
     id: "anthropic",
-    url: "https://api.anthropic.com/v1/messages",
-    model: "claude-sonnet-5-5",
+    model: CONSULTANT_CLAUDE_MODEL,
     keyEnv: "ANTHROPIC_API_KEY",
-    getKey: () => process.env.MODULCA_ANTHROPIC_KEY || process.env.ANTHROPIC_API_KEY || undefined,
-    buildHeaders: (apiKey) => ({
-      "Content-Type": "application/json",
-      "x-api-key": apiKey!,
-      "anthropic-version": "2023-06-01",
-    }),
-    buildBody: (messages, maxTokens) => {
-      // Anthropic uses a different format: system is separate, messages are user/assistant only
-      const system = messages.find((m) => m.role === "system")?.content ?? "";
-      const chatMsgs = messages.filter((m) => m.role !== "system").map((m) => ({
-        role: m.role,
-        content: m.content,
-      }));
-      return {
-        model: "claude-sonnet-5-5",
-        system,
-        messages: chatMsgs,
-        max_tokens: maxTokens,
-        temperature: 0.7,
-      };
-    },
-    extractReply: (data: any) => {
-      // Anthropic response: { content: [{ type: "text", text: "..." }] }
-      const blocks = data?.content;
-      if (Array.isArray(blocks)) {
-        return blocks.filter((b: any) => b.type === "text").map((b: any) => b.text).join("") || null;
-      }
-      return null;
-    },
+    getKey: getAnthropicKey,
+    isDisabled: isAnthropicDisabled,
+    call: callClaude,
   },
   openai: {
     id: "openai",
@@ -587,7 +580,10 @@ export async function POST(req: NextRequest) {
         `\nUse this profile to personalize recommendations. Reference their style preference and home size when relevant.`;
     }
 
-    const systemPrompt = getSystemPrompt(tier || "free") + quizContext + ragContext + tierNote;
+    // Stable part (cacheable for Claude) vs. per-request part (quiz profile + RAG articles)
+    const stableSystem = getSystemPrompt(tier || "free");
+    const volatileSystem = quizContext + ragContext + tierNote;
+    const systemPrompt = stableSystem + volatileSystem;
 
     const fullMessages = [
       { role: "system", content: systemPrompt },
@@ -600,6 +596,10 @@ export async function POST(req: NextRequest) {
       .filter(Boolean);
 
     for (const provider of providerChain) {
+      if (provider.isDisabled?.()) {
+        devLog(`[consultant] ${provider.id}: disabled by kill switch, skipping`);
+        continue;
+      }
       // Skip providers that need a missing API key
       const apiKey = provider.getKey ? provider.getKey() : provider.keyEnv ? process.env[provider.keyEnv] : undefined;
       if ((provider.keyEnv || provider.getKey) && !apiKey) {
@@ -609,26 +609,36 @@ export async function POST(req: NextRequest) {
 
       try {
         devLog(`[consultant] Trying ${provider.id} (${tier || "free"} tier)...`);
-        const response = await fetch(provider.url, {
-          method: "POST",
-          headers: provider.buildHeaders(apiKey),
-          body: JSON.stringify(provider.buildBody(fullMessages, tierCfg.maxTokens)),
-        });
-
-        if (!response.ok) {
-          const err = await response.text().catch(() => "");
-          console.error(`[consultant] ${provider.id} error ${response.status}:`, err.slice(0, 200));
-          continue;
-        }
-
-        // Pollinations returns plain text; others return JSON
         let reply: string | null;
-        const contentType = response.headers.get("content-type") || "";
-        if (contentType.includes("application/json")) {
-          const data = await response.json();
-          reply = provider.extractReply(data);
+        if (provider.call) {
+          reply = await provider.call({
+            stableSystem,
+            volatileSystem,
+            messages: messages.slice(-20),
+            maxTokens: tierCfg.maxTokens,
+            apiKey: apiKey!,
+          });
         } else {
-          reply = await response.text();
+          const response = await fetch(provider.url, {
+            method: "POST",
+            headers: provider.buildHeaders(apiKey),
+            body: JSON.stringify(provider.buildBody(fullMessages, tierCfg.maxTokens)),
+          });
+
+          if (!response.ok) {
+            const err = await response.text().catch(() => "");
+            console.error(`[consultant] ${provider.id} error ${response.status}:`, err.slice(0, 200));
+            continue;
+          }
+
+          // Pollinations returns plain text; others return JSON
+          const contentType = response.headers.get("content-type") || "";
+          if (contentType.includes("application/json")) {
+            const data = await response.json();
+            reply = provider.extractReply(data);
+          } else {
+            reply = await response.text();
+          }
         }
 
         if (reply && reply.trim()) {

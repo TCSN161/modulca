@@ -49,6 +49,7 @@
     "domains:check:json": "node scripts/domain-check.mjs --json"
   },
   "dependencies": {
+    "@anthropic-ai/sdk": "^1.14.0",
     "@auth/prisma-adapter": "^2.11.1",
     "@prisma/client": "^5.22.0",
     "@react-pdf/renderer": "^4.3.2",
