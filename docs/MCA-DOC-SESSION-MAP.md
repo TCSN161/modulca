@@ -3,7 +3,7 @@
 **Ce e**: vederea de ansamblu asupra tuturor chat-urilor (1–9) și sesiunilor: ce face fiecare, în ce stare e, ce a livrat, ce urmează, de cine depinde.
 **Cine o ține la zi**: MAIN, după fiecare sesiune terminată și la închiderea de vineri.
 **Ultima actualizare**: 2026-11-26 seara (MAIN 1.02)
-**Legat de**: [[MCA-DOC-CHAT-WORKFLOW-2026-11-22]] (cine ce deține) · [[MCA-DOC-CHAT-NAMING-2026-11-22]] (cum se numesc) · [[MCA-DOC-ROADMAP-ALL-CHATS-2026-11-23]] (ce urmează pe săptămâni)
+**Legat de**: [[MCA-DOC-CHAT-WORKFLOW-2026-11-22]] (cine ce deține) · [[MCA-DOC-CHAT-NAMING-2026-11-22]] (cum se numesc) · [[MCA-DOC-ROADMAP-ALL-CHATS-2026-11-23]] (ce urmează pe săptămâni) · [[MCA-DOC-ROADMAP-ALL-CHATS-2026-11-26]] (planul complet)
 
 Legendă: 🟢 lucrează acum · 🟡 așteaptă (pe cine scrie) · ✅ terminată (se poate arhiva) · 🔵 urmează (încă nepornită)
 
