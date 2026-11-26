@@ -9,6 +9,7 @@
 
 | Date | Decision | Driver | Supersedes |
 |---|---|---|---|
+| 2026-11-26 | Revenue streams map R1–R12 (subscriptions, render resale with reserve, CATUC docs, affiliate furniture/materials, land marketplace, contractors directory, producers, financing, energy, education, white-label); candidate group 12 = Marketplace & Partners | Costin: many funnels/revenue sources | — |
 | 2026-11-26 | Chat 5 = Design + Drawings (owns configurator core: wizard, design, land, marketplace, project save) · Chat 8 Express + Chat 9 Radar registered · SEC-01/012 applied in Supabase | Express audit found unowned core modules; Costin approved | Chat 5 = Drawings only |
 | 2026-11-26 | No DeepSeek top-up for Phase 2: Claude does RO→EN translation (F2, F4, F6); revisit DeepSeek for bulk work later | Costin: small extra Claude cost, keeps €50 cap headroom | DeepSeek $5 top-up for Phase 2 translation |
 | 2026-11-25 | CATUC permit service = detachable module inside modulca.eu (/autorizare), spin-out only on data; Chat 6 registered as Marketing | Costin: future standalone service + content channel | "Chat 6 not needed before beta" |

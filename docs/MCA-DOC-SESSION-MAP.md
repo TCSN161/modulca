@@ -154,7 +154,7 @@ Stripe live (4) · canal YouTube (6) · presă + Cornetu (7) · Blender pipeline
 |---|---|---|
 | **10 Support / Feedback beta** | Dacă feedback-ul de la beta depășește ~1 oră/zi de triaj | 1 MAIN |
 | **11 SEO / Analytics** | Când pornim conținut regulat (ian) și vrem rapoarte săptămânale GA4 / Search Console | 1 MAIN + 6 Marketing |
-| **12 Producători / Supply** | Când avem primii producători de module în discuții concrete | 7 Partners |
+| **12 Marketplace & Parteneri** (teren, constructori, producători, finanțare, energie) | Când avem primii parteneri concreți pentru venituri R6–R10 ([[MCA-STRAT-REVENUE-STREAMS-2026-11-26]]) | 7 Partners + 5 Design |
 | **13 Mobile / AR** | Dacă după lansare vrem aplicație sau „casa pe terenul tău” în AR | 3 Engines |
 
 Regula: un chat nou apare doar când un grup existent nu mai poate duce sarcina fără să-și încarce contextul. Altfel e doar o sesiune nouă într-un chat existent.
