@@ -8,6 +8,10 @@ import { falEngine } from "./engines/fal";
 import { cloudflareEngine } from "./engines/cloudflare";
 import { cloudflareKleinEngine } from "./engines/cloudflareKlein";
 import { isEngineDisabled } from "./engines/killSwitch";
+import { getServerTier } from "@/shared/server/serverTier";
+import { engineTierFor, clampMaxCost } from "./engines/renderTier";
+import { checkAndConsumeQuota, refundQuota, quotaExceededResponse } from "@/shared/server/quota";
+import { getTierConfig } from "@/features/auth/types";
 import { replicateEngine } from "./engines/replicate";
 import { huggingfaceEngine } from "./engines/huggingface";
 import { segmindEngine } from "./engines/segmind";
@@ -377,7 +381,7 @@ async function tryEngines(
       devLog(`[ai-render] Cache HIT for "${renderReq.prompt.slice(0, 40)}..." engine=${cached.engineId}`);
       logRender({
         prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
-        seed: renderReq.seed, mode, tier, engine_id: cached.engineId,
+        seed: renderReq.seed, mode, tier, user_id: renderReq.userId, engine_id: cached.engineId,
         status: "success", cost_usd: 0, image_size_bytes: cached.buffer.length,
         content_type: cached.contentType, cache_hit: true, cache_key: cacheKey,
       });
@@ -408,7 +412,7 @@ async function tryEngines(
     // Log to analytics (fire and forget)
     logRender({
       prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
-      seed: renderReq.seed, mode, tier, engine_id: engineId, engine_label: result.engine,
+      seed: renderReq.seed, mode, tier, user_id: renderReq.userId, engine_id: engineId, engine_label: result.engine,
       status: "success", cost_usd: result.costUsd ?? 0, latency_ms: result.latencyMs,
       image_size_bytes: result.buffer.length, content_type: result.contentType,
       cache_hit: false,
@@ -420,7 +424,7 @@ async function tryEngines(
     recordFailure(engineId, error, creditCtx);
     logRender({
       prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
-      seed: renderReq.seed, mode, tier, engine_id: engineId,
+      seed: renderReq.seed, mode, tier, user_id: renderReq.userId, engine_id: engineId,
       status: "failed", error_message: error, cost_usd: 0, cache_hit: false,
     });
   }
@@ -493,6 +497,29 @@ async function tryEngines(
 }
 
 /* ------------------------------------------------------------------ */
+/*  Server tier + per-user quota (BUG-SEC-02 / E07 / E08, 2026-11-26)  */
+/* ------------------------------------------------------------------ */
+
+/**
+ * Resolve the tier from the verified session (client `tier` is IGNORED) and
+ * consume one render unit. getServerTier never throws; quota falls back to an
+ * in-memory counter if the 012 RPC fails — so this is fail-safe.
+ */
+async function startRender(req: NextRequest, clientMaxCost: unknown) {
+  const ctx = await getServerTier(req);
+  const quota = await checkAndConsumeQuota(ctx, "render");
+  const tier = engineTierFor(ctx);
+  const maxCost = clampMaxCost(clientMaxCost, getTierConfig(tier).features.maxCostUsdPerImage);
+  return { ctx, quota, tier, maxCost };
+}
+
+/** No image produced → give the unit back. */
+async function finishRender(res: Response, st: Awaited<ReturnType<typeof startRender>>): Promise<Response> {
+  if (!res.ok) await refundQuota(st.ctx, "render", st.quota.source);
+  return res;
+}
+
+/* ------------------------------------------------------------------ */
 /*  GET /api/ai-render  — text-to-image                               */
 /* ------------------------------------------------------------------ */
 
@@ -504,13 +531,16 @@ export async function GET(req: NextRequest) {
     const height = Number(searchParams.get("height") || "576");
     const seed = searchParams.get("seed") || String(Date.now());
     const engineParam = searchParams.get("engine");
-    const maxCost = Number(searchParams.get("maxCostUsd") || "1.0");
 
-    const tier = searchParams.get("tier") || "free";
+    // NEVER trust ?tier= (BUG-SEC-02) — the verified session decides.
+    const st = await startRender(req, searchParams.get("maxCostUsd"));
+    if (!st.quota.allowed) return quotaExceededResponse(st.quota);
+    const { tier, maxCost } = st;
 
     const renderReq: AiRenderRequest = {
       prompt, width, height, seed,
       tier,
+      userId: st.ctx.userId ?? undefined,
       policyFlags: DEFAULT_POLICY,
     };
 
@@ -519,7 +549,7 @@ export async function GET(req: NextRequest) {
     );
 
     const order = getFallbackChain(tier, false);
-    return await tryEngines(renderReq, engineParam, order, maxCost);
+    return await finishRender(await tryEngines(renderReq, engineParam, order, maxCost), st);
   } catch (err) {
     console.error("[ai-render] GET unhandled error:", err);
     return NextResponse.json(
@@ -552,8 +582,7 @@ export async function POST(req: NextRequest) {
       seed = String(Date.now()),
       engine: engineParam = null,
       baseImage = null,
-      tier = "free",
-      maxCostUsd = 1.0,
+      maxCostUsd = null,
     } = body as Record<string, unknown> & {
       prompt?: string;
       width?: number;
@@ -561,9 +590,13 @@ export async function POST(req: NextRequest) {
       seed?: string | number;
       engine?: string | null;
       baseImage?: string | null;
-      tier?: string;
-      maxCostUsd?: number;
+      maxCostUsd?: number | null;
     };
+
+    // NEVER trust body.tier (BUG-SEC-02) — the verified session decides.
+    const st = await startRender(req, maxCostUsd);
+    if (!st.quota.allowed) return quotaExceededResponse(st.quota);
+    const tier = st.tier;
 
     const renderReq: AiRenderRequest = {
       prompt: String(prompt),
@@ -571,16 +604,17 @@ export async function POST(req: NextRequest) {
       height: Number(height),
       seed: String(seed),
       baseImage: baseImage ? String(baseImage) : undefined,
-      tier: String(tier),
+      tier,
+      userId: st.ctx.userId ?? undefined,
       policyFlags: DEFAULT_POLICY,
     };
 
     devLog(
-      `[ai-render] POST: "${String(prompt).slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} img2img=${!!baseImage} maxCost=$${maxCostUsd}`
+      `[ai-render] POST: "${String(prompt).slice(0, 60)}..." ${width}x${height} engine=${engineParam || "auto"} img2img=${!!baseImage} tier=${tier} maxCost=$${st.maxCost}`
     );
 
-    const order = getFallbackChain(String(tier), !!baseImage);
-    return await tryEngines(renderReq, engineParam as string | null, order, Number(maxCostUsd));
+    const order = getFallbackChain(tier, !!baseImage);
+    return await finishRender(await tryEngines(renderReq, engineParam as string | null, order, st.maxCost), st);
   } catch (err) {
     console.error("[ai-render] POST unhandled error:", err);
     return NextResponse.json(

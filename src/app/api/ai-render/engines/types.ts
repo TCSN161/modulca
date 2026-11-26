@@ -24,8 +24,10 @@ export interface AiRenderRequest {
   seed: string;
   /** Optional base64-encoded PNG from 3D scene capture (for img2img engines) */
   baseImage?: string;
-  /** User tier — used for cost ceiling enforcement */
+  /** User tier — used for cost ceiling enforcement (server-resolved, never client) */
   tier?: string;
+  /** Verified Supabase user id (null/undefined for guests) — for render_logs */
+  userId?: string;
   /** Policy flags for region/compliance control */
   policyFlags?: PolicyFlags;
 }
