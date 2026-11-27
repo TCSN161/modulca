@@ -28,9 +28,9 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 
 | Ce | Nov 2026 (până pe 27) | Sigur? | Notă |
 |---|---|---|---|
-| Cloudflare Workers AI (cloudflare + klein, 10k neuroni/zi) | €0 | ✅ | Motorul implicit; plafon zilnic gratuit |
+| Cloudflare Workers AI (cloudflare + klein, 10k neuroni/zi) | €0 | ✅ | 27 nov: **1.310 / 10.000 neuroni** azi, toți pe `flux-2-klein-4b` (≥ 2 randări) → cost exact per randare = Chat 3 (3.09) |
 | AI Horde, Pollinations | €0 | ✅ | |
-| OpenAI (randări de test + consultant Premium) | ≈ €0,03 test + ❓ consultant | 🟡 / ❓ | Consultantul Premium merge **OpenAI first** (4.04) |
+| OpenAI (randări de test + consultant Premium) | **$0,02** (org „Personal”, 7 cereri) | ✅ console 27 nov | ⚠️ limita lunară setată la **| OpenAI (randări de test + consultant Premium) |00** → propunere: coborâtă la $5. Cheia de pe prod poate fi în alt cont (0 imagini în org „Personal”, deși bake-off-ul a randat cu OpenAI) → de verificat |
 | Anthropic API (consultant Architect/Constructor) | ≈ €0,15 test (2.08) + ❓ prod | 🟡 / ❓ | Cu prompt caching; puțini utilizatori până la beta |
 | Leonardo | prepaid (3.114 tokeni pe 26 nov; ~160 pierduți prin ST34, 60 în bake-off) | ✅ sold, ❓ cât s-a plătit inițial | €0 nou; ≈ 240 randări Depth rămase |
 | Stability | prepaid, 25 credite | ✅ sold | €0 nou; ≈ 8 randări Structure |
@@ -58,7 +58,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 ## 5. Ce trebuie completat (Costin, ~10 min, Lun 30)
 
 - [x] Claude Pro €18 · ChatGPT Plus €20 (păstrat) · Vercel Hobby · Sentry Developer · Supabase Free · domenii .eu (2028) + .nl (2027)
-- [ ] OpenAI + Anthropic: factura API din noiembrie (dashboard → Usage)
+- [x] OpenAI: $0,02 în nov (org „Personal”) · [ ] Anthropic: factura API din noiembrie (Console nelogat încă) · [ ] OpenAI: coborâm limita de $100 la $5? (OK Costin) · [ ] în ce cont e cheia OpenAI de pe prod?
 
 Automatizare mai târziu (Radar): linia de cost AI din Usage & Cost API Anthropic, sau o foaie Claude Sheets; nu acum.
 
@@ -66,4 +66,5 @@ Automatizare mai târziu (Radar): linia de cost AI din Usage & Cost API Anthropi
 
 | Data | Spațiu folosit | Notă |
 |---|---|---|
+| Vin 27 nov (seara, Database → Tables) | `projects` = **20 MB pentru 29 de rânduri (~0,7 MB/proiect)** din cauza randărilor salvate ca imagini; `render_logs` 536 kB (461 rânduri); restul < 200 kB/tabel; bucket `renders` are doar folderul `cache` | confirmă mutarea în Storage din W50 |
 | Vin 27 nov | **50 / 500 MB (10%)** · egress 0,09 / 5 GB · fișiere 0,00 / 1 GB · 4 / 50.000 utilizatori activi · loguri 0,01 / 1 GB | prima valoare de referință (Costin, Org → Usage). Baza conține deja randări ca imagini în proiecte → urmărim creșterea pe săptămână |

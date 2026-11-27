@@ -172,7 +172,7 @@ Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu
 | ST17 | ✅ | 432fbf1 | Textele din Stripe actualizate de Costin (6 produse TEST, 27 nov) |
 | ST18 | ✅ | ghid 5aed99c + Google Console (Costin) | ✅ verificat pe prod 27 nov: ecranul Google arată „to continue to **ModulCA**” + logo + Privacy/Terms; brand verificat de Google în aceeași zi |
 | ST19 | ✅ | 8e505c9 | — |
-| ST20 | 🟡 | 5aed99c | Nereprodus; ipoteza `toLocaleString()` în SSR; lista de apeluri → **Chat 5** |
+| ST20 | 🟡 | 5aed99c | **Nu e rezolvat**: Sentry MODULCA-WEB-2 „Hydration failed”, 5 evenimente, ultimul la 27 nov ~17:00 în release 7222095 (după 5aed99c), pe `/project/[id]/finalize` (și `/products`); consola arată #418 și pe `/render`. Sentry are 2 Session Replays. Utilizator: Chrome, locale en-US, timezone Europe/Bucharest → **Chat 5** (5.05) |
 | ST21 | ✅ | 5aed99c | ✅ verificat pe prod 27 nov: auth/db/stripe/engines/knowledge ok, 0 drafturi indexate; „degraded” doar din lipsa `POLLINATIONS_API_KEY` (Costin, Vercel) |
 | ST22 | 🟡 | f015f08 (bannere) | Rescrierea pe CATUC după review-ul arhitectului partener · **Chat 2** |
 | ST23 | ✅ | 7d785df | — |
@@ -220,3 +220,5 @@ Proiect: `Smoke Test 1.03`. O singură randare consumată. Nu s-a descărcat PDF
 | BUG-ST39 | F-B | `/project/[id]/architect` | Antetul arată „Project 5895a485-…” în loc de numele proiectului | **Chat 5** | low |
 
 **Retest 27 nov seara (după e8f7dd0 + redeploy cu variabilele noi)**: ST36 ✅ randarea „Ce vezi” se salvează imediat și apare în prezentare după navigare · ST37 ✅ eticheta „Rendered with FLUX.2 klein (Cloudflare)”, fără „fallback” · `/api/health` = **ok** (Pollinations cu cheie). 1 randare consumată.
+
+**Console verificate 27 nov seara (1.05)**: Sentry = o singură problemă în 14 zile (ST20, hidratare); Stripe TEST = 6 produse actualizate azi, prețurile = site-ul, webhook `https://www.modulca.eu/api/stripe/webhook` activ, 0% erori; Vercel = Hobby, variabilele noi setate; Supabase = Free, 50 MB (projects 20 MB).
