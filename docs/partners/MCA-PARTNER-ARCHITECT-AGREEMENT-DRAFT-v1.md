@@ -43,14 +43,16 @@
 - **50 EUR** la livrarea L1 și L2;
 - **100 EUR** amânat: scadent la prima încasare a MCA din abonamente, dar **cel târziu la 28 februarie 2027**.
 
+*(Plafonul și împărțirea 50 + 100 EUR: handoff 23 nov — **propus — confirmă Costin**.)*
+
 4.2. Plata în 15 zile de la primirea facturii. ⚠️ De verificat: forma de facturare a sumei amânate și efectul fiscal al plății eșalonate.
-4.3. Orice lucrare suplimentară cere acord scris prealabil. Nu există retainer lunar.
-4.4. Dacă se livrează doar L1, se datorează o parte proporțională, propusă: 100 EUR din total (35 EUR la livrare + 65 EUR amânat). ⚠️ De confirmat de părți.
+4.3. Orice lucrare suplimentară cere acord scris prealabil. Nu există retainer lunar. Actualizările ulterioare de conținut (când se schimbă legea sau normele) se comandă pe blocuri, la cerere, orientativ **75–100 EUR/bloc**; după 15 ianuarie 2027 numai prin act adițional. *(**propus — confirmă Costin**)*
+4.4. Dacă se livrează doar L1, se datorează o parte proporțională, propusă: 100 EUR din total (35 EUR la livrare + 65 EUR amânat). ⚠️ **propus — confirmă Costin** (nu apare în handoff).
 
 ## 5. Beneficii în natură
 
 5.1. Abonament **Architect** al platformei (valoare de listă 49,99 EUR/lună), gratuit pe durata acordului. ⚠️ Tratament fiscal al beneficiului în natură.
-5.2. Statut de „arhitect partener fondator”: MCA îi poate recomanda cu prioritate Arhitectului Partener utilizatorii care cer un arhitect, inclusiv pentru proiectul-pilot. Aceasta **nu** garantează un volum de lucrări, nu creează exclusivitate și nu obligă niciun client. ⚠️ Un eventual drept de prim refuz pe 2027 se negociază separat.
+5.2. Statut de „arhitect partener fondator”: MCA îi recomandă întâi Arhitectului Partener utilizatorii beta care cer un arhitect și proiectul-pilot, și îi acordă **drept de prim refuz** pentru recomandările de proiecte venite prin platformă în 2027 (drept care supraviețuiește până la 31 decembrie 2027). Aceasta **nu** garantează un volum de lucrări și nu obligă niciun client să îl aleagă. ⚠️ *(**propus — confirmă Costin**)*
 5.3. MCA **nu percepe comision** pentru lucrările obținute prin recomandare. Orice schimbare cere acord scris și verificarea compatibilității cu deontologia profesiei (OAR). ⚠️
 
 ## 6. Răspundere
@@ -87,8 +89,8 @@
 ## 11. Durată și încetare
 
 11.1. Acordul intră în vigoare la semnare și durează **până la 15 ianuarie 2027**. Prelungirea (inclusiv pentru actualizări periodice ale conținutului) se face doar prin act adițional.
-11.2. Oricare parte poate înceta acordul cu un preaviz scris de 15 zile. ⚠️ Livrabilele deja predate se plătesc conform art. 4.
-11.3. Supraviețuiesc încetării: plata sumei amânate (art. 4.1), art. 6, 7, 8 și 9.
+11.2. Oricare parte poate înceta acordul cu un preaviz scris de **30 de zile** *(**propus — confirmă Costin**)*. ⚠️ Livrabilele deja predate se plătesc conform art. 4.
+11.3. Supraviețuiesc încetării: plata sumei amânate (art. 4.1), art. 6, 7, 8 și 9; dreptul de la art. 5.2 supraviețuiește doar dacă acordul expiră la termen ⚠️.
 
 ## 12. Dispoziții finale
 
@@ -103,9 +105,13 @@
 
 ---
 
-## Anexă internă (nu se trimite): de decis de Costin
+## Anexă internă (nu se trimite): propus — confirmă Costin
 
-1. **Durata 15 ian 2027** (cerința acestei sesiuni) față de **30 iun 2027** din handoff: aici am pus 15 ian; blocurile de actualizare ian–iun intră prin act adițional.
-2. **Preaviz 15 zile** (handoff: 30, prea lung pentru un acord de 7 săptămâni).
-3. **Plata parțială** de la 4.4 și momentul celor 50 EUR (propus: după L1 **și** L2; alternativ după L1).
-4. Verificare de jurist: cost punctual, de decis. Minim art. 4, 6, 9.
+Opțiunile deschise urmează recomandarea din handoff-ul din 23 nov (cerința MAIN, 27 nov). Nu blochează draftul.
+
+1. **Durata 15 ian 2027** (cerința explicită a sesiunii 7.02). Handoff-ul recomanda **30 iun 2027**; blocurile de actualizare ian–iun intră prin act adițional.
+2. **Preaviz 30 de zile** (handoff). La un acord de 7 săptămâni, efectul practic e mic.
+3. **50 EUR la livrare + 100 EUR amânat** (handoff). „La livrare” = după L1 **și** L2. Plata parțială 4.4 nu apare în handoff.
+4. **Drept de prim refuz 2027** și **75–100 EUR/bloc** (handoff).
+5. Dacă cere peste 150 EUR: se reduce aria la F3 + PDF-uri, nu crește onorariul (handoff).
+6. Verificare de jurist înainte de semnare (recomandată în handoff; cost punctual). Minim art. 4, 5.2, 6, 9.

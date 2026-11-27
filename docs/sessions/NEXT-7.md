@@ -5,7 +5,7 @@
 
 ## Ce aprobă Costin întâi
 
-1. Acordul: onorariu (50 + 100 EUR), plată parțială, durată 15 ian 2027, preaviz 15 zile, verificare de jurist (anexa internă).
+1. Acordul (propus — confirmă Costin, nu blochează): 50 + 100 EUR, plată parțială, durată 15 ian 2027, preaviz 30 zile, prim refuz 2027, 75–100 EUR/bloc, jurist (anexa internă).
 2. Pachetul F2+F3: mesajul de însoțire și termenele 3 dec / 11–13 dec.
 3. DPA: click-urile Sentry + OpenAI; e-mailurile Vercel, Stability, Leonardo, Pollinations; Vercel Pro sau nu înainte de 15 dec; AI Horde (recomandat: dezactivat până la opt-in).
 4. E-mailul beta: durata contului gratuit, chestionarul.

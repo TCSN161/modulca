@@ -85,6 +85,8 @@ Se pot folosi și comentarii sau modificări urmărite pe documentul primit. Avi
 
 ## 6. Calendar propus
 
+*Termenele și aria urmează handoff-ul din 23 nov — **propus — confirmă Costin**. Dacă efortul depășește estimarea: F3 + PDF-uri au prioritate.*
+
 | Data | Ce | Cine |
 |---|---|---|
 | Lun 30 nov – Mar 1 dec | Apel + trimiterea pachetului | Costin |
