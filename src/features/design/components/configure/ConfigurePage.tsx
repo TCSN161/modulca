@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { formatNumber } from "@/shared/lib/format";
 import Link from "next/link";
 import ModuleFloorPlan from "./ModuleFloorPlan";
 import CombinedFloorPlan from "./CombinedFloorPlan";
@@ -127,7 +128,7 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
           </div>
           <div className="flex justify-between pt-1 border-t border-gray-100">
             <span className="text-gray-500 font-semibold">Est. Cost</span>
-            <span className="font-bold text-brand-amber-600">&euro;{estimatedCost.toLocaleString()}</span>
+            <span className="font-bold text-brand-amber-600">&euro;{formatNumber(estimatedCost)}</span>
           </div>
         </div>
       </div>
@@ -200,13 +201,13 @@ function WallSidebar({ mod }: { mod: ModuleConfig }) {
         <div className="mt-2 flex items-center justify-between rounded-md bg-gray-50 px-2 py-1.5 text-[10px]">
           <span className="font-semibold text-gray-500 uppercase">Wall Impact</span>
           <span className={`font-bold ${wallCost > 0 ? "text-red-500" : wallCost < 0 ? "text-green-600" : "text-gray-400"}`}>
-            {wallCost > 0 ? "+" : ""}&euro;{wallCost.toLocaleString()}
+            {wallCost > 0 ? "+" : ""}&euro;{formatNumber(wallCost)}
           </span>
         </div>
         {thicknessCost > 0 && (
           <div className="mt-1 flex items-center justify-between rounded-md bg-amber-50 px-2 py-1.5 text-[10px]">
             <span className="font-semibold text-amber-700 uppercase">Insulation Upgrade</span>
-            <span className="font-bold text-amber-600">+&euro;{thicknessCost.toLocaleString()}</span>
+            <span className="font-bold text-amber-600">+&euro;{formatNumber(thicknessCost)}</span>
           </div>
         )}
       </div>

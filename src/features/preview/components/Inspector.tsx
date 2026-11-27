@@ -1,15 +1,16 @@
 "use client";
 
 import { useState } from "react";
-import { useDesignStore } from "@/features/design/store";
+import { formatNumber } from "@/shared/lib/format";
+import { useDesignStore, useDesignStats } from "@/features/design/store";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { FLOOR_MATERIALS, WALL_MATERIALS, getPreset, getPresetsForType } from "@/features/design/layouts";
 
 type InspectorTab = "geometry" | "material" | "metadata";
 
 export default function Inspector() {
-  const { selectedModule, modules, getStats } = useDesignStore();
-  const stats = getStats();
+  const { selectedModule, modules } = useDesignStore();
+  const stats = useDesignStats();
   const [activeTab, setActiveTab] = useState<InspectorTab>("geometry");
 
   const selectedMod = selectedModule
@@ -239,7 +240,7 @@ export default function Inspector() {
                   </div>
                   <div className="flex justify-between">
                     <span className="text-gray-500">Base Cost</span>
-                    <span className="font-medium text-brand-teal-800">€{FINISH_LEVELS[1].pricePerModule.toLocaleString()}</span>
+                    <span className="font-medium text-brand-teal-800">€{formatNumber(FINISH_LEVELS[1].pricePerModule)}</span>
                   </div>
                 </div>
               </>

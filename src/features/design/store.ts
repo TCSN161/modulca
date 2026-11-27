@@ -1,5 +1,6 @@
 "use client";
 
+import { useMemo } from "react";
 import { create } from "zustand";
 import { MODULE_TYPES, FINISH_LEVELS, SHARED_WALL_DISCOUNT, DESIGN_FEE_PERCENTAGE } from "@/shared/types";
 import type { GridCell } from "@/features/land/store";
@@ -713,4 +714,20 @@ if (typeof window !== "undefined") {
       }
     });
   }
+}
+
+/**
+ * BUG-ST20: hydration-safe design stats for render code.
+ *
+ * `getStats()` reads the *live* store via `get()`. The store is filled from
+ * localStorage in a microtask at module load, i.e. before React hydrates, so a
+ * component that calls `getStats()` while rendering prints the saved project's
+ * totals during hydration while the server HTML had an empty project, which
+ * throws "Hydration failed" / #418. Selectors go through useSyncExternalStore,
+ * which uses the server snapshot during hydration, so stats derived from them match.
+ */
+export function useDesignStats(): DesignStats {
+  const modules = useDesignStore((s) => s.modules);
+  const finishLevel = useDesignStore((s) => s.finishLevel);
+  return useMemo(() => computeDesignStats(modules, finishLevel), [modules, finishLevel]);
 }

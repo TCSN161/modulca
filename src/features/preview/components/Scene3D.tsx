@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect, useCallback } from "react";
+import { formatNumber } from "@/shared/lib/format";
 import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { OrbitControls, PerspectiveCamera, ContactShadows, Environment } from "@react-three/drei";
 import { useDesignStore, type ModuleConfig } from "@/features/design/store";
@@ -238,7 +239,7 @@ function ModuleInfoPanel({
         </div>
         <div className="flex justify-between pt-1 border-t border-gray-100">
           <span className="text-gray-500 font-semibold">Est. Cost</span>
-          <span className="font-bold text-brand-amber-600">&euro;{cost.toLocaleString()}</span>
+          <span className="font-bold text-brand-amber-600">&euro;{formatNumber(cost)}</span>
         </div>
       </div>
 
@@ -320,7 +321,7 @@ function ModuleInfoPanel({
           </div>
           <div className="flex justify-between">
             <span className="text-gray-500">Created</span>
-            <span className="font-medium text-brand-teal-800">{new Date().toLocaleDateString()}</span>
+            <span className="font-medium text-brand-teal-800" suppressHydrationWarning>{new Date().toLocaleDateString()}</span>
           </div>
         </div>
       )}

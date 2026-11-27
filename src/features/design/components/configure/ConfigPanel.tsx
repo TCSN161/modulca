@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { formatNumber } from "@/shared/lib/format";
 import { useDesignStore } from "../../store";
 import { FINISH_LEVELS } from "@/shared/types";
 import { getPresetsForType, getPreset, FLOOR_MATERIALS, WALL_MATERIALS } from "../../layouts";
@@ -296,7 +297,7 @@ export default function ConfigPanel({ moduleRow, moduleCol }: ConfigPanelProps) 
               Module Estimate
             </div>
             <div className="text-xl font-bold text-brand-amber-600">
-              €{modulePrice.toLocaleString()}
+              €{formatNumber(modulePrice)}
             </div>
           </div>
         </div>

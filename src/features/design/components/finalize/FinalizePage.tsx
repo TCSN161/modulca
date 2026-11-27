@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
+import { formatNumber } from "@/shared/lib/format";
 import Link from "next/link";
-import { useDesignStore } from "../../store";
+import { useDesignStore, useDesignStats } from "../../store";
 import { useAuthStore } from "@/features/auth/store";
 import { listProjectsSettled } from "@/features/auth/projectService";
 import { computeProjectCost } from "../../projectCost";
@@ -22,8 +23,8 @@ export default function FinalizePage() {
   const modules = useDesignStore((s) => s.modules);
   const finishLevel = useDesignStore((s) => s.finishLevel);
   const styleDirection = useDesignStore((s) => s.styleDirection);
-  const getStats = useDesignStore((s) => s.getStats);
-  const stats = getStats();
+  // BUG-ST20: selector-derived stats (getStats() reads live state during hydration)
+  const stats = useDesignStats();
   // BUG-ST08 / ST12: products in the summary and in the total (one cost function)
   const [selectedProducts, setSelectedProductsState] = useState<SelectedProduct[]>([]);
   useEffect(() => {
@@ -180,21 +181,21 @@ export default function FinalizePage() {
                         <div className="text-sm font-semibold text-brand-charcoal">Structural Shell</div>
                         <div className="text-[11px] text-brand-gray">CLT Panels &amp; Insulation</div>
                       </div>
-                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{structuralCost.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{formatNumber(structuralCost)}</span>
                     </div>
                     <div className="flex items-center justify-between rounded-[12px] bg-brand-bone-100 p-4">
                       <div>
                         <div className="text-sm font-semibold text-brand-charcoal">Interior Finishes</div>
                         <div className="text-[11px] text-brand-gray">{finish.label} &amp; Wall Details</div>
                       </div>
-                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{interiorCost.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{formatNumber(interiorCost)}</span>
                     </div>
                     <div className="flex items-center justify-between rounded-[12px] bg-brand-bone-100 p-4">
                       <div>
                         <div className="text-sm font-semibold text-brand-charcoal">System Integration</div>
                         <div className="text-[11px] text-brand-gray">HVAC, Electrical &amp; Plumbing</div>
                       </div>
-                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{systemCost.toLocaleString()}</span>
+                      <span className="text-sm font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{formatNumber(systemCost)}</span>
                     </div>
                   </>
                 );
@@ -205,18 +206,18 @@ export default function FinalizePage() {
             {stats.sharedWallDiscount > 0 && (
               <div className="flex justify-between text-sm text-emerald-600 mb-2 px-1">
                 <span>Shared wall savings ({stats.sharedWalls} walls)</span>
-                <span className="font-medium">-&euro;{stats.sharedWallDiscount.toLocaleString()}</span>
+                <span className="font-medium">-&euro;{formatNumber(stats.sharedWallDiscount)}</span>
               </div>
             )}
             <div className="flex justify-between text-sm text-brand-gray mb-3 px-1">
               <span>Design fee (8%)</span>
-              <span className="font-medium">&euro;{Math.round(stats.designFee).toLocaleString()}</span>
+              <span className="font-medium">&euro;{formatNumber(Math.round(stats.designFee))}</span>
             </div>
 
             {cost.productCost > 0 && (
               <div className="flex justify-between text-sm text-brand-gray mb-3 px-1">
                 <span>Products ({cost.productLines.length})</span>
-                <span className="font-medium">&euro;{Math.round(cost.productCost).toLocaleString()}</span>
+                <span className="font-medium">&euro;{formatNumber(Math.round(cost.productCost))}</span>
               </div>
             )}
 
@@ -225,7 +226,7 @@ export default function FinalizePage() {
               <div className="flex items-baseline justify-between">
                 <div>
                   <div className="text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">Estimated Total</div>
-                  <span className="text-2xl font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{Math.round(cost.grandTotal).toLocaleString()}</span>
+                  <span className="text-2xl font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{formatNumber(Math.round(cost.grandTotal))}</span>
                 </div>
                 <span className="text-[10px] text-brand-gray">*Excluding land &amp; permits</span>
               </div>
@@ -377,7 +378,7 @@ export default function FinalizePage() {
                   <div className="space-y-3">
                     <p className="text-xs text-gray-500">
                       {contactMode === "quote"
-                        ? `Your project details (${stats.totalModules} modules, ${stats.totalArea}m², ~€${Math.round(cost.grandTotal).toLocaleString()}) will be included automatically.`
+                        ? `Your project details (${stats.totalModules} modules, ${stats.totalArea}m², ~€${formatNumber(Math.round(cost.grandTotal))}) will be included automatically.`
                         : "Schedule a free 30-minute call with one of our modular construction architects."}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">

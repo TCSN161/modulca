@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { formatNumber } from "@/shared/lib/format";
 import type { ProductLine } from "../../projectCost";
 
 /** BUG-ST08: selected products on the Finalize summary (same lines as the cost total). */
@@ -39,17 +40,17 @@ export default function FinalizeProducts({
               <span className="truncate text-brand-charcoal">
                 {l.name}
                 <span className="ml-1 text-[11px] text-brand-gray">
-                  {l.unit === "m2" ? `${l.quantity.toLocaleString()} m²` : `× ${l.quantity}`}
+                  {l.unit === "m2" ? `${formatNumber(l.quantity)} m²` : `× ${l.quantity}`}
                 </span>
               </span>
               <span className="font-medium text-brand-charcoal" suppressHydrationWarning>
-                &euro;{Math.round(l.total).toLocaleString()}
+                &euro;{formatNumber(Math.round(l.total))}
               </span>
             </li>
           ))}
           <li className="flex justify-between border-t border-gray-100 pt-1.5 text-sm font-semibold">
             <span>Products total</span>
-            <span suppressHydrationWarning>&euro;{Math.round(total).toLocaleString()}</span>
+            <span suppressHydrationWarning>&euro;{formatNumber(Math.round(total))}</span>
           </li>
         </ul>
       )}

@@ -1,9 +1,10 @@
 "use client";
 
 import { useEffect, useState, useRef, useCallback, useMemo } from "react";
+import { formatNumber } from "@/shared/lib/format";
 import Link from "next/link";
 import dynamic from "next/dynamic";
-import { useDesignStore, type SavedRender } from "../../store";
+import { useDesignStore, useDesignStats, type SavedRender } from "../../store";
 import { useSaveDesign } from "../../hooks/useSaveDesign";
 import { useLandStore } from "@/features/land/store";
 import { getStyleDirection } from "../../styles";
@@ -43,7 +44,6 @@ export default function RenderPage() {
   const setModulesFromGrid = useDesignStore((s) => s.setModulesFromGrid);
   const styleDirection = useDesignStore((s) => s.styleDirection);
   const finishLevel = useDesignStore((s) => s.finishLevel);
-  const getStats = useDesignStore((s) => s.getStats);
   const loadFromLocalStorage = useDesignStore((s) => s.loadFromLocalStorage);
 
   const { saved, handleSave } = useSaveDesign();
@@ -104,7 +104,8 @@ export default function RenderPage() {
 
   // Monthly render quota — server-side via auth store (Supabase + localStorage fallback)
   const monthlyRenderCount = useAuthStore((s) => s.monthlyRenderCount);
-  const { allowed: canRender } = useAuthStore.getState().canUseMonthlyRender();
+  // BUG-ST20: a selector, not getState(), so hydration sees the server snapshot
+  const canRender = useAuthStore((s) => s.canUseMonthlyRender().allowed);
   const atRenderLimit = !canRender;
   const incrementMonthlyRenders = useAuthStore((s) => s.incrementMonthlyRenders);
 
@@ -204,12 +205,8 @@ export default function RenderPage() {
     () => (currentMod ? WALL_MATERIALS.find((w) => w.id === currentMod.wallColor) : null),
     [currentMod],
   );
-  // getStats is a zustand getter reading fresh state; recompute when inputs change
-  const stats = useMemo(
-    () => getStats(),
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    [getStats, modules, finishLevel],
-  );
+  // BUG-ST20: selector-derived stats (getStats() reads live state during hydration)
+  const stats = useDesignStats();
 
   // BUG-ST36: the SavedRender for the image on screen (metadata of that image, not the current UI choice)
   const makeAiRender = useCallback((imageUrl: string): SavedRender => {
@@ -918,21 +915,21 @@ export default function RenderPage() {
                 <div className="text-[10px] font-bold text-gray-400 uppercase">Cost Summary</div>
                 <div className="flex justify-between text-xs text-gray-600" suppressHydrationWarning>
                   <span>Module cost ({finishLevel})</span>
-                  <span className="font-medium">&euro;{stats.moduleCost.toLocaleString()}</span>
+                  <span className="font-medium">&euro;{formatNumber(stats.moduleCost)}</span>
                 </div>
                 {stats.sharedWallDiscount > 0 && (
                   <div className="flex justify-between text-xs text-green-600">
                     <span>Shared wall discount</span>
-                    <span className="font-medium">-&euro;{stats.sharedWallDiscount.toLocaleString()}</span>
+                    <span className="font-medium">-&euro;{formatNumber(stats.sharedWallDiscount)}</span>
                   </div>
                 )}
                 <div className="flex justify-between text-xs text-gray-600">
                   <span>Design fee (8%)</span>
-                  <span className="font-medium">&euro;{stats.designFee.toLocaleString()}</span>
+                  <span className="font-medium">&euro;{formatNumber(stats.designFee)}</span>
                 </div>
                 <div className="mt-1 border-t border-gray-200 pt-1 flex justify-between text-sm font-bold text-brand-teal-800" suppressHydrationWarning>
                   <span>Total</span>
-                  <span>&euro;{stats.totalEstimate.toLocaleString()}</span>
+                  <span>&euro;{formatNumber(stats.totalEstimate)}</span>
                 </div>
               </div>
 
@@ -1107,7 +1104,7 @@ export default function RenderPage() {
                         <div className="text-[10px] font-bold text-gray-400 uppercase">Cost Summary</div>
                         <div className="mt-1 flex justify-between text-sm font-bold text-brand-teal-800" suppressHydrationWarning>
                           <span>Total</span>
-                          <span>&euro;{stats.totalEstimate.toLocaleString()}</span>
+                          <span>&euro;{formatNumber(stats.totalEstimate)}</span>
                         </div>
                       </div>
                       <Link href={`/project/${projectId}/technical`}

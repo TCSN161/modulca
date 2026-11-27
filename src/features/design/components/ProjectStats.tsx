@@ -1,6 +1,6 @@
 "use client";
 
-import { useDesignStore, type FinishLevelId } from "../store";
+import { useDesignStore, useDesignStats, type FinishLevelId } from "../store";
 import { FINISH_LEVELS } from "@/shared/types";
 import Link from "next/link";
 import { useProjectId } from "@/shared/hooks/useProjectId";
@@ -15,9 +15,9 @@ function formatEuro(n: number): string {
 
 export default function ProjectStats() {
   const projectId = useProjectId();
-  const { finishLevel, setFinishLevel, getStats, selectedModule, modules } =
+  const { finishLevel, setFinishLevel, selectedModule, modules } =
     useDesignStore();
-  const stats = getStats();
+  const stats = useDesignStats();
 
   const selectedMod = selectedModule
     ? modules.find(

@@ -3,9 +3,10 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { formatNumber } from "@/shared/lib/format";
 import Link from "next/link";
 import Image from "next/image";
-import { useDesignStore } from "../../store";
+import { useDesignStore, useDesignStats } from "../../store";
 import { useLandStore } from "@/features/land/store";
 import { PRODUCT_CATALOG, getProductsByCategory } from "@/assets";
 import type { ProductEntry } from "@/assets";
@@ -182,7 +183,7 @@ function ProductDetailModal({
           {/* Price */}
           <div className="mt-4 flex items-baseline gap-2">
             <span className="text-2xl font-bold text-[#E8913A]">
-              &euro;{product.price.toLocaleString()}
+              &euro;{formatNumber(product.price)}
             </span>
             <span className="text-sm text-gray-400">{product.unit}</span>
           </div>
@@ -218,7 +219,7 @@ function ProductDetailModal({
             </div>
             {quantity > 0 && (
               <span className="text-sm text-gray-400">
-                Subtotal: &euro;{(product.price * quantity).toLocaleString()}
+                Subtotal: &euro;{formatNumber(product.price * quantity)}
               </span>
             )}
           </div>
@@ -244,7 +245,8 @@ function ProductDetailModal({
 
 export default function ProductsPage() {
   const projectId = useProjectId();
-  const { modules, setModulesFromGrid, getStats, loadFromLocalStorage } = useDesignStore();
+  const { modules, setModulesFromGrid, loadFromLocalStorage } = useDesignStore();
+  const finishLevel = useDesignStore((s) => s.finishLevel);
   const { gridCells, gridRotation } = useLandStore();
 
   const [activeCategory, setActiveCategory] = useState<CategoryId>("finishing");
@@ -281,7 +283,8 @@ export default function ProductsPage() {
     }
   }, [selectedProducts, initialized, projectId]);
 
-  const stats = getStats();
+  // BUG-ST20: selector-derived stats (getStats() reads live state during hydration)
+  const stats = useDesignStats();
 
   // Filter products
   const filteredProducts = searchQuery
@@ -297,7 +300,7 @@ export default function ProductsPage() {
   // BUG-ST12/ST31: one cost function; per-m² products cover the usable floor area
   const cost = computeProjectCost({
     modules,
-    finishLevel: useDesignStore.getState().finishLevel,
+    finishLevel,
     selectedProducts,
   });
   const productTotal = cost.productCost;
@@ -520,7 +523,7 @@ export default function ProductsPage() {
                       <div className="flex items-baseline justify-between mt-3">
                         <div className="flex items-baseline gap-1">
                           <span className="text-[#E8913A] font-bold text-base">
-                            &euro;{product.price.toLocaleString()}
+                            &euro;{formatNumber(product.price)}
                           </span>
                           <span className="text-[10px] text-gray-400">{product.unit}</span>
                         </div>
@@ -627,9 +630,9 @@ export default function ProductsPage() {
                         <p className="text-[9px] text-gray-400">{product.brand}</p>
                       )}
                       <p className="text-[10px] text-[#E8913A] font-semibold">
-                        &euro;{product.price.toLocaleString()} &times;{" "}
-                        {line?.unit === "m2" ? `${line.quantity.toLocaleString()} m²` : s.quantity} ={" "}
-                        &euro;{(line?.total ?? product.price * s.quantity).toLocaleString()}
+                        &euro;{formatNumber(product.price)} &times;{" "}
+                        {line?.unit === "m2" ? `${formatNumber(line.quantity)} m²` : s.quantity} ={" "}
+                        &euro;{formatNumber(line?.total ?? product.price * s.quantity)}
                       </p>
 
                       {/* Quantity Controls */}
@@ -685,7 +688,7 @@ export default function ProductsPage() {
                   Module Costs ({stats.totalModules} modules)
                 </span>
                 <span className="text-xs font-medium text-gray-900">
-                  &euro;{stats.moduleCost.toLocaleString()}
+                  &euro;{formatNumber(stats.moduleCost)}
                 </span>
               </div>
               {stats.sharedWallDiscount > 0 && (
@@ -694,14 +697,14 @@ export default function ProductsPage() {
                     Shared Wall Discount
                   </span>
                   <span className="text-xs font-medium text-emerald-600">
-                    -&euro;{stats.sharedWallDiscount.toLocaleString()}
+                    -&euro;{formatNumber(stats.sharedWallDiscount)}
                   </span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span className="text-xs text-gray-600">Design Fee (8%)</span>
                 <span className="text-xs font-medium text-gray-900">
-                  &euro;{stats.designFee.toLocaleString()}
+                  &euro;{formatNumber(stats.designFee)}
                 </span>
               </div>
               <div className="flex justify-between">
@@ -709,7 +712,7 @@ export default function ProductsPage() {
                   Products ({selectedProducts.length} items)
                 </span>
                 <span className="text-xs font-medium text-gray-900">
-                  &euro;{productTotal.toLocaleString()}
+                  &euro;{formatNumber(productTotal)}
                 </span>
               </div>
               <div className="flex justify-between pt-2 border-t border-gray-200">
@@ -717,7 +720,7 @@ export default function ProductsPage() {
                   Grand Total
                 </span>
                 <span className="text-sm font-bold text-[#1B3A4B]" suppressHydrationWarning>
-                  &euro;{grandTotal.toLocaleString()}
+                  &euro;{formatNumber(grandTotal)}
                 </span>
               </div>
             </div>
