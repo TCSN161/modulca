@@ -58,7 +58,7 @@
 | 13 | Rezervi conturile **@modulca** pe rețelele sociale | când ai timp, până pe 13 dec | 20 min | Instagram, TikTok, YouTube, Facebook, LinkedIn |
 | ~~14~~ | ✅ **Făcut (27 nov)**: costuri fixe confirmate ≈ €40/lună, sub plafon (bugetul §1) | — | — | — |
 | ~~16~~ | ✅ **Făcut (27 nov)**: ~~spațiul din baza Supabase~~ = 50 / 500 MB, detalii în bugetul §6 | — | — | — |
-| 17 | **Blender + conectorul Claude**: instalezi add-on-ul din pagina conectorului oficial (claude.com/connectors/blender, Blender Lab, verificat de Anthropic) și îl activezi în Blender; 3.10 verifică legătura | până Vin 4 | 20 min | Blender e deja descărcat; lucrăm doar pe copii ale modelelor |
+| 17 | **Blender + conectorul Claude** (început 27 nov): ✅ extensia Vercel, Supabase, Sentry, Stripe adăugate · ⏳ driver NVIDIA Studio 621.40 descărcat (Blender cere ≥ 580 pentru OptiX pe RTX 3060) · ❌ extensia Blender din Claude pică la instalare („file in use”, pywin32) → după restart: șterge `%APPDATA%ClaudeClaude Extensionsant.dir.gh.blender.blender-mcp` înainte să deschizi Claude, apoi reinstalează · ⏳ add-on-ul Blender Lab: bifează Network → Allow Online Access, apoi drag & drop de 2 ori de pe blender.org/lab/mcp-server | după restart, până Vin 4 | 20 min | Plan B (3.10): Blender legat direct de Claude Code din configurația proiectului |
 | 15 | Lista de invitați beta (10–20, nume + email, fișier privat, nu în repo) | până pe 10 dec | 1 h | — |
 | ~~—~~ | ~~NotebookLM Q11–Q25~~ | — | — | **Nu mai e nevoie**: Q11–Q25 au fost răspunse și verificate de Chat 2 (2.07) din textul legii |
 
