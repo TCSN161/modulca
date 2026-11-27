@@ -182,18 +182,26 @@ const DEFAULT_POLICY: PolicyFlags = {
 /** Minimum size for a valid render image — content moderation placeholders are typically <10KB */
 const MIN_VALID_IMAGE_BYTES = 8000;
 
-function imageResponse(result: AiRenderResult) {
-  return new NextResponse(new Uint8Array(result.buffer), {
-    status: 200,
-    headers: {
-      "Content-Type": result.contentType,
-      "Content-Length": String(result.buffer.length),
-      "X-AI-Engine": result.engine,
-      "X-AI-Cost-Usd": String(result.costUsd ?? 0),
-      "X-AI-Latency-Ms": String(result.latencyMs ?? 0),
-      "Cache-Control": "public, max-age=3600",
-    },
-  });
+/**
+ * BUG-ST29: `X-AI-Fallback-From` = comma list of engine ids that were tried in
+ * this request and failed (no result / content-filter image) before the one in
+ * `X-AI-Engine` answered. Engines only skipped (kill switch, budget, tier, not
+ * funded) are not listed. Sent only when the list is not empty.
+ */
+const FALLBACK_HEADER = "X-AI-Fallback-From";
+
+function imageResponse(result: AiRenderResult, failedEngines: string[] = []) {
+  const headers: Record<string, string> = {
+    "Content-Type": result.contentType,
+    "Content-Length": String(result.buffer.length),
+    "X-AI-Engine": result.engine,
+    "X-AI-Cost-Usd": String(result.costUsd ?? 0),
+    "X-AI-Latency-Ms": String(result.latencyMs ?? 0),
+    "Cache-Control": "public, max-age=3600",
+  };
+  const failed = [...new Set(failedEngines)].filter((id) => id !== result.engine);
+  if (failed.length > 0) headers[FALLBACK_HEADER] = failed.join(",");
+  return new NextResponse(new Uint8Array(result.buffer), { status: 200, headers });
 }
 
 /** Check if a result looks like a content-moderation placeholder instead of a real render */
@@ -258,8 +266,12 @@ async function tryEngines(
     });
   }
 
+  /** Engines tried in this request that failed, in order (BUG-ST29 header) */
+  const failedEngines: string[] = [];
+
   /** Helper: handle a failed engine attempt */
   function onFailure(engineId: string, error: string, creditId = engineId) {
+    failedEngines.push(engineId);
     recordFailure(creditId, error, creditCtx);
     logRender({
       prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
@@ -290,7 +302,7 @@ async function tryEngines(
         } else {
           devLog(`[ai-render] ✓ ${result.engine} cost=${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
           await onSuccess(engineParam, result, cid);
-          return imageResponse(result);
+          return imageResponse(result, failedEngines);
         }
       } else {
         onFailure(engineParam, "no-result", cid);
@@ -331,7 +343,7 @@ async function tryEngines(
       }
       devLog(`[ai-render] ✓ ${result.engine} cost=${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
       await onSuccess(engineId, result, cid);
-      return imageResponse(result);
+      return imageResponse(result, failedEngines);
     }
     onFailure(engineId, "no-result", cid);
     devLog(`[ai-render] Engine "${engineId}" failed, trying next...`);
