@@ -43,8 +43,8 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 | Mie 2 | **8.02** Express MVP (1) · **1.07** B15 upgrade sharp | OK B15 · **decizia €10** (termen 10 dec) |
 | Joi 3 | **8.02** Express MVP (2) · **4.05** invitație + promo + plafon de cost | Conturi de afiliat |
 | Vin 4 | **1.08** test complet 2 · **9.02** Radar · **1.09** închiderea W49 | Login în panoul de browser pentru test |
-| Sâm 5 | **10.02** benchmark-uri · **2.10** corecturi partener (⏳ după review) | Aprobi emailul către utilizatori |
-| Dum 6 | **7.03** email către cei 10 utilizatori (draft) · **2.11** publicare Faza 2 (⏳ după semnătură) | Lista invitaților (termen 10 dec) |
+| Sâm 5 | **3.10** audit 3D + legătura Blender · **2.10** corecturi partener (⏳ după review) | Aprobi emailul către utilizatori |
+| Dum 6 | **3.11** Blender pipeline v0 (un modul refăcut) · **7.03** email utilizatori (draft) · **2.11** publicare Faza 2 (⏳) | Lângă PC pentru Blender |
 
 ### W50: 7–13 dec (Faza 3)
 | Ce | Grup |
@@ -74,7 +74,7 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 | Stripe TEST → LIVE, CUI, bancă | 4 Billing |
 | Canal YouTube + Shorts (după review Vlad), lead magnet, quiz | 6 Marketing |
 | Presă (3 jurnaliști), povestea Cornetu | 7 Partners |
-| Blender pipeline, postprocessing 3, video AI (dacă avem venit) | 3 Engines |
+| Blender pipeline extins la toate modulele (început în W49–W50, decis de Costin 27 nov), postprocessing 3, video AI (dacă avem venit) | 3 Engines |
 | Express: prompt liber, mai multe randări | 8 Express |
 | Haiku 5.5 pentru traduceri, batch pentru bibliotecă | 2 Neufert |
 

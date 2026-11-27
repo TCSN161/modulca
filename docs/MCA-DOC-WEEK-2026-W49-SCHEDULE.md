@@ -28,14 +28,14 @@
 | **Mie 2** | **8.02** Express MVP, partea 1 · **1.07** upgrade securitate B15 (sharp 0.34→0.35) | Opus · Sonnet | OK pentru B15 · **decizia €10** (de preferat azi, după verificarea klein) |
 | **Joi 3** | **8.02** Express MVP, partea 2 · **4.05** poartă de invitație + promo ancorat + plafon lunar de cost (30% din preț) + `ENGINE_LIMITS` după decizia €10 | Opus · Opus | Conturi de afiliat Profitshare + 2Performant (§3 #8) |
 | **Vin 4** | **1.08** test complet 2 (dimineața, după deploy-uri; cont logat, retest ST-uri) · **9.02** raport Radar · seara **1.09** închiderea W49 (+ prima verificare a spațiului din baza Supabase) | Opus · Sonnet · Opus | La login, te autentifici tu în panoul de browser (~5 min) · 10 min rezumatul |
-| **Sâm 5** | **10.02** benchmark-uri + prețuri (NEXT-10) · **2.10** corecturile arhitectului partener (⏳ doar dacă a trimis review-ul) | Sonnet · Opus | Aprobi emailul către cei 10 utilizatori (7.03) |
-| **Dum 6** | **7.03** email către cei 10 utilizatori (draft, nu se trimite fără OK) · **2.11** publicarea Fazei 2 (⏳ doar după semnătură) | Sonnet · Opus | Opțional: lista invitaților beta (termen 10 dec) |
+| **Sâm 5** | **3.10** audit 3D (decis de Costin 27 nov): ce arată rău pe fiecare tip de modul (neclar, puțin detaliu, mobilier suprapus), inventarul celor 20 GLB, legătura cu Blender verificată pe o copie · **2.10** corecturile arhitectului partener (⏳ doar dacă a trimis review-ul) | Opus · Opus | Aprobi emailul către cei 10 utilizatori (7.03) |
+| **Dum 6** | **3.11** Blender pipeline v0: un modul (dormitorul) refăcut în Blender (materiale, texturi, muchii teșite, lumină coaptă) → GLB comprimat → comparat cu cel vechi · **7.03** email către cei 10 utilizatori (draft) · **2.11** publicare Faza 2 (⏳ după semnătură) | Opus · Sonnet · Opus | Ești lângă PC pentru Blender (conectorul rulează local) |
 
 **Rezervă**: dacă 8.02 nu se termină joi, partea 3 intră sâmbătă în locul lui 10.02 (care se mută în W50). Dacă arhitectul partener nu răspunde până miercuri → planul B (alt arhitect din rețeaua OAR), Chat 7.
 
 **Supabase Free (decis de Costin 27 nov)**: rămânem pe Free; Pro ($25/lună) doar peste ~400 utilizatori sau ~400 MB în bază. Gărzile: (1) export manual al bazei înainte de 15 dec, (2) verificarea spațiului în fiecare închidere de vineri, (3) **randările mutate din rândul proiectului în Supabase Storage în W50**, nu după beta, (4) o accesare automată pe zi de sărbători, ca proiectul să nu intre în pauză.
 
-**Mutat în W50**: 3.09 capacitate gratuită + compresie GLB (NEXT-3, task B) · 5.05 audit export → spec PermitTracker (dacă vineri nu e loc) · `/catuc-check` · insignă BETA.
+**Mutat în W50**: 10.02 benchmark-uri (loc pentru 3D; NEXT-10 zice oricum „după primele răspunsuri beta”) · 3.09 capacitate gratuită + compresie GLB (NEXT-3, task B) · 5.05 audit export → spec PermitTracker (dacă vineri nu e loc) · `/catuc-check` · insignă BETA.
 
 ---
 
@@ -58,6 +58,7 @@
 | 13 | Rezervi conturile **@modulca** pe rețelele sociale | când ai timp, până pe 13 dec | 20 min | Instagram, TikTok, YouTube, Facebook, LinkedIn |
 | ~~14~~ | ✅ **Făcut (27 nov)**: costuri fixe confirmate ≈ €40/lună, sub plafon (bugetul §1) | — | — | — |
 | ~~16~~ | ✅ **Făcut (27 nov)**: ~~spațiul din baza Supabase~~ = 50 / 500 MB, detalii în bugetul §6 | — | — | — |
+| 17 | **Blender + conectorul Claude**: instalezi add-on-ul din pagina conectorului oficial (claude.com/connectors/blender, Blender Lab, verificat de Anthropic) și îl activezi în Blender; 3.10 verifică legătura | până Vin 4 | 20 min | Blender e deja descărcat; lucrăm doar pe copii ale modelelor |
 | 15 | Lista de invitați beta (10–20, nume + email, fișier privat, nu în repo) | până pe 10 dec | 1 h | — |
 | ~~—~~ | ~~NotebookLM Q11–Q25~~ | — | — | **Nu mai e nevoie**: Q11–Q25 au fost răspunse și verificate de Chat 2 (2.07) din textul legii |
 

@@ -141,12 +141,15 @@ Numărul final se dă la pornire (următorul liber din chat). Stare: **📅 plan
 | 2.09 verificare link-uri bibliotecă (ST28) | 1.03 | Books „Read” → 404; repară sau scoate link-urile | Mar 1 | 📅 (Sonnet) |
 | 3.08 PDF în română (ST32) | 1.03 / 5.02 | PDF RO+EN, ST30 legende, ST31 costuri din `computeProjectCost`, ST29 header fallback | Mar 1 | 📅 |
 | Randări → Supabase Storage (ST27 urmare) | MAIN (Costin, 27 nov) | Bucket + migrație + RLS; clientul salvează URL-ul; baza rămâne sub 500 MB pe Free | W50 | 📅 (5 + 3 + MAIN) |
+| 3.10 audit 3D + legătura Blender | Costin (27 nov) | Ce arată rău în 3D (neclar, puțin detaliu, mobilier suprapus — include B2 din bake-off), inventar GLB, conectorul Blender verificat pe o copie | Sâm 5 dec | 📅 (Opus) |
+| 3.11 Blender pipeline v0 | Costin (27 nov) | Un modul refăcut în Blender (materiale, texturi, lumină coaptă) → GLB comprimat; regulă: niciodată pe singura copie | Dum 6 dec | 📅 (Opus) |
+| 3.12+ module refăcute în Blender + mobilier fără suprapuneri | 3.11 | Restul modulelor, verificare de coliziuni la presetările de mobilier (cu Chat 5) | W50 | 📅 |
 | 3.09 capacitate gratuită + compresie GLB | 3.07 (NEXT-3) | Contor neuroni CF, Pollinations cu cheie, gltf-transform | W50 | 📅 |
 | 4.05 poartă de invitație + promo + plafon de cost | 4.04 / 10.01 | Invitație beta, promo ancorat, plafon lunar 30% din preț, `ENGINE_LIMITS` | Joi 3 | 📅 |
 | 5.05 audit export → spec PermitTracker | 5.01 | Audit read-only al exportului PDF + lista ST20 | Vin 4 | 📅 |
 | 6.04 revizuire scripturi | 6.03 | Ajustează Shorts după review | După semnătura partenerului (~5 dec) | ⏳ |
 | 8.02 Express MVP | 8.01 | Întrebări → proiect → 3 randări → prezentare | Mie 2 – Joi 3 | 📅 |
-| 10.02 benchmark-uri + prețuri | 10.01 | Închide §7 din cercetare, costuri consultant per plan | Sâm 5 | 📅 (Sonnet) |
+| 10.02 benchmark-uri + prețuri | 10.01 | Închide §7 din cercetare, costuri consultant per plan | W50 (mutat pentru 3D) | 📅 (Sonnet) |
 | Decizie €10 (Replicate / Stability / CF Paid / Leonardo Depth) | 3.06 / 3.07 | Doar dacă klein + Horde nu ajung pentru demo și beta | **până pe 10 dec** | ⏳ Costin |
 | 9.02 raport săptămânal | 9.01 | Top 3 „merită făcut” | Vin 4, apoi vinerea | 📅 |
 | Test Haiku 5.5 pentru traduceri | 9.01 | Înlocuiește DeepSeek | în 2.05 sau 2.10 | 📅 |
