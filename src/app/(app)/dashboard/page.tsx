@@ -20,7 +20,7 @@ import { BUILDING_PRESETS } from "@/shared/types";
 const TEMPLATES = [
   { presetId: "house-family",  name: "Family House",  desc: "9 modules — spacious living", gradient: "from-emerald-800 to-emerald-600" },
   { presetId: "studio-loft",   name: "Loft Studio",   desc: "3 modules — compact living",  gradient: "from-slate-700 to-slate-500" },
-  { presetId: "house-l-shape", name: "L-Shape Villa", desc: "9 modules — courtyard style", gradient: "from-amber-800 to-amber-600" },
+  { presetId: "house-lshape",  name: "L-Shape Villa", desc: "9 modules — courtyard style", gradient: "from-amber-800 to-amber-600" },
 ];
 
 export default function DashboardPage() {

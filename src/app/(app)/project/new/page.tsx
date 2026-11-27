@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store";
 import { saveProject } from "@/features/auth/projectService";
 import { BUILDING_PRESETS } from "@/shared/types";
+import { applyTemplate } from "@/features/design/projectTemplate";
 
 /**
  * New Project page — wrapped in Suspense because useSearchParams() needs it.
@@ -55,7 +56,8 @@ function NewProjectForm() {
     setCreating(true);
 
     try {
-      const data: Record<string, unknown> = { preset: preset ?? undefined };
+      // BUG-ST10: the template's modules + grid are saved (and applied) with the project
+      const data: Record<string, unknown> = { preset: preset ?? undefined, ...applyTemplate(preset) };
       const result = await saveProject(userId ?? "demo", { name: name.trim(), data });
 
       if (result.ok) {
@@ -125,14 +127,17 @@ function NewProjectForm() {
           </div>
 
           <div className="mb-6">
-            <label className="mb-2 block text-xs font-medium text-gray-600">
+            <span id="template-label" className="mb-2 block text-xs font-medium text-gray-600">
               Start from template (optional)
-            </label>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+            </span>
+            <div role="group" aria-labelledby="template-label" className="grid grid-cols-2 sm:grid-cols-3 gap-2">
               {BUILDING_PRESETS.map((bp) => (
                 <button
                   key={bp.id}
                   type="button"
+                  aria-label={`${bp.label}, ${bp.cells.length} modules`}
+                  aria-pressed={preset === bp.id}
+                  data-testid={`template-${bp.id}`}
                   onClick={() => {
                     setPreset(preset === bp.id ? null : bp.id);
                     if (error) setError(null);
