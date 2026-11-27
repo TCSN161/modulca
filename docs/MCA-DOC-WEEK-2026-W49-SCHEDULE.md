@@ -93,3 +93,4 @@
 |---|---|
 | Vin 27 | Planul scris de 1.05. 5.04 img2img automat rulează din W48. |
 | Vin 27 (seara) | **2.05** adus din Lun 30: F4 `urban-planning-pug-puz.new.md` + F6 `building-permit-romania.new.md` scrise (RO+EN), self-check Chat 2 marcat în spec §4, 0 articole lipsă, 0 TBD. Niciun fapt schimbat față de F2/F3. NEXT-2 = 2.06. |
+| Vin 27 (seara) | **9.02 Radar**: eroarea Blender diagnosticată (uv nu șterge `pywin32-311.data`; serverul instalat totuși pornește, 26 unelte). Plan B pentru 3.10 = server din Claude Code, `docs/radar/2026-11-26-blender-connector.md` §3. ⚠️ La §3 #17: **nu șterge folderul extensiei** înainte de pasul 1 din plan B; add-on-ul Blender încă nu răspunde; driverul era 511.65. |

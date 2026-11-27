@@ -1,6 +1,6 @@
 # MCA-DOC-AI-RADAR — what's new in Claude / AI tools and what we do with it
 
-**Status**: Living doc. Last sweep: 2026-11-26 (9.01). Weekly top 3 on Fridays in `docs/radar/WEEKLY-*.md`; full sweep on the monthly "AI upgrade day" (first Monday of the month).
+**Status**: Living doc. Last sweep: 2026-11-26 (9.01); refresh 2026-11-27 (9.02). Weekly top 3 on Fridays in `docs/radar/WEEKLY-*.md`; full sweep on the monthly "AI upgrade day" (first Monday of the month).
 **Owner**: Chat 9 Radar (registered 2026-11-26). MAIN routes what it proposes. Every chat may propose rows through handoffs.
 **Related**: [[MCA-DOC-SPRINT-2026-11-26-27]] §4
 
@@ -13,6 +13,7 @@ Status legend: ✅ using · 🧪 try next · 📅 planned (with date) · 👀 wa
 | Date | Link / note | From | Triage |
 |---|---|---|---|
 | 2026-11-26 | First sweep (web search + official pages), no links from Costin yet | Radar | rows in §1–§5; notes in `docs/radar/2026-11-26-*.md` |
+| 2026-11-27 | Blender extension install error on Costin's PC; 3D quality track 3.10/3.11 | MAIN | §4 + [Blender note](radar/2026-11-26-blender-connector.md): run the official server from Claude Code |
 
 Links can be YouTube, X, blogs or Anthropic posts. Radar reads or summarizes each one and moves it into a category below, or marks it ⛔.
 
@@ -59,7 +60,7 @@ Links can be YouTube, X, blogs or Anthropic posts. Radar reads or summarizes eac
 
 | Capability | Use | Status |
 |---|---|---|
-| Claude Sheets (beta, 10 Nov; exports .xlsx/CSV; paid plans per secondary sources) | Budget tracker (€50 cap), beta cohort tracker, cost estimator — [note](radar/2026-11-26-claude-sheets-office.md) | 🧪 |
+| Claude Sheets (beta, 10 Nov; exports .xlsx/CSV; paid plans per secondary sources) | Beta cohort tracker (budget done in [MCA-DOC-BUDGET-2026](MCA-DOC-BUDGET-2026.md)), cost estimator — [note](radar/2026-11-26-claude-sheets-office.md) | 🧪 |
 | Claude for Google Docs / Sheets / Slides add-on (beta) | Same sheets, edited where Costin already keeps them; needed plan not stated on the product page | 🧪 |
 | Claude for Excel / Word / PowerPoint / Outlook add-ins (Pro, Max, Team, Enterprise) | Only if you work in Microsoft 365 | 👀 |
 | Word / Google Docs, Claude Docs (in any chat since 16 Sep) | Vlad agreement, DPA letters, press kit | 🧪 |
@@ -95,8 +96,8 @@ Owner of the upgrades: Chat 3 Engines (renders, video, 3D) · Chat 6 Marketing (
 | Video | Wan 2.2 (Apache 2.0, ~24 GB GPU, secondary sources) | Alternative to LTX | 👀 |
 | Video | NotebookLM "Scurt" / "Explicații" | CATUC explainers, Shorts | ✅ (Chat 6 pilot) |
 | 3D web | Three.js + React Three Fiber + postprocessing | Live 3D in the browser | ✅ · 📅 postprocessing 3 (W50) |
-| 3D assets | gltf-transform | Compress the 20 GLB models (faster loads) | 📅 W49 |
-| 3D assets | Blender + official Blender connector for Claude (Blender Lab) — [note](radar/2026-11-26-blender-connector.md) | Asset pipeline, module variants, baked light | 📅 Jan |
+| 3D assets | gltf-transform | Compress the redone GLB models (today ~0.35 MB in total, little to gain before remodelling) | 📅 W50 |
+| 3D assets | Blender + official Blender connector for Claude (Blender Lab) — [note](radar/2026-11-26-blender-connector.md) | Asset pipeline, module variants, baked light; desktop extension fails to install (27 Nov), plan B in the note | 📅 5–6 Dec (3.10, 3.11) |
 | 3D assets | Hunyuan3D / TripoSR / Modly image-to-3D (local GPU) | Furniture props; check Hunyuan's license for EU use first | 👀 |
 | 3D capture | Gaussian splats / photogrammetry | Scans of built houses (investors: "show real houses") | 👀 after Cornetu |
 | AR / VR | `@react-three/xr` (already a dependency) | "Place the house on your land" on a phone | 👀 after beta |
