@@ -12,6 +12,11 @@ import { STRIPE_PRICES, redirectToCheckout, openCustomerPortal, isStripeConfigur
 const TIER_ORDER: AccountTier[] = ["guest_free", "free", "premium", "architect", "constructor"];
 const rank = (t: AccountTier) => TIER_ORDER.indexOf(t);
 
+/** €19.99 / €149.90 / €17 — never "149.9" (BUG-ST17). */
+function formatEur(n: number): string {
+  return Number.isInteger(n) ? String(n) : n.toFixed(2);
+}
+
 /** Tiers visible on the pricing page (skip guest) */
 const VISIBLE_TIERS = ACCOUNT_TIERS.filter((t) => t.id !== "guest_free");
 
@@ -153,6 +158,13 @@ export default function PricingPage() {
             const isConstructor = tier.id === "constructor";
             const tierLabel = t(`tier.${tierId}.label`);
             const tierDescription = t(`tier.${tierId}.description`);
+            // BUG-ST17: numbers in the feature list come from the tier config (single source).
+            const featureParams = {
+              modules: tier.features.maxModules,
+              renders: tier.features.aiRendersPerMonth,
+              res: tier.features.renderResolution.toUpperCase(),
+              projects: tier.features.maxProjects,
+            };
 
             return (
               <div
@@ -194,7 +206,7 @@ export default function PricingPage() {
                   {price ? (
                     <>
                       <span className="text-2xl font-bold text-brand-teal-800">
-                        &euro;{monthlyEquiv}
+                        &euro;{formatEur(monthlyEquiv ?? 0)}
                       </span>
                       <span className="text-xs text-gray-400">{t("billing.perMonth")}</span>
                       {yearly && (
@@ -213,7 +225,7 @@ export default function PricingPage() {
                   {getFeatureIndexes(tierId).map((idx) => (
                     <li key={idx} className="flex items-start gap-1.5 text-[11px] text-gray-600">
                       <span className="mt-0.5 text-brand-teal-600 shrink-0">&#10003;</span>
-                      {t(`features.${tierId}.${idx}`)}
+                      {t(`features.${tierId}.${idx}`, featureParams)}
                     </li>
                   ))}
                 </ul>

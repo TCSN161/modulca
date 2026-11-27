@@ -318,29 +318,29 @@
     },
     "features": {
       "free": {
-        "0": "Up to 6 modules per project",
-        "1": "5 AI renders/month (SD)",
+        "0": "Up to {modules} modules per project",
+        "1": "{renders} AI renders/month ({res})",
         "2": "Floor plan + section drawings",
         "3": "3D walkthrough",
-        "4": "Knowledge base (123 free articles)",
+        "4": "Knowledge base (free articles)",
         "5": "AI consultant (basic, 1 country)",
-        "6": "2 saved projects",
+        "6": "{projects} saved projects",
         "7": "3-month Premium beta bonus"
       },
       "premium": {
-        "0": "Up to 12 modules per project",
-        "1": "50 AI renders/month (HD)",
+        "0": "Up to {modules} modules per project",
+        "1": "{renders} AI renders/month ({res})",
         "2": "All 6 drawing types + PDF export",
         "3": "Auto-tour + permit tracker",
-        "4": "Full knowledge library (180 articles)",
-        "5": "AI consultant (GPT-4o, 3 countries)",
+        "4": "Full knowledge library (all articles)",
+        "5": "Advanced AI consultant (3 countries)",
         "6": "Product catalog with real pricing",
-        "7": "10 projects + sharable links",
+        "7": "{projects} projects + sharable links",
         "8": "Email support"
       },
       "architect": {
-        "0": "Up to 50 modules, custom sizes",
-        "1": "200 AI renders/month (4K)",
+        "0": "Up to {modules} modules, custom sizes",
+        "1": "{renders} AI renders/month ({res})",
         "2": "DWG/DXF export for CAD",
         "3": "Full library + all country regulations",
         "4": "AI consultant (Claude, deep context)",
@@ -350,7 +350,7 @@
         "8": "VR mode + priority support"
       },
       "constructor": {
-        "0": "Up to 200 modules per project",
+        "0": "Up to {modules} modules per project",
         "1": "Unlimited AI renders (4K)",
         "2": "Full library + unlimited AI context",
         "3": "White-label branding",

@@ -10,6 +10,8 @@
  *   Gray-50: #f9fafb
  */
 
+import { getTierConfig } from "@/features/auth/types";
+
 const BRAND_TEAL = "#115e59";
 const BRAND_AMBER = "#f59e0b";
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.modulca.eu";
@@ -84,10 +86,21 @@ export function welcomeEmailHtml(displayName?: string): string {
 
 export function upgradeEmailHtml(tier: string, displayName?: string): string {
   const name = displayName || "there";
-  const tierLabel = tier === "architect" ? "Architect" : "Premium";
-  const features = tier === "architect"
-    ? ["Up to 50 modules with custom sizes", "100 AI renders/month (4K)", "DWG/DXF export for CAD", "Team collaboration + client dashboard", "Priority support"]
-    : ["Up to 12 modules per project", "30 AI renders/month (HD)", "All 6 drawing types + PDF export", "Product catalog with real pricing", "Email support"];
+  // BUG-ST17: numbers come from the tier config (features/auth/types.ts), the single source.
+  const known = tier === "architect" || tier === "constructor" ? tier : "premium";
+  const cfg = getTierConfig(known).features;
+  const tierLabel = known === "architect" ? "Architect" : known === "constructor" ? "Constructor" : "Premium";
+  const renders = cfg.aiRendersPerMonth === -1 ? "Unlimited AI renders" : `${cfg.aiRendersPerMonth} AI renders/month`;
+  const res = cfg.renderResolution.toUpperCase();
+  const features = known === "premium"
+    ? [`Up to ${cfg.maxModules} modules per project`, `${renders} (${res})`, "All 6 drawing types + PDF export", "Product catalog with real pricing", "Email support"]
+    : [
+        `Up to ${cfg.maxModules} modules with custom sizes`,
+        `${renders} (${res})`,
+        "DWG/DXF export for CAD",
+        known === "constructor" ? "White-label branding + unlimited team" : "Team collaboration + client dashboard",
+        known === "constructor" ? "Dedicated account manager" : "Priority support",
+      ];
 
   return layout(`
     <h2 style="margin:0 0 16px;font-size:20px;color:${BRAND_TEAL};">Your ${tierLabel} Plan is Active!</h2>

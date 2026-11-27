@@ -318,29 +318,29 @@
     },
     "features": {
       "free": {
-        "0": "Tot 6 modules per project",
-        "1": "5 AI-renders/maand (SD)",
+        "0": "Tot {modules} modules per project",
+        "1": "{renders} AI-renders/maand ({res})",
         "2": "Plattegrond + doorsneden",
         "3": "3D-rondleiding",
-        "4": "Kennisbank (123 gratis artikelen)",
+        "4": "Kennisbank (gratis artikelen)",
         "5": "AI-consultant (basis, 1 land)",
-        "6": "2 opgeslagen projecten",
+        "6": "{projects} opgeslagen projecten",
         "7": "3 maanden bètabonus Premium"
       },
       "premium": {
-        "0": "Tot 12 modules per project",
-        "1": "50 AI-renders/maand (HD)",
+        "0": "Tot {modules} modules per project",
+        "1": "{renders} AI-renders/maand ({res})",
         "2": "Alle 6 tekeningtypes + PDF-export",
         "3": "Auto-tour + vergunningstracker",
-        "4": "Volledige kennisbibliotheek (180 artikelen)",
-        "5": "AI-consultant (GPT-4o, 3 landen)",
+        "4": "Volledige kennisbibliotheek (alle artikelen)",
+        "5": "Geavanceerde AI-consultant (3 landen)",
         "6": "Productcatalogus met echte prijzen",
-        "7": "10 projecten + deelbare links",
+        "7": "{projects} projecten + deelbare links",
         "8": "E-mailsupport"
       },
       "architect": {
-        "0": "Tot 50 modules, aangepaste maten",
-        "1": "200 AI-renders/maand (4K)",
+        "0": "Tot {modules} modules, aangepaste maten",
+        "1": "{renders} AI-renders/maand ({res})",
         "2": "DWG/DXF-export voor CAD",
         "3": "Volledige bibliotheek + alle landenregels",
         "4": "AI-consultant (Claude, diepe context)",
@@ -350,7 +350,7 @@
         "8": "VR-modus + prioriteitssupport"
       },
       "constructor": {
-        "0": "Tot 200 modules per project",
+        "0": "Tot {modules} modules per project",
         "1": "Onbeperkte AI-renders (4K)",
         "2": "Volledige bibliotheek + onbeperkte AI-context",
         "3": "White-label branding",

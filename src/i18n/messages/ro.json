@@ -318,29 +318,29 @@
     },
     "features": {
       "free": {
-        "0": "Până la 6 module per proiect",
-        "1": "5 randări AI/lună (SD)",
+        "0": "Până la {modules} module per proiect",
+        "1": "{renders} randări AI/lună ({res})",
         "2": "Planuri de etaj + secțiuni",
         "3": "Tur 3D",
-        "4": "Bază de cunoștințe (123 articole gratuite)",
+        "4": "Bază de cunoștințe (articole gratuite)",
         "5": "Consultant AI (de bază, 1 țară)",
-        "6": "2 proiecte salvate",
+        "6": "{projects} proiecte salvate",
         "7": "3 luni bonus beta Premium"
       },
       "premium": {
-        "0": "Până la 12 module per proiect",
-        "1": "50 randări AI/lună (HD)",
+        "0": "Până la {modules} module per proiect",
+        "1": "{renders} randări AI/lună ({res})",
         "2": "Toate cele 6 tipuri de desene + export PDF",
         "3": "Tur automat + tracker autorizații",
-        "4": "Bibliotecă completă (180 articole)",
-        "5": "Consultant AI (GPT-4o, 3 țări)",
+        "4": "Bibliotecă completă (toate articolele)",
+        "5": "Consultant AI avansat (3 țări)",
         "6": "Catalog de produse cu prețuri reale",
-        "7": "10 proiecte + linkuri partajabile",
+        "7": "{projects} proiecte + linkuri partajabile",
         "8": "Suport pe email"
       },
       "architect": {
-        "0": "Până la 50 module, dimensiuni custom",
-        "1": "200 randări AI/lună (4K)",
+        "0": "Până la {modules} module, dimensiuni custom",
+        "1": "{renders} randări AI/lună ({res})",
         "2": "Export DWG/DXF pentru CAD",
         "3": "Bibliotecă completă + reglementări din toate țările",
         "4": "Consultant AI (Claude, context profund)",
@@ -350,7 +350,7 @@
         "8": "Mod VR + suport prioritar"
       },
       "constructor": {
-        "0": "Până la 200 module per proiect",
+        "0": "Până la {modules} module per proiect",
         "1": "Randări AI nelimitate (4K)",
         "2": "Bibliotecă completă + context AI nelimitat",
         "3": "Branding white-label",
