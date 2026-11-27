@@ -168,7 +168,7 @@ Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu
 | ST14 | ✅ | d36ba7d | Retest portal cu cont comp |
 | ST15 | ✅ | 62c33a2 | — |
 | ST16 | ✅ | bd3c7c8 | — |
-| ST17 | ✅ | 432fbf1 | Textele produselor în Stripe · **Costin** (NEXT-4) |
+| ST17 | ✅ | 432fbf1 | Textele din Stripe actualizate de Costin (6 produse TEST, 27 nov) |
 | ST18 | ❌ | ghid 5aed99c | Verificarea brandului în Google Console · **Costin** (`MCA-DOC-GOOGLE-LOGIN-BRANDING.md`) |
 | ST19 | ✅ | 8e505c9 | — |
 | ST20 | 🟡 | 5aed99c | Nereprodus; ipoteza `toLocaleString()` în SSR; lista de apeluri → **Chat 5** |

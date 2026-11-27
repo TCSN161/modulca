@@ -39,7 +39,7 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 | Zi | Sesiuni (max 3/zi, max 2 deodată) | Costin |
 |---|---|---|
 | Lun 30 | **2.05** F4+F6 · **7.02** acord arhitect partener + DPA + pachetul F2+F3 | Verificare pe site · brand Google · aprobi DPA |
-| Mar 1 | **3.08** PDF în RO (ST32, ST30, ST31, ST29) · **2.09** link-uri bibliotecă (ST28) | Citești F4+F6 · textele Stripe |
+| Mar 1 | **3.08** PDF în RO (ST32, ST30, ST31, ST29) · **2.09** link-uri bibliotecă (ST28) | Citești F4+F6 |
 | Mie 2 | **8.02** Express MVP (1) · **1.07** B15 upgrade sharp | OK B15 · **decizia €10** (termen 10 dec) |
 | Joi 3 | **8.02** Express MVP (2) · **4.05** invitație + promo + plafon de cost | Conturi de afiliat |
 | Vin 4 | **1.08** test complet 2 · **9.02** Radar · **1.09** închiderea W49 | Login în panoul de browser pentru test |
