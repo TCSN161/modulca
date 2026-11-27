@@ -41,6 +41,8 @@ interface ArchitectStore {
 
   // Init & persistence
   initProject: (projectId: string, projectName?: string) => void;
+  /** BUG-ST39: show the real project name (no-op when empty or unchanged). */
+  setProjectName: (name: string) => void;
   loadFromStorage: () => void;
   saveToStorage: () => void;
   setActiveTab: (tab: ArchitectStore["activeTab"]) => void;
@@ -160,6 +162,14 @@ export const useArchitectStore = create<ArchitectStore>((set, get) => ({
       }
     } catch { /* proceed with default */ }
     set({ project: createDefaultProject(projectId, projectName || "New Project") });
+  },
+
+  setProjectName: (name) => {
+    const proj = get().project;
+    const clean = name.trim();
+    if (!proj || !clean || proj.projectName === clean) return;
+    set({ project: { ...proj, projectName: clean } });
+    get().saveToStorage();
   },
 
   loadFromStorage: () => {
