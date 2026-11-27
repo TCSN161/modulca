@@ -49,7 +49,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 ## 4. Ce propune MAIN (decide Costin)
 
 1. **Renunți la ChatGPT Plus** (€20) → fix €18, loc în plafon pentru motoare și Vercel Pro. Claude face tot ce făcea „a doua opinie”.
-1b. **Supabase rămâne Free** până la ~400 utilizatori. Riscuri de urmărit: pauza după 7 zile fără trafic (în beta nu ar trebui să apară) și lipsa backup-ului zilnic → MAIN face un export manual al bazei înainte de 15 dec (pre-flight).
+1b. **Supabase rămâne Free** (✅ aprobat de Costin, 27 nov) până la ~400 utilizatori **sau ~400 MB în bază**; spațiul se notează în fiecare închidere de vineri (tabelul §6). Riscuri de urmărit: pauza după 7 zile fără trafic (în beta nu ar trebui să apară) și lipsa backup-ului zilnic → MAIN face un export manual al bazei înainte de 15 dec (pre-flight).
 2. **Verifici Sentry**: dacă e „Team” plătit, treci pe Developer (free) până la lansare.
 3. **Decizia €10 pe motoare** (termen 10 dec): întâi Leonardo Depth din creditul deja plătit (€0 nou), apoi Replicate doar dacă testul 2 arată randări nefidele. Cu (1) făcut, €10 încap în plafon.
 4. **Vercel Pro** intră în bugetul din ianuarie, plătit din primele abonamente (plan de afaceri v0: plafonul rămâne €50 în dec–ian).
@@ -65,3 +65,9 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 - [ ] OpenAI + Anthropic: factura API din noiembrie (dashboard → Usage)
 
 Automatizare mai târziu (Radar): linia de cost AI din Usage & Cost API Anthropic, sau o foaie Claude Sheets; nu acum.
+
+## 6. Spațiul din baza Supabase (Free = 500 MB; la ~400 MB → Pro)
+
+| Data | Spațiu folosit | Notă |
+|---|---|---|
+| Lun 30 nov | ❓ (Costin citește din dashboard) | prima valoare de referință |

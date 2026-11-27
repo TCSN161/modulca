@@ -140,6 +140,7 @@ Numărul final se dă la pornire (următorul liber din chat). Stare: **📅 plan
 | 2.05 F4+F6 | 2.03 / plan | Urbanism PUG/PUZ + ghidul de autorizare | Lun 30 | 📅 |
 | 2.09 verificare link-uri bibliotecă (ST28) | 1.03 | Books „Read” → 404; repară sau scoate link-urile | Mar 1 | 📅 (Sonnet) |
 | 3.08 PDF în română (ST32) | 1.03 / 5.02 | PDF RO+EN, ST30 legende, ST31 costuri din `computeProjectCost`, ST29 header fallback | Mar 1 | 📅 |
+| Randări → Supabase Storage (ST27 urmare) | MAIN (Costin, 27 nov) | Bucket + migrație + RLS; clientul salvează URL-ul; baza rămâne sub 500 MB pe Free | W50 | 📅 (5 + 3 + MAIN) |
 | 3.09 capacitate gratuită + compresie GLB | 3.07 (NEXT-3) | Contor neuroni CF, Pollinations cu cheie, gltf-transform | W50 | 📅 |
 | 4.05 poartă de invitație + promo + plafon de cost | 4.04 / 10.01 | Invitație beta, promo ancorat, plafon lunar 30% din preț, `ENGINE_LIMITS` | Joi 3 | 📅 |
 | 5.05 audit export → spec PermitTracker | 5.01 | Audit read-only al exportului PDF + lista ST20 | Vin 4 | 📅 |
@@ -172,7 +173,8 @@ Numărul final se dă la pornire (următorul liber din chat). Stare: **📅 plan
 | 3.0x walkthrough v0 | | W50 | 📅 |
 | 2.1x Privacy + ToS beta (+ paragraf afiliere R5) | | W50 | 📅 |
 | 7.0x lista de invitați + email | | până pe 10 dec | 📅 |
-| 1.0x pre-flight beta | | 14 dec | 📅 |
+| 1.0x pre-flight beta | + export manual al bazei (backup) | 14 dec | 📅 |
+| 1.0x accesare zilnică de sărbători | GitHub Actions → `/api/health`, 20 dec – 6 ian (Supabase Free nu intră în pauză) | până pe 19 dec | 📅 |
 | 3.0x LTX video wire-up | | după beta, dacă avem buget | 💡 |
 
 ### 4.3 După beta (ianuarie)

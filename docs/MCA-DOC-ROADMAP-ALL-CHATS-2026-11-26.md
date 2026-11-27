@@ -53,6 +53,7 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 | 5.05 audit export (dacă nu s-a făcut în W49) → PermitTracker: 3 PDF-uri pentru notificare (art. 294) + zip; la arhitectul partener pe 11 dec | 5 Design + Drawings |
 | Express: 3 briefuri de test → teste automate Playwright | 8 Express |
 | Insignă BETA + widget de feedback | 4 Billing |
+| **Randările din rândul proiectului → Supabase Storage** (bucket + migrație + RLS; clientul salvează URL, nu imaginea): ține baza sub 500 MB pe Supabase Free | 5 Design (client) + 3 Engines (bucket) + MAIN (migrație) |
 | Video walkthrough v0 (înregistrare AutoTour) · 3.09 capacitate gratuită + compresie modele 3D (gltf-transform) | 3 Engines |
 | Privacy + ToS cu clauza de beta | 2 Neufert |
 | Lista de invitați (10–20) + email de invitație | 7 Partners + Costin |
@@ -60,7 +61,8 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 ### W51: 14–20 dec (Faza 4 → **Beta 15 dec**)
 | Ce | Grup |
 |---|---|
-| Pre-flight: ops:check, CI, secrete, Sentry, test complet | 1 MAIN |
+| Pre-flight: ops:check, CI, secrete, Sentry, test complet, **export manual al bazei Supabase (backup)** | 1 MAIN |
+| Accesare automată zilnică (GitHub Actions → `/api/health`, care atinge baza) de pe 20 dec până pe 6 ian, ca proiectul Free să nu intre în pauză | 1 MAIN |
 | Trimiterea invitațiilor, monitorizare primele 48 h | 1 MAIN + Costin |
 | Reparații rapide din feedback | grupul responsabil |
 
@@ -119,6 +121,6 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 4. **Testul complet ca poartă**: înainte de fiecare lot mare de deploy (și obligatoriu înainte de beta). Din W50 îl face automat Express (briefurile de test).
 5. **Model potrivit pe sarcină**: Opus pentru juridic, arhitectură și cod complex; Sonnet pentru Radar, documente și sarcini mecanice; economisește limita de utilizare.
 6. **Verificare TypeScript înainte de push** (instalată) + CI pe GitHub: un commit stricat nu mai blochează site-ul ore întregi.
-7. **Vinerea**: închidere în 3 părți (ce s-a făcut / ce a alunecat / ce urmează), sesiunile terminate mutate în grupuri, harta și planul actualizate.
+7. **Vinerea**: închidere în 3 părți (ce s-a făcut / ce a alunecat / ce urmează), sesiunile terminate mutate în grupuri, harta și planul actualizate, **spațiul din baza Supabase notat în [[MCA-DOC-BUDGET-2026]]** (Free = 500 MB; la ~400 MB → Pro).
 8. **Bugetul**: [[MCA-DOC-BUDGET-2026]] se actualizează la fiecare sfârșit de lună; costurile fixe cunoscute sunt €38 (Supabase e pe Free, confirmat de Costin 27 nov); Vercel Pro din ianuarie le duce peste €50 → decizie Costin până la lansare.
 9. **Riscuri urmărite** (top 5): arhitectul partener nu răspunde la timp (planul B: alt arhitect din rețeaua OAR) · limita de utilizare (max 2 sesiuni) · un singur motor gratuit stabil (avem acum 3) · conținut juridic greșit (poarta Vlad + citări) · PC-ul rămâne fără memorie (Nahimic).

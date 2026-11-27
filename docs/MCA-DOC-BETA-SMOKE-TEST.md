@@ -178,7 +178,7 @@ Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu
 | ST24 | ✅ | 7d785df | — |
 | ST25 | ✅ | 7d785df | — |
 | ST26 | ✅ | 7d785df | — |
-| ST27 | ✅ | 6d36b94 | Mutare din data URI în Storage (migrație + RLS), după beta · Chat 3/MAIN |
+| ST27 | ✅ | 6d36b94 | Mutare din data URI în Storage (migrație + RLS) **în W50, înainte de beta** (Supabase Free, 500 MB) · Chat 5 + 3 + MAIN |
 | ST28 | ❌ | — | Link-uri moarte în Books · **Chat 2** (2.09, W49) |
 | ST29 | 🟡 | 9db1afd (UI) | Header `X-AI-Fallback-From` pe server + afișare în PDF · **Chat 3** (3.08) |
 | ST30 | ❌ | — | Legende tăiate, colaj Horde în PDF · **Chat 3** (3.08) |

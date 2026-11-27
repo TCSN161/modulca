@@ -26,11 +26,13 @@
 | **Mar 1** | **3.08** PDF în română: ST32 (RO+EN) + ST30 legende + ST31 costuri din `computeProjectCost` + ST29 header `X-AI-Fallback-From` · **2.09** verificarea link-urilor din bibliotecă (ST28) | Opus · Sonnet | Citești F4+F6 (seara) |
 | **Mie 2** | **8.02** Express MVP, partea 1 · **1.07** upgrade securitate B15 (sharp 0.34→0.35) | Opus · Sonnet | OK pentru B15 · **decizia €10** (de preferat azi, după verificarea klein) |
 | **Joi 3** | **8.02** Express MVP, partea 2 · **4.05** poartă de invitație + promo ancorat + plafon lunar de cost (30% din preț) + `ENGINE_LIMITS` după decizia €10 | Opus · Opus | Conturi de afiliat Profitshare + 2Performant (§3 #8) |
-| **Vin 4** | **1.08** test complet 2 (dimineața, după deploy-uri; cont logat, retest ST-uri) · **9.02** raport Radar · seara **1.09** închiderea W49 | Opus · Sonnet · Opus | La login, te autentifici tu în panoul de browser (~5 min) · 10 min rezumatul |
+| **Vin 4** | **1.08** test complet 2 (dimineața, după deploy-uri; cont logat, retest ST-uri) · **9.02** raport Radar · seara **1.09** închiderea W49 (+ prima verificare a spațiului din baza Supabase) | Opus · Sonnet · Opus | La login, te autentifici tu în panoul de browser (~5 min) · 10 min rezumatul |
 | **Sâm 5** | **10.02** benchmark-uri + prețuri (NEXT-10) · **2.10** corecturile arhitectului partener (⏳ doar dacă a trimis review-ul) | Sonnet · Opus | Aprobi emailul către cei 10 utilizatori (7.03) |
 | **Dum 6** | **7.03** email către cei 10 utilizatori (draft, nu se trimite fără OK) · **2.11** publicarea Fazei 2 (⏳ doar după semnătură) | Sonnet · Opus | Opțional: lista invitaților beta (termen 10 dec) |
 
 **Rezervă**: dacă 8.02 nu se termină joi, partea 3 intră sâmbătă în locul lui 10.02 (care se mută în W50). Dacă arhitectul partener nu răspunde până miercuri → planul B (alt arhitect din rețeaua OAR), Chat 7.
+
+**Supabase Free (decis de Costin 27 nov)**: rămânem pe Free; Pro ($25/lună) doar peste ~400 utilizatori sau ~400 MB în bază. Gărzile: (1) export manual al bazei înainte de 15 dec, (2) verificarea spațiului în fiecare închidere de vineri, (3) **randările mutate din rândul proiectului în Supabase Storage în W50**, nu după beta, (4) o accesare automată pe zi de sărbători, ca proiectul să nu intre în pauză.
 
 **Mutat în W50**: 3.09 capacitate gratuită + compresie GLB (NEXT-3, task B) · 5.05 audit export → spec PermitTracker (dacă vineri nu e loc) · `/catuc-check` · insignă BETA.
 
@@ -54,6 +56,7 @@
 | 12 | Search Console → Sitemaps: statusul e „Success”? | Lun 30 | 5 min | dacă tot „Couldn't fetch”, spui MAIN |
 | 13 | Rezervi conturile **@modulca** pe rețelele sociale | când ai timp, până pe 13 dec | 20 min | Instagram, TikTok, YouTube, Facebook, LinkedIn |
 | 14 | Confirmi costurile lunare reale (planul Claude, ChatGPT Plus, Vercel, domeniul) | Lun 30 | 10 min | completezi rândurile ❓ din `docs/MCA-DOC-BUDGET-2026.md` |
+| 16 | Te uiți o dată în Supabase → Reports / Database: cât spațiu ocupă baza acum (din 500 MB) și spui cifra lui MAIN | Lun 30 | 5 min | dashboard Supabase |
 | 15 | Lista de invitați beta (10–20, nume + email, fișier privat, nu în repo) | până pe 10 dec | 1 h | — |
 | ~~—~~ | ~~NotebookLM Q11–Q25~~ | — | — | **Nu mai e nevoie**: Q11–Q25 au fost răspunse și verificate de Chat 2 (2.07) din textul legii |
 
@@ -78,6 +81,7 @@
 - [ ] Testul 2: toate ST ✅ confirmate pe prod, ST28/ST32 reparate
 - [ ] Decizia €10 luată · brandul Google trimis · textele Stripe actualizate ✅ (27 nov)
 - [ ] Bugetul lunar confirmat sub €50 (sau decizie explicită de depășire)
+- [ ] Spațiul din baza Supabase notat (prima valoare de referință)
 
 ---
 
