@@ -99,3 +99,35 @@ describe("ai-horde censored output (3.06 bake-off)", () => {
     expect(fetchMock.mock.calls.some(([u]) => String(u) === "https://x/y.webp")).toBe(false);
   });
 });
+
+describe("ai-horde ControlNet img2img (3.06 bake-off)", () => {
+  afterEach(() => { vi.unstubAllGlobals(); vi.unstubAllEnvs(); vi.useRealTimers(); });
+
+  it("defaults to depth; none/unknown → plain img2img", async () => {
+    const { hordeControlType, hordeImg2imgParams } = await import("./aihorde");
+    expect(hordeControlType({})).toBe("depth");
+    expect(hordeControlType({ AIHORDE_CONTROL_TYPE: "Canny" })).toBe("canny");
+    expect(hordeControlType({ AIHORDE_CONTROL_TYPE: "none" })).toBeNull();
+    expect(hordeImg2imgParams("depth")).toEqual({ control_type: "depth", denoising_strength: 1.0, steps: 15 });
+    expect(hordeImg2imgParams(null)).toEqual({ denoising_strength: 0.6 });
+  });
+
+  it("sends control_type + quality words in the POSITIVE prompt", async () => {
+    vi.useFakeTimers();
+    let sent: { prompt: string; params: Record<string, unknown>; source_image?: string } | null = null;
+    vi.stubGlobal("fetch", vi.fn(async (url: string, init?: RequestInit) => {
+      if (url.endsWith("/generate/async")) { sent = JSON.parse(String(init?.body)); return new Response(JSON.stringify({ id: "j" }), { status: 202 }); }
+      return new Response(JSON.stringify({ done: true, faulted: true }));
+    }));
+    const { aiHordeEngine } = await import("./aihorde");
+    const p = aiHordeEngine({ prompt: "bedroom model", width: 1024, height: 576, seed: "1", baseImage: "data:image/png;base64,AAAA" } as never);
+    await vi.runAllTimersAsync();
+    await p;
+    expect(sent!.params).toMatchObject({ control_type: "depth", denoising_strength: 1.0, steps: 15 });
+    expect(sent!.source_image).toBe("AAAA");
+    const [pos, neg] = sent!.prompt.split("###");
+    expect(pos).toMatch(/photorealistic/);
+    expect(pos).not.toMatch(/\bbedroom\b|\bmodel\b/);
+    expect(neg).not.toMatch(/photorealistic/);
+  });
+});

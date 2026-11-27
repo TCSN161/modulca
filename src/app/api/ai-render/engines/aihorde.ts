@@ -16,7 +16,8 @@ function sanitizeForContentFilter(prompt: string): string {
     .replace(/\btoilet\b/gi, "WC fixture")
     .replace(/\bshower\b/gi, "rain head fixture")
     .replace(/\bbathtub\b/gi, "soaking tub")
-    .replace(/\bbed\b/gi, "sleeping platform");
+    .replace(/\bbed\b/gi, "sleeping platform")
+    .replace(/\bmodel\b/gi, "visualization"); // "model" trips Horde's CSAM filter (3.06 bake-off)
 }
 
 const HORDE_API = "https://stablehorde.net/api/v2";
@@ -31,8 +32,28 @@ const TIMEOUT_MS = 75_000;
  * source_image + source_processing "img2img". Live test: 11 s, keeps the
  * geometry, but SD-1.5 quality is weak, so it sits LAST in the img2img chain.
  * Kill switch for img2img only: AIHORDE_IMG2IMG_DISABLED=1.
+ *
+ * 3.06 bake-off (2026-11-27): plain img2img returned only censored / lost jobs,
+ * while ControlNet "depth" kept the EXACT 3D camera and cut (geometry 4.5/5,
+ * SD-1.5 quality). So img2img now uses ControlNet by default.
+ * AIHORDE_CONTROL_TYPE=depth|canny|none (none = old plain img2img, denoise 0.6).
+ * Steps drop to 15 with ControlNet: 25 steps exceeds the anonymous work budget (403).
  */
 const IMG2IMG_DENOISE = 0.6;
+const HORDE_CONTROL_TYPES = new Set(["depth", "canny", "hed", "normal", "mlsd", "scribble", "seg", "fakescribbles", "hough"]);
+
+/** ControlNet mode for img2img, or null for plain img2img. Single source of truth. */
+export function hordeControlType(env: Record<string, string | undefined> = process.env): string | null {
+  const v = (env.AIHORDE_CONTROL_TYPE ?? "depth").trim().toLowerCase();
+  return HORDE_CONTROL_TYPES.has(v) ? v : null;
+}
+
+/** img2img params: ControlNet (full denoise, 15 steps) or plain img2img. */
+export function hordeImg2imgParams(control: string | null): Record<string, unknown> {
+  return control
+    ? { control_type: control, denoising_strength: 1.0, steps: 15 }
+    : { denoising_strength: IMG2IMG_DENOISE };
+}
 
 function hordeSourceImage(b64?: string): string | undefined {
   if (!b64 || /^(1|true|yes|on)$/i.test(process.env.AIHORDE_IMG2IMG_DISABLED || "")) return undefined;
@@ -67,7 +88,8 @@ export const aiHordeEngine: AiRenderEngine = async (
   try {
     // 1. Submit async generation job
     const sourceImage = hordeSourceImage(req.baseImage);
-    devLog(`[ai-horde] Submitting ${sourceImage ? "img2img" : "text2img"} job...`);
+    const control = sourceImage ? hordeControlType() : null;
+    devLog(`[ai-horde] Submitting ${sourceImage ? `img2img${control ? "+" + control : ""}` : "text2img"} job...`);
     const submitRes = await fetch(`${HORDE_API}/generate/async`, {
       method: "POST",
       headers: {
@@ -75,13 +97,15 @@ export const aiHordeEngine: AiRenderEngine = async (
         apikey: ANON_KEY,
       },
       body: JSON.stringify({
-        prompt: `${sanitizeForContentFilter(req.prompt)} ### professional photograph, 8k, photorealistic, architectural interior design, empty room`,
+        // Text after "###" is Horde's NEGATIVE prompt. Before 3.06 the quality words sat
+        // there, i.e. we asked the model to AVOID "photorealistic, 8k".
+        prompt: `${sanitizeForContentFilter(req.prompt)}, professional architectural photograph, photorealistic, 8k ### cartoon, lowpoly, clay render, blurry, distorted, text, watermark`,
         params: {
           ...hordeSize(req.width, req.height),
           steps: 25,
           cfg_scale: 7,
           sampler_name: "k_euler_a",
-          ...(sourceImage ? { denoising_strength: IMG2IMG_DENOISE } : {}),
+          ...(sourceImage ? hordeImg2imgParams(control) : {}),
         },
         ...(sourceImage ? { source_image: sourceImage, source_processing: "img2img" } : {}),
         nsfw: false,

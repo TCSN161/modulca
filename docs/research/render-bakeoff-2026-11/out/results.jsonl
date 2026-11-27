@@ -1,0 +1,50 @@
+{"engine":"cf-klein-4b","room":"kitchen","at":"2026-11-26T20:22:31.877Z","ok":false,"ms":263,"error":"429 {\"errors\":[{\"message\":\"AiError: AiError: you have used up your daily free allocation of 10,000 neurons, please upgrade to Cloudflare's Workers Paid plan if you would like to continue usage. (cb06c483-"}
+{"engine":"gemini-edit","room":"kitchen","at":"2026-11-26T20:22:39.285Z","ok":false,"ms":475,"error":"429 RESOURCE_EXHAUSTED: You exceeded your current quota (free tier limit 0)"}
+{"engine":"hf-kontext","room":"kitchen","at":"2026-11-26T20:22:39.864Z","ok":false,"ms":447,"error":"402 Purchase pre-paid credits to continue using Inference Providers"}
+{"engine":"openai-edit","room":"kitchen","at":"2026-11-26T20:22:47.968Z","ok":true,"file":"openai-edit-kitchen.jpg","ms":10355,"note":"1504 in / 272 out tokens"}
+{"engine":"openai-edit","room":"living","at":"2026-11-26T20:23:07.566Z","ok":true,"file":"openai-edit-living.jpg","ms":8612}
+{"engine":"openai-edit","room":"bedroom","at":"2026-11-26T20:23:16.178Z","ok":true,"file":"openai-edit-bedroom.jpg","ms":7537}
+{"engine":"pollinations-kontext","room":"kitchen","at":"2026-11-26T20:23:46.237Z","ok":false,"ms":432,"error":"403 kontext isn't part of the Classic API; needs a Pollinations API key"}
+{"engine":"hfspace-kontext","room":"kitchen","at":"2026-11-26T20:24:13.264Z","ok":true,"file":"hfspace-kontext-kitchen.jpg","ms":35163}
+{"engine":"hfspace-qwen-edit","room":"kitchen","at":"2026-11-26T20:25:12.012Z","ok":true,"file":"hfspace-qwen-edit-kitchen.jpg","ms":52470}
+{"engine":"hfspace-qwen-edit","room":"living","at":"2026-11-26T20:26:14.960Z","ok":false,"ms":1425,"error":"ZeroGPU quota used up (Space returns error null)"}
+{"engine":"hfspace-qwen-edit","room":"bedroom","at":"2026-11-26T20:26:16.385Z","ok":false,"ms":842,"error":"ZeroGPU quota used up (Space returns error null)"}
+{"engine":"hfspace-kontext","room":"living","at":"2026-11-26T20:26:17.313Z","ok":true,"file":"hfspace-kontext-living.jpg","ms":30685}
+{"engine":"hfspace-kontext","room":"bedroom","at":"2026-11-26T20:26:47.999Z","ok":true,"file":"hfspace-kontext-bedroom.jpg","ms":30217}
+{"engine":"leonardo-depth","room":"kitchen","at":"2026-11-26T20:28:23.938Z","ok":false,"ms":1773,"error":"gen {\"error\":\"Weight must be provided\",\"path\":\"$\",\"code\":\"unexpected\"}"}
+{"engine":"leonardo-depth","room":"kitchen","at":"2026-11-26T20:28:29.597Z","ok":true,"file":"leonardo-depth-kitchen.jpg","ms":31126,"bytes":516638,"note":"1024x896 tokens=?"}
+{"engine":"leonardo-depth","room":"living","at":"2026-11-26T20:29:14.357Z","ok":true,"file":"leonardo-depth-living.jpg","ms":12470,"bytes":523422,"note":"1024x896 tokens=?"}
+{"engine":"leonardo-depth","room":"bedroom","at":"2026-11-26T20:29:26.828Z","ok":true,"file":"leonardo-depth-bedroom.jpg","ms":18847,"bytes":497331,"note":"1024x896 tokens=?"}
+{"engine":"horde-depth","room":"kitchen","at":"2026-11-26T20:30:55.539Z","ok":false,"ms":327,"error":"429 {\"message\":\"2 per 1 second\"}"}
+{"engine":"horde-depth","room":"living","at":"2026-11-26T20:30:55.867Z","ok":false,"ms":200,"error":"429 {\"message\":\"2 per 1 second\"}"}
+{"engine":"horde-depth","room":"bedroom","at":"2026-11-26T20:30:56.067Z","ok":false,"ms":152,"error":"429 {\"message\":\"2 per 1 second\"}"}
+{"engine":"horde-canny","room":"kitchen","at":"2026-11-26T20:30:55.548Z","ok":false,"ms":1220,"error":"403 {\"message\":\"Due to heavy demand, for requests over 576x576 or over the applicable first-order-equivalent sampler work budget the client needs to already have the required kudos. This request requires "}
+{"engine":"horde-canny","room":"living","at":"2026-11-26T20:30:56.769Z","ok":false,"ms":903,"error":"403 {\"message\":\"Due to heavy demand, for requests over 576x576 or over the applicable first-order-equivalent sampler work budget the client needs to already have the required kudos. This request requires "}
+{"engine":"horde-canny","room":"bedroom","at":"2026-11-26T20:30:57.673Z","ok":false,"ms":929,"error":"403 {\"message\":\"Due to heavy demand, for requests over 576x576 or over the applicable first-order-equivalent sampler work budget the client needs to already have the required kudos. This request requires "}
+{"engine":"horde-img2img","room":"kitchen","at":"2026-11-26T20:30:55.564Z","ok":false,"ms":617103,"bytes":23960,"note":"576x512 Deliberate worker=squeeko","error":"censored placeholder (Horde filter false positive, prompt not sanitised); 576x512 Deliberate worker=squeeko"}
+{"engine":"horde-img2img","room":"living","at":"2026-11-26T20:41:12.668Z","ok":false,"ms":223092,"bytes":23960,"note":"576x512 Deliberate worker=squeeko","error":"censored placeholder (Horde filter false positive, prompt not sanitised); 576x512 Deliberate worker=squeeko"}
+{"engine":"horde-img2img","room":"bedroom","at":"2026-11-26T20:44:55.761Z","ok":false,"ms":296378,"bytes":23960,"note":"576x512 Deliberate worker=squeeko","error":"censored placeholder (Horde filter false positive, prompt not sanitised); 576x512 Deliberate worker=squeeko"}
+{"engine":"horde-depth","room":"kitchen","at":"2026-11-26T20:50:47.835Z","ok":true,"file":"horde-depth-kitchen.jpg","ms":771719,"bytes":38996,"note":"576x512 Deliberate worker=t63c_5080"}
+{"engine":"leonardo-depth","room":"house","at":"2026-11-26T21:08:14.994Z","ok":true,"file":"leonardo-depth-house.jpg","ms":17502,"bytes":330987,"note":"1024x576 tokens=?"}
+{"engine":"leonardo-depth","room":"house-clientprompt","at":"2026-11-26T21:08:32.496Z","ok":true,"file":"leonardo-depth-house-clientprompt.jpg","ms":15104,"bytes":307221,"note":"1024x576 tokens=?"}
+{"engine":"openai-edit","room":"house-clientprompt","at":"2026-11-26T21:08:47.733Z","ok":true,"file":"openai-edit-house-clientprompt.jpg","ms":9104,"bytes":1271090,"note":"usage={\"input_tokens\":656,\"input_tokens_details\":{\"image_tokens\":576,\"text_tokens\":80},\"output_tokens\":272,\"output_tokens_details\":{\"image_tokens\":272,\"text_tokens\":0},\"total_tokens\":928}"}
+{"engine":"hfspace-kontext","room":"house","at":"2026-11-26T21:08:56.932Z","ok":true,"file":"hfspace-kontext-house.jpg","ms":30028,"bytes":35108}
+{"engine":"hfspace-kontext","room":"house-clientprompt","at":"2026-11-26T21:09:26.961Z","ok":true,"file":"hfspace-kontext-house-clientprompt.jpg","ms":29741,"bytes":72166}
+{"engine":"horde-depth","room":"living","at":"2026-11-26T21:03:39.554Z","ok":true,"file":"horde-depth-living.jpg","ms":706961,"bytes":58792,"note":"576x512 Deliberate worker=t63c_5080"}
+{"engine":"horde-depth","room":"bedroom","at":"2026-11-26T21:15:26.515Z","ok":true,"file":"horde-depth-bedroom.jpg","ms":880072,"bytes":41670,"note":"576x512 Deliberate worker=t63c_5080"}
+{"engine":"horde-canny","room":"kitchen","at":"2026-11-26T21:30:08.681Z","ok":true,"file":"horde-canny-kitchen.jpg","ms":527755,"bytes":39336,"note":"576x512 Deliberate worker=t63c_5080"}
+{"engine":"horde-canny","room":"living","at":"2026-11-26T21:38:56.436Z","ok":false,"ms":583284,"error":"censored placeholder (Horde filter false positive) worker=t63c_5080"}
+{"engine":"horde-canny","room":"bedroom","at":"2026-11-26T21:48:39.721Z","ok":false,"ms":1553684,"error":"no image {\"message\":\"Image Waiting Prompt (Status) with ID '845ded45-eb05-41b0-b7e8-546d56097a36' not found.\",\"rc\":\"RequestNotFound\"}"}
+{"engine":"horde-img2img","room":"kitchen","at":"2026-11-26T22:14:35.506Z","ok":false,"ms":258893,"error":"censored placeholder (Horde filter false positive) worker=squeeko"}
+{"engine":"horde-img2img","room":"living","at":"2026-11-26T22:18:54.399Z","ok":false,"ms":50593730,"error":"fetch failed"}
+{"engine":"horde-img2img","room":"bedroom","at":"2026-11-27T12:22:08.173Z","ok":false,"ms":29,"error":"fetch failed"}
+{"engine":"cf-klein-4b","room":"kitchen","at":"2026-11-27T12:22:36.711Z","ok":true,"file":"cf-klein-4b-kitchen.jpg","ms":5185,"bytes":579817,"note":"1024x896"}
+{"engine":"cf-klein-4b","room":"living","at":"2026-11-27T12:22:41.898Z","ok":true,"file":"cf-klein-4b-living.jpg","ms":4160,"bytes":634286,"note":"1024x896"}
+{"engine":"cf-klein-4b","room":"bedroom","at":"2026-11-27T12:22:46.058Z","ok":true,"file":"cf-klein-4b-bedroom.jpg","ms":4110,"bytes":565353,"note":"1024x896"}
+{"engine":"cf-klein-4b","room":"house","at":"2026-11-27T12:22:50.169Z","ok":true,"file":"cf-klein-4b-house.jpg","ms":3861,"bytes":409245,"note":"1024x576"}
+{"engine":"cf-klein-4b","room":"house-clientprompt","at":"2026-11-27T12:22:54.030Z","ok":true,"file":"cf-klein-4b-house-clientprompt.jpg","ms":4727,"bytes":385927,"note":"1024x576"}
+{"engine":"cf-klein-4b-ref512","room":"kitchen","at":"2026-11-27T12:22:58.903Z","ok":true,"file":"cf-klein-4b-ref512-kitchen.jpg","ms":5741,"bytes":592824,"note":"1024x896"}
+{"engine":"cf-klein-4b-ref512","room":"living","at":"2026-11-27T12:23:04.645Z","ok":true,"file":"cf-klein-4b-ref512-living.jpg","ms":4508,"bytes":524735,"note":"1024x896"}
+{"engine":"cf-klein-4b-ref512","room":"bedroom","at":"2026-11-27T12:23:09.153Z","ok":true,"file":"cf-klein-4b-ref512-bedroom.jpg","ms":3420,"bytes":483514,"note":"1024x896"}
+{"engine":"cf-klein-4b-ref512","room":"house","at":"2026-11-27T12:23:12.573Z","ok":true,"file":"cf-klein-4b-ref512-house.jpg","ms":4526,"bytes":440784,"note":"1024x576"}
+{"engine":"cf-klein-4b-ref512","room":"house-clientprompt","at":"2026-11-27T12:23:17.100Z","ok":true,"file":"cf-klein-4b-ref512-house-clientprompt.jpg","ms":5683,"bytes":333993,"note":"1024x576"}
