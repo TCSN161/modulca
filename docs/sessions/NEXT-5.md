@@ -1,35 +1,35 @@
 # NEXT-5 — proposed next Chat 5 Design + Drawings session
 
-**Session:** `5.03.DesignDrawings_Project-Save-Bugs_2026112X` (date = day MAIN starts it)
-**Written by:** 5.02 (2026-11-26) · **Model:** Opus (code)
+**Session:** `5.03-A.DesignDrawings_Img2Img-Camera-Depth_2026112X` (date = day MAIN starts it)
+**Written by:** 5.03 (2026-11-27) · **Model:** Opus (code)
+**Inputs ready:** 3.06 bake-off done (`docs/MCA-DOC-AI-ENGINES-3D-BAKEOFF-2026-11.md`). Wait for 3.07 only if it changes the route contract (depth/control image field).
 
 ## Prompt
 
-You are Chat 5 Design + Drawings, session `5.03.DesignDrawings_Project-Save-Bugs`.
+You are Chat 5 Design + Drawings, session `5.03-A.DesignDrawings_Img2Img-Camera-Depth`.
 
 Read first:
-- The §9 read-first files in `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md`. Write only in Chat 5 paths (§10).
-- `docs/MCA-DOC-BETA-SMOKE-TEST.md`, rows ST06, ST08, ST09, ST10, ST11, ST12, ST31 and ST35.
-- W48 live log §6 (`docs/MCA-DOC-WEEK-2026-W48-SCHEDULE.md`), the 5.01 and 5.02 lines.
-- `src/features/design/projectSnapshot.ts` (single save/restore path) and `src/features/design/renderPersistence.ts` (5.02 pattern: write the store, then save at once).
+- The §9 read-first files in `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md`. Write only in Chat 5 paths (§10). `*Three*` components are Chat 3; `RenderScene3D.tsx` B1 is assigned to Chat 5 by the bake-off doc §4.
+- `docs/MCA-DOC-AI-ENGINES-3D-BAKEOFF-2026-11.md` §3–§5: klein (`cloudflare-klein`, 1024 ref) is the default; **the prod failure was the prompt and the view, not the engine**.
+- W48 live log §6, the 5.02 and 5.03 lines. `src/features/design/components/render/useRenderEngine.ts`, `RenderPage.tsx`, `RenderScene3D.tsx`.
 
-Fix, in this order, one commit each:
-1. **ST06 (high)**: products added on the Products step are lost on a full page load. The cloud load (`CloudSyncProvider` / `useSaveDesign` → `applyProjectSnapshot`) overwrites `modulca-selected-products` with the cloud copy `[]`. Fix both sides: a product change must save the project at once (like renders in 5.02), and `CloudSyncProvider` auto-save must also watch the product selection (it is not in the design store; add a subscription or a change event in `productSelection.ts`).
-2. **ST09**: Constructor opening `/project/[id]/architect` by full page load sees the "Upgrade to Architect" gate; the in-app link works. The FeatureGate decides before the tier has loaded. Wait for the auth/tier load (loading state) before gating. If the gate component is outside Chat 5 paths, note the exact change for its owner instead.
-3. **ST11**: the first dashboard load shows "0 projects" and the second shows 4 (race in the cloud fetch), plus a transient "Sign in to save" on Products while signed in. Show a loading state until the auth session is known. Do not render empty or signed-out states before that.
-4. **ST12 + ST31**: there is one cost function. The dashboard card (€43,200) differs from Design/Finalize (€39,096). Products (EUR 65) are not in the Total Estimate. Per-m² products (XPS, gypsum) are quantity 1. Make the dashboard use `getStats()` (or a pure shared function). Add products to the total. Add a unit (`pcs` | `m2`) and quantity from the module area for per-m² items. Add tests.
-5. **ST10**: the `/project/new` template choice ("Compact House") is ignored. Apply the template's modules (via `applyProjectSnapshot` or the wizard's `applyToProject`). Add accessible names to the template buttons.
-6. **ST08** (low, high-collision file `FinalizePage.tsx`; check `git log` for the last hour first): add the products section, and make "N projects saved" use the same source as the dashboard.
-7. **ST35** (low): the render page "Design Inspiration" cards (`src/features/design/components/render/RenderGallery.tsx`, `STYLE_PINS` in `renderConstants.ts`) show flat colour blocks, no images. Wire real images, either curated ones from the `src/assets/` registry or `public/`, with the colour as fallback.
+Build, one commit each:
+1. **Automatic Image→Image**: "3D + Text" always sends the current 3D capture (`toJpegDataUrl(raw, 1024, 0.85)`, keep the size). Enable the capture in `viewMode === "all"` (today `captureRef.current = null`, nothing is sent).
+2. **View-describing prompts** (bake-off §4.2): All Modules → "Turn this 3D cutaway axonometric of a modular house (N modules: …) into a photorealistic architectural cutaway render, seen from above at the same angle. Keep the exact camera, the outer walls cut at the same height, every window and door opening and every furniture position. <style>". Single room → "Turn this 3D view of a <room> into a photoreal render; keep the exact camera, walls, openings and furniture positions. <style>". Pure function + tests.
+3. **Camera presets** that actually move the camera (B1): `useThree().camera.position.set(...)` + `controls.update()` on change; in-room "interior" position (≈ `[0.9, 1.5, 0.9]`, `minDistance` ≈ 0.5), corner, detail, axonometric.
+4. **First-person camera** inside a module (eye height 1.6 m, look-around; WASD optional) for the capture.
+5. **FOV slider** (e.g. 35–90°), stored with the render settings, applied to the capture camera.
+6. **Depth map**: render a depth pass of the same camera from Three.js (`MeshDepthMaterial` or a depth texture → normalised grayscale JPEG) and send it as the control image when the route supports it (Horde ControlNet depth today; Replicate `flux-depth-dev` only if Costin approves paid). Check the field name with Chat 3 (3.07) before wiring; until then, generate + preview it only.
+7. Optional, small: B2 Kitchen L-shape overlap, B3 partition walls in All Modules (bake-off §4.3).
 
 Finish:
-- `npx vitest run src/features/design src/features/wizard` + `npx tsc --noEmit` + `npm run test:run`.
-- Explicit-path commits, push (the pre-push hook runs tsc).
-- One line in §6 of the current week's schedule doc. Next prompt into `docs/sessions/NEXT-5.md`.
+- `npx vitest run src/features/design src/features/wizard` + `npx tsc --noEmit` + `npm run test:run`. Browser pass on `/project/demo/render` (no login needed).
+- Explicit-path commits, push. One line in §6 of the current week's schedule doc. Next prompt into this file.
 - Do not start any other session.
 
-## Context carried over from 5.02
-- Renders: `persistSavedRender()` re-encodes to a ≤1024 px JPEG and saves via `saveActiveProject`. `CloudSyncProvider` auto-save now also watches `savedRenders`. Reuse this pattern for products (ST06).
-- `saveToLocalStorage` falls back to saving without `savedRenders` on a quota error. `loadFromLocalStorage` then keeps the in-memory renders.
-- Not verified in a browser in 5.02: the built-in pane could not open localhost while another session's dev server was running. Do a quick browser pass of render → presentation → reload first, then start ST06.
-- Open for others: Chat 3 should send `X-AI-Fallback-From`, and the presentation reader should show `fallbackFrom` and `baseSource` (live-log line). MAIN owns the ST05 compare call in `src/app/admin/engines/page.tsx` and the ST04 counter in `features/auth/store.ts`.
+## Context carried over from 5.03
+- Project-save bugs ST06, ST08–ST12, ST31, ST35 fixed (W48 live log, Fri 27).
+- `features/design/projectCost.ts` `computeProjectCost()` / `computeProjectCostFromData()` is the one cost function (design + products, per-m² by usable area). **Open (not Chat 5 path):** the presentation PDF "Cost Summary" and "Selected Products" should call it so ST31 is fixed on the PDF too.
+- `useAuthReady()` (`features/design/hooks/useAuthReady.ts`) + `useAuthStore.sessionChecked`: use it before any tier gate. Only the Architect page, dashboard and CloudSaveButton use it; the inline `FeatureGate`s in Configure / Technical / Walkthrough / Products / Finalize may still flash the upgrade prompt on a direct load (not reported yet).
+- Product selection: user edits are "pending" (`modulca-selected-products-pending`) until a cloud save succeeds; `applyProjectSnapshot(data, { projectId })` keeps pending local products.
+- `/project/new` and the dashboard need login in the local dev server; `/project/demo/*` does not.
