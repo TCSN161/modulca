@@ -1,4 +1,44 @@
+import { useState } from "react";
 import type { CameraAngle, StylePin } from "./renderConstants";
+import { pinImage } from "./inspirationImages";
+
+/** BUG-ST35: product photo when we have one, else a labelled placeholder (never a bare colour block). */
+function PinVisual({ pin }: { pin: StylePin }) {
+  const img = pinImage(pin);
+  const [failed, setFailed] = useState(false);
+  const showImg = img && !failed;
+  return (
+    <div
+      className="relative w-full flex items-end p-3"
+      style={{ height: pin.h, backgroundColor: pin.color }}
+      data-testid="inspiration-visual"
+    >
+      {showImg ? (
+        // eslint-disable-next-line @next/next/no-img-element -- local /public photo, onError fallback
+        <img
+          src={img.url}
+          alt={img.productName}
+          loading="lazy"
+          onError={() => setFailed(true)}
+          className="absolute inset-0 h-full w-full object-cover"
+        />
+      ) : (
+        <div
+          className="absolute inset-0 flex items-center justify-center px-4 text-center"
+          aria-hidden="true"
+        >
+          <span className="rounded-lg bg-white/70 px-3 py-2 text-xs font-semibold text-gray-700 backdrop-blur-sm">
+            {pin.label}
+            <span className="mt-0.5 block text-[9px] font-normal text-gray-500">No photo yet</span>
+          </span>
+        </div>
+      )}
+      <span className="relative rounded bg-white/80 px-2 py-0.5 text-[9px] font-bold text-gray-600 uppercase backdrop-blur-sm">
+        {pin.cat}
+      </span>
+    </div>
+  );
+}
 
 interface RenderGalleryProps {
   pins: StylePin[];
@@ -46,18 +86,7 @@ export default function RenderGallery({
               className="mb-3 overflow-hidden rounded-xl border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow cursor-pointer"
               style={{ breakInside: "avoid" }}
             >
-              <div
-                className="w-full flex items-end p-3 bg-cover bg-center"
-                style={{
-                  height: pin.h,
-                  backgroundColor: pin.color,
-                  backgroundImage: pin.img ? `url(${pin.img})` : undefined,
-                }}
-              >
-                <span className="rounded bg-white/80 px-2 py-0.5 text-[9px] font-bold text-gray-600 uppercase backdrop-blur-sm">
-                  {pin.cat}
-                </span>
-              </div>
+              <PinVisual pin={pin} />
               <div className="p-3">
                 <div className="text-xs font-semibold text-brand-teal-800">{pin.label}</div>
                 <div className="mt-1 flex items-center justify-between">
