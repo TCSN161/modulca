@@ -81,6 +81,8 @@ export interface ExpressJob {
   projectId: string | null;
   projectName: string;
   stage: ExpressStage;
+  /** The stage that was running when the job failed */
+  failedStage?: ExpressStage;
   modules: number;
   productCount: number;
   estimateEur: number | null;

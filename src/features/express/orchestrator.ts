@@ -84,7 +84,7 @@ export async function runExpress(
     onProgress?.(job);
   };
   const fail = (error: string) => {
-    commit({ stage: "failed", error, finishedAt: deps.now() });
+    commit({ stage: "failed", failedStage: job.stage, error, finishedAt: deps.now() });
     return job;
   };
   commit({});

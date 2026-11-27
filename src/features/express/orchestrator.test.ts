@@ -123,6 +123,7 @@ describe("runExpress", () => {
     const job = await runExpress(g1, deps);
     expect(job.stage).toBe("failed");
     expect(job.error).toBe("save: offline");
+    expect(job.failedStage).toBe("save");
     expect(deps.requestRender).not.toHaveBeenCalled();
   });
 
