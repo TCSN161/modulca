@@ -172,7 +172,7 @@ Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu
 | ST18 | ❌ | ghid 5aed99c | Verificarea brandului în Google Console · **Costin** (`MCA-DOC-GOOGLE-LOGIN-BRANDING.md`) |
 | ST19 | ✅ | 8e505c9 | — |
 | ST20 | 🟡 | 5aed99c | Nereprodus; ipoteza `toLocaleString()` în SSR; lista de apeluri → **Chat 5** |
-| ST21 | ✅ | 5aed99c | Retest `/api/health` după deploy |
+| ST21 | ✅ | 5aed99c | ✅ verificat pe prod 27 nov: auth/db/stripe/engines/knowledge ok, 0 drafturi indexate; „degraded” doar din lipsa `POLLINATIONS_API_KEY` (Costin, Vercel) |
 | ST22 | 🟡 | f015f08 (bannere) | Rescrierea pe CATUC după review-ul arhitectului partener · **Chat 2** |
 | ST23 | ✅ | 7d785df | — |
 | ST24 | ✅ | 7d785df | — |
