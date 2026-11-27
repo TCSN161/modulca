@@ -56,7 +56,7 @@
 | 11 | Aprobări: emailurile DPA (Lun 30) · upgrade B15 (Mie 2) · emailul către utilizatori (Sâm 5) | W49 | 15 min total | un „OK” în chat-ul MAIN |
 | ~~12~~ | ✅ **Făcut (27 nov)**: sitemap-ul (240 URL, 200 OK) retrimis în Search Console (cont `uiiacgsauto`); „Couldn’t fetch” era statusul vechi. Recitim vineri 4 dec. Contul `costin.telefon` e acum și el proprietar (DNS) | — | — | — |
 | 13 | Rezervi conturile **@modulca** pe rețelele sociale | când ai timp, până pe 13 dec | 20 min | Instagram, TikTok, YouTube, Facebook, LinkedIn |
-| 14 | Confirmi costurile lunare reale (planul Claude, ChatGPT Plus, Sentry, domeniul; Vercel = Hobby ✅, Supabase = Free ✅) | Lun 30 | 10 min | completezi rândurile ❓ din `docs/MCA-DOC-BUDGET-2026.md` |
+| ~~14~~ | ✅ **Făcut (27 nov)**: costuri fixe confirmate ≈ €40/lună, sub plafon (bugetul §1) | — | — | — |
 | ~~16~~ | ✅ **Făcut (27 nov)**: ~~spațiul din baza Supabase~~ = 50 / 500 MB, detalii în bugetul §6 | — | — | — |
 | 15 | Lista de invitați beta (10–20, nume + email, fișier privat, nu în repo) | până pe 10 dec | 1 h | — |
 | ~~—~~ | ~~NotebookLM Q11–Q25~~ | — | — | **Nu mai e nevoie**: Q11–Q25 au fost răspunse și verificate de Chat 2 (2.07) din textul legii |

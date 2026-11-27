@@ -14,15 +14,15 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 |---|---|---|---|---|
 | Supabase | **Free** | €0 | ✅ Costin (27 nov) + `MCA-DOC-BLOCKERS-2026-11-19.md` B1 („Keep Supabase Free”) | Limite Free: 500 MB DB, 1 GB stocare, 50k utilizatori activi/lună, **pauză automată după 7 zile fără activitate** (s-a întâmplat în nov), **fără backup zilnic**. Pro ($25 ≈ €23) doar peste ~400 utilizatori sau dacă vrem backup înainte de beta |
 | Vercel | Hobby | €0 | ✅ verificat 27 nov (Team Settings → Billing: Hobby, fără card) | ⚠️ Hobby nu permite uz comercial → **Pro ($20 ≈ €18,5) cel târziu la lansare (1 feb)** sau la primul plătitor |
-| Claude (Claude Code, abonament) | Pro €18 (19 nov) | €18 | ❓ | În W48 am rulat 3–4 sesiuni Opus deodată și am atins limita; dacă planul s-a schimbat (Max), totalul crește mult |
-| ChatGPT Plus | Plus | €20 | ❓ (încă activ?) | Rol: „a doua opinie”. În W48 n-a fost folosit în niciun flux |
-| Sentry | Team | ❓ ($26 dacă e plătit; €0 dacă e trial/free) | ❓ | `COMPANY_INFO.md` scrie „Team” → de verificat urgent |
+| Claude (Claude Code, abonament) | **Pro** | €18 | ✅ Costin, 27 nov | Limită de utilizare pe săptămână → max 2 sesiuni deodată |
+| ChatGPT Plus | Plus | €20 | ✅ activ (Costin, 27 nov) | Păstrat deocamdată; candidat de tăiat dacă trebuie loc în plafon (Vercel Pro în ian) |
+| Sentry | **Developer (free)** | €0 | ✅ Costin, 27 nov | `COMPANY_INFO.md` scria „Team” → învechit |
 | Resend (email tranzacțional) | Free, 3k/lună | €0 | ✅ | |
-| Domeniu modulca.eu (Namecheap) | anual | ≈ €1 (€8–12/an) | 🟡 | data reînnoirii ❓ |
+| Domenii modulca.eu + modulca.nl (Namecheap) | anual | ≈ €2 (≈ €10/an fiecare 🟡) | ✅ date, 🟡 preț | **.eu plătit până pe 10 apr 2028** (reînnoire până pe 5 apr 2028) · **.nl expiră 10 apr 2027** (reînnoire până pe 5 apr 2027) |
 | GitHub, Mapbox, Search Console, NotebookLM | free | €0 | 🟡 | Mapbox: free până la 50k încărcări de hartă/lună |
 | Perplexity Pro | condiționat | €0 (neactivat) | 🟡 | |
 
-**Total fix cunoscut**: Claude €18 + ChatGPT €20 = **€38 → sub plafon (rămân €12)**, fără Sentry și fără Vercel Pro.
+**Total fix (toate confirmate 27 nov)**: Claude €18 + ChatGPT €20 + domenii ≈ €2 = **≈ €40 → sub plafon (rămân ≈ €10)**. Supabase, Vercel, Sentry, Resend = Free.
 
 ## 2. Costuri variabile (AI pe API, randări)
 
@@ -42,9 +42,9 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 
 | Lună | Fix | Variabil | Total | Față de €50 |
 |---|---|---|---|---|
-| **Nov 2026** (real, parțial) | €38 cunoscut + Sentry ❓ | < €1 + ❓ | **≈ €39 + ❓** | 🟢 sub (dacă Sentry e free) |
-| **Dec 2026** (prognoză, beta 15 dec) | €38 | €1–5 consultant + **€0–10 decizia motoare** | €39–53 | 🟡 la limită dacă luăm €10 pe motoare |
-| **Ian 2027** (prognoză, pre-lansare) | €38 + Vercel Pro €18,5 = €56,5 | €5–15 | €62–72 | 🔴 peste — Vercel Pro din primele abonamente, sau renunțăm la ChatGPT Plus |
+| **Nov 2026** (real, parțial) | €40 | < €1 + API consultant ❓ | **≈ €41** | 🟢 sub |
+| **Dec 2026** (prognoză, beta 15 dec) | €40 | €1–5 consultant + **€0–10 decizia motoare** | €41–55 | 🟡 la limită dacă luăm €10 pe motoare |
+| **Ian 2027** (prognoză, pre-lansare) | €40 + Vercel Pro €18,5 = €58,5 | €5–15 | €64–74 | 🔴 peste — Vercel Pro din primele abonamente, sau renunțăm la ChatGPT Plus |
 
 ## 4. Ce propune MAIN (decide Costin)
 
@@ -57,11 +57,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 
 ## 5. Ce trebuie completat (Costin, ~10 min, Lun 30)
 
-- [ ] Planul Claude actual și prețul
-- [ ] ChatGPT Plus: activ? păstrezi?
-- [ ] Vercel: Hobby sau Pro?
-- [ ] Sentry: planul real
-- [ ] Domeniul: preț și data reînnoirii
+- [x] Claude Pro €18 · ChatGPT Plus €20 (păstrat) · Vercel Hobby · Sentry Developer · Supabase Free · domenii .eu (2028) + .nl (2027)
 - [ ] OpenAI + Anthropic: factura API din noiembrie (dashboard → Usage)
 
 Automatizare mai târziu (Radar): linia de cost AI din Usage & Cost API Anthropic, sau o foaie Claude Sheets; nu acum.
