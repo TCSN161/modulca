@@ -134,7 +134,10 @@ export default function DashboardPage() {
           </span>
         </Link>
         <div className="flex items-center gap-3">
-          {isAuthenticated ? (
+          {/* BUG-ST38: neutral skeleton until the session is known (no "Log in" flash) */}
+          {!authReady ? (
+            <div className="h-4 w-24 rounded bg-brand-bone-200 animate-pulse" aria-hidden="true" data-testid="dashboard-auth-skeleton" />
+          ) : isAuthenticated ? (
             <div className="flex items-center gap-2">
               <div className="hidden sm:block text-right">
                 <div className="text-xs font-medium text-brand-charcoal">{userName || userEmail}</div>
@@ -179,7 +182,7 @@ export default function DashboardPage() {
           <div className="mb-8">
             <p className="label-caps mb-1">Beta</p>
             <h1 className="text-2xl md:text-3xl font-bold text-brand-charcoal tracking-heading mb-1">
-              Welcome back,<br />{userName || "Architect"}
+              Welcome back,<br />{authReady ? (userName || "Architect") : <span className="inline-block h-4 w-20 rounded bg-brand-bone-200 animate-pulse align-middle" aria-hidden="true" />}
             </h1>
           </div>
 
@@ -195,7 +198,7 @@ export default function DashboardPage() {
               <span className="text-2xl font-bold text-brand-charcoal">
                 {loaded ? projects.length : "--"}
               </span>
-              {maxProjects !== -1 && (
+              {authReady && maxProjects !== -1 && (
                 <span className="text-[10px] text-brand-gray">/{maxProjects}</span>
               )}
             </div>
@@ -208,9 +211,9 @@ export default function DashboardPage() {
                 <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">AI Renders</span>
               </div>
               <span className="text-2xl font-bold text-brand-charcoal">
-                {monthlyRenderCount}
+                {authReady ? monthlyRenderCount : "--"}
               </span>
-              {maxRenders !== -1 && (
+              {authReady && maxRenders !== -1 && (
                 <span className="text-[10px] text-brand-gray">/{maxRenders}</span>
               )}
             </div>
@@ -222,7 +225,7 @@ export default function DashboardPage() {
                 <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">AI Today</span>
               </div>
               <span className="text-2xl font-bold text-brand-charcoal">
-                {aiCallsToday}
+                {authReady ? aiCallsToday : "--"}
               </span>
             </div>
             <div className="rounded-[12px] bg-brand-bone-200 p-4">
@@ -233,9 +236,9 @@ export default function DashboardPage() {
                 <span className="text-[10px] font-bold text-brand-gray uppercase tracking-[0.05em]">Plan</span>
               </div>
               <span className="text-sm font-bold" style={{ color: tierConfig.color }}>
-                {tierConfig.label}
+                {authReady ? tierConfig.label : <span className="inline-block h-4 w-20 rounded bg-brand-bone-200 animate-pulse align-middle" aria-hidden="true" />}
               </span>
-              {userTier !== "architect" && userTier !== "constructor" && (
+              {authReady && userTier !== "architect" && userTier !== "constructor" && (
                 <Link
                   href="/pricing"
                   className="mt-2 inline-block text-[10px] font-bold text-brand-amber-600 hover:text-brand-amber-700 transition-colors"
