@@ -9,7 +9,7 @@
 |---|---|
 | `435e125` | `src/features/express/`: `types.ts`, `normalize.ts` (answers + tier caps → `ExpressBrief`), `briefToWizardInput.ts` (→ Chat 5 `WizardInput.targetModuleCount/bedroomsRequested`, capped to tier + 40 % plot footprint), `pickProducts.ts` (style ∩ room, one per subcategory by finish), `countyCentroids.ts` (42), `brief.test.ts` |
 | `8ad4219` | `renderPlan.ts` (Chat 5 `buildViewPrompt` + `sanitizePrompt` + `buildImg2ImgBody`, engine auto → klein chain, **no client tier**), `orchestrator.ts` (`runExpress`, `retryFailedRenders`, all side effects via `ExpressDeps`), `orchestrator.test.ts` (mocked engines) |
-| (this commit) | `clientDeps.ts` (real deps: wizard store, land `setPolygon`, `setSelectedProducts`, `saveActiveProject` with id "" = always a new project, `computeProjectCost`, `persistSavedRender`, POST `/api/ai-render` + Bearer), `flag.ts`, `i18n.ts` (RO/EN/NL) + `i18n.test.ts`, `ExpressPage.tsx`, route `src/app/(app)/express/page.tsx` (404 when the flag is off). tsc 0, vitest express 25/25, next build green |
+| `450551f` | `clientDeps.ts` (real deps: wizard store, land `setPolygon`, `setSelectedProducts`, `saveActiveProject` with id "" = always a new project, `computeProjectCost`, `persistSavedRender`, POST `/api/ai-render` + Bearer), `flag.ts`, `i18n.ts` (RO/EN/NL) + `i18n.test.ts`, `ExpressPage.tsx`, route `src/app/(app)/express/page.tsx` (404 when the flag is off). tsc 0, vitest express 25/25, next build green |
 
 Design decisions:
 - **No Claude call in the MVP.** The form answers map straight to the brief (deterministic). `/api/express/brief` (Claude, free prompt) is post-MVP.
