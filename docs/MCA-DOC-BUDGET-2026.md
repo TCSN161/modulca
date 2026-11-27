@@ -30,7 +30,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 |---|---|---|---|
 | Cloudflare Workers AI (cloudflare + klein, 10k neuroni/zi) | €0 | ✅ | 27 nov: **1.310 / 10.000 neuroni** azi, toți pe `flux-2-klein-4b` (≥ 2 randări) → cost exact per randare = Chat 3 (3.09) |
 | AI Horde, Pollinations | €0 | ✅ | |
-| OpenAI (randări de test + consultant Premium) | **$0,02** (org „Personal”, 7 cereri) | ✅ console 27 nov | ⚠️ limita lunară setată la **| OpenAI (randări de test + consultant Premium) |00** → propunere: coborâtă la $5. Cheia de pe prod poate fi în alt cont (0 imagini în org „Personal”, deși bake-off-ul a randat cu OpenAI) → de verificat |
+| OpenAI (randări de test + consultant Premium) | **$0,02** (org „Personal”, 7 cereri) | ✅ console 27 nov | ✅ limita lunară coborâtă de la $100 la **$5, hard limit** (Costin OK, 27 nov; alerte la $4 / $5). Auto-reload activ: sub $5 reîncarcă la $10, max $10/lună. Cheia de pe prod poate fi în alt cont (0 imagini în org „Personal”, deși bake-off-ul a randat cu OpenAI) → de verificat |
 | Anthropic API (consultant Architect/Constructor) | ≈ €0,15 test (2.08) + ❓ prod | 🟡 / ❓ | Cu prompt caching; puțini utilizatori până la beta |
 | Leonardo | prepaid (3.114 tokeni pe 26 nov; ~160 pierduți prin ST34, 60 în bake-off) | ✅ sold, ❓ cât s-a plătit inițial | €0 nou; ≈ 240 randări Depth rămase |
 | Stability | prepaid, 25 credite | ✅ sold | €0 nou; ≈ 8 randări Structure |
@@ -58,7 +58,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 ## 5. Ce trebuie completat (Costin, ~10 min, Lun 30)
 
 - [x] Claude Pro €18 · ChatGPT Plus €20 (păstrat) · Vercel Hobby · Sentry Developer · Supabase Free · domenii .eu (2028) + .nl (2027)
-- [x] OpenAI: $0,02 în nov (org „Personal”) · [ ] Anthropic: factura API din noiembrie (Console nelogat încă) · [ ] OpenAI: coborâm limita de $100 la $5? (OK Costin) · [ ] în ce cont e cheia OpenAI de pe prod?
+- [x] OpenAI: $0,02 în nov (org „Personal”) · [ ] Anthropic: factura API din noiembrie (Console nelogat încă) · [x] OpenAI: limita = $5 hard (27 nov) · [ ] în ce cont e cheia OpenAI de pe prod?
 
 Automatizare mai târziu (Radar): linia de cost AI din Usage & Cost API Anthropic, sau o foaie Claude Sheets; nu acum.
 
