@@ -1,13 +1,31 @@
 import { NextResponse } from "next/server";
 import { ARTICLES, REGIONS, CATEGORIES } from "@/knowledge/_index";
 import { checkEnv } from "@/shared/config/env-check";
+import {
+  checkAuth,
+  checkDb,
+  checkStripe,
+  checkEngines,
+  checkKnowledge,
+  overallStatus,
+  type ModuleStatus,
+} from "./checks";
 
 export const dynamic = "force-dynamic";
 
 /**
  * Health check & provider status endpoint.
- * Reports which AI providers are configured and knowledge library stats.
+ *
+ * BUG-ST21: per-module status — auth (Supabase Auth reachable), db (1-row select),
+ * stripe (key valid + TEST/LIVE mode), image engines (config-only), knowledge
+ * (no *.new.md in the index). Network checks run in parallel with 2.5 s timeouts;
+ * the full result is cached in-process for 60 s so monitors can't hammer upstreams.
+ * HTTP 503 only when auth or db is down; degraded stays 200.
  */
+
+const CACHE_TTL_MS = 60_000;
+let cache: { at: number; body: Record<string, unknown>; httpStatus: number } | null = null;
+let inflight: Promise<{ body: Record<string, unknown>; httpStatus: number }> | null = null;
 
 interface ProviderStatus {
   id: string;
@@ -29,23 +47,34 @@ const PROVIDER_INFO: { id: string; keyCheck?: () => boolean; keyEnv?: string; mo
   { id: "pollinations", model: "openai-proxy", tiers: ["free", "premium", "architect"] },
 ];
 
-export async function GET() {
-  try {
-    const providers: ProviderStatus[] = PROVIDER_INFO.map((p) => ({
-      id: p.id,
-      configured: p.keyCheck ? p.keyCheck() : p.keyEnv ? !!process.env[p.keyEnv] : true,
-      model: p.model,
-      tiers: p.tiers,
-    }));
+async function buildHealth(): Promise<{ body: Record<string, unknown>; httpStatus: number }> {
+  const t0 = Date.now();
+  const providers: ProviderStatus[] = PROVIDER_INFO.map((p) => ({
+    id: p.id,
+    configured: p.keyCheck ? p.keyCheck() : p.keyEnv ? !!process.env[p.keyEnv] : true,
+    model: p.model,
+    tiers: p.tiers,
+  }));
+  const configuredCount = providers.filter((p) => p.configured).length;
+  const envCheck = checkEnv();
 
-    const configuredCount = providers.filter((p) => p.configured).length;
+  const [auth, db, stripe] = await Promise.all([checkAuth(), checkDb(), checkStripe()]);
+  const modules: Record<string, ModuleStatus> = {
+    auth,
+    db,
+    stripe,
+    engines: checkEngines(),
+    knowledge: checkKnowledge(),
+  };
+  const status = overallStatus(modules);
 
-    // Environment validation
-    const envCheck = checkEnv();
-
-    return NextResponse.json({
-      status: envCheck.ok ? "ok" : "degraded",
+  return {
+    httpStatus: status === "down" ? 503 : 200,
+    body: {
+      status,
       timestamp: new Date().toISOString(),
+      durationMs: Date.now() - t0,
+      modules,
       knowledge: {
         articles: ARTICLES.length,
         categories: CATEGORIES.filter((c) => c.articleCount > 0).length,
@@ -65,12 +94,31 @@ export async function GET() {
         missingOptional: envCheck.missing.filter((m) => !m.critical).map((m) => m.key),
         warnings: envCheck.warnings,
       },
-    });
+    },
+  };
+}
+
+export async function GET() {
+  try {
+    const now = Date.now();
+    if (!cache || now - cache.at > CACHE_TTL_MS) {
+      // Coalesce concurrent misses into one upstream round.
+      inflight ??= buildHealth().finally(() => {
+        inflight = null;
+      });
+      const fresh = await inflight;
+      cache = { at: Date.now(), ...fresh };
+    }
+    const ageS = Math.round((Date.now() - cache.at) / 1000);
+    return NextResponse.json(
+      { ...cache.body, cached: ageS > 0, cacheAgeS: ageS },
+      {
+        status: cache.httpStatus,
+        headers: { "Cache-Control": "public, max-age=0, s-maxage=60, stale-while-revalidate=30" },
+      },
+    );
   } catch (error) {
     console.error("[api/health] GET error:", error);
-    return NextResponse.json(
-      { error: "Health check failed" },
-      { status: 500 },
-    );
+    return NextResponse.json({ status: "down", error: "Health check failed" }, { status: 500 });
   }
 }

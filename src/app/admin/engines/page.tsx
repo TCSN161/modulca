@@ -3,6 +3,7 @@
 import { useState, useCallback } from "react";
 import EngineBillingBar from "@/features/admin/EngineBillingBar";
 import PublishButton from "@/features/gallery/components/PublishButton";
+import { authHeaders } from "@/shared/lib/authHeaders";
 
 interface EngineResult {
   engineId: string;
@@ -102,7 +103,10 @@ export default function EngineComparisonPage() {
       if (selectedEngines.length > 0) {
         params.set("engines", selectedEngines.join(","));
       }
-      const res = await fetch(`/api/ai-render/compare?${params}`);
+      // BUG-ST05: compare is tier-gated server-side — send the Supabase Bearer.
+      const res = await fetch(`/api/ai-render/compare?${params}`, {
+        headers: await authHeaders(),
+      });
       const data: CompareResponse = await res.json();
       setResults(data);
     } catch (err) {

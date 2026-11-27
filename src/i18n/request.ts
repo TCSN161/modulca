@@ -29,5 +29,9 @@ export default getRequestConfig(async () => {
   return {
     locale,
     messages,
+    // BUG-ST20: fixed time zone so server (UTC on Vercel) and browser format
+    // dates identically — avoids React #418 hydration text mismatches.
+    // NextIntlClientProvider in the root layout inherits it automatically (v4).
+    timeZone: "Europe/Bucharest",
   };
 });

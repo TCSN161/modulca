@@ -35,7 +35,7 @@ const ENV_VARS: EnvVar[] = [
 
   // ── Optional: AI rendering engines ──
   { key: "POLLINATIONS_API_KEY", label: "Pollinations (free AI renders)", required: false, serverOnly: true },
-  { key: "HUGGINGFACE_API_KEY", label: "Hugging Face inference", required: false, serverOnly: true },
+  { key: "HUGGINGFACE_API_TOKEN", label: "Hugging Face inference", required: false, serverOnly: true },
   { key: "OPENAI_API_KEY", label: "OpenAI DALL-E", required: false, serverOnly: true },
 ];
 
