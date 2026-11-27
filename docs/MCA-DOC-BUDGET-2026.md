@@ -70,4 +70,4 @@ Automatizare mai târziu (Radar): linia de cost AI din Usage & Cost API Anthropi
 
 | Data | Spațiu folosit | Notă |
 |---|---|---|
-| Lun 30 nov | ❓ (Costin citește din dashboard) | prima valoare de referință |
+| Vin 27 nov | **50 / 500 MB (10%)** · egress 0,09 / 5 GB · fișiere 0,00 / 1 GB · 4 / 50.000 utilizatori activi · loguri 0,01 / 1 GB | prima valoare de referință (Costin, Org → Usage). Baza conține deja randări ca imagini în proiecte → urmărim creșterea pe săptămână |

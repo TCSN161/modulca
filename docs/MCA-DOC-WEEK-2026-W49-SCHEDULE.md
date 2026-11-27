@@ -56,7 +56,7 @@
 | 12 | Search Console → Sitemaps: statusul e „Success”? | Lun 30 | 5 min | dacă tot „Couldn't fetch”, spui MAIN |
 | 13 | Rezervi conturile **@modulca** pe rețelele sociale | când ai timp, până pe 13 dec | 20 min | Instagram, TikTok, YouTube, Facebook, LinkedIn |
 | 14 | Confirmi costurile lunare reale (planul Claude, ChatGPT Plus, Vercel, domeniul) | Lun 30 | 10 min | completezi rândurile ❓ din `docs/MCA-DOC-BUDGET-2026.md` |
-| 16 | Te uiți o dată în Supabase → Reports / Database: cât spațiu ocupă baza acum (din 500 MB) și spui cifra lui MAIN | Lun 30 | 5 min | dashboard Supabase |
+| ~~16~~ | ✅ **Făcut (27 nov)**: ~~spațiul din baza Supabase~~ = 50 / 500 MB, detalii în bugetul §6 | — | — | — |
 | 15 | Lista de invitați beta (10–20, nume + email, fișier privat, nu în repo) | până pe 10 dec | 1 h | — |
 | ~~—~~ | ~~NotebookLM Q11–Q25~~ | — | — | **Nu mai e nevoie**: Q11–Q25 au fost răspunse și verificate de Chat 2 (2.07) din textul legii |
 
@@ -81,7 +81,7 @@
 - [ ] Testul 2: toate ST ✅ confirmate pe prod, ST28/ST32 reparate
 - [ ] Decizia €10 luată · brandul Google trimis · textele Stripe actualizate ✅ (27 nov)
 - [ ] Bugetul lunar confirmat sub €50 (sau decizie explicită de depășire)
-- [ ] Spațiul din baza Supabase notat (prima valoare de referință)
+- [x] Spațiul din baza Supabase notat (prima valoare de referință): 50 / 500 MB, 27 nov
 
 ---
 
