@@ -164,7 +164,7 @@ const PERMIT_STEPS: PermitStep[] = [
     id: "cu",
     label: "Urban Planning Certificate",
     labelRo: "Certificat de Urbanism (CU)",
-    description: "Obtained from local city hall (primărie). Valid 12-24 months. Defines building parameters, setbacks, max height, and land use.",
+    description: "Obtained from local city hall (primărie). Valid 12–36 months, set by the issuer (CATUC art. 257). Defines building parameters, setbacks, max height, land use and which permit route applies.",
     required: true,
   },
   {
@@ -183,9 +183,9 @@ const PERMIT_STEPS: PermitStep[] = [
   },
   {
     id: "dtac",
-    label: "Technical Project (DTAC)",
-    labelRo: "Proiect Tehnic (DTAC)",
-    description: "Full architectural drawings package signed by a licensed architect. Includes architecture, structure, MEP installations.",
+    label: "Permit Project (PAC, formerly DTAC)",
+    labelRo: "Proiect pentru autorizarea construirii (PAC, fost DTAC)",
+    description: "Drawings package for the permit (CATUC art. 264, annex 2; simplified annex 3 for rural single-family homes), signed by a licensed architect. Architecture, structure, installations.",
     required: true,
   },
   {
@@ -213,7 +213,7 @@ const PERMIT_STEPS: PermitStep[] = [
     id: "ac",
     label: "Building Permit",
     labelRo: "Autorizație de Construire (AC)",
-    description: "The actual building permit issued by city hall. Valid 12 months (extendable once for 12 months). Must be displayed on site.",
+    description: "The building permit issued by city hall within 30 days of a complete file (CATUC art. 273). Works must start within 3 years, which cannot be extended (art. 309). A single-storey house ≤ 150 m² in a rural intravilan may use the simpler notification route instead (art. 294–298).",
     required: true,
   },
   {
