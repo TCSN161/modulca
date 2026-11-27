@@ -4,7 +4,10 @@ import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { useDesignStore } from "../../store";
 import { useAuthStore } from "@/features/auth/store";
-import { listProjects } from "@/features/auth/projectService";
+import { listProjectsSettled } from "@/features/auth/projectService";
+import { computeProjectCost } from "../../projectCost";
+import { getSelectedProducts, subscribeSelectedProducts, type SelectedProduct } from "../../productSelection";
+import FinalizeProducts from "./FinalizeProducts";
 import { saveActiveProject, getActiveProject } from "../../projectSnapshot";
 import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import DesignHeader from "../shared/DesignHeader";
@@ -21,13 +24,20 @@ export default function FinalizePage() {
   const styleDirection = useDesignStore((s) => s.styleDirection);
   const getStats = useDesignStore((s) => s.getStats);
   const stats = getStats();
+  // BUG-ST08 / ST12: products in the summary and in the total (one cost function)
+  const [selectedProducts, setSelectedProductsState] = useState<SelectedProduct[]>([]);
+  useEffect(() => {
+    setSelectedProductsState(getSelectedProducts());
+    return subscribeSelectedProducts(() => setSelectedProductsState(getSelectedProducts()));
+  }, []);
+  const cost = computeProjectCost({ modules, finishLevel, selectedProducts });
 
   const { userId, isAuthenticated, canCreateProject } = useAuthStore();
 
   const [projectName, setProjectName] = useState("My Modular Home");
   const [saving, setSaving] = useState(false);
   const [saved, setSaved] = useState(false);
-  const [projectCount, setProjectCount] = useState(0);
+  const [projectCount, setProjectCount] = useState<number | null>(null);
   const [showUpgrade, setShowUpgrade] = useState(false);
   const [contactMode, setContactMode] = useState<ContactMode>(null);
   const [contactForm, setContactForm] = useState({ name: "", email: "", phone: "", message: "" });
@@ -39,7 +49,8 @@ export default function FinalizePage() {
   useEffect(() => {
     (async () => {
       if (!userId) return;
-      const projects = await listProjects(userId);
+      // BUG-ST08: same source as the dashboard (retry once on an early empty list)
+      const projects = await listProjectsSettled(userId);
       setProjectCount(projects.length);
     })();
   }, [userId]);
@@ -71,7 +82,7 @@ export default function FinalizePage() {
 
     if (result.ok) {
       setSaved(true);
-      setProjectCount((c) => existingId ? c : c + 1);
+      setProjectCount((c) => (existingId || c === null ? c : c + 1));
     }
 
     setSaving(false);
@@ -202,17 +213,26 @@ export default function FinalizePage() {
               <span className="font-medium">&euro;{Math.round(stats.designFee).toLocaleString()}</span>
             </div>
 
+            {cost.productCost > 0 && (
+              <div className="flex justify-between text-sm text-brand-gray mb-3 px-1">
+                <span>Products ({cost.productLines.length})</span>
+                <span className="font-medium">&euro;{Math.round(cost.productCost).toLocaleString()}</span>
+              </div>
+            )}
+
             {/* Total */}
             <div className="border-t border-brand-bone-300/60 pt-3">
               <div className="flex items-baseline justify-between">
                 <div>
                   <div className="text-[10px] font-bold text-brand-olive-500 uppercase tracking-[0.08em]">Estimated Total</div>
-                  <span className="text-2xl font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{Math.round(stats.totalEstimate).toLocaleString()}</span>
+                  <span className="text-2xl font-bold text-brand-charcoal" suppressHydrationWarning>&euro;{Math.round(cost.grandTotal).toLocaleString()}</span>
                 </div>
                 <span className="text-[10px] text-brand-gray">*Excluding land &amp; permits</span>
               </div>
             </div>
           </div>
+
+          <FinalizeProducts lines={cost.productLines} total={cost.productCost} projectId={projectId} />
 
           {/* Save project */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm p-6 mb-6">
@@ -248,7 +268,7 @@ export default function FinalizePage() {
             </div>
             {isAuthenticated && (
               <p className="text-xs text-gray-400">
-                {projectCount} project{projectCount !== 1 ? "s" : ""} saved
+                {projectCount === null ? "--" : projectCount} project{projectCount !== 1 ? "s" : ""} saved
                 {isAuthenticated && " — synced to cloud"}
               </p>
             )}
@@ -357,7 +377,7 @@ export default function FinalizePage() {
                   <div className="space-y-3">
                     <p className="text-xs text-gray-500">
                       {contactMode === "quote"
-                        ? `Your project details (${stats.totalModules} modules, ${stats.totalArea}m², ~€${Math.round(stats.totalEstimate).toLocaleString()}) will be included automatically.`
+                        ? `Your project details (${stats.totalModules} modules, ${stats.totalArea}m², ~€${Math.round(cost.grandTotal).toLocaleString()}) will be included automatically.`
                         : "Schedule a free 30-minute call with one of our modular construction architects."}
                     </p>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -398,7 +418,7 @@ export default function FinalizePage() {
                           requests.push({
                             type: contactMode,
                             ...contactForm,
-                            project: { modules: stats.totalModules, area: stats.totalArea, estimate: stats.totalEstimate, style: styleDirection },
+                            project: { modules: stats.totalModules, area: stats.totalArea, estimate: cost.grandTotal, style: styleDirection },
                             date: new Date().toISOString(),
                           });
                           localStorage.setItem("modulca-contact-requests", JSON.stringify(requests));
