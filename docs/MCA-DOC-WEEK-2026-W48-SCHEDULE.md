@@ -152,6 +152,8 @@ NAMING doc §3 lists the ingest as `1.03.MAIN_NotebookLM-Ingest`. But `scripts/c
 | Fri 27 | **Chat 3 3.07 structure-control engines ready, OFF until funded** ([doc §8](MCA-DOC-AI-ENGINES-3D-BAKEOFF-2026-11.md)): `replicate-depth` (flux-depth-dev), `replicate-canny` (flux-canny-dev), `stability-structure` sit right after klein in the paid-tier img2img chain and switch on by themselves when `REPLICATE_API_TOKEN` / `STABILITY_API_KEY` (balance ≥ 5 credits) exist; unfunded = skipped silently. New optional POST `controlImage` + `controlType` (depth/canny) for Chat 5 5.03-A; Horde uses it with `image_is_control`. Tests mocked, €0 spent. €10 ≈ 430 Replicate or ≈ 220 Stability renders. Chat 4: `ENGINE_LIMITS` still caps replicate/stability at $1 per instance. |
 | Fri 27 | **Chat 5 5.03 project-save bugs** (0e13f6a · c449aaf · 5a23384 · e0abd95 · 1941f1f · 4e647c3 · 1e8b4af): **ST09** Architect page waits for the auth session (spinner) before FeatureGate; MAIN file `features/auth/store.ts` minimally gains `sessionChecked` (set in a `finally` after `loadSession`). **ST06** product edits are marked pending per project until a cloud save succeeds; the cloud load no longer overwrites them; auto-save also watches products. **ST11** dashboard waits for auth, retries an empty first list once, ignores stale responses; no transient "Sign in to save". **ST12+ST31** one cost function `features/design/projectCost.ts` (getStats → `computeDesignStats`; dashboard card was 9 m²×€1,200); products in the total; per-m² products cover the usable area (unit pcs|m2 from the catalog, stored shape unchanged). **ST08** Finalize lists products, total incl. products, project count = dashboard source. **ST10** `/project/new` template saves + applies its modules/grid; buttons get aria-label/aria-pressed; dashboard L-Shape card id fixed. **ST35** inspiration cards show local product photos (18/36) or a named placeholder (browser-checked). Tests: 169/169 in design/wizard/auth/land/project. Open: PDF/presentation should use `computeProjectCost` (ST31 reader side, not Chat 5 path); other FeatureGates (Configure/Technical/Walkthrough/Products) may flash the upgrade prompt on direct load — same `useAuthReady` fix. |
 | Fri 27 | **MAIN 1.04 ST05/ST21/ST20/ST18**: **ST05** admin compare sends Bearer (`authHeaders`). **ST21** `/api/health` → `modules.{auth,db,stripe,engines,knowledge}` (Supabase auth health, 1-row HEAD on `profiles`, Stripe `/v1/balance` + TEST/LIVE + key-pair/webhook check, 20 image engines config-only + kill switch, `.new.md` in index), 2.5 s timeouts, 60 s cache, 503 only if auth/db down; env-check now asks `HUGGINGFACE_API_TOKEN` (engine's real name). **ST20** zustand reads are hydration-safe (server snapshot); real cause = runtime-locale formatting in SSR HTML (`toLocaleString()` = "12,500" on Vercel vs "12.500" in a ro-RO browser; prod pane is en-US so not reproduced). MAIN: next-intl `timeZone: Europe/Bucharest`; new `shared/lib/format.ts` (`formatNumber`/`formatEurInt`, pinned locale). **Route → Chat 5** (replace bare `toLocaleString()` with `formatNumber`): `design/components/configure/ConfigPanel.tsx:299`, `ConfigurePage.tsx:130,203,209`; `products/ProductsPage.tsx:185,221,523,630-632,688-720`; `render/RenderPage.tsx:831-845,1028`; `finalize/FinalizePage.tsx:208,213,219,380` + `FinalizeProducts.tsx:42,46`; `preview/components/Scene3D.tsx:241` + `:323` (`new Date().toLocaleDateString()` in render) + `Inspector.tsx:242`; `wizard/page.tsx:343`; `marketplace/MarketplacePage.tsx:501-726`; `architect/*` (ChangeOrders, FeeTracker, OverviewDashboard:188, PhaseTracker, ProjectNotes:116). **ST18** guide `MCA-DOC-GOOGLE-LOGIN-BRANDING.md` → recommend free Google brand verification (2–3 days), Supabase custom domain (~$10/mo) only if needed. Costin: do the console steps. |
+| Fri 27 | **Chat 10 10.01 Business** (cc83be7): revenue research + business plan v0, R1–R12 ranking, top 3 = R1(+R2 packs on budget engines), R3 CATUC packs, R5 affiliate. For Chat 4: monthly cost cap per user = 30% of price. R6 needs CAEN 6831 (H2). Start-Up Nation not eligible. |
+| Fri 27 eve | **MAIN 1.05 week close-out**: §9 below, session map, smoke-test §5 (26 ✅ / 5 🟡 / 4 ❌), W49 schedule, budget sheet v0 (known fixed costs €61 > €50 cap), roadmap v2 §2–§4. |
 
 ---
 
@@ -177,3 +179,37 @@ NAMING doc §3 lists the ingest as `1.03.MAIN_NotebookLM-Ingest`. But `scripts/c
 | Lun 30 (W49) | 2.05 F4+F6 · 7.02 acord + DPA | 2 · 7 | 📅 |
 
 Costin: verificare pe site după deploy (randare după 3D cu klein, PDF nou, consultant CATUC) · contact sheet bake-off · citește F3 · Search Console → Sitemaps · conturile @modulca · răspunsul partenerului arhitect.
+
+## 9. Închiderea W48 (scris vineri 27 seara, sesiunea 1.05 MAIN)
+
+### 9.1 Ce s-a făcut, pe grupuri
+| Grup | Livrat | Commit-uri |
+|---|---|---|
+| **1 MAIN** | Harta sesiunilor + roadmap v2 + fișiere NEXT · hook pre-push cu `tsc` · sitemap/robots reparate (Search Console) · **1.03** test complet pe prod (35 BUG-ST) · **1.04** ST05 admin, ST21 `/api/health` pe module, ST20 garduri de hidratare, ghid ST18 login Google | 8b86223 · 527dbce · 9bbc764 · 93b242b · 4328a65 · 89f4ac1 · 5aed99c |
+| **2 Neufert** | Ingest NotebookLM Q1–Q10 (2.02) · F2 autorizare (2.03) · consultant Claude reparat (2.06) · F3 modular-prefab (2.04) · Q11–Q25 + OCR Clarificări + capitol CATUC nou (2.07) · consultantul știe CATUC, bannere „Actualizare în curs” (2.08) | b3c7c6e · 5533ec3 · 70db407 · a9f5004 · 1cf7a76 · 9eadfa0 · f015f08 |
+| **3 Engines** | Raport motoare (3.02) · motor gratuit `cloudflare-klein` + Horde + kill switch (3.03) · compare/upscale protejate (3.04) · ST01/03/07 + PDF ST23–26 (3.05) · bake-off 3D → randare, klein = implicit, ST34 (3.06) · motoare cu control de structură, oprite până la credit (3.07) | 8c57cc6 · f3b2fd8 · eb21bba · 33f0682 · 2aaa637 · 7d785df · 63b44d9 · 108f532 · 0a37698 |
+| **4 Billing** | Conturi comp + webhook sigur (4.02) · plan citit pe server + cotă per utilizator, migrația 012 (4.03) · plăți sigure ST14–17, ST19, DB-01, `/api/stripe/status` (4.04) | 34666e4 · 379e148 · 62c33a2 · bd3c7c8 · d36ba7d · 432fbf1 · 8e505c9 · 714bcf8 |
+| **5 Design + Drawings** | Teren + produse salvate, interfețe Express (5.01) · pagina de randare val 2: ST27, ST03, ST29, ST02, ST05, ST33 (5.02) · bug-uri de proiect ST06, ST08–12, ST31, ST35 (5.03) · 5.04 img2img automat 🟢 în lucru | 8723dc0 · 2d15359 · 6d36b94 · 92c41c9 · 9db1afd · 01ce3b3 · b757f22 · c449aaf · e0abd95 · 1e8b4af |
+| **6 Marketing** | Voce de brand v1, piloni, 5 Shorts DRAFT, 4 scripturi lungi, calendar ian (pauză până la review-ul juridic) | 330449f · f8523df · dbe90dc |
+| **8 Express** | Audit wizard + spec Express v1 | 5c11e95 |
+| **9 Radar** | Primul sweep + raport săptămânal | e21db2d |
+| **10 Business** | Cercetare venituri, plan de afaceri v0, clasament R1–R12, top 3 (R1+R2, R3, R5) | cc83be7 |
+
+Bilanț: **~110 commit-uri**, 35 BUG-ST găsite → **26 reparate în cod**, 5 parțial, 4 deschise (vezi `MCA-DOC-BETA-SMOKE-TEST.md` §5). Faza 2: F2 + F3 + capitolul CATUC gata (nepublicate, așteaptă arhitectul partener).
+
+### 9.2 Ce a alunecat
+| Ce | Plan | Acum | De ce |
+|---|---|---|---|
+| F4 + F6 | Vin 27 | **Lun 30** (2.05) | No-Go pe NotebookLM marți → tot Faza 2 s-a mutat cu o zi |
+| Pachetul F2+F3 pentru arhitectul partener | Sâm 28 | Lun 30 (7.02) | Nu s-a stabilit încă apelul; pachetul e gata pe disc |
+| 1.05 retrospectivă noiembrie | Dum 29 | Dum 29 → **1.06** | Numărul 1.04 a fost folosit pentru reparațiile MAIN, 1.05 = închiderea asta |
+| 5.03-A img2img automat | Sâm 28 | 🟢 rulează deja (5.04) | Pornit mai devreme, vineri |
+| Verificarea pe prod a reparațiilor de vineri | Vin 27 | W49 (Costin + test 2) | Deploy-uri multe în aceeași zi; nimic retestat cu contul logat |
+| B15 upgrade sharp, 4.04 promo cap-coadă | W49 | W49 (neschimbat) | — |
+
+### 9.3 Ce am învățat
+1. **Câte sesiuni în paralel**: miercuri–joi au rulat 3–4 deodată → limita de utilizare atinsă, PC fără memorie (teste OOM), un deploy stricat. **Regula rămâne max 2 deodată, max 3 pe zi**; sesiunile mecanice pe Sonnet.
+2. **Checkout comun + hook pre-push**: toate sesiunile lucrează în același folder, deci `tsc` din hook vede și fișierele *necomise* ale altei sesiuni (4.04 și 2.08 au raportat erori care nu erau ale lor). Hook-ul a oprit căderile de 4 h, dar: commit cu căi explicite, iar o eroare `tsc` în fișierul altcuiva = așteaptă, nu „repara”. Două sesiuni nu pornesc dev server în același folder (5.02 nu a putut testa în browser).
+3. **`sed` pe rânduri de tabel lipite**: o editare cu `sed` pe hartă a lipit rânduri și a trebuit revert (9f1b927 → 3d7b430 → e720cd4). Tabelele mari se editează cu Edit pe un singur rând, sau se adaugă o secțiune nouă.
+4. **Testul complet a meritat**: 35 de bug-uri reale în 1 zi, toate cu responsabil pe cale de fișier; jumătate reparate în <24 h. Se repetă înainte de fiecare lot mare (test 2 în W49).
+5. **„Reparat în cod” ≠ „merge pe site”**: aproape nimic din vineri nu e verificat cu contul logat pe prod. Fiecare raport scrie de acum explicit „neverificat pe prod”.

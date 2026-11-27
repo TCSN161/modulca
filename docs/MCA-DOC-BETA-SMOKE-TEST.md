@@ -143,3 +143,47 @@ Run 1 test project: `Smoke Test 1.03` (id `5895a485-…`, Compact House → Smal
 | F-I Ops | ✅ pass (with notes) | `/api/health` 200 ok, sitemap/robots 200. React #418 (ST20), health scope (ST21) |
 
 **Top 4 for MAIN routing**: ST01 (Chat 3), ST06 (Chat 5), ST13 (Chat 2), ST14+ST15+ST16 (Chat 4).
+
+## 5. Status per bug (închiderea W48, 2026-11-27, 1.05 MAIN)
+
+Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu e încă reverificat pe prod cu contul logat** → testul 2 (W49) confirmă. ST33–ST35 au apărut după run 1 (pagina de randare, bake-off).
+
+**Bilanț: 26 ✅ reparate · 5 🟡 parțial · 4 ❌ deschise.**
+
+| BUG | Stare | Commit | Ce mai rămâne · cine |
+|---|---|---|---|
+| ST01 | ✅ | 2aaa637 | Retest pe prod (renders după 00:00 UTC, cota CF) |
+| ST02 | ✅ | 01ce3b3 | — |
+| ST03 | ✅ | 92c41c9 · 2aaa637 | — |
+| ST04 | 🟡 | 01ce3b3 (apelantul) | Contorul din `features/auth/store.ts` încă numără încercările eșuate · **MAIN** |
+| ST05 | ✅ | 01ce3b3 · 5aed99c | Rute admin budget/analytics/gallery-stats fără auth pe server · **Chat 3 / MAIN** (nou) |
+| ST06 | ✅ | c449aaf | Retest logat |
+| ST07 | ✅ | 2aaa637 | — |
+| ST08 | ✅ | 1941f1f | Retest logat |
+| ST09 | ✅ | 0e13f6a | Retest logat |
+| ST10 | ✅ | 4e647c3 | Retest logat |
+| ST11 | ✅ | 5a23384 | Retest logat |
+| ST12 | ✅ | e0abd95 | — |
+| ST13 | ✅ | f015f08 | Retest F-F pe prod |
+| ST14 | ✅ | d36ba7d | Retest portal cu cont comp |
+| ST15 | ✅ | 62c33a2 | — |
+| ST16 | ✅ | bd3c7c8 | — |
+| ST17 | ✅ | 432fbf1 | Textele produselor în Stripe · **Costin** (NEXT-4) |
+| ST18 | ❌ | ghid 5aed99c | Verificarea brandului în Google Console · **Costin** (`MCA-DOC-GOOGLE-LOGIN-BRANDING.md`) |
+| ST19 | ✅ | 8e505c9 | — |
+| ST20 | 🟡 | 5aed99c | Nereprodus; ipoteza `toLocaleString()` în SSR; lista de apeluri → **Chat 5** |
+| ST21 | ✅ | 5aed99c | Retest `/api/health` după deploy |
+| ST22 | 🟡 | f015f08 (bannere) | Rescrierea pe CATUC după review-ul arhitectului partener · **Chat 2** |
+| ST23 | ✅ | 7d785df | — |
+| ST24 | ✅ | 7d785df | — |
+| ST25 | ✅ | 7d785df | — |
+| ST26 | ✅ | 7d785df | — |
+| ST27 | ✅ | 6d36b94 | Mutare din data URI în Storage (migrație + RLS), după beta · Chat 3/MAIN |
+| ST28 | ❌ | — | Link-uri moarte în Books · **Chat 2** (2.09, W49) |
+| ST29 | 🟡 | 9db1afd (UI) | Header `X-AI-Fallback-From` pe server + afișare în PDF · **Chat 3** (3.08) |
+| ST30 | ❌ | — | Legende tăiate, colaj Horde în PDF · **Chat 3** (3.08) |
+| ST31 | 🟡 | e0abd95 (calcul) | PDF-ul să folosească `computeProjectCost` (m², total cu produse) · **Chat 3** (3.08) |
+| ST32 | ❌ | — | PDF doar în engleză → RO+EN · **Chat 3** (3.08) |
+| ST33 | ✅ | b757f22 | img2img trimite motorul ales |
+| ST34 | ✅ | 63b44d9 | img2img nu mai cade pe text2img plătit |
+| ST35 | ✅ | 1e8b4af | — |
