@@ -3,7 +3,36 @@
 **Session:** `3.09.Engines_Free-Capacity-GLB-Compression_2026MMDD` (W50; date = day MAIN starts it)
 **Written by:** 3.07 (2026-11-27), renumbered by 3.08 (MAIN moved this work to 3.09; 3.08 = PDF ST29–ST32) · **Model:** Opus (code) · Keep it lean.
 
-## ▶ Next up first: 3.10 (Sat 5 Dec), written by MAIN 1.05 on 28 Nov
+## ▶ Next up first: 3.11 (Sun 6 Dec or next quota), written by 3.10 on 28 Nov
+
+**Session:** `3.11.Engines_Bedroom-Blender-Remodel` · **Model:** Opus · Costin at the PC, Blender 5.3 open, MCP add-on on :9876. 3.10 is done (3286b75, d1fcdc7, 3fa1562).
+
+### What 3.10 found (read `docs/research/blender-3d/3.10-audit-3d.md` + `3.10-blender-link.md`)
+- "Blurry" = **unlit flat furniture** (20/20 GLBs `KHR_materials_unlit`), not DPR/AA. Code fix shipped: `shared/glbMaterials.ts` makes them lit + shadows.
+- The kit models are **~½ real size** (bedDouble = 0.96×1.13×0.38 m) and stretched per axis in code.
+- `cabinetBedDrawer.glb` (27 cm drawer) still stands in for 16 labels (fridge, washer, bookshelf…). Wardrobe already moved to procedural.
+- All presets sit 5–23 cm in the walls; a plain clamp makes 20 floor overlaps (2.5 m interior cannot hold bed 1.8 + 2×0.45). Needs a layout redesign, not a clamp.
+
+### Prompt
+
+You are Chat 3 Engines, session `3.11.Engines_Bedroom-Blender-Remodel`. Talk to Costin in Romanian. Rebuild the **bedroom/rest** furniture in Blender through MCP, following Radar §5 (`docs/radar/2026-11-26-blender-connector.md`). Blender only through MCP; source `.blend` + GLBs go to `docs/research/blender-3d/3.11/`, **new names** (`bed-double-160.glb` …); do not overwrite `public/models/*` until Costin OKs the before/after.
+
+Steps (one commit each, explicit paths, push):
+1. **Interior first**: confirm interior size from code (`WALL_THICKNESS` 0.25 → 2.5 m; CLAUDE.md says 2.4 m with 0.3 walls — ask Costin which one is true). Redesign bedroom/rest to fit: bed **1.40 or 1.60 × 2.00** (1.80 does not fit with nightstands), 2 nightstands 0.40, wardrobe 0.60 deep on the opposite wall, ≥ 0.60 m walkway, door zone free. Fix `layouts.ts` for bedroom only + extend `layouts.overlap.test.ts` with an "inside walls" check (0.25–2.75 m) for that preset.
+2. **Model in Blender** (MCP `execute_blender_code`): bed, nightstand, wardrobe, at real size in metres, transforms applied, origin bottom-centre, −Z forward like the kit. Bevel 3–10 mm (1–2 segments) + Weighted Normal. Shared materials: wood, fabric, linen, metal (Principled, roughness/normal; textures 1024 px bed/wardrobe, 512 px rest).
+3. **Bake AO** to UV2 (Cycles OptiX, 64–128 samples) → `aoMap`. Export glTF binary: +Y up, apply modifiers, no unlit. Then `npx -y @gltf-transform/cli optimize in.glb out.glb --compress meshopt --texture-compress webp` (check `useGLTF` decodes meshopt; else keep uncompressed and note it).
+4. **Code**: map the new GLBs for bedroom labels; for these real-size models use **uniform scale = 1** (skip the per-axis fit when the model's bbox is within ±5 % of the layout size), still floor-aligned. Keep the old path for the other 17 models.
+5. **Accept**: same default camera `/project/demo/visualize` bedroom before/after (3.10 screenshots are the "before"); FPS on Costin's phone (Chrome remote or the `stats` overlay) ≥ 50; numbers in the doc.
+
+**Budget:** ≤ 5k tris per piece, ≤ 30k tris for the bedroom set; ≤ 1.5 MB for the 3 GLBs after compression (≤ 5 MB per module total). 0 live AI renders.
+
+Rules: `tsc` + vitest green; one row in §6 of the week schedule; do not start other sessions. If time is left: replace the `cabinetBedDrawer.glb` stand-ins with procedural boxes (fridge, washer, bookshelf) in `FurnitureRenderer.tsx` + `module3d.tsx`.
+
+Report (first lines): commits, before/after numbers (tris, MB, FPS), what is still on the old kit.
+
+---
+
+## ✅ Done: 3.10 (ran Sat 28 Nov night, pulled forward), written by MAIN 1.05 on 28 Nov
 
 **Session:** `3.10.Engines_3D-Audit-Blender-Link_20261205` · **Model:** Opus · Costin is at the PC with Blender 5.3 open. 3.09 (below) moves after 3.11.
 
