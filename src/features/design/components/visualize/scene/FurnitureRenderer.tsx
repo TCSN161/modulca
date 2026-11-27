@@ -4,7 +4,7 @@ import { useRef, useState, useEffect, Suspense, Component } from "react";
 import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import { Text, useCursor, useGLTF } from "@react-three/drei";
-import type { FurnitureItem } from "../../../layouts";
+import { modelFrame, type FurnitureItem } from "../../../layouts";
 import { makeGlbLit } from "../../shared/glbMaterials";
 import type { FurnitureOverride } from "../../../store";
 
@@ -528,11 +528,13 @@ export function FurniturePiece({
   if (!Number.isFinite(posX)) posX = MODULE_SZ / 2 - item.width / 2;
   if (!Number.isFinite(posZ)) posZ = MODULE_SZ / 2 - item.depth / 2;
   const displayColor = override?.color ?? item.color;
-  const rotationY = (override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0;
+  // 5.06: preset `facing` + wall mount (layouts.modelFrame); user rotation adds on top
+  const frame = modelFrame(item);
+  const rotationY = frame.rotationY + ((override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0);
   const halfH = item.height / 2;
 
   return (
-    <group position={[posX + item.width / 2, halfH, posZ + item.depth / 2]}>
+    <group position={[posX + item.width / 2, frame.baseY + halfH, posZ + item.depth / 2]}>
       {/* Invisible hitbox for interaction — uses max(w,d) so it covers any rotation angle */}
       <mesh
         visible={false}
@@ -562,17 +564,17 @@ export function FurniturePiece({
         {getGlbPath(item.label) ? (
           <SafeGlbFurniture
             path={getGlbPath(item.label)!}
-            w={item.width}
+            w={frame.modelW}
             h={item.height}
-            d={item.depth}
+            d={frame.modelD}
             color={displayColor}
             label={item.label}
           />
         ) : (
           <DetailedFurniture
-            w={item.width}
+            w={frame.modelW}
             h={item.height}
-            d={item.depth}
+            d={frame.modelD}
             color={displayColor}
             label={item.label}
           />
@@ -581,7 +583,7 @@ export function FurniturePiece({
         {/* Selection wireframe outline only (no opaque overlay) */}
         {isSelected && (
           <lineSegments>
-            <edgesGeometry args={[new THREE.BoxGeometry(item.width + 0.02, item.height + 0.02, item.depth + 0.02)]} />
+            <edgesGeometry args={[new THREE.BoxGeometry(frame.modelW + 0.02, item.height + 0.02, frame.modelD + 0.02)]} />
             <lineBasicMaterial color="#4488ff" />
           </lineSegments>
         )}

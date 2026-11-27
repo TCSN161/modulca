@@ -12,7 +12,7 @@ import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
 import { makeGlbLit } from "./glbMaterials";
 import type { WallConfigs, WallThicknessConfigs, FurnitureOverride } from "../../store";
-import type { FurnitureItem } from "../../layouts";
+import { modelFrame, type FurnitureItem } from "../../layouts";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -651,7 +651,9 @@ export function StaticFurniturePiece({
   if (!Number.isFinite(posZ) || posZ < -0.5 || posZ > MODULE_SIZE + 0.5) posZ = MODULE_SIZE / 2 - safeD / 2;
 
   const displayColor = override?.color ?? item.color;
-  const rotationY = (override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0;
+  // 5.06: preset `facing` + wall mount (layouts.modelFrame); user rotation adds on top
+  const frame = modelFrame({ ...item, width: safeW, depth: safeD });
+  const rotationY = frame.rotationY + ((override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0);
   const halfH = safeH / 2;
   const glbPath = getGlbPath(item.label);
 
@@ -661,17 +663,17 @@ export function StaticFurniturePiece({
 
 
   return (
-    <group position={[worldX, halfH, worldZ]}>
+    <group position={[worldX, frame.baseY + halfH, worldZ]}>
       <group rotation={[0, rotationY, 0]}>
         {glbPath ? (
           <SafeGlbFurniture
             path={glbPath}
-            w={safeW} h={safeH} d={safeD}
+            w={frame.modelW} h={safeH} d={frame.modelD}
             color={displayColor} label={item.label}
           />
         ) : (
           <DetailedFurniture
-            w={safeW} h={safeH} d={safeD}
+            w={frame.modelW} h={safeH} d={frame.modelD}
             color={displayColor} label={item.label}
           />
         )}
