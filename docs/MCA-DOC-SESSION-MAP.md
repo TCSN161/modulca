@@ -26,6 +26,8 @@ Legendă: 🟢 lucrează acum · 🟡 așteaptă (pe cine scrie) · ✅ terminat
 
 **Bug-uri din testul complet** (detaliu: `MCA-DOC-BETA-SMOKE-TEST.md` §5–§6): **34 ✅ reparate din 39** · 3 🟡 parțial (ST04 MAIN, ST20 Chat 5, ST22 Chat 2) · 2 ❌ low (ST38, ST39 Chat 5). Seara de 27 nov, la cererea lui Costin, au rulat înainte de W49: **2.05** F4+F6 (d7f489f) · **2.09** ST28 (466b1a1) · **3.08** ST29–ST32 PDF în RO (7d2ac43, d27fac2) · **9.02** Radar + Blender (1783873). Testul complet 2 rămâne Vin 4.
 
+**Noaptea 27→28 nov (W49 tras înainte, la cererea lui Costin), toate pe master, neverificate pe prod:** 2.05 F4+F6 (d7f489f) · 2.09 ST28 (466b1a1) · 3.08 ST29–ST32 PDF RO (7d2ac43, d27fac2) · 9.02 Radar (1783873) · 7.02 ciorne acord + DPA + email utilizatori (c659f5f, nimic trimis) · 4.05 poartă de invitație + promo ancorat + spec plafon de cost (b84540a, e088db7, 6e85ddb) — **Costin: SQL 013 în SQL Editor** · 5.05 ST20/ST38/ST39 + B2 + spec PermitTracker (2266499, 5074ff1, ec96dcb, c307613, 947f25a) · 8.02 Express MVP partea 1, ascuns de `EXPRESS_ENABLED` (435e125, 8ad4219, 450551f) · 1.07 B15 sharp 0.35.5, audit 0 high (4fe60aa). **Rămas din W49:** 8.02 partea 2 · test complet 2 · corecturi partener · publicare Faza 2 · Blender 3.10/3.11.
+
 ---
 
 ## 1. Arborele complet
