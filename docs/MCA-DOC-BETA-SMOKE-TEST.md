@@ -148,7 +148,7 @@ Run 1 test project: `Smoke Test 1.03` (id `5895a485-…`, Compact House → Smal
 
 Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu e încă reverificat pe prod cu contul logat** → testul 2 (W49) confirmă. ST33–ST35 au apărut după run 1 (pagina de randare, bake-off).
 
-**Bilanț: 26 ✅ reparate · 5 🟡 parțial · 4 ❌ deschise.**
+**Bilanț: 27 ✅ reparate · 5 🟡 parțial · 3 ❌ deschise** (ST18 închis pe 27 nov seara).
 
 | BUG | Stare | Commit | Ce mai rămâne · cine |
 |---|---|---|---|
@@ -169,7 +169,7 @@ Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu
 | ST15 | ✅ | 62c33a2 | — |
 | ST16 | ✅ | bd3c7c8 | — |
 | ST17 | ✅ | 432fbf1 | Textele din Stripe actualizate de Costin (6 produse TEST, 27 nov) |
-| ST18 | ❌ | ghid 5aed99c | Verificarea brandului în Google Console · **Costin** (`MCA-DOC-GOOGLE-LOGIN-BRANDING.md`) |
+| ST18 | ✅ | ghid 5aed99c + Google Console (Costin) | ✅ verificat pe prod 27 nov: ecranul Google arată „to continue to **ModulCA**” + logo + Privacy/Terms; brand verificat de Google în aceeași zi |
 | ST19 | ✅ | 8e505c9 | — |
 | ST20 | 🟡 | 5aed99c | Nereprodus; ipoteza `toLocaleString()` în SSR; lista de apeluri → **Chat 5** |
 | ST21 | ✅ | 5aed99c | ✅ verificat pe prod 27 nov: auth/db/stripe/engines/knowledge ok, 0 drafturi indexate; „degraded” doar din lipsa `POLLINATIONS_API_KEY` (Costin, Vercel) |

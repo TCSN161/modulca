@@ -45,7 +45,7 @@
 | 1 | **Verifici reparațiile pe site** (logat): randare „3D + Text” (trebuie „Randat cu cloudflare-klein”), PDF nou (pagini, randări curate), consultantul la o întrebare CATUC, `/pricing` + „Manage” pe contul comp | Lun 30 | 45 min | modulca.eu; scrii în chat-ul MAIN ce nu merge |
 | 2 | Te uiți pe contact sheet-ul bake-off (klein vs randările vechi din PDF #8) | Lun 30 | 10 min | `docs/research/render-bakeoff-2026-11/index.html` |
 | 3 | Citești F3 (+ nota CC1 / art. 440(3) care poate schimba F2) | până Lun 30 | 40 min | `src/knowledge/06-regulations/RO/modular-prefab-regulations.new.md` |
-| 4 | **Login Google cu numele ModulCA** (ST18): brand în Google Cloud Console, trimis la verificare (2–3 zile lucrătoare la Google) | **Lun 30** (ca să fie aprobat înainte de 15 dec) | 15 min + așteptare | `docs/MCA-DOC-GOOGLE-LOGIN-BRANDING.md` varianta A (gratuită) |
+| ~~4~~ | ✅ **Făcut (27 nov)**: brand verificat de Google, ecranul arată „ModulCA” + logo. ~~Login Google cu numele ModulCA~~ (ST18): brand în Google Cloud Console, trimis la verificare (2–3 zile lucrătoare la Google) | **Lun 30** (ca să fie aprobat înainte de 15 dec) | 15 min + așteptare | `docs/MCA-DOC-GOOGLE-LOGIN-BRANDING.md` varianta A (gratuită) |
 | ~~5~~ | ✅ **Făcut (27 nov)**: ~~Stripe, textele produselor~~, toate cele 6 produse TEST (lunar + anual); la LIVE (ian) se refac la fel | — | — | Stripe → Product catalog; textele exacte în `docs/sessions/NEXT-4.md` |
 | 6 | **Vercel**: `CF_KLEIN_MAX_SIDE=768` și cheia gratuită `POLLINATIONS_API_KEY` (dacă nu sunt puse) | Lun 30 | 10 min | Vercel → Environment Variables → Redeploy |
 | 7 | **Decizia €10 pe motoare**: (a) nimic, rămânem pe klein + Horde gratuit · (b) Replicate €10 ≈ 430 randări depth/canny · (c) Stability €10 ≈ 220 · (d) Cloudflare Workers Paid (≈ $5/lună + neuroni peste plafon, preț de verificat) · (e) OK pentru Leonardo Depth din creditul prepaid rămas (~240 randări, €0 nou) | **până pe 10 dec** (ideal Mie 2) | 10 min | Recomandarea MAIN: **(e) acum** (bani deja plătiți) + **(a)**; (b) doar dacă testul 2 arată randări nefidele |
@@ -79,7 +79,7 @@
 - [ ] F4 + F6 scrise, 0 TBD · pachetul la arhitectul partener
 - [ ] Express MVP: un brief → proiect complet → 3 randări → prezentare
 - [ ] Testul 2: toate ST ✅ confirmate pe prod, ST28/ST32 reparate
-- [ ] Decizia €10 luată · brandul Google trimis · textele Stripe actualizate ✅ (27 nov)
+- [ ] Decizia €10 luată · brandul Google ✅ verificat (27 nov) · textele Stripe actualizate ✅ (27 nov)
 - [ ] Bugetul lunar confirmat sub €50 (sau decizie explicită de depășire)
 - [x] Spațiul din baza Supabase notat (prima valoare de referință): 50 / 500 MB, 27 nov
 

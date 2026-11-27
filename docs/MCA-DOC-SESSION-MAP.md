@@ -24,7 +24,7 @@ Legendă: 🟢 lucrează acum · 🟡 așteaptă (pe cine scrie) · ✅ terminat
 | 9 Radar | 9.01 | ✅ | 9.02 raportul de vineri | Vin 4 |
 | 10 Business | 10.01 | ✅ plan de afaceri v0 | 10.02 benchmark-uri + prețuri | Sâm 5 |
 
-**Bug-uri din testul complet** (detaliu: `MCA-DOC-BETA-SMOKE-TEST.md` §5): 26 ✅ reparate în cod · 5 🟡 parțial (ST04 MAIN, ST20 Chat 5, ST22 Chat 2, ST29 + ST31 Chat 3) · 4 ❌ deschise (ST18 Costin, ST28 Chat 2, ST30 + ST32 Chat 3). Nimic reverificat încă pe prod cu contul logat → testul 2, Vin 4.
+**Bug-uri din testul complet** (detaliu: `MCA-DOC-BETA-SMOKE-TEST.md` §5): 27 ✅ reparate (ST18 + ST21 verificate pe prod) · 5 🟡 parțial (ST04 MAIN, ST20 Chat 5, ST22 Chat 2, ST29 + ST31 Chat 3) · 3 ❌ deschise (ST28 Chat 2, ST30 + ST32 Chat 3). Nimic reverificat încă pe prod cu contul logat → testul 2, Vin 4.
 
 ---
 
