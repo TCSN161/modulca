@@ -1,11 +1,11 @@
 # NEXT-5 — proposed next Chat 5 Design + Drawings session
 
-**Session:** `5.06.DesignDrawings_PermitTracker-PT1-PT3_2026XXXX` (date = day MAIN starts it)
-**Written by:** 5.05 (2026-11-28) · **Model:** Sonnet is enough for PT-1/PT-2; Opus for PT-3
+**Session:** `5.07.DesignDrawings_PermitTracker-PT1-PT3_2026XXXX` (date = day MAIN starts it)
+**Written by:** 5.05 (2026-11-28), renumbered + handover added by 5.06 (2026-11-28; 5.06 was spent on the furniture layouts) · **Model:** Sonnet is enough for PT-1/PT-2; Opus for PT-3
 
 ## Prompt
 
-You are Chat 5 Design + Drawings, session `5.06.DesignDrawings_PermitTracker-PT1-PT3`. Talk to Costin in Romanian.
+You are Chat 5 Design + Drawings, session `5.07.DesignDrawings_PermitTracker-PT1-PT3`. Talk to Costin in Romanian.
 
 Read first:
 - The §9 read-first files in `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md`. Write only in Chat 5 paths.
@@ -23,6 +23,18 @@ Finish: tsc + vitest, one §6 row in the current week's schedule doc, next promp
 - **ST20 hydration**: root cause = the design store loads localStorage in a module-load microtask, before React hydrates; render-time `getStats()` / `useXStore.getState()` read the live store, so hydration differs from the server HTML. Rule for all new code: **in render use selectors or `useDesignStats()`, never `getState()` / `getStats()`**. Proof test `design/components/finalize/hydration.test.tsx` (renderToString → hydrateRoot); add pages to it when they show store-derived text. Not verified on prod: watch Sentry MODULCA-WEB-2 for 24–48 h after deploy. `/render` was fixed by the same change (stats + quota) but has no SSR test (Three.js).
 - **ST38**: dashboard header/stats wait for `useAuthReady()` (test `app/(app)/dashboard/page.test.tsx`).
 - **ST39**: architect store `setProjectName()`; page resolves the name from the active project, else `loadProject()`.
-- **B2**: `layouts.overlap.test.ts` guards all furniture presets (inside 0–3 m, no overlap > 2 cm, rugs exempt). **Known, not fixed:** preset coordinates use the 3 m footprint, but the 3D walls are 0.25 m (up to 0.3 m) inside it, so items at x/z 0.05–0.1 sit partly inside the walls in 3D. A real fix moves the coordinate system to the 2.4 m interior (2D floor plan, 3D, drawings): do it with the Blender remodel 3.10/3.11, not separately.
+- **B2**: superseded by 5.06 below.
 - Still open from 5.04: bake-off B3 (no partition walls in All Modules); inline FeatureGates may flash on a direct load (wrap with `useAuthReady()`).
 
+
+## Handover from 5.06 Furniture layouts (d85d1be, 468fd6f)
+Done: all **24/24 presets re-authored** on the real interior (0.25–2.75 m, walls 0.25 m); default south door swing zone (x 1.05–1.95, 0.9 m deep) free except terrace; beds/desks long side on a wall; aisles ≥ 0.6 m (by hand, not tested). New optional `FurnitureItem.facing` (front direction: model rotated, w/d swapped) and `mountY` (wall-mounted: mirrors, wall TV, screen, whiteboard, tool wall, coat rack, grab bar, water heater). `layouts.modelFrame()` is the one place both renderers use (`FurnitureRenderer.tsx` + `module3d.tsx`: 3 lines each + 1-line placeholder guard; reported to Chat 3). `furniturePlaceholders.ts` = 30 labels drawn as sized primitives until Blender (3.11+/W50): kitchen counters/island, fridge, stove, shelves, tall cabinet, washer/dryer, water heater, wall items, benches, lounger, BBQ. `layouts.overlap.test.ts`: rendered 3D box (after facing/scale), wall bounds, door zone, overlap > 2 cm, mapping guard: 95 tests green; tsc + full vitest (592) green.
+
+Not done / open:
+- **Step 5 screenshots** (before/after, `docs/research/blender-3d/5.06-*.png`) skipped: another session's dev server was already running in the folder and the brief said not to start a second one. Do it at the start of 3.11 (or the next 3D session), same camera, all 8 room types. "Before" is only possible from a checkout of ceb81bb.
+- Not checked in the live 3D: rotated kit models (east/west/north) assume the model's front is +Z; if one faces the wrong way, flip that item's `facing` in `layouts.ts`, nothing else.
+- Users with saved `furnitureOverrides` keep their old positions (0–3 m); no migration.
+- 2.5 m rooms are tight: bedroom now has a 1.4 m double bed (was 1.8 king), the island preset is an island bar against the west wall, meeting table 0.8 m.
+- Aisle ≥ 0.6 m is not machine-checked; a free-path test (door → front of each item) would be the next guard.
+- Inset assumes walls ≤ 0.25 m (store max today); thicker walls would need the per-wall thickness as inset.
+- Wardrobe / hall wardrobe stay procedural (3.10); the 3.11 bedroom remodel covers them.
