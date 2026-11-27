@@ -91,3 +91,12 @@ select
 -- update public.profiles p set beta_invited_at = i.invited_at
 --   from public.beta_invites i
 --  where lower(p.email) = i.email and p.beta_invited_at is null;
+
+-- PASUL 5 (opțional, decizie Costin): păstrează promo-ul pentru TOȚI utilizatorii free existenți
+-- (cei ~11 conturi făcute înainte de 013). Fără acest pas ei devin Explorer fără promo.
+-- Promo-ul lor de 3 luni pornește de la data aleasă mai jos (de ex. startul beta).
+-- insert into public.beta_invites (email, invited_at, invited_by, note)
+--   select lower(email), '2026-12-15', 'grandfather', 'cont existent inainte de 013'
+--     from public.profiles where tier = 'free' and email is not null
+--   on conflict (email) do nothing;
+-- apoi rulează PASUL 4.

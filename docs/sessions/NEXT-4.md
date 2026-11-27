@@ -1,38 +1,35 @@
 # NEXT-4 — proposed next Chat 4 Billing session
 
-**Session:** `4.05.Billing_Invite-Gate-Promo-Anchor_2026112X` (date = day MAIN starts it)
-**Written by:** 4.04 (2026-11-27) · **Model:** Opus (code)
+**Session:** `4.06.Billing_Cost-Cap-Expiry-Email_2026MMDD` (date = day MAIN starts it)
+**Written by:** 4.05 (2026-11-28) · **Model:** Opus (code)
 
-## What 4.04 shipped (master)
+## What 4.05 shipped (master)
 | Commit | Bug | Change |
 |---|---|---|
-| 62c33a2 | ST15 | `/api/stripe/checkout` needs a session (Bearer/cookie); the user id and email come from it. The body `userId` is ignored. `redirectToCheckout(priceId)` sends `authHeaders`. |
-| bd3c7c8 | ST16 | `src/app/api/stripe/billing.ts` + tests. The checkout returns 409 `not_an_upgrade` for a tier ≤ the effective tier, 409 `use_portal` for a live subscriber (no second subscription), and 400 for an unknown price. On `checkout.session.completed`, the webhook keeps a comp tier when the purchase is lower, does not bind the subscription, and sends a Sentry warning ("refund needed"). `/pricing`: "Current plan" on the effective tier; lower tiers show "Included in your plan" plus the portal or "Contact us". |
-| d36ba7d | ST14 | `openCustomerPortal()` sends Bearer. The portal returns `{code:"comp"}` / `{code:"no_subscription"}` (200) and shows "Cont gratuit (comp), fără abonament Stripe" (RO/EN/NL). `/pricing` shows it inline; the dashboard gets a localized `alert` fallback. |
-| 432fbf1 | ST17 | The `/pricing` feature numbers (modules, renders/month, resolution, projects) are ICU params read from `ACCOUNT_TIERS`. Prices show as €149.90. The article counts are gone. The Premium consultant is "Advanced AI consultant": its chain is **OpenAI first** (`consultant/route.ts` `CONSULTANT_DEPTH.premium`), so it is *not* labelled Claude; Architect keeps Claude. The upgrade email reads from the tier config (it said 30/100 renders before; Constructor now gets its own list). |
-| 8e505c9 | ST19 | `features/beta/components/BetaPromoNotice.tsx` appears above the sign-up form. |
-| 714bcf8 | DB-01 + promo | The webhook maps `incomplete`→`unpaid` and `incomplete_expired`/`paused`→`canceled`, and throws on a failed profile update (Stripe retries). New route `GET /api/stripe/status`: tier, effective tier, beta days left, comp, subscription, all computed on the server. |
+| b84540a | B2-03 + B2-02 | Migration `013_beta_invites.sql` (+ paste-ready `docs/MCA-SQL-013-APPLY.sql`, **not applied**): table `beta_invites` (email PK lowercase, invited_at, invited_by, note; RLS, no policies), `profiles.beta_invited_at`, the 011 guard also protects `beta_invited_at`, view `beta_promo_users` re-anchored and revoked from anon/authenticated. `src/features/beta/claim.ts` (pure rules + tests) and `POST /api/beta/claim` (allowlist lookup, optional `BETA_INVITE_CODE`, writes `beta_invited_at` once, never moves it). Promo anchor = `beta_invited_at` everywhere: `getEffectiveTier`/`getBetaPromoDaysLeft` (types.ts), `promoAnchorOf` in `billing.ts` (checkout + status), `serverTier.ts`. The auth store calls the claim after sign-up (SIGNED_IN) and at every login; `?invite=CODE` on any URL is kept in localStorage until the claim. Pre-013 safe: `select("*")`, missing table = not invited. |
+| e088db7 | cost cap | `docs/MCA-SPEC-USER-COST-CAP.md`: €6/€15/€45 per user per month, fallback to €0 engines. Not coded: needs migration 014 (money counter) and the ai-render / consultant call sites (Chat 3 / Chat 2). |
+| 6e85ddb | UI-01 + item 3 | Dashboard: the portal result is shown inline (`notify:false`), "Upgrade" hidden for Constructor. |
 
-Tested: `npx vitest run` gives 384/384. tsc is clean except `dashboard/page.tsx`, which 5.03 is editing (uncommitted). In the browser, `/pricing` (guest) shows €149.90 and numbers from the config, and `/register` shows the beta banner. Not tested live: checkout and portal with a signed-in comp account. Costin or MAIN should check them in TEST mode on prod. Don't enter a card.
+Tested: vitest 472/472, tsc 0. Not tested live (no browser run with a signed-in account, SQL not applied).
+Pricing beta banner: it reads the store, which now gets the anchor from the server claim, so it is server-sourced; no separate `/api/stripe/status` call added.
 
-## Costin — Stripe dashboard text to change by hand (TEST and later LIVE)
-The tier config (`src/features/auth/types.ts`) is the source. Product descriptions in Stripe → Product catalog:
-- **ModulCA Premium**: "Up to 12 modules per project · 50 AI renders/month (HD) · all 6 drawing types + PDF export · 10 projects · email support". It says 30 renders / 5 projects now.
-- **ModulCA Architect**: "Up to 50 modules, custom sizes · 200 AI renders/month (4K) · DWG/DXF export · unlimited projects · team collaboration · priority support".
-- **ModulCA Constructor**: "Up to 200 modules · unlimited AI renders (4K, fair use 100/day) · white-label · unlimited projects · dedicated account manager". The price is €149.90/month.
-- Don't mention a model name (GPT-4o or Claude) in any Stripe text.
+## Costin
+1. SQL Editor → paste `docs/MCA-SQL-013-APPLY.sql` PASUL 1, Run; PASUL 2 must show true/true/true.
+2. Add invites (PASUL 3). Decide PASUL 5 (keep the promo for the existing free accounts) — without it they are Explorer.
+3. Optional: set `BETA_INVITE_CODE` in Vercel env (Production). Unset = code path off. Share links as `https://modulca.eu/register?invite=CODE`.
+**Until step 1 runs, no one has the promo on prod** (the code is already live).
 
-## Prompt for 4.05
+## Prompt for 4.06
 
-You are Chat 4 Billing, session `4.05.Billing_Invite-Gate-Promo-Anchor`.
-Read first: the §9 files in `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md`, this file, and `docs/MCA-DOC-PRICING-COMP-ACCOUNTS.md` §4 (BUG-B2-*). Write only in Chat 4 paths.
-1. **BUG-B2-03, invite gate for the Dec 15 invite-only beta.** Ask MAIN whether to use an invite code or an email allowlist. Build it in `src/features/beta/**`, with a server check in a `src/app/api/beta/**` or `api/stripe/**`-style route. Any migration goes through MAIN.
-2. **BUG-B2-02, promo anchor.** Wait for MAIN's decision (`beta_invited_at` or signup date). Then change `getEffectiveTier` / `computeBillingStatus` in one place.
-3. **Dashboard, once 5.03 has committed `dashboard/page.tsx`.** Read `/api/stripe/status` and render the portal result inline instead of using an `alert`. Hide "Upgrade" for Constructor (BUG-UI-01; MAIN owns the dashboard, so ask first). Have the pricing page's beta banner use `/api/stripe/status` too.
-4. **BUG-B2-04, promo expiry email** at 7 days left and at 0, with MAIN (templates).
-Finish: run vitest and tsc, commit with explicit paths, push, add a live-log line, and write the next NEXT-4.
+You are Chat 4 Billing, session `4.06.Billing_Cost-Cap-Expiry-Email`.
+Read first: this file, `docs/MCA-SPEC-USER-COST-CAP.md`, `src/features/beta/claim.ts`.
+0. Check with MAIN that MCA-SQL-013 is applied (PASUL 2 output). If not, remind Costin, nothing else blocks.
+1. **Cost cap.** If MAIN approves migration 014 from the spec: write it + `src/shared/server/costCap.ts` + tests; hand Chat 3/Chat 2 the one-line wiring (`overUserCap` in `UseEngineContext`, `recordUserCost`).
+2. **BUG-B2-04, promo expiry email** at 7 days left and at 0 (MAIN owns templates). Needs a daily job (Vercel cron on Hobby = 1/day is enough) reading `beta_promo_users` with the service role; mark sent in a column to avoid repeats (migration).
+3. Sign-up form: optional "Invite code" field writing `INVITE_CODE_STORAGE_KEY` (RO/EN/NL), if MAIN wants it beyond `?invite=`.
+4. Smoke test on prod with a test account: not invited → Explorer; allowlisted → Premium (Beta — ~90d left); `/api/stripe/status` shows `betaInvitedAt`.
+Finish: vitest + tsc, commit with explicit paths, push, W50 log row, next NEXT-4.
 
 ## Open, owned elsewhere
-- BUG-B2-01 (`useRenderEngine` sends the raw tier): Chat 3. Now partly moot, because routes use `getServerTier`.
-- BUG-SEC-01: done by migration 011 (MAIN). Check that it is applied in prod.
-- ST18 (Google consent shows the supabase.co domain): MAIN.
+- BUG-B2-01 (`useRenderEngine` raw tier): Chat 3, mostly moot (routes use `getServerTier`).
+- ST18 (Google consent shows supabase.co): MAIN.
