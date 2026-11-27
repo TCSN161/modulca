@@ -24,13 +24,13 @@ Post Phase 1 close, consolidated clean list. Old blockers (B1, B3, B5, B7, B10, 
 - **Owner**: Costin
 - **Phase**: This week
 
-### B15. 6 remaining vulnerabilities (require breaking changes)
-- **Breakdown**: 1 high (brace-expansion) + 5 moderate (glob/minimatch via Sentry + sharp libvips CVEs)
-- **Fix requires**: `sharp 0.34.5 → 0.35.5` breaking change (API changes for libvips 9 → 10)
-- **Impact**: Image optimization pipeline — OG images, thumbnails
-- **Owner**: Claude (analysis), user approval for breaking change
-- **Phase**: Dedicated session (Phase 3 or weekend)
-- **Est. time**: 2-3h analysis + test
+### B15. npm audit: high one fixed (2026-11-28); 5 moderate remain (Sentry 11 needed)
+- **Before (Nov 28)**: 6 vulnerabilities = 1 high (**sharp ≤0.35.5-rc.1**: libvips/libheif/librsvg CVEs; brace-expansion no longer appeared) + 5 moderate (glob 9–14.0.1 + minimatch 7–11 via `@sentry/nextjs` 10.78 → `@sentry/bundler-plugins` / `@sentry/webpack-plugin`)
+- **Done (1.07)**: `sharp ^0.34.5 → ^0.35.5` (libvips 8.18.3, sharp-libvips 1.3.4). Now deduplicated with Next's own sharp 0.35.5; linux-x64 binaries are in the lockfile. Code change: **none needed**. The only runtime user is `src/features/gallery/processor.ts` (`rotate/metadata/resize/composite/webp/png`), and it calls none of the APIs removed in 0.35 (`failOnError`, `metadata.paletteBitDepth`, old `sharpen` props, `format.jp2k`). OG images (`/og`) use `next/og`, not sharp. Verified: tsc 0, vitest 543/543, `next build` OK, plus a local test of `processRenderImage` (2400×1800 PNG → 1600×1200 WebP with QR watermark + 400×300 thumbnail).
+- **After**: 5 moderate, 0 high. `npm audit fix` without `--force` changes nothing: the fix needs `@sentry/nextjs` ≥11.11 (latest 11.20.0), a **major** bump. Glob/minimatch are only used by Sentry's source-map upload at **build time**, with no user input, so there is no runtime exposure. Left as is, on purpose. Do not force a `glob` override (glob 13 → 14 is also a major).
+- **Remaining**: a dedicated Sentry 10 → 11 session (migration guide + `instrumentation*.ts` / `next.config` / `sentry.*.config`). Phase 5, not a beta blocker.
+- **Not verified on prod**: gallery publish (`/api/renders/publish`) on Vercel after deploy. `/og` does not depend on sharp.
+- **Owner**: Claude
 
 ### B8. EXT-OPS-001 user decisions (deferred from April)
 - **Original**: LinkedIn URL, Stripe acct_id, Supabase Pro decision
@@ -63,7 +63,7 @@ Post Phase 1 close, consolidated clean list. Old blockers (B1, B3, B5, B7, B10, 
 |---|---:|---|
 | Important blocking Phase 2 | 1 (B2) | Mixed |
 | Important needs user | 3 (B4, B8, B16) | Costin |
-| Important needs dedicated Claude session | 1 (B15) | Claude |
+| Important needs dedicated Claude session | 1 (B15: sharp done, Sentry 11 left) | Claude |
 | Low priority | 1 (B6) | Costin |
 
 **No critical blockers** (all B1/B3/etc. resolved Phase 1).
