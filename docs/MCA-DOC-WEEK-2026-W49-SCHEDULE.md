@@ -54,6 +54,7 @@
 | 9 | Conturi de afiliat **Profitshare** și **2Performant** (gratuite) + citești comisioanele reale | Joi 3 | 30 min | Sursa de venit R5; cifrele merg la 10.02 |
 | 10 | **Apel cu arhitectul partener** + trimiți pachetul F2+F3 (pregătit de 7.02) | când răspunde (ideal Lun 30 – Mar 1) | 45 min | Întrebările din handoff-ul Chat 7 + lista `research/2026-11-26-catuc-partner-review-list.md` |
 | 11 | Aprobări: emailurile DPA (Lun 30) · upgrade B15 (Mie 2) · emailul către utilizatori (Sâm 5) | W49 | 15 min total | un „OK” în chat-ul MAIN |
+| ~~11b~~ | ✅ **OK B15 dat de Costin (27 nov seara)**: upgrade sharp 0.34.5 → 0.35.5 (1 high + 5 moderate vulnerabilități) → sesiunea 1.07, după 4.05/5.05 | — | — | — |
 | ~~12~~ | ✅ **Făcut (27 nov)**: sitemap-ul (240 URL, 200 OK) retrimis în Search Console (cont `uiiacgsauto`); „Couldn’t fetch” era statusul vechi. Recitim vineri 4 dec. Contul `costin.telefon` e acum și el proprietar (DNS) | — | — | — |
 | 13 | Rezervi conturile **@modulca** pe rețelele sociale | când ai timp, până pe 13 dec | 20 min | Instagram, TikTok, YouTube, Facebook, LinkedIn |
 | ~~14~~ | ✅ **Făcut (27 nov)**: costuri fixe confirmate ≈ €40/lună, sub plafon (bugetul §1) | — | — | — |
