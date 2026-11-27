@@ -310,6 +310,14 @@ Every CATUC article below was checked to exist in `docs/references/catuc/catuc-1
 | L.350 — certificat de urbanism | art. 253–258 (see 4a) | 🟩 Verified | Q3 |
 | L.350 — RUR / urbanist cu drept de semnătură | art. 141, 142 | 🟩 Verified (exists, title) | Q10 |
 | Ord. 233/2016 (norme L.350) | abrogated (art. 576(3) lit. d)); replacement: **Ord. nr. 1.022/28.08.2026** (M.Of. 724/28.08.2026) — procedura de elaborare/aprobare a documentațiilor AT/U, formulare, lista avizelor | 🟩 Confirmed 2.07 (Portal notes art. 31/55/87 + MDLPA Clarificări pct. 1) | Q9, Q23, OCR |
+| L.350 / HG 525/1996 — parcelare, dezmembrare | art. 216 (parcelare = ≥ 3 parcele), art. 218 (intravilan: PUZ; ≤ 12 loturi locuințe individuale: PUD, o singură dată), art. 240 (dezmembrare = 2 imobile, CU operațiuni cadastrale; alin. (7) mai multe locuințe pe același teren doar cu PUZ/PUD); CU valabil încă 12 luni după aprobarea PUZ/PUD (art. 257 alin. (10)) | 🟩 Verified (2.05) | Law text + Clarificări pct. 11 |
+
+**F4 / F6 review status (handoff ITEM-5):**
+
+| File | Review | Session | Articles cited (all in JSON) |
+|---|---|---|---|
+| F4 `06-regulations/RO/urban-planning-pug-puz.new.md` | ✅ **self-checked** (Chat 2, not architect) | 2.05, 2026-11-27 | 30, 0 missing |
+| F6 `17-guides/building-permit-romania.new.md` | ✅ **self-checked** (Chat 2, not architect) | 2.05, 2026-11-27 | 29 CATUC (+ Cod fiscal art. 474, 476), 0 missing |
 
 ### 4c. Topic-level (no 1:1 old article)
 

@@ -1,42 +1,46 @@
 # NEXT-2 — proposed next Chat 2 Neufert session
 
-**Session:** `2.05.Neufert_Phase2-F4-F6-Content_20261130` (Mon 30)
-**Written by:** 2.04 (2026-11-26), updated by 2.07 and 2.08 (2026-11-26) · **Model:** Opus (legal content) · Keep it lean.
+**Session:** `2.06.Neufert_Phase2-ArchitectEdits-F7_20261130` (Mon 30, or as soon as the partner architect's F2/F3 answers are in)
+**Written by:** 2.05 (2026-11-27; 2.05 ran Fri 27 evening, pulled forward from Mon 30) · **Model:** Opus (legal content) · Keep it lean.
 
 ## Prompt
 
-You are Chat 2 Neufert, session `2.05.Neufert_Phase2-F4-F6-Content_20261130`, doing ITEM-4 from `docs/handoffs/MCA-HANDOFF-2-PHASE2-KICKOFF-2026-11-24.md`.
+You are Chat 2 Neufert, session `2.06.Neufert_Phase2-ArchitectEdits-F7_20261130`. Talk to Costin in Romanian.
 
 Read first:
 - The §9 read-first files in `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md`. Write only in Chat 2 paths (§10).
-- The handoff: ITEM-4, ITEM-5 (self-check rule for F4–F10), ITEM-6 (PAC), ITEM-7 (unverified order numbers).
-- `docs/MCA-SPEC-CATUC-PHASE2-PLAN.md`: §3 F4 + F6 plans and §4 mapping table (4b = Legea 350/2001 → CATUC: PUG art. 45–61, PUZ art. 62–76, PUD art. 81–85, CU art. 253–258).
-- `docs/research/2026-11-25-notebooklm-catuc-answers.md`, including the Verification/errata section (Q3 is the PUG/PUZ/PUD answer).
-- Style and structure to mirror: F2 `src/knowledge/06-regulations/RO/building-permit-process.new.md` and F3 `modular-prefab-regulations.new.md` (both done).
-- Source of truth: `docs/references/catuc/catuc-169-2026-text.md` and `catuc-169-2026-articole.json`.
+- `docs/MCA-SPEC-CATUC-PHASE2-PLAN.md` §3 (F5, F7) and §4 (mapping table + F4/F6 review status).
+- The partner review list `docs/research/2026-11-26-catuc-partner-review-list.md` (§2 questions, §5 the 2.07 addendum) and the architect's answers, if they are in (Chat 7 packages them; check `docs/` for `MCA-DOC-VLAD-REVIEW-PACKAGE-2026-11-28.md` and any answers file). Never write the partner architect's name in content.
+- Source of truth: `docs/references/catuc/catuc-169-2026-text.md` and `catuc-169-2026-articole.json`; Clarificări: `docs/references/catuc/catuc-clarificari-ocr.md`.
 
-Task A — F4 `src/knowledge/06-regulations/RO/urban-planning-pug-puz.new.md`:
-- Fill every TBD. Remap Legea 350/2001 → CATUC: urbanism documentation (art. 13), PUG (45–61; CUT > 4 only via PUG, art. 46; update art. 61, 573), PUZ (62–76; POT/CUT +20% once, art. 66), PUD = **Proiect** urbanistic de detaliu (81–85; approved by the mayor's order, art. 85), validity (art. 109), and the CU link (art. 257(9): CU may require a PUD/PUZ).
-- What a modular-house buyer needs: when a PUZ/PUD is needed for their plot, and how POT/CUT limits the number of modules.
-- Every legal sentence cites a CATUC article you checked in the law text. Ord. 1.022/2026 is now **confirmed** (2.07: Portal notes + MDLPA Clarificări pct. 1) and may be named: Ord. nr. 1.022/28.08.2026, M.Of. nr. 724/28.08.2026 — procedura de elaborare/aprobare a documentațiilor AT/U, formulare, lista avizelor.
-- Frontmatter `id` = the live file's id (check `urban-planning-pug-puz.md`), so the `.new.md` → `.md` swap keeps the URL.
+Task A — only if the architect's answers are in: integrate them into F2 `building-permit-process.new.md` and F3 `modular-prefab-regulations.new.md`.
+- Key open point: CC1 / art. 440(3) (no technical checking) vs. art. 259(5) and F2 §3.2/§4.6. When answered, also align F6 Step A2 (`17-guides/building-permit-romania.new.md`) and `src/app/api/consultant/catucFacts.ts` (re-run `catucFacts.test.ts`).
+- Other answers: 309(5)/309(6)/310(5) reading, metropolitan exclusion (294(2)(a)(ii)), arhitect-șef aviz scope, diriginte de șantier for CC1.
+- Record each answer in the files' provenance sections; set `status` to the approved value the spec §8 deploy gate expects.
+- If the answers are not in, skip Task A and say so in one line.
 
-Task B — F6 `src/knowledge/17-guides/building-permit-romania.md` → create `building-permit-romania.new.md`:
-- Step-by-step guide for the end user, built on F2 (cite the same articles, no new legal claims without a check). PAC (fostul DTAC) once. Drop "Norme metodologice CATUC — TBD" from sources.
-- Same `id` rule.
+Task B — F7 `src/knowledge/17-guides/choosing-land-modular-home.md` → create `choosing-land-modular-home.new.md`:
+- Same `id` as the live file. Chat 2 self-check (ITEM-5), RO first then EN.
+- Rewrite the legal parts on CATUC, reusing F4 (CU for information art. 253(3)(a); POT/CUT Annex 1 + Clarificări pct. 7; PUD/PUZ triggers art. 82, 66, 257(9); several houses on one plot art. 240(7); parcelare art. 216, 218, 240) and F2 (notification only rural intravilan). Check NP 074 status before citing it.
+- Mark `self-checked` in the spec §4 F4/F6 status table (add an F7 row).
 
-Rules:
-- RO first, then EN. DeepSeek is allowed only for RO→EN translation of finished F4/F6 text (check the balance first; it was $0.00 on Thu 26 → Claude translates). Claude reviews every DeepSeek line.
-- Keep the "informational only" disclaimer. Never write the partner architect's name.
-- F4 and F6 get a **Chat 2 self-check** (not an architect review): mark both `self-checked` in the spec §4 mapping table.
+Task C (small) — F5 `src/knowledge/06-regulations/RO/_meta.yaml`: sources → CATUC (spec §3 F5); fix "Legea 10/1995 — still in force" (mostly abrogated, art. 576(3)(c)).
 
 Finish:
-- Script check: every `art. N` cited exists in the JSON (0 missing). Art. 415/524 exist only in `text.md` (the JSON merged them into 414/523), so cite them only if you also check `text.md`. Annexes are in the art. 584 entry of the JSON.
-- No TBD left. Run `node scripts/build-knowledge.mjs` (`.new.md` is skipped; restore `_index.ts` if only the timestamp changed).
-- `git add` only your files, commit with explicit paths, push (the pre-push hook runs tsc when `src/` changes).
+- Script check: every `art. N` cited exists in the JSON (0 missing). Art. 415/524 only in `text.md`. Script from 2.05 is easy to redo: extract `art. N` / lists / ranges, compare with the JSON article numbers.
+- No TBD left. Run `node scripts/build-knowledge.mjs`, then `git checkout -- src/knowledge/_index.ts` (never commit it).
+- `git status` first; commit with explicit paths; push (pre-push runs tsc when `src/` changes; if it fails on another session's file, wait and retry).
 - One line in §6 of the current week's schedule doc.
-- Write the next prompt into `docs/sessions/NEXT-2.md`. Candidates: integrate the architect's F2/F3 edits after Sat 28 review; F7 `choosing-land-modular-home`; ~~ingest NotebookLM Q11–Q25~~ (done in 2.07); integrate the architect's answers on the 2.07 addendum (§5 of the partner review list); separate `catuc-clarificari-2026.new.md` chapter (spec §1) from `docs/references/catuc/catuc-clarificari-ocr.md`.
+- Write the next prompt into `docs/sessions/NEXT-2.md`. Candidates: separate `catuc-clarificari-2026.new.md` chapter (spec §1); F8–F10; RO blog `casa-modulara-romania` rewrite (after review).
 - Do not start any other session.
+
+## Context carried over from 2.05 (F4 + F6, 2026-11-27)
+- F4 `06-regulations/RO/urban-planning-pug-puz.new.md` (id `ro-urban-planning`, proOnly kept `true` like the live file) and F6 `17-guides/building-permit-romania.new.md` (id `building-permit-romania`) are written and self-checked. F4 cites 30 CATUC articles, F6 29 (+ Cod fiscal 474/476); 0 missing.
+- No fact changed vs F2/F3; `catucFacts.ts` not touched. New verified facts in F6: art. 143(4)–(6) (0.1% state control contribution, half for notification, paid at the start notice) and art. 352(1)–(3) (0.5% ISC contribution, 50% at start, balance by acceptance). The old guide's "CSC 0.5%" is dropped (not in CATUC).
+- F6 Step A2 mirrors F3 on technical checking (open with the architect). F2 left unchanged.
+- Open in F4 provenance: Annex 1 POT definition — the consolidated text lists items 1–8 (uncovered terraces, alleys, parking, pools, pergolas, PV…) without saying whether they count or are excluded. Check the official M.Of. text before using the list (useful for F7).
+- On swap `.new.md` → `.md`: remove the ST22 banner from the live F4 and F6 files.
+- `build-knowledge` raised `articleCount` 16 → 17 in `_index.ts` (another session's `15-books` work, not F4/F6); restored, not committed.
 
 ## Context carried over from 2.08 (consultant CATUC awareness, ST13 + ST22)
 - `src/app/api/consultant/catucFacts.ts` = the verified CATUC facts the consultant uses until F2/F3 go live (cached system block, all tiers). If F4/F6 or the architect's review changes a fact (e.g. CC1 / art. 440(3) technical checking, metropolitan exclusion), update this block in the same session and re-run `catucFacts.test.ts`.
