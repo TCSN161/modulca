@@ -1,11 +1,11 @@
 # NEXT-3 — proposed next Chat 3 Engines session
 
-**Session:** `3.08.Engines_Free-Capacity-GLB-Compression_2026112X` (date = day MAIN starts it)
-**Written by:** 3.07 (2026-11-27) · **Model:** Opus (code) · Keep it lean.
+**Session:** `3.09.Engines_Free-Capacity-GLB-Compression_2026MMDD` (W50; date = day MAIN starts it)
+**Written by:** 3.07 (2026-11-27), renumbered by 3.08 (MAIN moved this work to 3.09; 3.08 = PDF ST29–ST32) · **Model:** Opus (code) · Keep it lean.
 
 ## Prompt
 
-You are Chat 3 Engines, session `3.08.Engines_Free-Capacity-GLB-Compression`.
+You are Chat 3 Engines, session `3.09.Engines_Free-Capacity-GLB-Compression`.
 
 Read first:
 - The §9 read-first files in `docs/MCA-DOC-CHAT-WORKFLOW-2026-11-22.md`. Write only in Chat 3 paths (§10).
@@ -26,6 +26,11 @@ Task B: free capacity (carried over).
 Task C: GLB compression with gltf-transform (carried over): inventory, `scripts/engines-glb-compress.mjs`, −60 % target, before/after screenshots. `package.json` needs MAIN's OK.
 
 Finish: `npx vitest run src/app/api/ai-render` + `npx tsc --noEmit`, explicit-path commit, push, one live-log line, next prompt here. Do not start other sessions.
+
+## Context carried over from 3.08 (PDF, 2026-11-27)
+- `/api/ai-render` image responses send `X-AI-Fallback-From: a,b` = engine ids tried and failed before `X-AI-Engine` (skipped engines not listed; header absent when the first engine answered). Test: `fallbackHeader.route.test.ts`. Keep it when touching `tryEngines`.
+- Presentation strings live in `src/features/presentation/i18n/{en,ro,nl}.ts` (not in `src/i18n/messages`); PDF font = Inter in `public/fonts/pdf/`. Engine labels in captions come from `AI_ENGINES` (renderConstants), so a new engine needs a label there.
+- Not verified: PDF download in a logged-in browser and on prod (Costin's next smoke run).
 
 ## Context carried over from 3.07
 - Paid img2img chain: `klein → replicate-depth → replicate-canny → stability-structure → fal → wavespeed → ai-horde → cloudflare → pollinations`. The paid ones are skipped silently until funded (`engines/structureFunding.ts`). Paid text2img runs only with `allowPaidText2img: true` (BUG-ST34).
