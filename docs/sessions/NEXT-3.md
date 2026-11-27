@@ -3,6 +3,47 @@
 **Session:** `3.09.Engines_Free-Capacity-GLB-Compression_2026MMDD` (W50; date = day MAIN starts it)
 **Written by:** 3.07 (2026-11-27), renumbered by 3.08 (MAIN moved this work to 3.09; 3.08 = PDF ST29–ST32) · **Model:** Opus (code) · Keep it lean.
 
+## ▶ Next up first: 3.10 (Sat 5 Dec), written by MAIN 1.05 on 28 Nov
+
+**Session:** `3.10.Engines_3D-Audit-Blender-Link_20261205` · **Model:** Opus · Costin is at the PC with Blender 5.3 open. 3.09 (below) moves after 3.11.
+
+### Prompt
+
+You are Chat 3 Engines, session `3.10.Engines_3D-Audit-Blender-Link_20261205`. Talk to Costin in Romanian. This is the first of two 3D sessions; 3.11 (Sun 6) remodels one module in Blender. Costin's complaint: the 3D is blurry, has little detail and the furniture sits wrong or overlaps.
+
+Ready since 28 Nov (verified):
+- Blender 5.3, NVIDIA Studio driver 621.40, Cycles **OptiX** on the RTX 3060 Laptop;
+- the official Blender Lab **MCP add-on 1.0.3**, server on `localhost:9876`, Auto Start;
+- the Claude Code side: local `.mcp.json` → `blender` server (`%USERPROFILE%\.local\bin\blender-mcp.exe`, uv tool from projects.blender.org/lab/blender_mcp). A read-only test listed Camera/Cube/Light.
+
+Read first:
+- `docs/radar/2026-11-26-blender-connector.md` (§3 setup, **§5 the 8 rules for Chat 3**: unlit materials, per-axis stretching at `FurnitureRenderer.tsx:145-148` and `module3d.tsx:366-375`, PBR, bevels, AO, meshopt, collisions, one module before/after);
+- `docs/MCA-DOC-AI-ENGINES-3D-BAKEOFF-2026-11.md` §4 (B1 camera, B2 fixed in c307613, B3 partitions);
+- the asset registry in `src/assets/` and `public/models/*.glb` (20 models).
+Write only Chat 3 paths plus `docs/`.
+
+Do (one commit per step, explicit paths, push):
+1. **Audit, no code change.** For each module type (bedroom, bathroom, kitchen, living, …), take a screenshot through the built-in browser at `/project/demo/visualize`. Table: what looks wrong · cause (file:line) · fix (code vs Blender) · size.
+   - Check the "blurry" cause first: canvas DPR / `gl.setPixelRatio`, antialias, texture filtering, unlit materials.
+2. **Quick code wins, if they are small and safe:** a correct DPR (capped at 2), antialias, and no per-axis stretching where uniform scale + real dimensions are possible. Test them, and take a before/after screenshot from the same camera.
+3. **Blender link on a copy:**
+   - copy one GLB (`bedDouble.glb`) to `docs/research/blender-3d/` (never edit the original);
+   - import it in Blender through MCP;
+   - report triangles, materials and dimensions, and whether the unlit extension is present;
+   - no export into `public/` in this session.
+4. **Plan for 3.11:** the bedroom module rebuilt in Blender per the rules in Radar §5, with the exact steps, the budget (triangles, MB) and the acceptance check (same camera before/after, FPS on a phone). Write it into the "3.11" section of this file.
+
+Rules:
+- Blender only through MCP, only on copies.
+- 0 live AI renders.
+- `tsc` + vitest stay green.
+- One row in §6 of the current week's schedule.
+- Do not start other sessions.
+
+Report (first lines): commit hashes, top 5 problems with their causes, what was fixed in code, what goes to Blender in 3.11.
+
+---
+
 ## Prompt
 
 You are Chat 3 Engines, session `3.09.Engines_Free-Capacity-GLB-Compression`.
