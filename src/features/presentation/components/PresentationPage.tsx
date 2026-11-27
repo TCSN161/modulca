@@ -1,16 +1,21 @@
 "use client";
 
-import { useEffect, useState, useRef, useCallback, lazy, Suspense } from "react";
+import { useEffect, useMemo, useState, useRef, useCallback, lazy, Suspense } from "react";
 import Link from "next/link";
+import { useLocale } from "next-intl";
 import { useDesignStore } from "@/features/design/store";
 import { useLandStore } from "@/features/land/store";
-import { MODULE_TYPES, FINISH_LEVELS } from "@/shared/types";
 import { getStyleDirection } from "@/features/design/styles";
 import StepNav from "@/features/design/components/shared/StepNav";
 import FeatureGate from "@/shared/components/FeatureGate";
 import { useAuthStore } from "@/features/auth/store";
 import MobileStepFooter from "@/features/design/components/shared/MobileStepFooter";
 import { useProjectId } from "@/shared/hooks/useProjectId";
+import { computeProjectCost } from "@/features/design/projectCost";
+import {
+  getSelectedProducts, subscribeSelectedProducts, type SelectedProduct,
+} from "@/features/design/productSelection";
+import { LOCALE_LABELS } from "@/i18n/config";
 import "@/features/design/components/technical/print.css";
 
 const PdfDownloadButton = lazy(() => import("./PdfGenerator"));
@@ -26,80 +31,27 @@ import RendersSlide from "./slides/RendersSlide";
 import MaterialsSlide from "./slides/MaterialsSlide";
 import ProductsSlide from "./slides/ProductsSlide";
 import CostSlide from "./slides/CostSlide";
-import { resolveSelectedProducts, type ResolvedProduct } from "../hooks/selectedProducts";
+import NextStepsEditSlide, { type NextStep } from "./slides/NextStepsEditSlide";
+import type { SlideContext, SlideId } from "./slides/types";
 import { useProjectName, presentationFileName } from "../hooks/projectName";
+import { presentationT, PRESENTATION_LOCALES, toPresentationLocale, defaultNextSteps } from "../i18n";
 
 type PresentationTemplate = "minimal" | "bold" | "classic" | "luxury" | "architect";
-type SlideId =
-  | "cover"
-  | "description"
-  | "site"
-  | "floorplan"
-  | "vision"
-  | "modules"
-  | "renders"
-  | "materials"
-  | "products"
-  | "cost"
-  | "next";
 
-interface SlideConfig {
-  id: SlideId;
-  label: string;
-  description: string;
-  enabled: boolean;
-}
+interface SlideToggle { id: SlideId; enabled: boolean }
 
-const TEMPLATES: Record<PresentationTemplate, { label: string; description: string; accent: string; bg: string; text: string }> = {
-  minimal: {
-    label: "Minimal White",
-    description: "Clean, modern — inspired by Zaha Hadid Architects",
-    accent: "#C8956C",
-    bg: "#FFFFFF",
-    text: "#1a1a1a",
-  },
-  bold: {
-    label: "Dark Contrast",
-    description: "Bold, dramatic — inspired by BIG (Bjarke Ingels)",
-    accent: "#F59E0B",
-    bg: "#111111",
-    text: "#FFFFFF",
-  },
-  classic: {
-    label: "Classic Architectural",
-    description: "Traditional, elegant — inspired by Foster + Partners",
-    accent: "#1D6B6B",
-    bg: "#F8F6F2",
-    text: "#2A2A2A",
-  },
-  luxury: {
-    label: "Real Estate Luxury",
-    description: "Premium, exclusive — inspired by high-end real estate marketing",
-    accent: "#C5A572",
-    bg: "#0A0A0A",
-    text: "#FFFFFF",
-  },
-  architect: {
-    label: "Architecture Portfolio",
-    description: "Clean, technical — inspired by architectural submission documents",
-    accent: "#333333",
-    bg: "#FFFFFF",
-    text: "#1a1a1a",
-  },
+/** Colours only; labels come from the presentation i18n (BUG-ST32) */
+const TEMPLATES: Record<PresentationTemplate, { accent: string; bg: string; text: string }> = {
+  minimal: { accent: "#C8956C", bg: "#FFFFFF", text: "#1a1a1a" },
+  bold: { accent: "#F59E0B", bg: "#111111", text: "#FFFFFF" },
+  classic: { accent: "#1D6B6B", bg: "#F8F6F2", text: "#2A2A2A" },
+  luxury: { accent: "#C5A572", bg: "#0A0A0A", text: "#FFFFFF" },
+  architect: { accent: "#333333", bg: "#FFFFFF", text: "#1a1a1a" },
 };
 
-const DEFAULT_SLIDES: SlideConfig[] = [
-  { id: "cover", label: "Cover Page", description: "Project name, hero render, date", enabled: true },
-  { id: "description", label: "Project Description", description: "Auto-generated overview of your design", enabled: true },
-  { id: "site", label: "Site Plan", description: "Location map, terrain area, coordinates", enabled: true },
-  { id: "floorplan", label: "Floor Plan", description: "Technical drawing, module layout", enabled: true },
-  { id: "vision", label: "Design Vision", description: "Style direction, moodboard, palette", enabled: true },
-  { id: "modules", label: "Module Details", description: "Per-room specs, furniture, materials", enabled: true },
-  { id: "renders", label: "AI Renders", description: "Photorealistic visualizations", enabled: true },
-  { id: "materials", label: "Materials & Finishes", description: "Floor, wall, finish specifications", enabled: true },
-  { id: "products", label: "Products", description: "Selected items with quantities", enabled: true },
-  { id: "cost", label: "Cost Summary", description: "Full pricing breakdown", enabled: true },
-  { id: "next", label: "Next Steps", description: "Contact, timeline, builder info", enabled: true },
+const SLIDE_IDS: SlideId[] = [
+  "cover", "description", "site", "floorplan", "vision", "modules",
+  "renders", "materials", "products", "cost", "next",
 ];
 
 /**
@@ -116,34 +68,36 @@ const DEFAULT_SLIDES: SlideConfig[] = [
 const MATERIAL_TEXTURES: Record<string, string> = {
   // Floor materials (ids from FLOOR_MATERIALS)
   oak: "/images/products/fin-01-oak-flooring.jpg",
-  // walnut: no curated image yet — fallback to color swatch
-  // concrete: no curated image yet — fallback to color swatch
-  // Wall materials (ids from WALL_MATERIALS) — all use color swatches
-  // alabaster, sage, slate: clean solid colors render better than forcing a photo
+  // walnut, concrete: no curated image yet — colour swatch
+  // Wall materials: colour swatches
 };
 
 export default function PresentationPage() {
   const projectId = useProjectId();
   const { gridCells, gridRotation, polygon, mapCenter } = useLandStore();
   const {
-    modules, setModulesFromGrid, styleDirection, finishLevel, getStats,
+    modules, setModulesFromGrid, styleDirection, finishLevel,
     moodboardPins, savedRenders, loadFromLocalStorage,
   } = useDesignStore();
 
   const userTier = useAuthStore((s) => s.userTier);
   const [template, setTemplate] = useState<PresentationTemplate>("minimal");
-  const [slides, setSlides] = useState<SlideConfig[]>(DEFAULT_SLIDES);
+  const [slides, setSlides] = useState<SlideToggle[]>(SLIDE_IDS.map((id) => ({ id, enabled: true })));
   const [projectName, setProjectName] = useProjectName(projectId); // BUG-ST07
   const [clientName, setClientName] = useState("");
   const [activeSlide, setActiveSlide] = useState<SlideId>("cover");
   const [coverRenderIndex, setCoverRenderIndex] = useState(0);
-  const [nextSteps, setNextSteps] = useState([
-    { title: "Request a Builder Quote", desc: "Share this presentation with certified modular builders for detailed quotes." },
-    { title: "Book a Consultation", desc: "Schedule a session with our architects to refine your design." },
-    { title: "Secure Financing", desc: "Use this presentation for bank mortgage applications and investor meetings." },
-    { title: "Begin Construction", desc: "Once approved, your modular home can be manufactured and assembled in weeks." },
-  ]);
   const previewRef = useRef<HTMLDivElement>(null);
+
+  // BUG-ST32: slides + PDF follow the user's locale; the sidebar can override it
+  const uiLocale = useLocale();
+  const [localeOverride, setLocaleOverride] = useState<string | null>(null);
+  const locale = toPresentationLocale(localeOverride ?? uiLocale);
+  const t = useMemo(() => presentationT(locale), [locale]);
+
+  // Next steps: translated defaults until the user edits a step
+  const [editedSteps, setEditedSteps] = useState<Record<number, NextStep>>({});
+  const nextSteps = defaultNextSteps(t).map((d, i) => editedSteps[i] ?? d);
 
   useEffect(() => {
     if (modules.length > 0) return;
@@ -154,22 +108,24 @@ export default function PresentationPage() {
     }
   }, [modules.length, loadFromLocalStorage, gridCells, gridRotation, setModulesFromGrid]);
 
-  const stats = getStats();
-  const style = styleDirection ? getStyleDirection(styleDirection) : null;
-  const tmpl = { id: template, ...TEMPLATES[template] };
-  const finishInfo = FINISH_LEVELS.find((f) => f.id === finishLevel);
-  const enabledSlides = slides.filter((s) => s.enabled);
-
-  // Selected products — {productId, quantity} resolved via @/assets (BUG-X01)
-  const [products, setProducts] = useState<ResolvedProduct[]>([]);
+  // BUG-ST31: the one cost function (same total as Finalize + dashboard)
+  const [selectedProducts, setSelectedProductsState] = useState<SelectedProduct[]>([]);
   useEffect(() => {
-    setProducts(resolveSelectedProducts());
+    setSelectedProductsState(getSelectedProducts());
+    return subscribeSelectedProducts(() => setSelectedProductsState(getSelectedProducts()));
   }, []);
+  const cost = computeProjectCost({ modules, finishLevel, selectedProducts });
+
+  const style = styleDirection ? getStyleDirection(styleDirection) : null;
+  const tmpl = { id: template, ...TEMPLATES[template], label: t(`template.${template}.label`) };
+  const finishName = t.finish(finishLevel);
+  const styleName = style?.label || t("common.defaultStyle");
+  const enabledSlides = slides.filter((s) => s.enabled);
+  const isOn = (id: SlideId) => activeSlide === id && slides.find((s) => s.id === id)?.enabled;
+  const num = (id: SlideId) => enabledSlides.findIndex((s) => s.id === id) + 1;
 
   const toggleSlide = useCallback((id: SlideId) => {
-    setSlides((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s))
-    );
+    setSlides((prev) => prev.map((s) => (s.id === id ? { ...s, enabled: !s.enabled } : s)));
   }, []);
 
   // High-quality PDF export via modular engine (html2canvas + jsPDF)
@@ -179,9 +135,7 @@ export default function PresentationPage() {
     try {
       const { getDefaultEngine } = await import("../engines");
       const engine = getDefaultEngine();
-      const slideEls = Array.from(
-        document.querySelectorAll<HTMLElement>("[data-slide='true']")
-      );
+      const slideEls = Array.from(document.querySelectorAll<HTMLElement>("[data-slide='true']"));
       if (slideEls.length === 0) return;
       await engine.exportSlides(slideEls, {
         format: "pdf",
@@ -196,21 +150,41 @@ export default function PresentationPage() {
 
   const handleShareLink = useCallback(() => {
     navigator.clipboard.writeText(window.location.href);
-    alert("Presentation link copied to clipboard!");
-  }, []);
+    alert(t("ui.linkCopied"));
+  }, [t]);
 
   if (modules.length === 0) {
     return (
       <div className="flex h-screen items-center justify-center">
         <div className="text-center">
-          <p className="text-gray-500">No modules configured yet.</p>
+          <p className="text-gray-500">{t("ui.noModules")}</p>
           <Link href={`/project/${projectId}/land`} className="mt-4 inline-block rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white">
-            Go to Step 1
+            {t("ui.goStep1")}
           </Link>
         </div>
       </div>
     );
   }
+
+  /** Props every slide receives (SlideContext) */
+  const ctx: SlideContext = {
+    template: tmpl,
+    t,
+    projectName,
+    clientName,
+    moduleCount: modules.length,
+    totalAreaSqm: cost.totalArea,
+    usableAreaSqm: cost.usableArea,
+    styleName,
+    finishName,
+    savedRenders,
+    coverRenderIndex,
+    setCoverRenderIndex,
+  };
+
+  const moodImages = moodboardPins.length > 0
+    ? moodboardPins.map((pin) => ({ imageUrl: pin.imageUrl, label: pin.label }))
+    : (style?.moodImages || []).map((img) => ({ imageUrl: img.url, label: img.label }));
 
   return (
     <div className="flex h-screen flex-col bg-gray-50 print-presentation-root">
@@ -225,7 +199,7 @@ export default function PresentationPage() {
         <div className="flex items-center gap-2">
           <FeatureGate requires="sharableLink" hideIfLocked>
             <button onClick={handleShareLink} className="rounded-lg border border-gray-200 px-3 py-2 text-xs font-medium text-gray-600 hover:bg-gray-50">
-              Share Link
+              {t("ui.shareLink")}
             </button>
           </FeatureGate>
           <FeatureGate requires="pdfPresentation" hideIfLocked>
@@ -234,23 +208,25 @@ export default function PresentationPage() {
               disabled={exporting}
               className="rounded-lg border border-brand-olive-700 px-4 py-2 text-xs font-semibold text-brand-olive-700 hover:bg-brand-olive-50 transition-colors disabled:opacity-50"
             >
-              {exporting ? "Exporting..." : "Export HD PDF"}
+              {exporting ? t("ui.exporting") : t("ui.exportHd")}
             </button>
           </FeatureGate>
           <FeatureGate requires="pdfPresentation" hideIfLocked>
-          <Suspense fallback={<span className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white opacity-50">Loading...</span>}>
+          <Suspense fallback={<span className="rounded-lg bg-brand-amber-500 px-4 py-2 text-sm font-semibold text-white opacity-50">{t("ui.loading")}</span>}>
             <PdfDownloadButton
               template={template}
-              slides={slides}
+              slides={slides.map((s) => ({ ...s, label: t(`slide.${s.id}.label`) }))}
               projectName={projectName}
               clientName={clientName}
+              locale={locale}
               modules={modules}
-              stats={stats}
+              cost={cost}
               style={style ?? null}
-              finishLabel={finishInfo?.label || "Standard"}
+              finishLevel={finishLevel}
               polygon={polygon}
               mapCenter={mapCenter}
               savedRenders={savedRenders}
+              nextSteps={nextSteps}
               isFreeUser={userTier === "free"}
             />
           </Suspense>
@@ -261,11 +237,26 @@ export default function PresentationPage() {
       <div className="flex flex-1 overflow-hidden">
         {/* Left Sidebar — Settings */}
         <aside className="w-72 flex-shrink-0 border-r border-gray-200 bg-white overflow-y-auto p-4 print:hidden hidden md:block">
-          <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">Presentation Settings</h3>
+          <h3 className="mb-4 text-xs font-bold text-gray-500 uppercase tracking-wider">{t("ui.settings")}</h3>
+
+          {/* Presentation language (BUG-ST32) */}
+          <div className="mb-4">
+            <label htmlFor="presentation-locale" className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">{t("ui.language")}</label>
+            <select
+              id="presentation-locale"
+              value={locale}
+              onChange={(e) => setLocaleOverride(e.target.value)}
+              className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-brand-amber-500 focus:outline-none"
+            >
+              {PRESENTATION_LOCALES.map((l) => (
+                <option key={l} value={l}>{LOCALE_LABELS[l].flag} {LOCALE_LABELS[l].native}</option>
+              ))}
+            </select>
+          </div>
 
           {/* Project Name */}
           <div className="mb-4">
-            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Project Name</label>
+            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">{t("ui.projectName")}</label>
             <input
               type="text"
               value={projectName}
@@ -276,19 +267,19 @@ export default function PresentationPage() {
 
           {/* Client Name */}
           <div className="mb-4">
-            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">Client Name (optional)</label>
+            <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">{t("ui.clientName")}</label>
             <input
               type="text"
               value={clientName}
               onChange={(e) => setClientName(e.target.value)}
-              placeholder="Your name or company"
+              placeholder={t("ui.clientPlaceholder")}
               className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-sm text-gray-700 focus:border-brand-amber-500 focus:outline-none"
             />
           </div>
 
           {/* Template Selector */}
           <div className="mb-5">
-            <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">Template</label>
+            <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">{t("ui.template")}</label>
             <div className="space-y-2">
               {(Object.keys(TEMPLATES) as PresentationTemplate[]).map((key) => (
                 <button
@@ -305,9 +296,9 @@ export default function PresentationPage() {
                       className="h-6 w-6 rounded-full border border-gray-200"
                       style={{ background: `linear-gradient(135deg, ${TEMPLATES[key].bg} 50%, ${TEMPLATES[key].accent} 50%)` }}
                     />
-                    <span className="text-xs font-semibold text-gray-800">{TEMPLATES[key].label}</span>
+                    <span className="text-xs font-semibold text-gray-800">{t(`template.${key}.label`)}</span>
                   </div>
-                  <p className="mt-1 text-[10px] text-gray-400">{TEMPLATES[key].description}</p>
+                  <p className="mt-1 text-[10px] text-gray-400">{t(`template.${key}.desc`)}</p>
                 </button>
               ))}
             </div>
@@ -316,7 +307,7 @@ export default function PresentationPage() {
           {/* Slide Toggle */}
           <div className="mb-5">
             <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">
-              Slides ({enabledSlides.length} of {slides.length})
+              {t("ui.slidesCount", { enabled: enabledSlides.length, total: slides.length })}
             </label>
             <div className="space-y-1">
               {slides.map((slide) => (
@@ -325,8 +316,8 @@ export default function PresentationPage() {
                   className="flex items-center justify-between rounded-lg px-3 py-2 cursor-pointer hover:bg-gray-50"
                 >
                   <div>
-                    <span className="text-xs font-medium text-gray-700">{slide.label}</span>
-                    <p className="text-[9px] text-gray-400">{slide.description}</p>
+                    <span className="text-xs font-medium text-gray-700">{t(`slide.${slide.id}.label`)}</span>
+                    <p className="text-[9px] text-gray-400">{t(`slide.${slide.id}.desc`)}</p>
                   </div>
                   <button
                     type="button"
@@ -347,7 +338,7 @@ export default function PresentationPage() {
           {/* Navigation */}
           <div className="space-y-2">
             <Link href={`/project/${projectId}/finalize`} className="block text-center text-sm text-gray-500 hover:text-brand-teal-800">
-              &larr; Back to Finalize
+              &larr; {t("ui.backToFinalize")}
             </Link>
           </div>
         </aside>
@@ -366,264 +357,71 @@ export default function PresentationPage() {
                     : "bg-gray-100 text-gray-600 hover:bg-gray-200"
                 }`}
               >
-                {i + 1}. {slide.label}
+                {i + 1}. {t(`slide.${slide.id}.label`)}
               </button>
             ))}
           </div>
 
           {/* Slide Preview Area */}
           <div ref={previewRef} className="mx-auto" style={{ maxWidth: 900 }}>
-            {/* Each slide is a card styled per template */}
             {(activeSlide === "cover" || typeof window !== "undefined" && window.matchMedia("print").matches) && slides.find((s) => s.id === "cover")?.enabled && (
-              <CoverSlide
-                template={tmpl}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
+              <CoverSlide {...ctx} />
+            )}
+            {isOn("description") && (
+              <DescriptionSlide
+                {...ctx}
+                slideNumber={num("description")}
+                moduleTypes={modules.map((m) => m.moduleType)}
+                totalEstimateEur={cost.grandTotal}
+                styleTagline={style?.tagline}
               />
             )}
-
-            {activeSlide === "description" && slides.find((s) => s.id === "description")?.enabled && (() => {
-              const roomBreakdown = Array.from(new Set(modules.map((m) => m.moduleType))).map((type) => {
-                const mt = MODULE_TYPES.find((m) => m.id === type);
-                const count = modules.filter((m) => m.moduleType === type).length;
-                return `${count} ${mt?.label || type}${count > 1 ? "s" : ""}`;
-              });
-              return (
-                <DescriptionSlide
-                  template={tmpl}
-                  slideNumber={2}
-                  projectName={projectName}
-                  clientName={clientName}
-                  moduleCount={modules.length}
-                  totalAreaSqm={stats.totalArea}
-                  usableAreaSqm={stats.usableArea}
-                  styleName={style?.label || "Modern"}
-                  finishName={finishInfo?.label || "Standard"}
-                  savedRenders={savedRenders}
-                  coverRenderIndex={coverRenderIndex}
-                  setCoverRenderIndex={setCoverRenderIndex}
-                  roomBreakdown={roomBreakdown}
-                  totalEstimateEur={stats.totalEstimate}
-                  styleTagline={style?.tagline}
-                />
-              );
-            })()}
-
-            {activeSlide === "site" && slides.find((s) => s.id === "site")?.enabled && (
+            {isOn("site") && (
               <SiteSlide
-                template={tmpl}
-                slideNumber={2}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
+                {...ctx}
+                slideNumber={num("site")}
                 modules={modules}
                 mapCenter={mapCenter}
                 polygonCount={polygon.length}
                 gridRotation={gridRotation}
               />
             )}
-
-            {activeSlide === "floorplan" && slides.find((s) => s.id === "floorplan")?.enabled && (
-              <FloorplanSlide
-                template={tmpl}
-                slideNumber={3}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
-                gridCells={gridCells}
-                modules={modules}
+            {isOn("floorplan") && (
+              <FloorplanSlide {...ctx} slideNumber={num("floorplan")} gridCells={gridCells} modules={modules} />
+            )}
+            {isOn("vision") && (
+              <VisionSlide
+                {...ctx}
+                slideNumber={num("vision")}
+                styleDescription={style?.description}
+                palette={style?.palette || []}
+                moodImages={moodImages}
               />
             )}
-
-            {activeSlide === "vision" && slides.find((s) => s.id === "vision")?.enabled && (() => {
-              const moodImages = moodboardPins.length > 0
-                ? moodboardPins.map((pin) => ({ imageUrl: pin.imageUrl, label: pin.label }))
-                : (style?.moodImages || []).map((img) => ({ imageUrl: img.url, label: img.label }));
-              return (
-                <VisionSlide
-                  template={tmpl}
-                  slideNumber={4}
-                  projectName={projectName}
-                  clientName={clientName}
-                  moduleCount={modules.length}
-                  totalAreaSqm={stats.totalArea}
-                  usableAreaSqm={stats.usableArea}
-                  styleName={style?.label || "Modern Design"}
-                  finishName={finishInfo?.label || "Standard"}
-                  savedRenders={savedRenders}
-                  coverRenderIndex={coverRenderIndex}
-                  setCoverRenderIndex={setCoverRenderIndex}
-                  styleDescription={style?.description}
-                  palette={style?.palette || []}
-                  moodImages={moodImages}
-                />
-              );
-            })()}
-
-            {activeSlide === "modules" && slides.find((s) => s.id === "modules")?.enabled && (
-              <ModulesSlide
-                template={tmpl}
-                slideNumber={5}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
-                modules={modules}
-              />
+            {isOn("modules") && <ModulesSlide {...ctx} slideNumber={num("modules")} modules={modules} />}
+            {isOn("renders") && <RendersSlide {...ctx} slideNumber={num("renders")} renders={savedRenders} />}
+            {isOn("materials") && (
+              <MaterialsSlide {...ctx} slideNumber={num("materials")} modules={modules} textures={MATERIAL_TEXTURES} />
             )}
-
-            {activeSlide === "renders" && slides.find((s) => s.id === "renders")?.enabled && (
-              <RendersSlide
-                template={tmpl}
-                slideNumber={6}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
-                renders={savedRenders}
-              />
+            {isOn("products") && (
+              <ProductsSlide {...ctx} slideNumber={num("products")} lines={cost.productLines} productCost={cost.productCost} />
             )}
-
-            {activeSlide === "materials" && slides.find((s) => s.id === "materials")?.enabled && (
-              <MaterialsSlide
+            {isOn("cost") && <CostSlide {...ctx} slideNumber={num("cost")} cost={cost} />}
+            {isOn("next") && (
+              <NextStepsEditSlide
                 template={tmpl}
-                slideNumber={7}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
-                modules={modules}
-                textures={MATERIAL_TEXTURES}
+                t={t}
+                number={num("next")}
+                steps={nextSteps}
+                onChange={(i, step) => setEditedSteps((prev) => ({ ...prev, [i]: step }))}
               />
-            )}
-
-            {activeSlide === "products" && slides.find((s) => s.id === "products")?.enabled && (
-              <ProductsSlide
-                template={tmpl}
-                slideNumber={8}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
-                products={products}
-              />
-            )}
-
-            {activeSlide === "cost" && slides.find((s) => s.id === "cost")?.enabled && (
-              <CostSlide
-                template={tmpl}
-                slideNumber={9}
-                projectName={projectName}
-                clientName={clientName}
-                moduleCount={modules.length}
-                totalAreaSqm={stats.totalArea}
-                usableAreaSqm={stats.usableArea}
-                styleName={style?.label || "Modern"}
-                finishName={finishInfo?.label || "Standard"}
-                savedRenders={savedRenders}
-                coverRenderIndex={coverRenderIndex}
-                setCoverRenderIndex={setCoverRenderIndex}
-                moduleCost={stats.moduleCost}
-                sharedWallDiscount={stats.sharedWallDiscount}
-                designFee={stats.designFee}
-                totalEstimateEur={stats.totalEstimate}
-              />
-            )}
-
-            {activeSlide === "next" && slides.find((s) => s.id === "next")?.enabled && (
-              <SlideCard bg={tmpl.bg} text={tmpl.text} accent={tmpl.accent}>
-                <SlideHeader accent={tmpl.accent} text={tmpl.text} number={enabledSlides.findIndex((s) => s.id === "next") + 1} title="Next Steps" />
-                <div className="mt-8 max-w-lg mx-auto space-y-6">
-                  {nextSteps.map((item, i) => (
-                    <div key={i} className="flex gap-4">
-                      <div className="flex-shrink-0 h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold text-white" style={{ backgroundColor: tmpl.accent }}>
-                        {i + 1}
-                      </div>
-                      <div className="flex-1">
-                        <input
-                          type="text"
-                          value={item.title}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setNextSteps((prev) => prev.map((s, j) => j === i ? { ...s, title: val } : s));
-                          }}
-                          className="w-full bg-transparent text-sm font-bold border-b border-transparent hover:border-current focus:border-current focus:outline-none transition-colors"
-                          style={{ color: tmpl.text }}
-                        />
-                        <input
-                          type="text"
-                          value={item.desc}
-                          onChange={(e) => {
-                            const val = e.target.value;
-                            setNextSteps((prev) => prev.map((s, j) => j === i ? { ...s, desc: val } : s));
-                          }}
-                          className="w-full bg-transparent text-xs mt-1 border-b border-transparent hover:border-current focus:border-current focus:outline-none transition-colors"
-                          style={{ color: tmpl.text, opacity: 0.5 }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                  <div className="text-center pt-6">
-                    <div className="h-1 w-16 rounded mx-auto mb-4" style={{ backgroundColor: tmpl.accent }} />
-                    <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
-                      Generated with ModulCA | modulca.eu
-                    </p>
-                  </div>
-                </div>
-              </SlideCard>
             )}
           </div>
         </main>
 
         {/* Right Sidebar — Slide Navigator */}
         <aside className="hidden md:block w-56 flex-shrink-0 border-l border-gray-200 bg-white overflow-y-auto p-4 print:hidden">
-          <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">Slides</h3>
+          <h3 className="mb-3 text-xs font-bold text-gray-500 uppercase tracking-wider">{t("ui.slides")}</h3>
           <div className="space-y-1">
             {enabledSlides.map((slide, i) => (
               <button
@@ -638,7 +436,7 @@ export default function PresentationPage() {
                 <div className="flex items-center gap-2">
                   <span className="text-[10px] font-bold rounded bg-gray-100 px-1.5 py-0.5 text-gray-500">{i + 1}</span>
                   <span className={`text-xs ${activeSlide === slide.id ? "font-semibold text-brand-teal-800" : "text-gray-600"}`}>
-                    {slide.label}
+                    {t(`slide.${slide.id}.label`)}
                   </span>
                 </div>
               </button>
@@ -646,12 +444,12 @@ export default function PresentationPage() {
           </div>
 
           <div className="mt-6 rounded-lg bg-gray-50 p-3">
-            <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">Quick Stats</p>
+            <p className="text-[10px] font-bold text-gray-400 uppercase mb-2">{t("ui.quickStats")}</p>
             <div className="space-y-1 text-xs text-gray-600">
-              <div className="flex justify-between"><span>Modules</span><span className="font-medium">{modules.length}</span></div>
-              <div className="flex justify-between"><span>Area</span><span className="font-medium">{stats.totalArea}m2</span></div>
-              <div className="flex justify-between"><span>Style</span><span className="font-medium">{style?.label || "Modern"}</span></div>
-              <div className="flex justify-between"><span>Total</span><span className="font-bold text-brand-amber-600">EUR{stats.totalEstimate.toLocaleString()}</span></div>
+              <div className="flex justify-between"><span>{t("ui.statModules")}</span><span className="font-medium">{modules.length}</span></div>
+              <div className="flex justify-between"><span>{t("ui.statArea")}</span><span className="font-medium">{cost.totalArea} m²</span></div>
+              <div className="flex justify-between"><span>{t("ui.statStyle")}</span><span className="font-medium">{styleName}</span></div>
+              <div className="flex justify-between"><span>{t("ui.statTotal")}</span><span className="font-bold text-brand-amber-600">{t.eur(cost.grandTotal)}</span></div>
             </div>
           </div>
         </aside>
@@ -660,34 +458,3 @@ export default function PresentationPage() {
     </div>
   );
 }
-
-/* ------------------------------------------------------------------ */
-/*  Shared slide components                                            */
-/* ------------------------------------------------------------------ */
-
-function SlideCard({ bg, text, children }: { bg: string; text: string; accent?: string; children: React.ReactNode }) {
-  return (
-    <div
-      data-slide="true"
-      className="rounded-2xl shadow-lg mb-6 p-4 md:p-8 print:shadow-none print:rounded-none print:mb-0 print:break-after-page"
-      style={{ backgroundColor: bg, color: text, minHeight: 300, aspectRatio: "297/210" }}
-    >
-      {children}
-    </div>
-  );
-}
-
-function SlideHeader({ accent, text, number, title }: { accent: string; text: string; number: number; title: string }) {
-  return (
-    <div className="flex items-center gap-4">
-      <div className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold text-white" style={{ backgroundColor: accent }}>
-        {number}
-      </div>
-      <h2 className="text-2xl font-bold" style={{ color: text }}>{title}</h2>
-      <div className="flex-1 h-px" style={{ backgroundColor: text + "15" }} />
-    </div>
-  );
-}
-
-// DetailRow, CostRow → moved to ./slides/shared.tsx
-// SitePlanSvg → moved to ./slides/SitePlanSvg.tsx

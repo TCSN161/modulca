@@ -28,7 +28,7 @@ export interface ModulesSlideProps extends SlideContext {
 const MODS_PER_PAGE = 4;
 
 export default function ModulesSlide(props: ModulesSlideProps) {
-  const { template: tmpl, slideNumber, modules } = props;
+  const { template: tmpl, slideNumber, modules, t } = props;
 
   const pages: ModulesSlideModule[][] = [];
   for (let i = 0; i < modules.length; i += MODS_PER_PAGE) {
@@ -51,8 +51,8 @@ export default function ModulesSlide(props: ModulesSlideProps) {
             number={slideNumber + pageIdx}
             title={
               pages.length > 1
-                ? `Module Details (${pageIdx + 1}/${pages.length})`
-                : "Module Details"
+                ? `${t("modules.title")} (${pageIdx + 1}/${pages.length})`
+                : t("modules.title")
             }
           />
           <div className="mt-6 space-y-4">
@@ -76,11 +76,11 @@ export default function ModulesSlide(props: ModulesSlideProps) {
                       {mod.label}
                     </h4>
                     <span className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
-                      {mt?.label} | {preset?.label}
+                      {t.moduleType(mod.moduleType)} | {preset?.label}
                     </span>
                   </div>
                   <div className="grid grid-cols-4 gap-4 text-xs">
-                    <SpecCell label="Floor" text={tmpl.text}>
+                    <SpecCell label={t("modules.floor")} text={tmpl.text}>
                       <div className="flex items-center gap-1 mt-1">
                         <div
                           className="h-3 w-3 rounded border"
@@ -89,7 +89,7 @@ export default function ModulesSlide(props: ModulesSlideProps) {
                         <span style={{ color: tmpl.text }}>{floor?.label}</span>
                       </div>
                     </SpecCell>
-                    <SpecCell label="Walls" text={tmpl.text}>
+                    <SpecCell label={t("modules.walls")} text={tmpl.text}>
                       <div className="flex items-center gap-1 mt-1">
                         <div
                           className="h-3 w-3 rounded border"
@@ -98,14 +98,14 @@ export default function ModulesSlide(props: ModulesSlideProps) {
                         <span style={{ color: tmpl.text }}>{wall?.label}</span>
                       </div>
                     </SpecCell>
-                    <SpecCell label="Furniture" text={tmpl.text}>
+                    <SpecCell label={t("modules.furniture")} text={tmpl.text}>
                       <span className="block mt-1" style={{ color: tmpl.text }}>
-                        {preset?.furniture.length || 0} pieces
+                        {t("modules.pieces", { count: preset?.furniture.length || 0 })}
                       </span>
                     </SpecCell>
-                    <SpecCell label="Area" text={tmpl.text}>
+                    <SpecCell label={t("modules.area")} text={tmpl.text}>
                       <span className="block mt-1" style={{ color: tmpl.text }}>
-                        9m² (7m² usable)
+                        {t("modules.areaValue")}
                       </span>
                     </SpecCell>
                   </div>

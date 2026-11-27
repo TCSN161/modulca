@@ -15,7 +15,7 @@ export interface MaterialsSlideProps extends SlideContext {
 }
 
 export default function MaterialsSlide(props: MaterialsSlideProps) {
-  const { template: tmpl, slideNumber, modules, textures, finishName } = props;
+  const { template: tmpl, slideNumber, modules, textures, finishName, t } = props;
 
   const itemBg =
     tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8";
@@ -29,12 +29,13 @@ export default function MaterialsSlide(props: MaterialsSlideProps) {
         accent={tmpl.accent}
         text={tmpl.text}
         number={slideNumber}
-        title="Materials & Finishes"
+        title={t("materials.title")}
       />
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-2 gap-8">
         <MaterialColumn
-          title="Floor Materials"
+          title={t("materials.floorMaterials")}
+          usedIn={(count) => t("materials.usedIn", { count })}
           tmpl={tmpl}
           itemBg={itemBg}
           items={floorIds.map((id) => {
@@ -50,7 +51,8 @@ export default function MaterialsSlide(props: MaterialsSlideProps) {
           })}
         />
         <MaterialColumn
-          title="Wall Finishes"
+          title={t("materials.wallFinishes")}
+          usedIn={(count) => t("materials.usedIn", { count })}
           tmpl={tmpl}
           itemBg={itemBg}
           items={wallIds.map((id) => {
@@ -72,7 +74,7 @@ export default function MaterialsSlide(props: MaterialsSlideProps) {
           className="text-[10px] font-bold uppercase tracking-wider mb-2"
           style={{ color: tmpl.text, opacity: 0.4 }}
         >
-          Finish Level
+          {t("materials.finishLevel")}
         </p>
         <div
           className="inline-block rounded-lg px-4 py-2"
@@ -89,11 +91,13 @@ export default function MaterialsSlide(props: MaterialsSlideProps) {
 
 function MaterialColumn({
   title,
+  usedIn,
   tmpl,
   itemBg,
   items,
 }: {
   title: string;
+  usedIn: (count: number) => string;
   tmpl: { accent: string; text: string };
   itemBg: string;
   items: Array<{
@@ -133,7 +137,7 @@ function MaterialColumn({
                 {it.label}
               </span>
               <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>
-                Used in {it.count} module{it.count > 1 ? "s" : ""}
+                {usedIn(it.count)}
               </span>
             </div>
           </div>

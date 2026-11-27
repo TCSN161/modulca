@@ -19,7 +19,9 @@ interface Props {
   accent: string;
 }
 
-export default function SitePlanSvg({ modules, accent }: Props) {
+export default function SitePlanSvg({
+  modules, accent, boundaryLabel = "TERRAIN BOUNDARY", ariaLabel = "Site plan showing module layout",
+}: Props & { boundaryLabel?: string; ariaLabel?: string }) {
   if (modules.length === 0) return null;
 
   const minR = Math.min(...modules.map((m) => m.row));
@@ -39,7 +41,7 @@ export default function SitePlanSvg({ modules, accent }: Props) {
       className="w-full h-full"
       style={{ maxHeight: 200 }}
       role="img"
-      aria-label="Site plan showing module layout"
+      aria-label={ariaLabel}
     >
       {/* Terrain outline */}
       <rect
@@ -61,7 +63,7 @@ export default function SitePlanSvg({ modules, accent }: Props) {
         fill="#065f46"
         fontFamily="sans-serif"
       >
-        TERRAIN BOUNDARY
+        {boundaryLabel}
       </text>
       {/* North arrow */}
       <text

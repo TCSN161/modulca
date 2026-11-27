@@ -54,6 +54,8 @@ export const DEFAULT_SLIDES: SlideConfig[] = [
   { id: "next", label: "Next Steps", description: "Contact, timeline, builder info", enabled: true },
 ];
 
+import type { PresentationT } from "../../i18n";
+
 /**
  * Data passed from the orchestrator to each slide component.
  * Extend this as slides gain new inputs — each slide documents which fields
@@ -61,6 +63,8 @@ export const DEFAULT_SLIDES: SlideConfig[] = [
  */
 export interface SlideContext {
   template: SlideTemplate;
+  /** Presentation translator (BUG-ST32): t("key"), t.eur(), t.moduleType()… */
+  t: PresentationT;
   projectName: string;
   clientName: string;
   moduleCount: number;

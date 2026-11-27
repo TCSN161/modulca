@@ -1,28 +1,21 @@
 /**
- * CostSlide — breakdown of module cost + shared wall discount + design fee.
+ * CostSlide — module cost, discounts, upgrades, design fee, products, total.
+ * BUG-ST31: reads computeProjectCost(), so the total includes the products and
+ * matches Finalize and the dashboard card.
  */
 
 import { SlideCard, SlideHeader, CostRow } from "./shared";
 import type { SlideContext } from "./types";
+import type { ProjectCost } from "@/features/design/projectCost";
 
 export interface CostSlideProps extends SlideContext {
   slideNumber: number;
-  moduleCost: number;
-  sharedWallDiscount: number;
-  designFee: number;
-  totalEstimateEur: number;
+  cost: ProjectCost;
 }
 
 export default function CostSlide(props: CostSlideProps) {
-  const {
-    template: tmpl,
-    slideNumber,
-    moduleCost,
-    sharedWallDiscount,
-    designFee,
-    totalEstimateEur,
-    finishName,
-  } = props;
+  const { template: tmpl, slideNumber, cost: k, finishName, t } = props;
+  const signed = (n: number) => `${n > 0 ? "+" : "-"}${t.eur(Math.abs(n))}`;
 
   return (
     <SlideCard bg={tmpl.bg} text={tmpl.text}>
@@ -30,44 +23,48 @@ export default function CostSlide(props: CostSlideProps) {
         accent={tmpl.accent}
         text={tmpl.text}
         number={slideNumber}
-        title="Cost Summary"
+        title={t("cost.title")}
       />
 
       <div className="mt-8 max-w-md mx-auto space-y-3">
         <CostRow
-          label={`Module cost (${finishName})`}
-          value={`EUR${moduleCost.toLocaleString()}`}
+          label={t("cost.modules", { count: k.totalModules, finish: finishName })}
+          value={t.eur(k.moduleCost)}
           text={tmpl.text}
         />
-        {sharedWallDiscount > 0 && (
+        {k.sharedWallDiscount > 0 && (
           <CostRow
-            label="Shared wall discount"
-            value={`-EUR${sharedWallDiscount.toLocaleString()}`}
+            label={t("cost.sharedWall", { count: k.sharedWalls })}
+            value={`-${t.eur(k.sharedWallDiscount)}`}
             text={tmpl.text}
             green
           />
         )}
-        <CostRow
-          label="Design fee (8%)"
-          value={`EUR${designFee.toLocaleString()}`}
-          text={tmpl.text}
-        />
+        {k.wallUpgradeCost !== 0 && (
+          <CostRow label={t("cost.wallUpgrades")} value={signed(k.wallUpgradeCost)} text={tmpl.text} />
+        )}
+        {k.thicknessUpgradeCost !== 0 && (
+          <CostRow label={t("cost.thicknessUpgrades")} value={signed(k.thicknessUpgradeCost)} text={tmpl.text} />
+        )}
+        <CostRow label={t("cost.designFee")} value={t.eur(k.designFee)} text={tmpl.text} />
+        {k.productCost > 0 && (
+          <>
+            <CostRow label={t("cost.designSubtotal")} value={t.eur(k.totalEstimate)} text={tmpl.text} />
+            <CostRow label={t("cost.products")} value={t.eur(k.productCost)} text={tmpl.text} />
+          </>
+        )}
         <div className="border-t pt-3 mt-3" style={{ borderColor: tmpl.text + "20" }}>
           <div className="flex justify-between">
             <span className="text-lg font-bold" style={{ color: tmpl.text }}>
-              Total Estimate
+              {t("cost.total")}
             </span>
             <span className="text-lg font-bold" style={{ color: tmpl.accent }}>
-              EUR{totalEstimateEur.toLocaleString()}
+              {t.eur(k.grandTotal)}
             </span>
           </div>
         </div>
-        <p
-          className="text-[10px] text-center mt-4"
-          style={{ color: tmpl.text, opacity: 0.3 }}
-        >
-          * Estimate based on {finishName} finish level. Final price may vary based on local
-          conditions and builder quotes.
+        <p className="text-[10px] text-center mt-4" style={{ color: tmpl.text, opacity: 0.3 }}>
+          {t("cost.disclaimer", { finish: finishName })}
         </p>
       </div>
     </SlideCard>

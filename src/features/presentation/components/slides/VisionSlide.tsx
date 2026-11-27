@@ -26,7 +26,7 @@ export interface VisionSlideProps extends SlideContext {
 }
 
 export default function VisionSlide(props: VisionSlideProps) {
-  const { template: tmpl, slideNumber, styleName, styleDescription, palette, moodImages } = props;
+  const { template: tmpl, slideNumber, styleName, styleDescription, palette, moodImages, t } = props;
 
   return (
     <SlideCard bg={tmpl.bg} text={tmpl.text}>
@@ -34,7 +34,7 @@ export default function VisionSlide(props: VisionSlideProps) {
         accent={tmpl.accent}
         text={tmpl.text}
         number={slideNumber}
-        title="Design Vision"
+        title={t("vision.title")}
       />
 
       <div className="mt-6 grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -47,8 +47,7 @@ export default function VisionSlide(props: VisionSlideProps) {
             className="text-sm leading-relaxed mb-6"
             style={{ color: tmpl.text, opacity: 0.6 }}
           >
-            {styleDescription ||
-              "A carefully curated design direction that balances aesthetics with functionality."}
+            {styleDescription || t("vision.fallback")}
           </p>
 
           {palette && palette.length > 0 && (
@@ -57,7 +56,7 @@ export default function VisionSlide(props: VisionSlideProps) {
                 className="text-[10px] font-bold uppercase tracking-wider mb-2"
                 style={{ color: tmpl.text, opacity: 0.4 }}
               >
-                Color Palette
+                {t("vision.palette")}
               </p>
               <div className="flex gap-2">
                 {palette.map((swatch, i) => (
@@ -85,7 +84,7 @@ export default function VisionSlide(props: VisionSlideProps) {
             className="text-[10px] font-bold uppercase tracking-wider mb-2"
             style={{ color: tmpl.text, opacity: 0.4 }}
           >
-            Mood Board
+            {t("vision.moodBoard")}
           </p>
           {moodImages && moodImages.length > 0 ? (
             moodImages.slice(0, 4).map((img, i) => (
@@ -96,14 +95,14 @@ export default function VisionSlide(props: VisionSlideProps) {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={img.imageUrl}
-                  alt={img.label || `Mood ${i + 1}`}
+                  alt={img.label || `${t("vision.moodBoard")} ${i + 1}`}
                   className="h-full w-full object-cover"
                 />
               </div>
             ))
           ) : (
             <div className="rounded-lg bg-gray-100 aspect-video flex items-center justify-center">
-              <p className="text-xs text-gray-400">Moodboard images from Step 4</p>
+              <p className="text-xs text-gray-400">{t("vision.moodPlaceholder")}</p>
             </div>
           )}
         </div>

@@ -82,3 +82,17 @@ export function gridBounds(mods: readonly { row: number; col: number }[]) {
   const minRow = Math.min(...rows), minCol = Math.min(...cols);
   return { minRow, minCol, rows: Math.max(...rows) - minRow + 1, cols: Math.max(...cols) - minCol + 1 };
 }
+
+/**
+ * ST30 — caption cut at a word boundary, with an ellipsis ("Style prom",
+ * "resoluti" before). Short text is returned as is; a single word longer than
+ * `max` is cut hard.
+ */
+export function truncateWords(text: string | undefined | null, max: number): string {
+  const s = (text ?? "").replace(/\s+/g, " ").trim();
+  if (s.length <= max) return s;
+  const cut = s.slice(0, max - 1);
+  const lastSpace = cut.lastIndexOf(" ");
+  const base = lastSpace > max * 0.4 ? cut.slice(0, lastSpace) : cut;
+  return base.replace(/[\s,;:.\-–—|·]+$/, "") + "…";
+}

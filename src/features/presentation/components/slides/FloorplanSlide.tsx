@@ -29,7 +29,7 @@ export interface FloorplanSlideProps extends SlideContext {
 }
 
 export default function FloorplanSlide(props: FloorplanSlideProps) {
-  const { template: tmpl, slideNumber, gridCells, modules } = props;
+  const { template: tmpl, slideNumber, gridCells, modules, t } = props;
 
   const activeCells = gridCells.filter((c) => c.moduleType !== null);
   const cellsToRender =
@@ -44,11 +44,11 @@ export default function FloorplanSlide(props: FloorplanSlideProps) {
           accent={tmpl.accent}
           text={tmpl.text}
           number={slideNumber}
-          title="Floor Plan"
+          title={t("floorplan.title")}
         />
         <div className="mt-12 text-center">
           <p className="text-sm" style={{ color: tmpl.text, opacity: 0.5 }}>
-            No modules placed yet.
+            {t("floorplan.noModules")}
           </p>
         </div>
       </SlideCard>
@@ -86,11 +86,14 @@ export default function FloorplanSlide(props: FloorplanSlideProps) {
         accent={tmpl.accent}
         text={tmpl.text}
         number={slideNumber}
-        title="Floor Plan"
+        title={t("floorplan.title")}
       />
       <div className="mt-4 text-center">
         <p className="text-xs mb-1" style={{ color: tmpl.text, opacity: 0.4 }}>
-          {numCols * MODULE_EXTERIOR_SIZE}m x {numRows * MODULE_EXTERIOR_SIZE}m footprint | {modules.length * MODULE_EXTERIOR_AREA}m² total | {modules.length * MODULE_INTERIOR_AREA}m² usable
+          {t("floorplan.summary", {
+            w: numCols * MODULE_EXTERIOR_SIZE, h: numRows * MODULE_EXTERIOR_SIZE,
+            total: modules.length * MODULE_EXTERIOR_AREA, usable: modules.length * MODULE_INTERIOR_AREA,
+          })}
         </p>
       </div>
       <div className="mt-4 flex justify-center overflow-x-auto">
@@ -114,7 +117,7 @@ export default function FloorplanSlide(props: FloorplanSlideProps) {
                   }}
                 >
                   <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.15 }}>
-                    empty
+                    {t("floorplan.empty")}
                   </div>
                 </div>
               );
@@ -135,7 +138,7 @@ export default function FloorplanSlide(props: FloorplanSlideProps) {
                   {label || moduleType}
                 </div>
                 <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.5 }}>
-                  {mt?.label}
+                  {t.moduleType(moduleType)}
                 </div>
                 <div className="text-[8px]" style={{ color: tmpl.text, opacity: 0.4 }}>
                   {MODULE_EXTERIOR_SIZE}m x {MODULE_EXTERIOR_SIZE}m
@@ -157,7 +160,7 @@ export default function FloorplanSlide(props: FloorplanSlideProps) {
             >
               <div className="h-3 w-3 rounded" style={{ backgroundColor: mt?.color }} />
               <span>
-                {mt?.label} x{count} ({count * MODULE_EXTERIOR_AREA}m²)
+                {t("floorplan.legend", { type: t.moduleType(type), count, area: count * MODULE_EXTERIOR_AREA })}
               </span>
             </div>
           );

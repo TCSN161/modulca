@@ -24,19 +24,20 @@ export default function SiteSlide(props: SiteSlideProps) {
     mapCenter,
     polygonCount,
     gridRotation,
+    t,
   } = props;
 
   const location =
     mapCenter.lat !== 44.4268
       ? `${mapCenter.lat.toFixed(4)}, ${mapCenter.lng.toFixed(4)}`
-      : "Romania (default)";
+      : t("site.locationDefault");
 
   const terrainArea =
     polygonCount > 2
-      ? `~${Math.round(polygonCount * 50)} m² (estimated)`
-      : `~${totalAreaSqm * 4} m² (auto-sized)`;
+      ? t("site.terrainEstimated", { area: Math.round(polygonCount * 50) })
+      : t("site.terrainAuto", { area: totalAreaSqm * 4 });
 
-  const footprint = `${Math.ceil(Math.sqrt(totalAreaSqm))} × ${Math.ceil(Math.sqrt(totalAreaSqm))} m approx.`;
+  const footprint = t("site.footprintValue", { side: Math.ceil(Math.sqrt(totalAreaSqm)) });
 
   return (
     <SlideCard bg={tmpl.bg} text={tmpl.text}>
@@ -44,28 +45,33 @@ export default function SiteSlide(props: SiteSlideProps) {
         accent={tmpl.accent}
         text={tmpl.text}
         number={slideNumber}
-        title="Site Plan"
+        title={t("site.title")}
       />
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
         <div className="rounded-xl overflow-hidden bg-emerald-50 border border-emerald-200 aspect-video flex items-center justify-center p-4">
           {modules.length > 0 ? (
-            <SitePlanSvg modules={modules} accent={tmpl.accent} />
+            <SitePlanSvg
+              modules={modules}
+              accent={tmpl.accent}
+              boundaryLabel={t("site.boundary").toUpperCase()}
+              ariaLabel={t("site.planAria")}
+            />
           ) : (
-            <p className="text-sm text-gray-400">No modules placed yet</p>
+            <p className="text-sm text-gray-400">{t("site.noModules")}</p>
           )}
         </div>
         <div className="space-y-4">
-          <DetailRow label="Location" value={location} text={tmpl.text} />
-          <DetailRow label="Terrain Area" value={terrainArea} text={tmpl.text} />
+          <DetailRow label={t("site.location")} value={location} text={tmpl.text} />
+          <DetailRow label={t("site.terrainArea")} value={terrainArea} text={tmpl.text} />
           <DetailRow
-            label="Grid Configuration"
-            value={`${modules.length} module${modules.length !== 1 ? "s" : ""} placed`}
+            label={t("site.gridConfig")}
+            value={t("site.modulesPlaced", { count: modules.length })}
             text={tmpl.text}
           />
-          <DetailRow label="Grid Rotation" value={`${gridRotation}°`} text={tmpl.text} />
-          <DetailRow label="Total Built Area" value={`${totalAreaSqm} m²`} text={tmpl.text} />
-          <DetailRow label="Usable Area" value={`${usableAreaSqm} m²`} text={tmpl.text} />
-          <DetailRow label="Building Footprint" value={footprint} text={tmpl.text} />
+          <DetailRow label={t("site.gridRotation")} value={`${gridRotation}°`} text={tmpl.text} />
+          <DetailRow label={t("site.totalBuilt")} value={`${totalAreaSqm} m²`} text={tmpl.text} />
+          <DetailRow label={t("site.usable")} value={`${usableAreaSqm} m²`} text={tmpl.text} />
+          <DetailRow label={t("site.footprint")} value={footprint} text={tmpl.text} />
         </div>
       </div>
     </SlideCard>

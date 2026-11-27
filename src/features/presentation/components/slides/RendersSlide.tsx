@@ -13,6 +13,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { SlideCard, SlideHeader } from "./shared";
 import type { SlideContext } from "./types";
+import { renderEngineCaption, renderModeLabel } from "../../i18n";
 
 export interface RenderEntry {
   id: string;
@@ -22,6 +23,10 @@ export interface RenderEntry {
   engine?: string;
   resolution?: string;
   mode?: "img2img" | "text2img";
+  /** img2img base: 3D view or uploaded photo ("Photo+AI") */
+  baseSource?: "scene" | "upload";
+  /** Engines that failed before `engine` answered (BUG-ST29) */
+  fallbackFrom?: string[];
 }
 
 export interface RendersSlideProps extends SlideContext {
@@ -30,7 +35,7 @@ export interface RendersSlideProps extends SlideContext {
 }
 
 export default function RendersSlide(props: RendersSlideProps) {
-  const { template: tmpl, slideNumber, renders } = props;
+  const { template: tmpl, slideNumber, renders, t } = props;
   const [activeIdx, setActiveIdx] = useState(0);
 
   const total = renders.length;
@@ -64,13 +69,13 @@ export default function RendersSlide(props: RendersSlideProps) {
   if (total === 0) {
     return (
       <SlideCard bg={tmpl.bg} text={tmpl.text}>
-        <SlideHeader accent={tmpl.accent} text={tmpl.text} number={slideNumber} title="AI Renders" />
+        <SlideHeader accent={tmpl.accent} text={tmpl.text} number={slideNumber} title={t("renders.title")} />
         <div className="mt-6 text-center">
           <div className="rounded-xl overflow-hidden bg-gray-200 aspect-video flex items-center justify-center mb-4">
-            <p className="text-sm text-gray-500">Save renders from Step 8 to see them here</p>
+            <p className="text-sm text-gray-500">{t("renders.emptyBox")}</p>
           </div>
           <p className="text-xs" style={{ color: tmpl.text, opacity: 0.4 }}>
-            Use the &quot;Save to Presentation&quot; button in the Render step
+            {t("renders.emptyHint")}
           </p>
         </div>
       </SlideCard>
@@ -83,7 +88,7 @@ export default function RendersSlide(props: RendersSlideProps) {
         accent={tmpl.accent}
         text={tmpl.text}
         number={slideNumber}
-        title={total > 1 ? `AI Renders · ${activeIdx + 1} of ${total}` : "AI Renders"}
+        title={total > 1 ? t("renders.ofCount", { i: activeIdx + 1, n: total }) : t("renders.title")}
       />
 
       {/* Large single-render display */}
@@ -104,7 +109,7 @@ export default function RendersSlide(props: RendersSlideProps) {
             <button
               onClick={goPrev}
               className="absolute left-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors"
-              aria-label="Previous render"
+              aria-label={t("renders.prev")}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points="15 18 9 12 15 6" />
@@ -113,7 +118,7 @@ export default function RendersSlide(props: RendersSlideProps) {
             <button
               onClick={goNext}
               className="absolute right-2 top-1/2 -translate-y-1/2 w-10 h-10 rounded-full bg-black/50 hover:bg-black/70 text-white flex items-center justify-center transition-colors"
-              aria-label="Next render"
+              aria-label={t("renders.next")}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
                 <polyline points="9 18 15 12 9 6" />
@@ -134,14 +139,18 @@ export default function RendersSlide(props: RendersSlideProps) {
           </p>
         )}
         <div className="flex items-center gap-3 mt-2 flex-wrap">
-          {current.engine && (
-            <span className="text-xs" style={{ color: tmpl.text, opacity: 0.5 }}>
-              Engine: <strong>{current.engine}</strong>
-            </span>
-          )}
+          {current.engine && (() => {
+            const cap = renderEngineCaption(t, current);
+            return (
+              <span className="text-xs" style={{ color: tmpl.text, opacity: 0.5 }}>
+                {t("renders.engine")}: <strong>{cap.engine}</strong>
+                {cap.fallback && <span className="ml-1 text-brand-amber-600">{cap.fallback}</span>}
+              </span>
+            );
+          })()}
           {current.resolution && (
             <span className="text-xs" style={{ color: tmpl.text, opacity: 0.5 }}>
-              Resolution: <strong>{current.resolution}</strong>
+              {t("renders.resolution")}: <strong>{current.resolution}</strong>
             </span>
           )}
           {current.mode && (
@@ -149,7 +158,7 @@ export default function RendersSlide(props: RendersSlideProps) {
               className="text-[11px] px-2 py-0.5 rounded-full font-semibold"
               style={{ backgroundColor: tmpl.accent + "20", color: tmpl.accent }}
             >
-              {current.mode === "img2img" ? "3D+AI (img2img)" : "Text-to-Image"}
+              {renderModeLabel(t, current)}
             </span>
           )}
         </div>
@@ -172,7 +181,7 @@ export default function RendersSlide(props: RendersSlideProps) {
                   height: 30,
                   ...(active ? { ["--tw-ring-color" as string]: tmpl.accent } : {}),
                 }}
-                aria-label={`Go to render ${idx + 1}: ${r.label}`}
+                aria-label={t("renders.goTo", { i: idx + 1, label: r.label })}
                 title={r.label}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element */}
@@ -186,7 +195,7 @@ export default function RendersSlide(props: RendersSlideProps) {
       {/* Helper hint */}
       {total > 1 && (
         <p className="text-[10px] text-center mt-2" style={{ color: tmpl.text, opacity: 0.3 }}>
-          Use ← → arrow keys or click thumbnails to navigate
+          {t("renders.keysHint")}
         </p>
       )}
     </SlideCard>

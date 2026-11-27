@@ -47,3 +47,19 @@ describe("ST26 — site plan fallback", () => {
     expect(gridBounds([{ row: 2, col: 3 }, { row: 3, col: 5 }])).toEqual({ minRow: 2, minCol: 3, rows: 2, cols: 3 });
   });
 });
+
+describe("truncateWords (ST30)", () => {
+  it("keeps short text and cuts long text at a word boundary", async () => {
+    const { truncateWords } = await import("./pdfPlan");
+    expect(truncateWords("Short caption", 40)).toBe("Short caption");
+    const long = "Style prompt: modern Scandinavian bedroom, warm oak floor, soft daylight, high resolution photo";
+    const out = truncateWords(long, 50);
+    expect(out.length).toBeLessThanOrEqual(50);
+    expect(out.endsWith("…")).toBe(true);
+    expect(long.startsWith(out.slice(0, -1))).toBe(true);
+    // the char after the kept text is a space, i.e. no word was cut
+    expect(long[out.length - 1]).toMatch(/[\s,]/);
+    expect(truncateWords("Supercalifragilisticexpialidocious", 10)).toBe("Supercali…");
+    expect(truncateWords(undefined, 10)).toBe("");
+  });
+});

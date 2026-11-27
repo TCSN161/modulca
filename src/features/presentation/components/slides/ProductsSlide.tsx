@@ -1,29 +1,25 @@
 /**
- * ProductsSlide — selected products list with quantity, unit price, and totals.
+ * ProductsSlide — selected products with quantity, unit price and totals.
+ * BUG-ST31: lines come from computeProjectCost(): a per-m² product covers the
+ * usable floor area, so quantity is in m² and the total matches Finalize.
  */
 
 import { SlideCard, SlideHeader } from "./shared";
 import type { SlideContext } from "./types";
-
-export interface ProductEntry {
-  id: string;
-  name: string;
-  quantity: number;
-  price: number;
-}
+import type { ProductLine } from "@/features/design/projectCost";
 
 export interface ProductsSlideProps extends SlideContext {
   slideNumber: number;
-  products: ProductEntry[];
+  lines: ProductLine[];
+  productCost: number;
 }
 
 export default function ProductsSlide(props: ProductsSlideProps) {
-  const { template: tmpl, slideNumber, products } = props;
+  const { template: tmpl, slideNumber, lines, productCost, t } = props;
 
   const itemBg =
     tmpl.bg === "#FFFFFF" ? "#f8f8f8" : tmpl.bg === "#111111" ? "#1a1a1a" : "#f0ede8";
-
-  const total = products.reduce((sum, p) => sum + p.quantity * p.price, 0);
+  const unit = (u: ProductLine["unit"]) => (u === "m2" ? t("products.unitM2") : t("products.unitPcs"));
 
   return (
     <SlideCard bg={tmpl.bg} text={tmpl.text}>
@@ -31,31 +27,28 @@ export default function ProductsSlide(props: ProductsSlideProps) {
         accent={tmpl.accent}
         text={tmpl.text}
         number={slideNumber}
-        title="Selected Products"
+        title={t("products.title")}
       />
 
-      {products.length > 0 ? (
+      {lines.length > 0 ? (
         <div className="mt-6">
           <div className="space-y-2">
-            {products.map((p) => (
+            {lines.map((l) => (
               <div
-                key={p.id}
+                key={l.productId}
                 className="flex items-center justify-between rounded-lg p-3"
                 style={{ backgroundColor: itemBg }}
               >
                 <div>
                   <span className="text-sm font-medium" style={{ color: tmpl.text }}>
-                    {p.name}
+                    {l.name}
                   </span>
-                  <span
-                    className="block text-[10px]"
-                    style={{ color: tmpl.text, opacity: 0.4 }}
-                  >
-                    Qty: {p.quantity} × EUR{p.price}
+                  <span className="block text-[10px]" style={{ color: tmpl.text, opacity: 0.4 }}>
+                    {t.num(l.quantity)} {unit(l.unit)} × {t("products.perUnit", { price: t.eurPrice(l.unitPrice), unit: unit(l.unit) })}
                   </span>
                 </div>
                 <span className="text-sm font-bold" style={{ color: tmpl.accent }}>
-                  EUR{(p.quantity * p.price).toLocaleString()}
+                  {t.eur(l.total)}
                 </span>
               </div>
             ))}
@@ -65,17 +58,17 @@ export default function ProductsSlide(props: ProductsSlideProps) {
             style={{ borderColor: tmpl.text + "20" }}
           >
             <span className="text-sm font-bold" style={{ color: tmpl.text }}>
-              Products Total
+              {t("products.total")}
             </span>
             <span className="text-sm font-bold" style={{ color: tmpl.accent }}>
-              EUR{total.toLocaleString()}
+              {t.eur(productCost)}
             </span>
           </div>
         </div>
       ) : (
         <div className="mt-6 text-center py-12">
           <p className="text-sm" style={{ color: tmpl.text, opacity: 0.4 }}>
-            No products selected yet. Add products in Step 11 (Products).
+            {t("products.noneHint")}
           </p>
         </div>
       )}

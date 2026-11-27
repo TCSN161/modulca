@@ -21,6 +21,7 @@ export default function CoverSlide(props: SlideContext) {
     savedRenders,
     coverRenderIndex,
     setCoverRenderIndex,
+    t,
   } = props;
 
   return (
@@ -32,7 +33,7 @@ export default function CoverSlide(props: SlideContext) {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
               src={savedRenders[coverRenderIndex]?.imageUrl || savedRenders[0].imageUrl}
-              alt="Hero render"
+              alt={t("cover.heroAlt")}
               className="h-full w-full object-cover"
             />
             <div
@@ -49,33 +50,29 @@ export default function CoverSlide(props: SlideContext) {
             className="mb-8 text-[10px] font-bold uppercase tracking-[0.3em]"
             style={{ color: tmpl.accent }}
           >
-            ModulCA Project Presentation
+            {t("cover.kicker")}
           </div>
           <h1 className="text-4xl font-bold mb-4" style={{ color: tmpl.text }}>
             {projectName}
           </h1>
           {clientName && (
             <p className="text-lg mb-2" style={{ color: tmpl.text, opacity: 0.6 }}>
-              Prepared for {clientName}
+              {t("cover.preparedFor", { name: clientName })}
             </p>
           )}
           <p className="text-sm mb-8" style={{ color: tmpl.text, opacity: 0.4 }}>
-            {new Date().toLocaleDateString("en-US", {
-              year: "numeric",
-              month: "long",
-              day: "numeric",
-            })}
+            {t.date()}
           </p>
           <div
             className="flex items-center gap-6 text-xs"
             style={{ color: tmpl.text, opacity: 0.5 }}
           >
-            <span>{moduleCount} Modules</span>
+            <span>{t("common.modules", { count: moduleCount })}</span>
             <span>
-              {totalAreaSqm}m<sup>2</sup> Total Area
+              {totalAreaSqm} m² {t("cover.totalArea").toLowerCase()}
             </span>
-            <span>{styleName} Style</span>
-            <span>{finishName} Finish</span>
+            <span>{t("cover.styleLine", { style: styleName })}</span>
+            <span>{t("cover.finishLine", { finish: finishName })}</span>
           </div>
           <div
             className="mt-12 h-1 w-24 rounded mx-auto"
@@ -90,7 +87,7 @@ export default function CoverSlide(props: SlideContext) {
               className="text-[9px] uppercase tracking-wider mr-2"
               style={{ color: tmpl.text, opacity: 0.4 }}
             >
-              Cover image:
+              {t("cover.coverImage")}
             </span>
             {savedRenders.map((render, i) => (
               <button
