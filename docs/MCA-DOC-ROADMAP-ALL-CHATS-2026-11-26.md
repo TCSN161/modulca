@@ -53,7 +53,7 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 | 5.05 audit export (dacă nu s-a făcut în W49) → PermitTracker: 3 PDF-uri pentru notificare (art. 294) + zip; la arhitectul partener pe 11 dec | 5 Design + Drawings |
 | Express: 3 briefuri de test → teste automate Playwright | 8 Express |
 | Insignă BETA + widget de feedback | 4 Billing |
-| **Randările din rândul proiectului → Supabase Storage** (bucket + migrație + RLS; clientul salvează URL, nu imaginea): ține baza sub 500 MB pe Supabase Free | 5 Design (client) + 3 Engines (bucket) + MAIN (migrație) |
+| **Randările din rândul proiectului → Supabase Storage** (bucket-ul `renders` **există deja** în Supabase, public, folosit de server pentru cache și galerie, 0 politici = doar serverul scrie — verificat de Costin 27 nov; cel mai simplu: upload prin rută de server, fără politici noi pe client; clientul salvează URL, nu imaginea): ține baza sub 500 MB pe Supabase Free | 5 Design (client) + 3 Engines (bucket) + MAIN (migrație) |
 | Video walkthrough v0 (înregistrare AutoTour) · 3.09 capacitate gratuită + compresie modele 3D (gltf-transform) | 3 Engines |
 | Privacy + ToS cu clauza de beta | 2 Neufert |
 | Lista de invitați (10–20) + email de invitație | 7 Partners + Costin |
