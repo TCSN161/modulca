@@ -437,33 +437,35 @@ export function hasFeature(tier: AccountTier, feature: keyof FeatureAccess): boo
 }
 
 /**
- * Beta promotion: free accounts get Premium-level access for 3 months.
- * Check if a free account qualifies based on created_at timestamp.
+ * Beta promotion: INVITED free accounts get Premium-level access for 3 months.
+ *
+ * `promoAnchor` is `profiles.beta_invited_at` (BUG-B2-02, 4.05): the date the user
+ * was invited to the beta (allowlist row or invite code, see /api/beta/claim).
+ * null = not invited = no promo. It used to be `created_at`, which gave every
+ * sign-up the promo and cut it short for early sign-ups. Pass the invite date,
+ * never the sign-up date.
  */
-export function isBetaPromoActive(tier: AccountTier, createdAt: string | Date | null): boolean {
-  if (tier !== "free" || !createdAt) return false;
-  const created = new Date(createdAt);
-  const promoEnd = new Date(created);
-  promoEnd.setMonth(promoEnd.getMonth() + 3);
-  return new Date() < promoEnd;
+export function isBetaPromoActive(tier: AccountTier, promoAnchor: string | Date | null): boolean {
+  return getBetaPromoDaysLeft(tier, promoAnchor) > 0;
 }
 
 /**
  * Get the effective tier considering beta promo.
- * Free users within 3 months of registration → Premium features.
+ * Free users within 3 months of their beta invite → Premium features.
  */
-export function getEffectiveTier(tier: AccountTier, createdAt: string | Date | null): AccountTier {
-  if (isBetaPromoActive(tier, createdAt)) return "premium";
+export function getEffectiveTier(tier: AccountTier, promoAnchor: string | Date | null): AccountTier {
+  if (isBetaPromoActive(tier, promoAnchor)) return "premium";
   return tier;
 }
 
 /**
  * Get remaining beta promo days (0 if expired or not eligible).
  */
-export function getBetaPromoDaysLeft(tier: AccountTier, createdAt: string | Date | null): number {
-  if (tier !== "free" || !createdAt) return 0;
-  const created = new Date(createdAt);
-  const promoEnd = new Date(created);
+export function getBetaPromoDaysLeft(tier: AccountTier, promoAnchor: string | Date | null): number {
+  if (tier !== "free" || !promoAnchor) return 0;
+  const start = new Date(promoAnchor);
+  if (Number.isNaN(start.getTime())) return 0;
+  const promoEnd = new Date(start);
   promoEnd.setMonth(promoEnd.getMonth() + 3);
   const diff = promoEnd.getTime() - Date.now();
   return diff > 0 ? Math.ceil(diff / 86400_000) : 0;

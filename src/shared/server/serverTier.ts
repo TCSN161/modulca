@@ -4,7 +4,7 @@
  * API routes must NEVER trust a `tier` sent by the browser (body, query, header).
  * Call `getServerTier(req)` instead: it verifies the Supabase session
  * (Authorization: Bearer <access_token>, or the sb-*-auth-token cookie),
- * loads `profiles.tier` + `created_at` with the service role, and applies the
+ * loads `profiles.tier` + `beta_invited_at` (the promo anchor, BUG-B2-02) with the service role, and applies the
  * same beta-promo logic as the client (`getEffectiveTier` in features/auth/types).
  *
  * Not logged in → guest (`guest_free`), with a hashed IP (or cookie id) as the
@@ -22,7 +22,7 @@ export interface ServerTierContext {
   userId: string | null;
   /** Raw tier stored in profiles.tier (guest_free for guests). */
   tier: AccountTier;
-  /** Tier after the beta promo (free + <3 months → premium). Use this for limits. */
+  /** Tier after the beta promo (free + invited <3 months ago → premium). Use this for limits. */
   effectiveTier: AccountTier;
   /** Stable key for quota counters: "user:<uuid>" | "ip:<hash>" | "gid:<hash>" | "anon". */
   quotaSubject: string;
@@ -38,7 +38,9 @@ export function normalizeTier(raw: unknown): AccountTier {
 
 interface ProfileRow {
   tier: string | null;
-  created_at: string | null;
+  created_at?: string | null;
+  /** Migration 013; absent before it is applied → no promo. */
+  beta_invited_at?: string | null;
 }
 
 export interface ServerTierDeps {
@@ -53,7 +55,7 @@ const defaultDeps: ServerTierDeps = {
     if (!sb) return null;
     const { data, error } = await sb
       .from("profiles")
-      .select("tier, created_at")
+      .select("*") // "*" so a missing beta_invited_at column (pre-013) is not an error
       .eq("id", userId)
       .maybeSingle();
     if (error) {
@@ -144,7 +146,7 @@ export async function getServerTier(
   return {
     userId,
     tier: safeTier,
-    effectiveTier: getEffectiveTier(safeTier, profile.created_at),
+    effectiveTier: getEffectiveTier(safeTier, profile.beta_invited_at ?? null),
     quotaSubject: `user:${userId}`,
   };
 }

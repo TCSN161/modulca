@@ -16,7 +16,7 @@ function req(headers: Record<string, string> = {}, body?: unknown): Request {
   });
 }
 
-function deps(userId: string | null, profile: { tier: string | null; created_at: string | null } | null): ServerTierDeps {
+function deps(userId: string | null, profile: { tier: string | null; created_at: string | null; beta_invited_at?: string | null } | null): ServerTierDeps {
   return { getUserId: async () => userId, loadProfile: async () => profile };
 }
 
@@ -34,15 +34,22 @@ describe("getServerTier", () => {
     expect(r).toEqual({ userId: UID, tier: "architect", effectiveTier: "architect", quotaSubject: `user:${UID}` });
   });
 
-  it("applies the beta promo: free < 3 months → premium", async () => {
-    const r = await getServerTier(req(), deps(UID, { tier: "free", created_at: daysAgo(10) }));
+  it("applies the beta promo: free + invited < 3 months ago → premium", async () => {
+    const r = await getServerTier(req(), deps(UID, { tier: "free", created_at: daysAgo(400), beta_invited_at: daysAgo(10) }));
     expect(r.tier).toBe("free");
     expect(r.effectiveTier).toBe("premium");
   });
 
   it("no promo after 3 months", async () => {
-    const r = await getServerTier(req(), deps(UID, { tier: "free", created_at: daysAgo(120) }));
+    const r = await getServerTier(req(), deps(UID, { tier: "free", created_at: daysAgo(10), beta_invited_at: daysAgo(120) }));
     expect(r.effectiveTier).toBe("free");
+  });
+
+  it("BUG-B2-02/03: a new free account that was not invited gets no promo", async () => {
+    const r = await getServerTier(req(), deps(UID, { tier: "free", created_at: daysAgo(1) }));
+    expect(r.effectiveTier).toBe("free");
+    const r2 = await getServerTier(req(), deps(UID, { tier: "free", created_at: daysAgo(1), beta_invited_at: null }));
+    expect(r2.effectiveTier).toBe("free");
   });
 
   it("promo does not apply to paid tiers", async () => {

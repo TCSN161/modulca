@@ -49,8 +49,8 @@ describe("decideCheckout (BUG-ST16)", () => {
   });
 
   it("uses the effective tier: a beta-promo user already has Premium, may buy Architect", () => {
-    expect(decideCheckout(profile({ created_at: NEW }), "price_pm", ENV)).toMatchObject({ ok: false, code: "not_an_upgrade" });
-    expect(decideCheckout(profile({ created_at: NEW }), "price_am", ENV)).toMatchObject({ ok: true });
+    expect(decideCheckout(profile({ beta_invited_at: NEW }), "price_pm", ENV)).toMatchObject({ ok: false, code: "not_an_upgrade" });
+    expect(decideCheckout(profile({ beta_invited_at: NEW }), "price_am", ENV)).toMatchObject({ ok: true });
   });
 
   it("sends a live subscriber to the portal instead of a second subscription", () => {
@@ -103,13 +103,25 @@ describe("toDbSubscriptionStatus (BUG-DB-01)", () => {
 });
 
 describe("computeBillingStatus (server-side beta promo)", () => {
-  it("reports the promo for a new free account and none for comp", async () => {
+  it("reports the promo for an invited free account and none for comp", async () => {
     const { computeBillingStatus } = await import("./billing");
-    const s = computeBillingStatus(profile({ created_at: NEW }));
-    expect(s).toMatchObject({ tier: "free", effectiveTier: "premium", betaPromoActive: true, comp: false });
+    const s = computeBillingStatus(profile({ beta_invited_at: NEW }));
+    expect(s).toMatchObject({ tier: "free", effectiveTier: "premium", betaPromoActive: true, comp: false, betaInvitedAt: NEW });
     expect(s.betaPromoDaysLeft).toBeGreaterThan(80);
     const c = computeBillingStatus(profile({ tier: "constructor" }));
     expect(c).toMatchObject({ effectiveTier: "constructor", betaPromoActive: false, comp: true, hasSubscription: false });
     expect(computeBillingStatus(null)).toMatchObject({ tier: "free", effectiveTier: "free", betaPromoActive: false });
+  });
+
+  it("BUG-B2-02: the anchor is beta_invited_at, not created_at", async () => {
+    const { computeBillingStatus } = await import("./billing");
+    // New account, not invited → no promo.
+    expect(computeBillingStatus(profile({ created_at: NEW }))).toMatchObject({ effectiveTier: "free", betaPromoActive: false, betaInvitedAt: null });
+    // Old account (signed up long before the beta), invited 5 days ago → full promo.
+    const s = computeBillingStatus(profile({ created_at: OLD, beta_invited_at: NEW }));
+    expect(s.effectiveTier).toBe("premium");
+    expect(s.betaPromoDaysLeft).toBeGreaterThan(80);
+    // Invited 400 days ago → expired.
+    expect(computeBillingStatus(profile({ beta_invited_at: OLD })).betaPromoActive).toBe(false);
   });
 });

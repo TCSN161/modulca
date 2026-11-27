@@ -5,6 +5,8 @@ import type { AccountTier } from "./types";
 import { getTierConfig, getEffectiveTier, isBetaPromoActive, getBetaPromoDaysLeft } from "./types";
 import { getSupabase } from "@/shared/lib/supabase";
 import { setUser as setSentryUser } from "@/shared/lib/monitoring";
+import { authHeaders } from "@/shared/lib/authHeaders";
+import { INVITE_CODE_STORAGE_KEY } from "@/features/beta/claim";
 
 /**
  * Auth store — Supabase-backed with localStorage demo fallback.
@@ -37,6 +39,8 @@ interface AuthStore {
 
   // Beta promo
   userCreatedAt: string | null;
+  /** Beta invite date = promo anchor (BUG-B2-02), from POST /api/beta/claim. null = not invited. */
+  betaInvitedAt: string | null;
   betaPromoActive: boolean;
   betaPromoDaysLeft: number;
 
@@ -111,6 +115,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   totalCostUsd: 0,
   stripeCustomerId: null,
   userCreatedAt: null,
+  betaInvitedAt: null,
   betaPromoActive: false,
   betaPromoDaysLeft: 0,
 
@@ -277,6 +282,7 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
       totalCostUsd: 0,
       stripeCustomerId: null,
       userCreatedAt: null,
+      betaInvitedAt: null,
       betaPromoActive: false,
       betaPromoDaysLeft: 0,
     });
@@ -301,14 +307,14 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
 
   /* ── Effective Tier (considers beta promo) ── */
   getEffectiveTier: () => {
-    const { userTier, userCreatedAt } = get();
-    return getEffectiveTier(userTier, userCreatedAt);
+    const { userTier, betaInvitedAt } = get();
+    return getEffectiveTier(userTier, betaInvitedAt);
   },
 
   /* ── Feature Access (uses effective tier for beta promo) ── */
   canAccess: (feature) => {
-    const { userTier, userCreatedAt } = get();
-    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const { userTier, betaInvitedAt } = get();
+    const effectiveTier = getEffectiveTier(userTier, betaInvitedAt);
     const config = getTierConfig(effectiveTier);
     const val = (config.features as unknown as Record<string, unknown>)[feature];
     if (typeof val === "boolean") return val;
@@ -317,8 +323,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   canCreateProject: () => {
-    const { userTier, userCreatedAt, projectCount } = get();
-    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const { userTier, betaInvitedAt, projectCount } = get();
+    const effectiveTier = getEffectiveTier(userTier, betaInvitedAt);
     const config = getTierConfig(effectiveTier);
     const max = config.features.maxProjects;
     if (max === -1) return { allowed: true };
@@ -329,8 +335,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   canUseAiCall: () => {
-    const { userTier, userCreatedAt, aiCallsToday } = get();
-    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const { userTier, betaInvitedAt, aiCallsToday } = get();
+    const effectiveTier = getEffectiveTier(userTier, betaInvitedAt);
     const config = getTierConfig(effectiveTier);
     const max = config.features.aiRendersPerMonth;
     if (max === -1) return { allowed: true };
@@ -356,8 +362,8 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   canUseMonthlyRender: () => {
-    const { userTier, userCreatedAt, monthlyRenderCount } = get();
-    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const { userTier, betaInvitedAt, monthlyRenderCount } = get();
+    const effectiveTier = getEffectiveTier(userTier, betaInvitedAt);
     const config = getTierConfig(effectiveTier);
     const max = config.features.aiRendersPerMonth;
     if (max === -1) return { allowed: true };
@@ -391,11 +397,11 @@ export const useAuthStore = create<AuthStore>((set, get) => ({
   },
 
   getTierLabel: () => {
-    const { userTier, userCreatedAt } = get();
-    const effectiveTier = getEffectiveTier(userTier, userCreatedAt);
+    const { userTier, betaInvitedAt } = get();
+    const effectiveTier = getEffectiveTier(userTier, betaInvitedAt);
     const config = getTierConfig(effectiveTier);
     if (userTier === "free" && effectiveTier === "premium") {
-      const daysLeft = getBetaPromoDaysLeft(userTier, userCreatedAt);
+      const daysLeft = getBetaPromoDaysLeft(userTier, betaInvitedAt);
       return `${config.label} (Beta — ${daysLeft}d left)`;
     }
     return config.label;
@@ -496,22 +502,56 @@ async function loadSessionInner(set: (partial: Partial<AuthStore>) => void): Pro
       totalCostUsd: (profile?.total_cost_usd as number) ?? 0,
       stripeCustomerId: (profile?.stripe_customer_id as string) ?? null,
       userCreatedAt: (profile?.created_at as string) ?? session.user.created_at ?? null,
-      betaPromoActive: isBetaPromoActive(
-        ((profile?.tier as string) ?? "free") as AccountTier,
-        (profile?.created_at as string) ?? session.user.created_at ?? null,
-      ),
-      betaPromoDaysLeft: getBetaPromoDaysLeft(
-        ((profile?.tier as string) ?? "free") as AccountTier,
-        (profile?.created_at as string) ?? session.user.created_at ?? null,
-      ),
+    });
+
+    // BUG-B2-03/B2-02: the server checks the beta allowlist / invite code and returns the
+    // promo anchor (beta_invited_at). Runs after sign-up (SIGNED_IN) and at every login.
+    const invitedAt = await claimBetaInvite();
+    const tierNow = ((profile?.tier as string) ?? "free") as AccountTier;
+    set({
+      betaInvitedAt: invitedAt,
+      betaPromoActive: isBetaPromoActive(tierNow, invitedAt),
+      betaPromoDaysLeft: getBetaPromoDaysLeft(tierNow, invitedAt),
     });
 
     // Attach user context to error reports (persists across reloads via session)
     setSentryUser({ id: session.user.id, email: session.user.email ?? undefined });
 }
 
+/**
+ * POST /api/beta/claim with the stored invite code (if any). Returns the invite date or null.
+ * Never throws: on any failure the user is treated as not invited (no promo).
+ */
+async function claimBetaInvite(): Promise<string | null> {
+  try {
+    const code = typeof localStorage !== "undefined" ? localStorage.getItem(INVITE_CODE_STORAGE_KEY) : null;
+    const res = await fetch("/api/beta/claim", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", ...(await authHeaders()) },
+      body: JSON.stringify(code ? { code } : {}),
+    });
+    if (!res.ok) return null;
+    const data = (await res.json()) as { betaInvitedAt?: string | null; invited?: boolean; codeRejected?: boolean };
+    if (code && (data.invited || data.codeRejected)) localStorage.removeItem(INVITE_CODE_STORAGE_KEY);
+    return data.betaInvitedAt ?? null;
+  } catch {
+    return null;
+  }
+}
+
+/** `?invite=CODE` on any page → keep the code until the next claim (sign-up or login). */
+function captureInviteCodeFromUrl() {
+  try {
+    const code = new URLSearchParams(window.location.search).get("invite");
+    if (code && code.trim()) localStorage.setItem(INVITE_CODE_STORAGE_KEY, code.trim().slice(0, 64));
+  } catch {
+    /* ignore */
+  }
+}
+
 // Auto-hydrate on client + listen for auth changes (OAuth callbacks, token refresh)
 if (typeof window !== "undefined") {
+  captureInviteCodeFromUrl();
   queueMicrotask(() => {
     useAuthStore.getState().loadSession();
   });

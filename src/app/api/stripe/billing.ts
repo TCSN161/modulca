@@ -49,8 +49,15 @@ export function tierForPriceId(
 export interface BillingProfile {
   tier: string | null;
   created_at: string | null;
+  /** BUG-B2-02: beta promo anchor (migration 013). Absent/null = not invited, no promo. */
+  beta_invited_at?: string | null;
   stripe_subscription_id: string | null;
   subscription_status: string | null;
+}
+
+/** The one place that picks the beta promo anchor from a profile row (BUG-B2-02). */
+export function promoAnchorOf(p: { beta_invited_at?: string | null } | null | undefined): string | null {
+  return p?.beta_invited_at ?? null;
 }
 
 /** Comp account = paid tier with no Stripe subscription (docs/MCA-DOC-PRICING-COMP-ACCOUNTS.md). */
@@ -91,7 +98,7 @@ export function decideCheckout(
   }
 
   const stored = normalizeAccountTier(profile?.tier ?? "free");
-  const effective = getEffectiveTier(stored, profile?.created_at ?? null);
+  const effective = getEffectiveTier(stored, promoAnchorOf(profile));
   if (TIER_RANK[targetTier] <= TIER_RANK[effective]) {
     return {
       ok: false,
@@ -137,22 +144,25 @@ export interface BillingStatus {
   effectiveTier: AccountTier;
   betaPromoActive: boolean;
   betaPromoDaysLeft: number;
+  /** Invite date (promo anchor), null = not invited. */
+  betaInvitedAt: string | null;
   comp: boolean;
   hasSubscription: boolean;
   subscriptionStatus: string | null;
 }
 
-/** Server-computed billing status (beta promo from the DB `created_at`, not the browser). */
+/** Server-computed billing status (beta promo from the DB `beta_invited_at`, not the browser). */
 export function computeBillingStatus(profile: BillingProfile | null): BillingStatus {
   const tier = normalizeAccountTier(profile?.tier ?? "free");
-  const createdAt = profile?.created_at ?? null;
-  const effectiveTier = getEffectiveTier(tier, createdAt);
+  const anchor = promoAnchorOf(profile);
+  const effectiveTier = getEffectiveTier(tier, anchor);
   const promo = tier === "free" && effectiveTier !== "free";
   return {
     tier,
     effectiveTier,
     betaPromoActive: promo,
-    betaPromoDaysLeft: promo ? getBetaPromoDaysLeft(tier, createdAt) : 0,
+    betaPromoDaysLeft: promo ? getBetaPromoDaysLeft(tier, anchor) : 0,
+    betaInvitedAt: anchor,
     comp: isCompAccount(profile),
     hasSubscription: hasLiveSubscription(profile),
     subscriptionStatus: profile?.subscription_status ?? null,

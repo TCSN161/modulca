@@ -30,7 +30,7 @@ function resetStore(overrides: Record<string, unknown> = {}) {
     monthlyRenderCount: 0,
     totalCostUsd: 0,
     stripeCustomerId: null,
-    userCreatedAt: null,
+    betaInvitedAt: null,
     betaPromoActive: false,
     betaPromoDaysLeft: 0,
     ...overrides,
@@ -60,10 +60,10 @@ describe("canCreateProject", () => {
   });
 
   it("free tier: allows up to 2 projects", () => {
-    resetStore({ userTier: "free", projectCount: 0, userCreatedAt: null });
+    resetStore({ userTier: "free", projectCount: 0, betaInvitedAt: null });
     expect(useAuthStore.getState().canCreateProject()).toEqual({ allowed: true });
 
-    resetStore({ userTier: "free", projectCount: 2, userCreatedAt: null });
+    resetStore({ userTier: "free", projectCount: 2, betaInvitedAt: null });
     const result = useAuthStore.getState().canCreateProject();
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain("2");
@@ -72,7 +72,7 @@ describe("canCreateProject", () => {
   it("free tier with beta promo: gets premium limits (10 projects)", () => {
     const recent = new Date();
     recent.setDate(recent.getDate() - 1);
-    resetStore({ userTier: "free", projectCount: 5, userCreatedAt: recent.toISOString() });
+    resetStore({ userTier: "free", projectCount: 5, betaInvitedAt: recent.toISOString() });
     // Beta promo elevates free -> premium (10 projects)
     expect(useAuthStore.getState().canCreateProject()).toEqual({ allowed: true });
   });
@@ -102,10 +102,10 @@ describe("canCreateProject", () => {
 
 describe("canUseMonthlyRender", () => {
   it("free tier: allows up to 5 renders", () => {
-    resetStore({ userTier: "free", monthlyRenderCount: 4, userCreatedAt: null });
+    resetStore({ userTier: "free", monthlyRenderCount: 4, betaInvitedAt: null });
     expect(useAuthStore.getState().canUseMonthlyRender()).toEqual({ allowed: true });
 
-    resetStore({ userTier: "free", monthlyRenderCount: 5, userCreatedAt: null });
+    resetStore({ userTier: "free", monthlyRenderCount: 5, betaInvitedAt: null });
     const result = useAuthStore.getState().canUseMonthlyRender();
     expect(result.allowed).toBe(false);
     expect(result.reason).toContain("5");
@@ -143,31 +143,31 @@ describe("getEffectiveTier (store method)", () => {
   it("returns premium for free user within beta promo window", () => {
     const recent = new Date();
     recent.setDate(recent.getDate() - 7);
-    resetStore({ userTier: "free", userCreatedAt: recent.toISOString() });
+    resetStore({ userTier: "free", betaInvitedAt: recent.toISOString() });
     expect(useAuthStore.getState().getEffectiveTier()).toBe("premium");
   });
 
   it("returns free for free user after beta promo expires", () => {
     const old = new Date();
     old.setMonth(old.getMonth() - 4);
-    resetStore({ userTier: "free", userCreatedAt: old.toISOString() });
+    resetStore({ userTier: "free", betaInvitedAt: old.toISOString() });
     expect(useAuthStore.getState().getEffectiveTier()).toBe("free");
   });
 
   it("returns same tier for paid users regardless of createdAt", () => {
     const recent = new Date().toISOString();
-    resetStore({ userTier: "premium", userCreatedAt: recent });
+    resetStore({ userTier: "premium", betaInvitedAt: recent });
     expect(useAuthStore.getState().getEffectiveTier()).toBe("premium");
 
-    resetStore({ userTier: "architect", userCreatedAt: recent });
+    resetStore({ userTier: "architect", betaInvitedAt: recent });
     expect(useAuthStore.getState().getEffectiveTier()).toBe("architect");
 
-    resetStore({ userTier: "constructor", userCreatedAt: recent });
+    resetStore({ userTier: "constructor", betaInvitedAt: recent });
     expect(useAuthStore.getState().getEffectiveTier()).toBe("constructor");
   });
 
   it("returns free when createdAt is null (no beta promo)", () => {
-    resetStore({ userTier: "free", userCreatedAt: null });
+    resetStore({ userTier: "free", betaInvitedAt: null });
     expect(useAuthStore.getState().getEffectiveTier()).toBe("free");
   });
 });
@@ -207,7 +207,7 @@ describe("signOut", () => {
     expect(state.monthlyRenderCount).toBe(0);
     expect(state.totalCostUsd).toBe(0);
     expect(state.stripeCustomerId).toBeNull();
-    expect(state.userCreatedAt).toBeNull();
+    expect(state.betaInvitedAt).toBeNull();
     expect(state.betaPromoActive).toBe(false);
     expect(state.betaPromoDaysLeft).toBe(0);
   });

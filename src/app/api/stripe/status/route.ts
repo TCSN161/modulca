@@ -8,7 +8,8 @@ export const dynamic = "force-dynamic";
 
 /**
  * GET /api/stripe/status — the caller's billing status computed on the server
- * (4.02 follow-up: beta promo from the DB `created_at`, not the browser clock).
+ * (beta promo from the DB `beta_invited_at`, not the browser clock; select("*") so it
+ * keeps working before migration 013 adds the column).
  * Auth: `Authorization: Bearer` (use authHeaders()).
  * Returns BillingStatus: tier, effectiveTier, betaPromoActive, betaPromoDaysLeft,
  * comp, hasSubscription, subscriptionStatus. Read-only, no Stripe call.
@@ -24,7 +25,7 @@ export async function GET(req: NextRequest) {
   }
   const { data, error } = await sb
     .from("profiles")
-    .select("tier, created_at, stripe_subscription_id, subscription_status")
+    .select("*")
     .eq("id", userId)
     .maybeSingle();
   if (error) {

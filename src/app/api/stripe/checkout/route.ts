@@ -51,7 +51,7 @@ export async function POST(req: NextRequest) {
     }
     const { data: profile, error: profileErr } = await sb
       .from("profiles")
-      .select("tier, created_at, stripe_subscription_id, subscription_status")
+      .select("*")
       .eq("id", user.id)
       .maybeSingle();
     if (profileErr) {
