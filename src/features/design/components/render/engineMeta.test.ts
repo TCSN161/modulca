@@ -36,4 +36,9 @@ describe("engineMetaFromHeaders (BUG-ST29)", () => {
     expect(engineMetaFromHeaders(h({ "X-AI-Engine": "ai-horde" }), { requestedEngine: "ai-horde", hadBaseImage: true }).fallbackFrom).toEqual([]);
     expect(engineMetaFromHeaders(h({ "X-AI-Engine": "cloudflare-klein" }), { requestedEngine: "ai-horde", hadBaseImage: true }).fallbackFrom).toEqual(["ai-horde"]);
   });
+
+  it("BUG-ST37: klein reported as cloudflare-klein-img2img is klein, not a fallback", () => {
+    expect(engineMetaFromHeaders(h({ "X-AI-Engine": "cloudflare-klein-img2img" }), { requestedEngine: "auto", hadBaseImage: true }))
+      .toEqual({ engine: "cloudflare-klein", fallbackFrom: [], baseNotKept: false });
+  });
 });

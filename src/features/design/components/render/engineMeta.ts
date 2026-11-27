@@ -13,6 +13,14 @@ export const IMG2IMG_PRIMARY = "cloudflare-klein";
 /** Engines in the img2img chain that only read the prompt (3D view lost). */
 export const TEXT_ONLY_ENGINES = new Set(["cloudflare", "pollinations", "gemini", "together", "huggingface"]);
 
+/**
+ * Engine id without the route's mode suffix: the server reports klein img2img
+ * as "cloudflare-klein-img2img" (BUG-ST37), the client knows it as "cloudflare-klein".
+ */
+export function canonicalEngineId(id: string): string {
+  return id.trim().replace(/-img2img$/, "");
+}
+
 export interface EngineMeta {
   engine: string;
   fallbackFrom: string[];
@@ -24,10 +32,10 @@ export function engineMetaFromHeaders(
   headers: Headers,
   req: { requestedEngine: string | null; hadBaseImage: boolean },
 ): EngineMeta {
-  const engine = headers.get("x-ai-engine") || req.requestedEngine || "unknown";
+  const engine = canonicalEngineId(headers.get("x-ai-engine") || req.requestedEngine || "unknown");
   const fromHeader = (headers.get("x-ai-fallback-from") || "")
     .split(",")
-    .map((s) => s.trim())
+    .map((s) => canonicalEngineId(s))
     .filter(Boolean);
 
   let fallbackFrom = fromHeader;

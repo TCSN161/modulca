@@ -15,7 +15,7 @@ import MobileStepFooter from "../shared/MobileStepFooter";
 import type { LightingMode, CameraAngle, RenderMode, ViewMode, PromptTemplate, RenderResolution, AiEngine, RenderInputMode } from "./renderConstants";
 import { AI_ENGINES, PROMPT_TEMPLATES, RENDER_RESOLUTIONS, STYLE_PINS } from "./renderConstants";
 import { useRenderEngine, readApiError } from "./useRenderEngine";
-import { persistSavedRender } from "../../renderPersistence";
+import { useAutoPersistRender } from "./useAutoPersistRender";
 import { authHeaders } from "@/shared/lib/authHeaders";
 import RenderGallery from "./RenderGallery";
 import RenderInputModeSelector from "./RenderInputModeSelector";
@@ -85,6 +85,8 @@ export default function RenderPage() {
     handleGenerateAiRender: generateAiRender,
     resetAiImage,
   } = useRenderEngine({ aiEngine, renderResolution, inputMode, captureRef, depthCaptureRef, uploadImage });
+  const savedRenders = useDesignStore((s) => s.savedRenders);
+  const [shownSavedId, setShownSavedId] = useState<string | null>(null);
 
   // Tier-based render limits
   const userTier = useAuthStore((s) => s.userTier);
@@ -207,6 +209,46 @@ export default function RenderPage() {
     () => getStats(),
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [getStats, modules, finishLevel],
+  );
+
+  // BUG-ST36: the SavedRender for the image on screen (metadata of that image, not the current UI choice)
+  const makeAiRender = useCallback((imageUrl: string): SavedRender => {
+    const usedMode = aiEngineMeta?.inputMode ?? inputMode;
+    const styleName = style?.label || "Modern";
+    const moduleName = currentMod?.label || "Module";
+    const modeLabel = usedMode === "scene" ? "3D scene conversion" : usedMode === "upload" ? "photo conversion" : "AI text-to-image";
+    const engineName = aiEngineMeta?.engine || "AI";
+    const resLabel = RENDER_RESOLUTIONS[renderResolution]?.label || "Standard";
+    const description = [
+      `${styleName} interior design visualization of ${moduleName}.`,
+      `Generated via ${modeLabel} using ${engineName} engine at ${resLabel} resolution.`,
+      aiPrompt ? `Style prompt: "${aiPrompt.slice(0, 150)}${aiPrompt.length > 150 ? "..." : ""}"` : "",
+    ].filter(Boolean).join(" ");
+    return {
+      id: `render-${Date.now()}`,
+      imageUrl,
+      label: `${moduleName} — ${styleName} AI Render`,
+      engine: engineName,
+      moduleType: currentMod?.moduleType || "unknown",
+      createdAt: new Date().toISOString(),
+      description,
+      prompt: aiPrompt,
+      mode: usedMode === "text" ? "text2img" : "img2img",
+      baseSource: usedMode === "text" ? undefined : usedMode,
+      fallbackFrom: aiEngineMeta?.fallbackFrom.length ? aiEngineMeta.fallbackFrom : undefined,
+      resolution: resLabel,
+      view: usedMode === "scene" ? { camera, focalMm, viewMode } : undefined,
+    };
+  }, [aiEngineMeta, inputMode, style, currentMod, renderResolution, aiPrompt, camera, focalMm, viewMode]);
+  // Wait for the engine meta so the saved render names the right engine
+  const { status: autoSave, retry: retryAutoSave } = useAutoPersistRender(
+    aiImageUrl && aiEngineMeta ? aiImageUrl : null,
+    makeAiRender,
+    projectId,
+  );
+  const shownSaved = useMemo(
+    () => (shownSavedId ? savedRenders.find((r) => r.id === shownSavedId) ?? null : null),
+    [shownSavedId, savedRenders],
   );
 
   const pins = useMemo(
@@ -588,47 +630,17 @@ export default function RenderPage() {
                   >
                     {"📤 Share with Friends"}
                   </button>
-                  <button
-                    onClick={async () => {
-                      // Auto-generate description for presentation
-                      // Metadata of the image actually shown, not the current UI choice
-                      const usedMode = aiEngineMeta?.inputMode ?? inputMode;
-                      const styleName = style?.label || "Modern";
-                      const moduleName = currentMod?.label || "Module";
-                      const modeLabel = usedMode === "scene" ? "3D scene conversion" : usedMode === "upload" ? "photo conversion" : "AI text-to-image";
-                      const engineName = aiUsedEngine || "AI";
-                      const resLabel = RENDER_RESOLUTIONS[renderResolution]?.label || "Standard";
-                      const autoDescription = [
-                        `${styleName} interior design visualization of ${moduleName}.`,
-                        `Generated via ${modeLabel} using ${engineName} engine at ${resLabel} resolution.`,
-                        aiPrompt ? `Style prompt: "${aiPrompt.slice(0, 150)}${aiPrompt.length > 150 ? "..." : ""}"` : "",
-                      ].filter(Boolean).join(" ");
-
-                      const render: SavedRender = {
-                        id: `render-${Date.now()}`,
-                        imageUrl: aiImageUrl,
-                        label: `${moduleName} — ${styleName} AI Render`,
-                        engine: engineName,
-                        moduleType: currentMod?.moduleType || "unknown",
-                        createdAt: new Date().toISOString(),
-                        description: autoDescription,
-                        prompt: aiPrompt,
-                        mode: usedMode === "text" ? "text2img" : "img2img",
-                        baseSource: usedMode === "text" ? undefined : usedMode,
-                        fallbackFrom: aiEngineMeta?.fallbackFrom.length ? aiEngineMeta.fallbackFrom : undefined,
-                        resolution: resLabel,
-                        view: usedMode === "scene" ? { camera, focalMm, viewMode } : undefined,
-                      };
-                      // BUG-ST27: compressed + saved to the project row at once
-                      const res = await persistSavedRender(render, projectId);
-                      if (res.ok) alert("Render saved to your presentation!");
-                      else if (res.reason === "limit") alert(`Your plan keeps up to ${res.limit} renders. Remove one in the presentation or upgrade.`);
-                      else alert("Failed to save render.");
-                    }}
-                    className="block w-full rounded-lg bg-brand-teal-800 px-4 py-2 text-center text-xs font-semibold text-white hover:bg-brand-teal-700 transition-colors"
-                  >
-                    {"🎨 Save to Presentation"}
-                  </button>
+                  {/* BUG-ST36: saved automatically; this line reports it */}
+                  <div className="rounded-lg bg-brand-teal-50 px-3 py-2 text-center text-[11px] text-brand-teal-800" data-testid="render-autosave-status">
+                    {autoSave.state === "saving" && "Se salvează în prezentare… / Saving to presentation…"}
+                    {autoSave.state === "saved" && "✓ Salvat în prezentare / Saved to presentation"}
+                    {autoSave.state === "limit" && `Planul păstrează ${autoSave.limit} randări: șterge una din prezentare. / Your plan keeps ${autoSave.limit} renders: remove one in the presentation.`}
+                    {autoSave.state === "error" && (
+                      <button type="button" onClick={retryAutoSave} className="font-semibold text-brand-amber-600 underline">
+                        Salvarea a eșuat, reîncearcă / Save failed, retry
+                      </button>
+                    )}
+                  </div>
 
                   {/* Publish to public gallery — opt-in, contributes to the public /gallery */}
                   {aiImageUrl && (
@@ -757,6 +769,16 @@ export default function RenderPage() {
                     />
                   )}
 
+                  {/* A saved render picked from the strip below (BUG-ST36) */}
+                  {renderMode === "ai" && !aiImageUrl && !aiLoading && shownSaved && (
+                    <div className="absolute inset-0">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src={shownSaved.imageUrl} alt={shownSaved.label} className="h-full w-full object-cover rounded-2xl" />
+                      <button type="button" onClick={() => setShownSavedId(null)} className="absolute right-3 top-3 rounded-full bg-black/50 px-3 py-1 text-xs text-white">
+                        ✕ 3D
+                      </button>
+                    </div>
+                  )}
                   {/* AI generated image (from blob URL) */}
                   {renderMode === "ai" && aiImageUrl && !aiLoading && (
                     <div className="absolute inset-0">
@@ -765,7 +787,7 @@ export default function RenderPage() {
                     </div>
                   )}
                   {/* AI overlay: loading spinner, error, or initial prompt */}
-                  {renderMode === "ai" && (aiLoading || aiError || !aiImageUrl) && (
+                  {renderMode === "ai" && (aiLoading || aiError || (!aiImageUrl && !shownSaved)) && (
                     <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/50 backdrop-blur-sm rounded-2xl">
                       {aiLoading ? (
                         <div className="flex flex-col items-center gap-3 rounded-2xl bg-white/95 px-8 py-6 shadow-xl">
@@ -808,7 +830,7 @@ export default function RenderPage() {
                     {camera} · {lighting}
                   </div>
 
-                  {!renderedImage && (
+                  {!renderedImage && !(renderMode === "ai" && (aiImageUrl || shownSaved)) && (
                     <div className="absolute bottom-3 left-3 right-3">
                       <div className="rounded-lg bg-black/40 px-4 py-2 text-xs text-white backdrop-blur-sm">
                         Live 3D Preview — Click &quot;Generate Render&quot; to capture high-quality image
@@ -820,6 +842,24 @@ export default function RenderPage() {
 
               {renderMode === "ai" && aiImageUrl && !aiLoading && aiEngineMeta && (
                 <RenderEngineBadge className="-mt-4 text-center text-xs text-gray-500" engine={aiEngineMeta.engine} fallbackFrom={aiEngineMeta.fallbackFrom} baseNotKept={aiEngineMeta.baseNotKept} />
+              )}
+
+              {renderMode === "ai" && savedRenders.length > 0 && (
+                <div className="mx-auto w-full" style={{ maxWidth: 800 }} data-testid="saved-renders-strip">
+                  <div className="mb-1 text-[10px] font-bold uppercase text-gray-400">
+                    Randări salvate / Saved renders ({savedRenders.length})
+                  </div>
+                  <div className="flex gap-2 overflow-x-auto pb-1">
+                    {[...savedRenders].reverse().map((r) => (
+                      <button key={r.id} type="button" onClick={() => { resetAiImage(); setShownSavedId(r.id); }}
+                        className={`h-14 w-24 flex-shrink-0 overflow-hidden rounded-md border-2 ${shownSavedId === r.id ? "border-brand-amber-500" : "border-transparent"}`}
+                        title={r.label}>
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img src={r.imageUrl} alt={r.label} className="h-full w-full object-cover" />
+                      </button>
+                    ))}
+                  </div>
+                </div>
               )}
 
               <RenderGallery
