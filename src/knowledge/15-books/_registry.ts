@@ -7,7 +7,7 @@
  * Integration:
  *   - Open Library API → covers + "Read Free Online" links (via ISBN/OLID)
  *   - Amazon affiliate links → paid books (tag=modulca-21)
- *   - Direct links → Gutenberg, Archive.org, Wikisource, Smithsonian
+ *   - Direct links → Archive.org library scans (public domain), Wikipedia (in copyright)
  *
  * Add a book → add entry here + optional .md summary in this folder.
  */
@@ -27,7 +27,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     year: "~30 BC",
     type: "book",
     free: true,
-    url: "https://www.gutenberg.org/ebooks/20239",
+    url: "https://archive.org/details/vitruviustenbook00vitruoft",
     olid: "OL38640W",
     regions: [],
   },
@@ -38,7 +38,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     year: "1570",
     type: "book",
     free: true,
-    url: "https://archive.org/details/fourbooksofarch00pall",
+    url: "https://archive.org/details/gri_33125011569684",
     olid: "OL1170027W",
     regions: [],
   },
@@ -48,8 +48,8 @@ export const BOOK_REGISTRY: KBSource[] = [
     author: "Le Corbusier",
     year: "1923",
     type: "book",
-    free: true,
-    url: "https://archive.org/details/towardsnewarchi00leco",
+    free: false,
+    url: "https://en.wikipedia.org/wiki/Toward_an_Architecture",
     olid: "OL1340562W",
     regions: [],
   },
@@ -59,8 +59,8 @@ export const BOOK_REGISTRY: KBSource[] = [
     author: "Le Corbusier",
     year: "1948",
     type: "book",
-    free: true,
-    url: "https://archive.org/details/modulor-le-corbusier",
+    free: false,
+    url: "https://en.wikipedia.org/wiki/Modulor",
     olid: "OL5765972W",
     regions: [],
   },
@@ -71,7 +71,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     year: "1849",
     type: "book",
     free: true,
-    url: "https://www.gutenberg.org/ebooks/35898",
+    url: "https://archive.org/details/lampsofarchseven00ruskrich",
     olid: "OL1174283W",
     regions: [],
   },
@@ -92,7 +92,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     year: "1924",
     type: "book",
     free: true,
-    url: "https://archive.org/details/autobiographyofi0000sull",
+    url: "https://archive.org/details/autobiographyofi00sull_0",
     olid: "OL6039028W",
     regions: [],
   },
@@ -125,7 +125,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     year: "Current",
     type: "standard",
     free: true,
-    url: "https://passivehouse.com/02_informations/01_basics/01_basics.htm",
+    url: "https://passivehouse.com/",
     regions: [],
   },
   {
@@ -209,7 +209,7 @@ export const BOOK_REGISTRY: KBSource[] = [
     free: false,
     cost: "€80–120",
     isbn: "9781119284352",
-    url: "https://www.amazon.com/dp/1119284354?tag=modulca-21",
+    url: "https://www.amazon.com/dp/111928435X?tag=modulca-21",
     regions: [],
   },
   {

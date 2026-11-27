@@ -47,7 +47,7 @@ ModulCA's 3×3m (9m²) module system is directly informed by Neufert standards:
 - **ModulCA Knowledge Base**: Our Neufert Standards section distills the most relevant residential dimensions with ModulCA-specific module mapping.
 - **University libraries**: Most architecture school libraries have copies.
 
-> 📖 [Buy on Amazon →](https://www.amazon.com/dp/1119284354?tag=modulca-21)
+> 📖 [Buy on Amazon →](https://www.amazon.com/dp/111928435X?tag=modulca-21)
 
 ## Quick Reference: Essential Dimensions
 

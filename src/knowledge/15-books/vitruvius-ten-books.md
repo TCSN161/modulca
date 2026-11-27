@@ -16,7 +16,7 @@ relatedArticles: ["vitruvius-principles", "proportion-and-scale", "golden-ratio"
 
 Written around **30 BC** by Roman architect **Marcus Vitruvius Pollio**, *De Architectura* is the oldest surviving treatise on architecture. Its three principles — **Firmitas, Utilitas, Venustas** (Strength, Utility, Beauty) — still define what good architecture means 2,000 years later.
 
-📚 **Free to read**: [Project Gutenberg →](https://www.gutenberg.org/ebooks/20239) | [Archive.org →](https://archive.org/details/viaborArchitec)
+📚 **Free to read**: [Morgan translation, 1914 →](https://archive.org/details/vitruviustenbook00vitruoft) | [Gwilt translation, 1826 →](https://archive.org/details/architectureofma00vitruoft)
 
 ## The Three Vitruvian Principles
 
