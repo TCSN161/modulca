@@ -12,6 +12,7 @@ import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
 import { makeGlbLit } from "./glbMaterials";
 import type { WallConfigs, WallThicknessConfigs, FurnitureOverride } from "../../store";
+import { isPlaceholderLabel } from "../../furniturePlaceholders";
 import { modelFrame, type FurnitureItem } from "../../layouts";
 
 /* ------------------------------------------------------------------ */
@@ -131,6 +132,7 @@ export const LABEL_TO_GLB: Record<string, string> = {
 /** Resolve a furniture label to a GLB path. Exact match first, then partial. */
 export function getGlbPath(label: string): string | null {
   const lbl = label.toLowerCase();
+  if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
   if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
   const sortedKeys = Object.keys(LABEL_TO_GLB).sort((a, b) => b.length - a.length);
   for (const key of sortedKeys) {

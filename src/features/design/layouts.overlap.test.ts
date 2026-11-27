@@ -88,3 +88,13 @@ describe("furniture presets (5.06: rendered size, wall bounds, door zone)", () =
     expect(blocking).toEqual([]);
   });
 });
+
+describe("furniture model mapping (5.06)", () => {
+  it("kitchen counters, island and fridge never use a kit GLB (no bathroom sinks / drawers)", async () => {
+    const { isPlaceholderLabel } = await import("./furniturePlaceholders");
+    const wrong = ROOM_LAYOUTS.flatMap((r) => r.presets.flatMap((p) => p.furniture))
+      .filter((f) => /counter|island|fridge|shelves|bookshelf/i.test(f.label) && !isPlaceholderLabel(f.label))
+      .map((f) => f.label);
+    expect(wrong).toEqual([]);
+  });
+});

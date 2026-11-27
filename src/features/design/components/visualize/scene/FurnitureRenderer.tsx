@@ -4,6 +4,7 @@ import { useRef, useState, useEffect, Suspense, Component } from "react";
 import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import { Text, useCursor, useGLTF } from "@react-three/drei";
+import { isPlaceholderLabel } from "../../../furniturePlaceholders";
 import { modelFrame, type FurnitureItem } from "../../../layouts";
 import { makeGlbLit } from "../../shared/glbMaterials";
 import type { FurnitureOverride } from "../../../store";
@@ -117,6 +118,7 @@ const LABEL_TO_GLB: Record<string, string> = {
  */
 function getGlbPath(label: string): string | null {
   const lbl = label.toLowerCase();
+  if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
   // Try exact match first
   if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
   // Try partial match — sort keys longest-first so more specific keys win
