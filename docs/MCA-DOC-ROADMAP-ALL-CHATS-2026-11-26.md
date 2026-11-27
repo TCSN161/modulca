@@ -55,6 +55,8 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 | Insignă BETA + widget de feedback | 4 Billing |
 | **Randările din rândul proiectului → Supabase Storage** (bucket-ul `renders` **există deja** în Supabase, public, folosit de server pentru cache și galerie, 0 politici = doar serverul scrie — verificat de Costin 27 nov; cel mai simplu: upload prin rută de server, fără politici noi pe client; clientul salvează URL, nu imaginea): ține baza sub 500 MB pe Supabase Free | 5 Design (client) + 3 Engines (bucket) + MAIN (migrație) |
 | Video walkthrough v0 (înregistrare AutoTour) · 3.09 capacitate gratuită + compresie modele 3D (gltf-transform) | 3 Engines |
+| **Mobilier pe variante (decis de Costin 28 nov), etapa A**: 2–3 variante proprii, făcute în Blender, pentru fiecare piesă (pat mic/mediu/mare, masă mică/medie/mare, scaun cu/fără spătar, canapea 2/3 locuri, dulap 1/2/3 uși…), cu dimensiuni reale. Utilizatorul alege varianta din lista de produse sau din 3D, iar randarea o arată fiindcă pornește de la 3D. Fără probleme de licență | 3 Engines (modele) + 5 Design (alegerea în UI) |
+| **Mobilier real, etapa B0 (cercetare)**: surse de modele 3D de la producători (IKEA, alții, platforme BIM), condiții de licență pentru uz comercial, 5–10 producători de contactat. Doar documente | 10 Business + 7 Partners (+ 9 Radar) |
 | Privacy + ToS cu clauza de beta | 2 Neufert |
 | Lista de invitați (10–20) + email de invitație | 7 Partners + Costin |
 
@@ -75,10 +77,20 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 | Canal YouTube + Shorts (după review Vlad), lead magnet, quiz | 6 Marketing |
 | Presă (3 jurnaliști), povestea Cornetu | 7 Partners |
 | Blender pipeline extins la toate modulele (început în W49–W50, decis de Costin 27 nov), postprocessing 3, video AI (dacă avem venit) | 3 Engines |
+| **Mobilier real, etapa B1**: 10–20 produse reale din 1–2 surse cu permisiune scrisă; model 3D + dimensiuni + preț + link de afiliere (R5); „înlocuiește cu…” la click pe obiect în 3D | 3 Engines + 5 Design + 7 Partners + 4 Billing (afiliere) |
 | Express: prompt liber, mai multe randări | 8 Express |
 | Haiku 5.5 pentru traduceri, batch pentru bibliotecă | 2 Neufert |
 
 ---
+
+### Traseul „mobilier ales = mobilier văzut” (decis de Costin 28 nov)
+| Etapă | Când | Ce | Gata când |
+|---|---|---|---|
+| 0. Bază 3D | W49 (3.10, 3.11) | Modele refăcute în Blender: dimensiuni reale, scară uniformă (fără întindere pe axe), PBR, umbre coapte | Dormitorul arată bine înainte/după, din aceeași cameră |
+| A. Variante proprii | W50 (3.12+) + Chat 5 | 2–3 variante (S/M/L, cu/fără spătar etc.) pentru fiecare tip de piesă; alegere din listă sau din 3D; randarea le arată | Test: utilizatorul schimbă patul mic cu cel mare și randarea îl arată |
+| B0. Cercetare surse reale | W50 | Licențe pentru modelele producătorilor, lista de contacte | Document cu surse + condiții + 5–10 producători |
+| B1. Produse reale v1 | ianuarie | 10–20 produse reale cu permisiune, model + preț + link de afiliere, „înlocuiește cu…” | Un proiect cu mobilier 100% real, cumpărabil |
+| B2. Parteneri producători | feb–apr (grupul 13) | Producătorii își încarcă modelele, plătesc pentru vizibilitate (R8) | Primul producător plătitor |
 
 ## 3. Pe grupuri: de ce se ocupă fiecare și ce are de făcut
 

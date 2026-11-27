@@ -146,6 +146,8 @@ Numărul final se dă la pornire (următorul liber din chat). Stare: **📅 plan
 | 3.10 audit 3D + legătura Blender | Costin (27 nov) | Ce arată rău în 3D (neclar, puțin detaliu, mobilier suprapus — include B2 din bake-off), inventar GLB, conectorul Blender verificat pe o copie | Sâm 5 dec | 📅 (Opus) |
 | 3.11 Blender pipeline v0 | Costin (27 nov) | Un modul refăcut în Blender (materiale, texturi, lumină coaptă) → GLB comprimat; regulă: niciodată pe singura copie | Dum 6 dec | 📅 (Opus) |
 | 3.12+ module refăcute în Blender + mobilier fără suprapuneri | 3.11 | Restul modulelor, verificare de coliziuni la presetările de mobilier (cu Chat 5) | W50 | 📅 |
+| 3.12 mobilier pe variante (etapa A) | Costin (28 nov) | 2–3 variante proprii pentru fiecare piesă (pat S/M/L, masă S/M/L, scaun cu/fără spătar…), dimensiuni reale, în Blender; Chat 5 = alegere din listă sau 3D | W50 | 📅 |
+| 10.0x / 7.0x surse de mobilier real (etapa B0) | Costin (28 nov) | Modele 3D de la producători (IKEA etc.): licențe pentru uz comercial, contacte; apoi B1 în ianuarie (10–20 produse reale + afiliere) | W50 → ian | 📅 |
 | 3.09 capacitate gratuită + compresie GLB | 3.07 (NEXT-3) | Contor neuroni CF, Pollinations cu cheie, gltf-transform | W50 | 📅 |
 | 4.05 poartă de invitație + promo + plafon de cost | 4.04 / 10.01 | Invitație beta, promo ancorat, plafon lunar 30% din preț, `ENGINE_LIMITS` | Joi 3 | 📅 |
 | 5.05 audit export → spec PermitTracker | 5.01 | Audit read-only al exportului PDF + lista ST20 | Vin 4 | 📅 |
