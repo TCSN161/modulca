@@ -61,7 +61,7 @@ Geometry fidelity = walls / openings / room shape / furniture positions / camera
 | **Fallback 2 (prepaid, no new spend)** | Leonardo + Depth ControlNet (12 tokens) | keeps the volume; ≈ 240 renders on the existing balance. **Not wired**: needs Costin's OK (spends prepaid tokens) |
 | Not recommended | OpenAI / Kontext edit models | re-stage the scene at eye level; geometry lost |
 
-Chain after BUG-ST34 (commit 63b44d9): paid tiers `klein → stability/fal/replicate/wavespeed (funded only) → ai-horde → cloudflare → pollinations`; paid text2img only with `allowPaidText2img: true`. Free tiers: `klein → ai-horde → cloudflare → pollinations`.
+Chain after BUG-ST34 (commit 63b44d9), updated in 3.07 (§8): paid tiers `klein → replicate-depth/replicate-canny/stability-structure → fal/wavespeed (funded only) → ai-horde → cloudflare → pollinations`; paid text2img only with `allowPaidText2img: true`. Free tiers: `klein → ai-horde → cloudflare → pollinations`.
 
 **€10 Stability? No (for now).** Reasons: (1) klein is free and keeps the geometry at photo quality on our real captures (Chat 3 could not open PDF #8 or `render_logs`, so the direct comparison is Costin's); (2) the prod failure Costin saw was the prompt, which €10 would not fix; (3) 25 credits remain for 4–5 demo shots. Re-open only if Costin, looking at the sheet next to PDF #8, rates klein clearly worse for hero images.
 
@@ -111,6 +111,8 @@ Who can use it:
 | fd215cb | `ai-horde` returns null on Horde's `censored: true` placeholder (was shipped as a render) |
 | (this commit) | `ai-horde` img2img uses **ControlNet depth** by default (`AIHORDE_CONTROL_TYPE=depth\|canny\|none`, 15 steps); **prompt fix**: quality words were after `###`, i.e. in Horde's *negative* prompt; `model` added to the filter-word sanitiser. Bake-off scripts + contact sheet |
 
+| 3.07 | Structure-control engines `replicate-depth` / `replicate-canny` / `stability-structure`, off until funded; `controlImage` request field; Horde `image_is_control` (§8) |
+
 Kill switches unchanged: `AI_ENGINES_DISABLED`, `ENGINE_<ID>_DISABLED`, `AIHORDE_IMG2IMG_DISABLED`, `CF_KLEIN_MAX_SIDE`; new `AIHORDE_CONTROL_TYPE=none` restores the old Horde img2img.
 
 ## 7. Observations
@@ -118,3 +120,54 @@ Kill switches unchanged: `AI_ENGINES_DISABLED`, `ENGINE_<ID>_DISABLED`, `AIHORDE
 - Leonardo's API balance fell from 3,114 to 2,941 tokens on 26 Nov **before** this session's first Leonardo call (≈ 160 tokens spent elsewhere, probably the BUG-ST34 fallback Costin saw). After the fix, img2img can no longer reach Leonardo.
 - The CF pool was empty on the evening of 26 Nov (429 at 20:22 UTC). The 10 klein runs on 27 Nov used ≈ 1.2k neurons.
 - Horde's CSAM filter false-positives on room prompts. Words that trip it: "bedroom", "bed", "model". Prod now sanitises all three and rejects censored outputs.
+
+## 8. Structure-control engines: ready, OFF until funded (3.07, 2026-11-27)
+
+Three paid engines keep the exact 3D geometry. They are wired and tested with mocks (no paid call made). Each one switches **on by itself** once its key is set and the account has credit. Until then the route skips it silently: no call, no failure log.
+
+**Paid-tier img2img chain:** `cloudflare-klein` → **`replicate-depth` → `replicate-canny` → `stability-structure`** (funded only) → `fal` → `wavespeed` → `ai-horde` (ControlNet) → `cloudflare` → `pollinations`. Free tiers are unchanged: `klein → ai-horde → cloudflare → pollinations`. Klein stays first because it is free; the paid engines only run when klein fails.
+
+### 8.1 How to turn on
+
+| Engine id | Model (one place: `engines/structureFunding.ts`) | Env var to set (Vercel) | Where to buy credit | ≈ cost / render | ≈ renders for €10 | "Funded" means |
+|---|---|---|---|---|---|---|
+| `replicate-depth` | `black-forest-labs/flux-depth-dev` | `REPLICATE_API_TOKEN` | [replicate.com/account/billing](https://replicate.com/account/billing) | $0.025 (secondary source, not on the official page) | ≈ 430 (shared with canny) | key set; no balance API, so a 401/402 parks Replicate for 30 min |
+| `replicate-canny` | `black-forest-labs/flux-canny-dev` | same token | same | $0.025 | (same pool) | same |
+| `stability-structure` | `/v2beta/stable-image/control/structure` | `STABILITY_API_KEY` | [platform.stability.ai/account/credits](https://platform.stability.ai/account/credits) ($10 minimum) | 5 credits = $0.05 | ≈ 220 | key set AND `GET /v1/user/balance` ≥ 5 credits (cached 10 min); 401/402 parks it |
+| `ai-horde` (ControlNet) | Horde `control_type` depth/canny | none (anonymous key) | free (kudos queue) | €0 | unlimited, slow | always on; censored outputs are still rejected |
+
+€10 is taken as ≈ $10.8. Kill switches: `STRUCTURE_CONTROL_DISABLED=1` (all three), `AI_ENGINES_DISABLED=replicate-depth,…`, or `ENGINE_REPLICATE_DEPTH_DISABLED=1` / `ENGINE_REPLICATE_CANNY_DISABLED=1` / `ENGINE_STABILITY_STRUCTURE_DISABLED=1`. For Horde: `AIHORDE_CONTROL_TYPE` and `AIHORDE_IMG2IMG_DISABLED` (unchanged).
+
+**Limits that still apply after funding (not Chat 3 files):**
+- `creditManager.ts` (Chat 4): the engines draw from the `replicate` / `stability` budgets. `ENGINE_LIMITS` caps each at **$1.00 per server instance**, about 40 Replicate or 20 Stability renders before that instance stops using them. Chat 4 should raise it when Costin funds an engine.
+- Tier bands: `replicate` is priced $0.003 in `engine-billing-data.json` (budget band), so Premium, Architect and Constructor all reach `replicate-*`. The tier's `maxCostUsdPerImage` (Premium $0.05) still allows $0.025. `stability` is in the premium band, so **only Constructor** reaches `stability-structure`.
+
+### 8.2 Request shape for Chat 5 (5.03-A)
+
+`POST /api/ai-render`, JSON. New fields are optional; old clients keep working.
+
+```jsonc
+{
+  "prompt": "Turn this 3D cutaway axonometric … keep the exact camera …",
+  "width": 1024, "height": 576,
+  "seed": "123",                     // optional
+  "baseImage": "data:image/jpeg;base64,…",  // RGB 3D capture, long side ≤ 1024 (unchanged)
+  "controlImage": "data:image/png;base64,…", // NEW, optional: same camera, same size as baseImage
+  "controlType": "depth",            // NEW, optional: "depth" | "canny"; default "depth"
+  "engine": "auto"                   // optional; an explicit id is tried first
+}
+```
+
+Rules:
+- `controlImage` is **ignored without `baseImage`**: klein needs the RGB capture, and the control map is an extra.
+- A depth map should be white = near and black = far, PNG, rendered from exactly the same camera and aspect as `baseImage` (§5 snippet; invert `MeshDepthMaterial` if needed and tighten `near`/`far` to the house). Canny = white edges on black.
+- Who uses it:
+  - `replicate-depth` uses a depth map, `replicate-canny` a canny map; each falls back to the RGB capture when the map type does not match. Both models run their own preprocessor on whatever they get.
+  - `ai-horde` sends the map with `image_is_control: true` and `control_type` = `controlType`, so Horde skips its own estimator (not tested live).
+  - `stability-structure` and `cloudflare-klein` use only `baseImage`.
+- The response is unchanged: image bytes, plus `X-AI-Engine` (e.g. `replicate-depth`), `X-AI-Cost-Usd` and `X-AI-Latency-Ms`.
+
+### 8.3 Not verified
+
+- No live call on any of the three paid engines (balance $0, and no spend was allowed). The Replicate input names (`control_image`, `prompt`, `seed`, `output_format`) come from the model pages. Check the first funded render in `render_logs`.
+- Horde `image_is_control` with a Three.js map: untested.

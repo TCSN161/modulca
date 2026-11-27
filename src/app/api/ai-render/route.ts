@@ -26,11 +26,12 @@ import { devLog } from "@/shared/lib/devLog";
 // import { novitaEngine } from "./engines/novita";
 // import { wavespeedEngine } from "./engines/wavespeed";
 // import { runwayEngine } from "./engines/runway";
-import type { AiRenderEngine, AiRenderRequest, AiRenderResult, EngineInfo, PolicyFlags } from "./engines/types";
+import type { AiRenderRequest, AiRenderResult, PolicyFlags } from "./engines/types";
 import { canUseEngine, recordSuccess, recordFailure, type Tier } from "./engines/creditManager";
 import { logRender } from "./engines/renderLogger";
 import { makeCacheKey, getCachedRender, cacheResult } from "./engines/renderCache";
 import { getFallbackChain } from "./engines/chains";
+import { STRUCTURE_ENGINE_ENTRIES, type EngineEntry } from "./engines/structureRegistry";
 
 /**
  * Must be force-dynamic so Vercel runs this as a serverless function
@@ -56,7 +57,10 @@ export const dynamic = "force-dynamic";
 /*  Engine Registry                                                    */
 /* ------------------------------------------------------------------ */
 
-const ENGINES: Record<string, { fn: AiRenderEngine; info: EngineInfo; estimatedCostUsd: number }> = {
+const ENGINES: Record<string, EngineEntry> = {
+  /* ── Structure control (paid, OFF until funded — engines/structureFunding.ts) ── */
+  ...STRUCTURE_ENGINE_ENTRIES,
+
   /* ── Free engines (guest_free + free tier) ── */
   pollinations: {
     fn: pollinationsEngine,
@@ -235,8 +239,8 @@ async function tryEngines(
   }
 
   /** Helper: handle a successful engine result */
-  async function onSuccess(engineId: string, result: AiRenderResult) {
-    recordSuccess(engineId, result.costUsd ?? 0, result.latencyMs ?? 0, creditCtx);
+  async function onSuccess(engineId: string, result: AiRenderResult, creditId = engineId) {
+    recordSuccess(creditId, result.costUsd ?? 0, result.latencyMs ?? 0, creditCtx);
 
     // Cache the result (fire and forget, text2img only)
     if (!renderReq.baseImage) {
@@ -255,8 +259,8 @@ async function tryEngines(
   }
 
   /** Helper: handle a failed engine attempt */
-  function onFailure(engineId: string, error: string) {
-    recordFailure(engineId, error, creditCtx);
+  function onFailure(engineId: string, error: string, creditId = engineId) {
+    recordFailure(creditId, error, creditCtx);
     logRender({
       prompt: renderReq.prompt, width: renderReq.width, height: renderReq.height,
       seed: renderReq.seed, mode, tier, user_id: renderReq.userId, engine_id: engineId,
@@ -267,26 +271,29 @@ async function tryEngines(
   // If a specific engine is requested, try it first (if within budget), then fall back
   if (engineParam && ENGINES[engineParam]) {
     const eng = ENGINES[engineParam];
+    const cid = eng.creditId ?? engineParam;
     if (isEngineDisabled(engineParam)) {
       devLog(`[ai-render] Engine "${engineParam}" disabled by kill switch, skipping to fallback`);
     } else if (eng.estimatedCostUsd > maxCostUsd) {
       devLog(`[ai-render] Engine "${engineParam}" exceeds cost ceiling ($${eng.estimatedCostUsd} > $${maxCostUsd}), skipping to fallback`);
-    } else if (!canUseEngine(engineParam, creditCtx)) {
+    } else if (!canUseEngine(cid, creditCtx)) {
       devLog(`[ai-render] Engine "${engineParam}" blocked (tier/band/cap/credits), skipping to fallback`);
+    } else if (eng.available && !(await eng.available())) {
+      devLog(`[ai-render] Engine "${engineParam}" not funded, skipping to fallback`);
     } else {
       devLog(`[ai-render] Using engine: ${engineParam}`);
       const result = await eng.fn(renderReq);
       if (result) {
         if (isContentFilterImage(result)) {
           console.warn(`[ai-render] Engine "${engineParam}" returned content-filter image (${result.buffer.length} bytes), falling back...`);
-          onFailure(engineParam, "content-filter-image");
+          onFailure(engineParam, "content-filter-image", cid);
         } else {
-          devLog(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
-          await onSuccess(engineParam, result);
+          devLog(`[ai-render] ✓ ${result.engine} cost=${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
+          await onSuccess(engineParam, result, cid);
           return imageResponse(result);
         }
       } else {
-        onFailure(engineParam, "no-result");
+        onFailure(engineParam, "no-result", cid);
       }
       devLog(`[ai-render] Engine "${engineParam}" failed, falling back to others...`);
     }
@@ -305,8 +312,13 @@ async function tryEngines(
       devLog(`[ai-render] Skipping "${engineId}" — over cost ceiling ($${engine.estimatedCostUsd} > $${maxCostUsd})`);
       continue;
     }
-    if (!canUseEngine(engineId, creditCtx)) {
+    const cid = engine.creditId ?? engineId;
+    if (!canUseEngine(cid, creditCtx)) {
       devLog(`[ai-render] Skipping "${engineId}" — blocked by tier/band/cap/credits`);
+      continue;
+    }
+    if (engine.available && !(await engine.available())) {
+      devLog(`[ai-render] Skipping "${engineId}" — not funded (no key / no balance)`);
       continue;
     }
     devLog(`[ai-render] Trying engine: ${engineId}`);
@@ -314,14 +326,14 @@ async function tryEngines(
     if (result) {
       if (isContentFilterImage(result)) {
         console.warn(`[ai-render] Engine "${engineId}" returned content-filter image (${result.buffer.length} bytes), trying next...`);
-        onFailure(engineId, "content-filter-image");
+        onFailure(engineId, "content-filter-image", cid);
         continue;
       }
-      devLog(`[ai-render] ✓ ${result.engine} cost=$${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
-      await onSuccess(engineId, result);
+      devLog(`[ai-render] ✓ ${result.engine} cost=${result.costUsd ?? 0} latency=${result.latencyMs ?? 0}ms`);
+      await onSuccess(engineId, result, cid);
       return imageResponse(result);
     }
-    onFailure(engineId, "no-result");
+    onFailure(engineId, "no-result", cid);
     devLog(`[ai-render] Engine "${engineId}" failed, trying next...`);
   }
 
@@ -419,6 +431,8 @@ export async function POST(req: NextRequest) {
       seed = String(Date.now()),
       engine: engineParam = null,
       baseImage = null,
+      controlImage = null,
+      controlType = null,
       maxCostUsd = null,
       allowPaidText2img = false,
     } = body as Record<string, unknown> & {
@@ -428,6 +442,9 @@ export async function POST(req: NextRequest) {
       seed?: string | number;
       engine?: string | null;
       baseImage?: string | null;
+      /** 3.07: depth/canny map from the same camera (structure engines only). */
+      controlImage?: string | null;
+      controlType?: string | null;
       maxCostUsd?: number | null;
       /** BUG-ST34: img2img may fall to PAID text2img (ignores the 3D view) only on explicit opt-in. */
       allowPaidText2img?: boolean;
@@ -444,6 +461,11 @@ export async function POST(req: NextRequest) {
       height: Number(height),
       seed: String(seed),
       baseImage: baseImage ? String(baseImage) : undefined,
+      // A control map is only meaningful next to the RGB capture.
+      ...(baseImage && controlImage ? {
+        controlImage: String(controlImage),
+        controlType: controlType === "canny" ? "canny" as const : "depth" as const,
+      } : {}),
       tier,
       userId: st.ctx.userId ?? undefined,
       policyFlags: DEFAULT_POLICY,

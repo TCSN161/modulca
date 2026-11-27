@@ -69,9 +69,10 @@ export const FALLBACK_ORDER = [
 ] as const;
 
 /**
- * img2img (paid tiers) — BUG-ST34 (2026-11-26): order is
- *   1. structure-preserving engines (klein free; stability/fal/replicate/
- *      wavespeed only when funded — creditManager skips the unfunded ones),
+ * img2img (paid tiers) — BUG-ST34 (2026-11-26), 3.07 (2026-11-27): order is
+ *   1. structure-preserving engines: klein (free), then the structure-control
+ *      engines replicate-depth/-canny + stability-structure, then fal/wavespeed
+ *      — the paid ones only when funded (route + creditManager skip the rest),
  *   2. ai-horde img2img (free, keeps geometry),
  *   3. FREE text2img last resort (cloudflare, pollinations).
  * Paid text2img engines (leonardo, openai, …) ignore the 3D capture, so they
@@ -81,7 +82,12 @@ export const FALLBACK_ORDER = [
  */
 export const IMG2IMG_FALLBACK = [
   "cloudflare-klein", // free, structure-preserving, 4–7 s
-  "stability", "fal", "replicate", "wavespeed", // structure-preserving, paid (funded only)
+  // 3.07 structure control (paid, OFF until funded: route skips them silently
+  // while there is no key / no balance — engines/structureFunding.ts)
+  "replicate-depth",     // ≈$0.025, FLUX depth: exact camera + geometry
+  "replicate-canny",     // ≈$0.025, FLUX canny: outlines + openings
+  "stability-structure", // ≈$0.05, Control Structure (constructor band today)
+  "fal", "wavespeed",    // reference-image edit, paid (funded only)
   "ai-horde",         // free img2img (weak, but keeps geometry)
   "cloudflare",       // free text2img — loses the 3D view, last resort
   "pollinations",     // free text2img — loses the 3D view, last resort

@@ -1,10 +1,11 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
 import { devLog } from "@/shared/lib/devLog";
+import { replicateDepthEngine } from "./replicateStructure";
 /**
  * Replicate — Largest model ecosystem
  *
- * Pay-per-second GPU billing. ControlNet for img2img.
+ * Pay-per-second GPU billing. img2img → flux-depth-dev (replicateStructure.ts).
  * FLUX generations ~$0.003-$0.01/image.
  * Community models for architectural visualization.
  *
@@ -27,8 +28,11 @@ export const replicateEngine: AiRenderEngine = async (
 
   const startMs = Date.now();
   try {
+    // 3.07: img2img = FLUX depth (structure control). The old SD-1.5
+    // jagilley/controlnet-depth2img branch fell back to text2img on error,
+    // which dropped the 3D view (BUG-ST34 pattern). No text2img fallback now.
     if (req.baseImage) {
-      return await tryControlNet(req, startMs);
+      return await replicateDepthEngine(req);
     }
     return await tryFlux(req, startMs);
   } catch (err) {
@@ -70,43 +74,6 @@ async function tryFlux(
 
   const prediction = await response.json();
   return await pollAndDownload(prediction, startMs, "replicate-flux", 0.003);
-}
-
-async function tryControlNet(
-  req: AiRenderRequest,
-  startMs: number
-): Promise<AiRenderResult | null> {
-  devLog("[replicate] Using ControlNet (img2img with structure)");
-
-  const imageDataUri = `data:image/png;base64,${req.baseImage}`;
-
-  const response = await fetch(API_URL, {
-    method: "POST",
-    headers: {
-      Authorization: `Bearer ${API_TOKEN}`,
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({
-      version: "jagilley/controlnet-depth2img:922c7bb67b87ec32cbc2fd11b1d5f94f0ba4f5571c4571a60a5aece6f785d164",
-      input: {
-        prompt: req.prompt.slice(0, 1000),
-        image: imageDataUri,
-        num_outputs: 1,
-        structure_strength: 0.65,
-        output_format: "png",
-      },
-    }),
-  });
-
-  if (!response.ok) {
-    const errText = await response.text().catch(() => "");
-    console.error(`[replicate] ControlNet error: ${response.status}`, errText.slice(0, 200));
-    // Fall back to text-only
-    return tryFlux(req, startMs);
-  }
-
-  const prediction = await response.json();
-  return await pollAndDownload(prediction, startMs, "replicate-controlnet", 0.02);
 }
 
 async function pollAndDownload(

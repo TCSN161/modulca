@@ -1,6 +1,7 @@
 import type { AiRenderEngine, AiRenderResult, AiRenderRequest } from "./types";
 
 import { devLog } from "@/shared/lib/devLog";
+import { STRUCTURE_ENGINES, isUnfundedStatus, markUnfunded, pickControlInput } from "./structureFunding";
 /**
  * Stability AI — Control/Structure endpoint
  *
@@ -14,8 +15,10 @@ import { devLog } from "@/shared/lib/devLog";
  */
 
 const API_KEY = process.env.STABILITY_API_KEY || "";
-const STRUCTURE_URL =
-  "https://api.stability.ai/v2beta/stable-image/control/structure";
+/** Endpoint id lives in STRUCTURE_ENGINES (one place). */
+const STRUCTURE_URL = STRUCTURE_ENGINES["stability-structure"].model;
+/** 0 = loose, 1 = rigid. Stability default 0.7; 0.65 keeps walls and openings. */
+export const STABILITY_CONTROL_STRENGTH = "0.65";
 const TEXT2IMG_URL =
   "https://api.stability.ai/v2beta/stable-image/generate/sd3";
 
@@ -47,18 +50,19 @@ export const stabilityEngine: AiRenderEngine = async (
 };
 
 async function tryStructure(
-  req: AiRenderRequest
+  req: AiRenderRequest,
+  key: string = API_KEY,
 ): Promise<AiRenderResult | null> {
   devLog("[stability] Using Control/Structure (img2img) mode");
 
   // Convert base64 to a Blob for multipart upload
-  const imageBuffer = Buffer.from(req.baseImage!, "base64");
+  const imageBuffer = Buffer.from(pickControlInput(undefined, req)!, "base64");
   const blob = new Blob([imageBuffer], { type: "image/png" });
 
   const formData = new FormData();
   formData.append("image", blob, "scene.png");
   formData.append("prompt", req.prompt.slice(0, 500));
-  formData.append("control_strength", "0.65"); // Balance between structure and creativity
+  formData.append("control_strength", STABILITY_CONTROL_STRENGTH);
   formData.append("output_format", "png");
   if (req.seed && req.seed !== "0") {
     formData.append("seed", String(Number(req.seed) % 4294967295));
@@ -67,13 +71,14 @@ async function tryStructure(
   const response = await fetch(STRUCTURE_URL, {
     method: "POST",
     headers: {
-      Authorization: `Bearer ${API_KEY}`,
+      Authorization: `Bearer ${key}`,
       Accept: "image/*",
     },
     body: formData,
   });
 
   if (!response.ok) {
+    if (isUnfundedStatus(response.status)) markUnfunded("stability");
     const errText = await response.text().catch(() => "");
     console.error(
       `[stability] Structure API error: ${response.status}`,
@@ -139,3 +144,27 @@ async function tryText2Img(
     engine: "stability-sd3",
   };
 }
+
+/**
+ * "stability-structure" (3.07): Control Structure as its own engine id, so the
+ * img2img chain can place it with the other structure-control engines and the
+ * route can skip it while unfunded (balance check in structureFunding.ts).
+ * Uses the RGB 3D capture: Structure extracts its own edges/depth from it.
+ */
+export const stabilityStructureEngine: AiRenderEngine = async (req) => {
+  const key = (process.env.STABILITY_API_KEY || "").trim();
+  if (!key || !req.baseImage) return null;
+  const startMs = Date.now();
+  try {
+    const result = await tryStructure(req, key);
+    if (result) {
+      result.engine = "stability-structure";
+      result.costUsd = STRUCTURE_ENGINES["stability-structure"].costUsd;
+      result.latencyMs = Date.now() - startMs;
+    }
+    return result;
+  } catch (err) {
+    console.error("[stability-structure] Error:", err);
+    return null;
+  }
+};

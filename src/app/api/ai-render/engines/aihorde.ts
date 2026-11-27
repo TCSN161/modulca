@@ -49,14 +49,34 @@ export function hordeControlType(env: Record<string, string | undefined> = proce
 }
 
 /** img2img params: ControlNet (full denoise, 15 steps) or plain img2img. */
-export function hordeImg2imgParams(control: string | null): Record<string, unknown> {
+export function hordeImg2imgParams(control: string | null, imageIsControl = false): Record<string, unknown> {
   return control
-    ? { control_type: control, denoising_strength: 1.0, steps: 15 }
+    ? { control_type: control, denoising_strength: 1.0, steps: 15, ...(imageIsControl ? { image_is_control: true } : {}) }
     : { denoising_strength: IMG2IMG_DENOISE };
 }
 
-function hordeSourceImage(b64?: string): string | undefined {
-  if (!b64 || /^(1|true|yes|on)$/i.test(process.env.AIHORDE_IMG2IMG_DISABLED || "")) return undefined;
+/**
+ * 3.07: when the client sends a ready-made control map (req.controlImage, e.g.
+ * the Three.js depth pass), Horde gets THAT as source_image with
+ * image_is_control=true, so it skips its own (weaker) estimator. The map type
+ * decides control_type. ControlNet off (AIHORDE_CONTROL_TYPE=none) → RGB capture.
+ */
+export function hordeImg2imgInput(
+  req: { baseImage?: string; controlImage?: string; controlType?: string },
+  env: Record<string, string | undefined> = process.env,
+): { source: string; control: string | null; imageIsControl: boolean } | null {
+  const base = hordeSourceImage(req.baseImage, env);
+  if (!base) return null;
+  const control = hordeControlType(env);
+  const mapType = (req.controlType || "depth").toLowerCase();
+  if (control && req.controlImage && HORDE_CONTROL_TYPES.has(mapType)) {
+    return { source: req.controlImage.replace(/^data:[^;]+;base64,/, ""), control: mapType, imageIsControl: true };
+  }
+  return { source: base, control, imageIsControl: false };
+}
+
+function hordeSourceImage(b64?: string, env: Record<string, string | undefined> = process.env): string | undefined {
+  if (!b64 || /^(1|true|yes|on)$/i.test(env.AIHORDE_IMG2IMG_DISABLED || "")) return undefined;
   return b64.replace(/^data:[^;]+;base64,/, "");
 }
 
@@ -87,9 +107,10 @@ export const aiHordeEngine: AiRenderEngine = async (
   const startMs = Date.now();
   try {
     // 1. Submit async generation job
-    const sourceImage = hordeSourceImage(req.baseImage);
-    const control = sourceImage ? hordeControlType() : null;
-    devLog(`[ai-horde] Submitting ${sourceImage ? `img2img${control ? "+" + control : ""}` : "text2img"} job...`);
+    const input = hordeImg2imgInput(req);
+    const sourceImage = input?.source;
+    const control = input?.control ?? null;
+    devLog(`[ai-horde] Submitting ${sourceImage ? `img2img${control ? "+" + control : ""}${input?.imageIsControl ? " (client map)" : ""}` : "text2img"} job...`);
     const submitRes = await fetch(`${HORDE_API}/generate/async`, {
       method: "POST",
       headers: {
@@ -105,7 +126,7 @@ export const aiHordeEngine: AiRenderEngine = async (
           steps: 25,
           cfg_scale: 7,
           sampler_name: "k_euler_a",
-          ...(sourceImage ? hordeImg2imgParams(control) : {}),
+          ...(sourceImage ? hordeImg2imgParams(control, input?.imageIsControl) : {}),
         },
         ...(sourceImage ? { source_image: sourceImage, source_processing: "img2img" } : {}),
         nsfw: false,

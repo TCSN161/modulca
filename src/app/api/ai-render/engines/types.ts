@@ -24,6 +24,15 @@ export interface AiRenderRequest {
   seed: string;
   /** Optional base64-encoded PNG from 3D scene capture (for img2img engines) */
   baseImage?: string;
+  /**
+   * Optional control map (3.07) rendered by the client from the same camera as
+   * baseImage: a depth pass (white = near) or a canny/edge image. Base64 PNG,
+   * data-URI prefix allowed. Used only by structure-control engines
+   * (replicate-depth/-canny, ai-horde ControlNet); ignored without baseImage.
+   */
+  controlImage?: string;
+  /** What controlImage is. Defaults to "depth" when controlImage is set. */
+  controlType?: "depth" | "canny";
   /** User tier — used for cost ceiling enforcement (server-resolved, never client) */
   tier?: string;
   /** Verified Supabase user id (null/undefined for guests) — for render_logs */

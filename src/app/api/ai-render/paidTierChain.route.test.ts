@@ -29,7 +29,7 @@ function fake(id: string) {
 }
 vi.mock("./engines/pollinations", () => ({ pollinationsEngine: fake("pollinations") }));
 vi.mock("./engines/aihorde", () => ({ aiHordeEngine: fake("ai-horde") }));
-vi.mock("./engines/stability", () => ({ stabilityEngine: fake("stability") }));
+vi.mock("./engines/stability", () => ({ stabilityEngine: fake("stability"), stabilityStructureEngine: fake("stability-structure") }));
 vi.mock("./engines/together", () => ({ togetherEngine: fake("together") }));
 vi.mock("./engines/leonardo", () => ({ leonardoEngine: fake("leonardo") }));
 vi.mock("./engines/fal", () => ({ falEngine: fake("fal") }));
