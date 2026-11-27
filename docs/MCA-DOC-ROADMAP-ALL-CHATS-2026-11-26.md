@@ -120,5 +120,5 @@ Pauză de sărbători: 23 dec – 5 ian, doar reparații urgente.
 5. **Model potrivit pe sarcină**: Opus pentru juridic, arhitectură și cod complex; Sonnet pentru Radar, documente și sarcini mecanice; economisește limita de utilizare.
 6. **Verificare TypeScript înainte de push** (instalată) + CI pe GitHub: un commit stricat nu mai blochează site-ul ore întregi.
 7. **Vinerea**: închidere în 3 părți (ce s-a făcut / ce a alunecat / ce urmează), sesiunile terminate mutate în grupuri, harta și planul actualizate.
-8. **Bugetul**: [[MCA-DOC-BUDGET-2026]] se actualizează la fiecare sfârșit de lună; costurile fixe cunoscute (€61) sunt deja peste plafonul de €50 → decizie Costin în W49.
+8. **Bugetul**: [[MCA-DOC-BUDGET-2026]] se actualizează la fiecare sfârșit de lună; costurile fixe cunoscute sunt €38 (Supabase e pe Free, confirmat de Costin 27 nov); Vercel Pro din ianuarie le duce peste €50 → decizie Costin până la lansare.
 9. **Riscuri urmărite** (top 5): arhitectul partener nu răspunde la timp (planul B: alt arhitect din rețeaua OAR) · limita de utilizare (max 2 sesiuni) · un singur motor gratuit stabil (avem acum 3) · conținut juridic greșit (poarta Vlad + citări) · PC-ul rămâne fără memorie (Nahimic).

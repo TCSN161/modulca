@@ -12,7 +12,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 
 | Serviciu | Plan | Cost/lună | Sigur? | Notă |
 |---|---|---|---|---|
-| Supabase | Pro | ≈ €23 ($25) | ✅ plan (ghid ST18: „planul Pro, pe care îl ai”) | `COMPANY_INFO.md` încă scrie „Free” → de actualizat |
+| Supabase | **Free** | €0 | ✅ Costin (27 nov) + `MCA-DOC-BLOCKERS-2026-11-19.md` B1 („Keep Supabase Free”) | Limite Free: 500 MB DB, 1 GB stocare, 50k utilizatori activi/lună, **pauză automată după 7 zile fără activitate** (s-a întâmplat în nov), **fără backup zilnic**. Pro ($25 ≈ €23) doar peste ~400 utilizatori sau dacă vrem backup înainte de beta |
 | Vercel | Hobby | €0 | ❓ | ⚠️ Hobby nu permite uz comercial → **Pro ($20 ≈ €18,5) cel târziu la lansare (1 feb)** sau la primul plătitor |
 | Claude (Claude Code, abonament) | Pro €18 (19 nov) | €18 | ❓ | În W48 am rulat 3–4 sesiuni Opus deodată și am atins limita; dacă planul s-a schimbat (Max), totalul crește mult |
 | ChatGPT Plus | Plus | €20 | ❓ (încă activ?) | Rol: „a doua opinie”. În W48 n-a fost folosit în niciun flux |
@@ -22,7 +22,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 | GitHub, Mapbox, Search Console, NotebookLM | free | €0 | 🟡 | Mapbox: free până la 50k încărcări de hartă/lună |
 | Perplexity Pro | condiționat | €0 (neactivat) | 🟡 | |
 
-**Total fix cunoscut**: Supabase €23 + Claude €18 + ChatGPT €20 = **€61 → peste plafon cu €11**, fără Sentry și fără Vercel Pro.
+**Total fix cunoscut**: Claude €18 + ChatGPT €20 = **€38 → sub plafon (rămân €12)**, fără Sentry și fără Vercel Pro.
 
 ## 2. Costuri variabile (AI pe API, randări)
 
@@ -42,13 +42,14 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 
 | Lună | Fix | Variabil | Total | Față de €50 |
 |---|---|---|---|---|
-| **Nov 2026** (real, parțial) | €61 cunoscut + Sentry ❓ | < €1 + ❓ | **≈ €62 + ❓** | 🔴 peste (+€12) |
-| **Dec 2026** (prognoză, beta 15 dec) | €61 | €1–5 consultant + **€0–10 decizia motoare** | €62–76 | 🔴 peste, dacă nu se taie ceva |
-| **Ian 2027** (prognoză, pre-lansare) | €61 + Vercel Pro €18,5 = €79,5 | €5–15 | €85–95 | 🔴 — trebuie venit sau decizie nouă de plafon |
+| **Nov 2026** (real, parțial) | €38 cunoscut + Sentry ❓ | < €1 + ❓ | **≈ €39 + ❓** | 🟢 sub (dacă Sentry e free) |
+| **Dec 2026** (prognoză, beta 15 dec) | €38 | €1–5 consultant + **€0–10 decizia motoare** | €39–53 | 🟡 la limită dacă luăm €10 pe motoare |
+| **Ian 2027** (prognoză, pre-lansare) | €38 + Vercel Pro €18,5 = €56,5 | €5–15 | €62–72 | 🔴 peste — Vercel Pro din primele abonamente, sau renunțăm la ChatGPT Plus |
 
 ## 4. Ce propune MAIN (decide Costin)
 
-1. **Renunți la ChatGPT Plus** (€20) → fix €41, sub plafon. Claude face tot ce făcea „a doua opinie”.
+1. **Renunți la ChatGPT Plus** (€20) → fix €18, loc în plafon pentru motoare și Vercel Pro. Claude face tot ce făcea „a doua opinie”.
+1b. **Supabase rămâne Free** până la ~400 utilizatori. Riscuri de urmărit: pauza după 7 zile fără trafic (în beta nu ar trebui să apară) și lipsa backup-ului zilnic → MAIN face un export manual al bazei înainte de 15 dec (pre-flight).
 2. **Verifici Sentry**: dacă e „Team” plătit, treci pe Developer (free) până la lansare.
 3. **Decizia €10 pe motoare** (termen 10 dec): întâi Leonardo Depth din creditul deja plătit (€0 nou), apoi Replicate doar dacă testul 2 arată randări nefidele. Cu (1) făcut, €10 încap în plafon.
 4. **Vercel Pro** intră în bugetul din ianuarie, plătit din primele abonamente (plan de afaceri v0: plafonul rămâne €50 în dec–ian).

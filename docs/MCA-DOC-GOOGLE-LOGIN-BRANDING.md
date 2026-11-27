@@ -12,7 +12,7 @@ Sunt două căi de rezolvare:
 | | A. Brand verificat în Google (gratuit) | B. Domeniu propriu pentru auth în Supabase (plătit) |
 |---|---|---|
 | Ce vede utilizatorul | „to continue to **ModulCA**” + logo | „to continue to **auth.modulca.eu**” (și, cu A, numele ModulCA) |
-| Cost | 0 € | Add-on Custom Domain: **~10 USD/lună** pe proiect (necesită planul Pro, pe care îl ai) |
+| Cost | 0 € | Add-on Custom Domain: **~10 USD/lună** pe proiect **+ planul Pro (~25 USD/lună)**, pentru că acum suntem pe Free (corectat 27 nov) |
 | Durată | 15 min de completat + **2–3 zile lucrătoare** verificarea Google | ~30 min + propagarea DNS (minute–ore) |
 | Risc | Niciunul pentru utilizatorii actuali | Trebuie adăugat noul callback în Google înainte de activare, altfel loginul Google cade |
 
