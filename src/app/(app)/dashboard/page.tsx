@@ -8,7 +8,7 @@ import { listProjectsSettled, deleteProject, type ProjectRecord } from "@/featur
 import { useAuthReady } from "@/features/design/hooks/useAuthReady";
 import { computeProjectCostFromData } from "@/features/design/projectCost";
 import { getTierConfig } from "@/features/auth/types";
-import { openCustomerPortal } from "@/shared/lib/stripe";
+import { openCustomerPortal, portalFallbackMessage } from "@/shared/lib/stripe";
 import { BUILDING_PRESETS } from "@/shared/types";
 
 /**
@@ -38,6 +38,8 @@ export default function DashboardPage() {
   const loadSeqRef = useRef(0);
   const [upgradeMsg, setUpgradeMsg] = useState<string | null>(null);
   const [portalLoading, setPortalLoading] = useState(false);
+  // 4.05 item 3: portal result shown inline (was an alert).
+  const [portalMsg, setPortalMsg] = useState<string | null>(null);
 
   const tierConfig = getTierConfig(userTier);
   const maxProjects = tierConfig.features.maxProjects;
@@ -424,7 +426,9 @@ export default function DashboardPage() {
                     <button
                       onClick={async () => {
                         setPortalLoading(true);
-                        await openCustomerPortal(stripeCustomerId);
+                        setPortalMsg(null);
+                        const r = await openCustomerPortal(stripeCustomerId, { notify: false });
+                        if (r !== "redirected") setPortalMsg(portalFallbackMessage(r));
                         setPortalLoading(false);
                       }}
                       disabled={portalLoading}
@@ -433,7 +437,7 @@ export default function DashboardPage() {
                       {portalLoading ? "Loading..." : "Manage"}
                     </button>
                   ) : null}
-                  {userTier !== "architect" && (
+                  {userTier !== "architect" && userTier !== "constructor" && (
                     <Link
                       href="/pricing"
                       className="text-xs font-bold text-white bg-brand-olive-700 hover:bg-brand-olive-800 rounded-lg px-3 py-1.5 transition-colors"
@@ -443,6 +447,11 @@ export default function DashboardPage() {
                   )}
                 </div>
               </div>
+              {portalMsg && (
+                <p role="status" className="mt-3 text-xs text-brand-gray">
+                  {portalMsg}
+                </p>
+              )}
             </div>
           )}
         </div>
