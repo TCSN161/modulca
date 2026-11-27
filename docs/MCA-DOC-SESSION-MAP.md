@@ -24,7 +24,7 @@ Legendă: 🟢 lucrează acum · 🟡 așteaptă (pe cine scrie) · ✅ terminat
 | 9 Radar | 9.01 | ✅ | 9.02 raportul de vineri | Vin 4 |
 | 10 Business | 10.01 | ✅ plan de afaceri v0 | 10.02 benchmark-uri + prețuri | Sâm 5 |
 
-**Bug-uri din testul complet** (detaliu: `MCA-DOC-BETA-SMOKE-TEST.md` §5): 27 ✅ reparate (ST18 + ST21 verificate pe prod) · 5 🟡 parțial (ST04 MAIN, ST20 Chat 5, ST22 Chat 2, ST29 + ST31 Chat 3) · 3 ❌ deschise (ST28 Chat 2, ST30 + ST32 Chat 3). Run 2 parțial pe prod (27 nov seara, logat): reparațiile țin, ST36 (randarea nu rămânea salvată) + ST37 găsite și **reparate de 5.04 în aceeași seară (e8f7dd0), verificate pe prod**; ST38–ST39 (low) rămân pentru 5.05. Testul complet 2 rămâne Vin 4.
+**Bug-uri din testul complet** (detaliu: `MCA-DOC-BETA-SMOKE-TEST.md` §5–§6): **34 ✅ reparate din 39** · 3 🟡 parțial (ST04 MAIN, ST20 Chat 5, ST22 Chat 2) · 2 ❌ low (ST38, ST39 Chat 5). Seara de 27 nov, la cererea lui Costin, au rulat înainte de W49: **2.05** F4+F6 (d7f489f) · **2.09** ST28 (466b1a1) · **3.08** ST29–ST32 PDF în RO (7d2ac43, d27fac2) · **9.02** Radar + Blender (1783873). Testul complet 2 rămâne Vin 4.
 
 ---
 

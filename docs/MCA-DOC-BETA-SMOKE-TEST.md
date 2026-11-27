@@ -149,7 +149,7 @@ Run 1 test project: `Smoke Test 1.03` (id `5895a485-…`, Compact House → Smal
 
 Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu e încă reverificat pe prod cu contul logat** → testul 2 (W49) confirmă. ST33–ST35 au apărut după run 1 (pagina de randare, bake-off).
 
-**Bilanț: 27 ✅ reparate · 5 🟡 parțial · 3 ❌ deschise** (ST18 închis pe 27 nov seara). Run 2 a adăugat ST36–ST39 (§6): ST36 + ST37 ✅ reparate și verificate pe prod (e8f7dd0), ST38 + ST39 deschise (low, Chat 5).
+**Bilanț (27 nov noaptea): 34 ✅ reparate · 3 🟡 parțial (ST04 MAIN, ST20 Chat 5, ST22 Chat 2) · 2 ❌ deschise (ST38, ST39 low, Chat 5)** — din 39. ST28–ST32 reparate de 2.09 și 3.08 în seara de 27 nov (neverificate pe prod).
 
 | BUG | Stare | Commit | Ce mai rămâne · cine |
 |---|---|---|---|
@@ -180,11 +180,11 @@ Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu
 | ST25 | ✅ | 7d785df | — |
 | ST26 | ✅ | 7d785df | — |
 | ST27 | ✅ | 6d36b94 | Mutare din data URI în Storage (migrație + RLS) **în W50, înainte de beta** (Supabase Free, 500 MB) · Chat 5 + 3 + MAIN |
-| ST28 | ❌ | — | Link-uri moarte în Books · **Chat 2** (2.09, W49) |
-| ST29 | 🟡 | 9db1afd (UI) | Header `X-AI-Fallback-From` pe server + afișare în PDF · **Chat 3** (3.08) |
-| ST30 | ❌ | — | Legende tăiate, colaj Horde în PDF · **Chat 3** (3.08) |
-| ST31 | 🟡 | e0abd95 (calcul) | PDF-ul să folosească `computeProjectCost` (m², total cu produse) · **Chat 3** (3.08) |
-| ST32 | ❌ | — | PDF doar în engleză → RO+EN · **Chat 3** (3.08) |
+| ST28 | ✅ | 466b1a1 (2.09) | 11 linkuri înlocuite (Internet Archive / surse oficiale), „Read Free” scos la 2 cărți; neverificate: 16 butoane Open Library + paginile Amazon, fără test în browser |
+| ST29 | ✅ | 9db1afd (UI) + 7d2ac43 (header) + d27fac2 (PDF) | Neverificat pe prod |
+| ST30 | ✅ | d27fac2 (3.08) | Legende tăiate la cuvânt; filtrul de colaje nu e făcut |
+| ST31 | ✅ | e0abd95 + d27fac2 (PDF cu `computeProjectCost`) | Neverificat pe prod |
+| ST32 | ✅ | d27fac2 (3.08) | PDF + slide-uri RO/EN/NL, verificat offline (456/456 teste); neverificat cu cont logat pe prod → testul 2 |
 | ST33 | ✅ | b757f22 | img2img trimite motorul ales |
 | ST34 | ✅ | 63b44d9 | img2img nu mai cade pe text2img plătit |
 | ST35 | ✅ | 1e8b4af | — |
