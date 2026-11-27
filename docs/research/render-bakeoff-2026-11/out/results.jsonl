@@ -48,3 +48,4 @@
 {"engine":"cf-klein-4b-ref512","room":"bedroom","at":"2026-11-27T12:23:09.153Z","ok":true,"file":"cf-klein-4b-ref512-bedroom.jpg","ms":3420,"bytes":483514,"note":"1024x896"}
 {"engine":"cf-klein-4b-ref512","room":"house","at":"2026-11-27T12:23:12.573Z","ok":true,"file":"cf-klein-4b-ref512-house.jpg","ms":4526,"bytes":440784,"note":"1024x576"}
 {"engine":"cf-klein-4b-ref512","room":"house-clientprompt","at":"2026-11-27T12:23:17.100Z","ok":true,"file":"cf-klein-4b-ref512-house-clientprompt.jpg","ms":5683,"bytes":333993,"note":"1024x576"}
+{"engine":"horde-depth","room":"house","at":"2026-11-27T12:23:47.985Z","ok":false,"ms":383094,"error":"censored placeholder (Horde filter false positive) worker=t63c_5080"}
