@@ -5,7 +5,8 @@ import { useAuthStore } from "@/features/auth/store";
 import { getTierConfig } from "@/features/auth/types";
 import { authHeaders } from "@/shared/lib/authHeaders";
 import { engineMetaFromHeaders, type EngineMeta } from "./engineMeta";
-import { toJpegDataUrl, BASE_IMAGE_QUALITY, STORED_RENDER_MAX_SIDE } from "./renderImage";
+import { toJpegDataUrl, toPngDataUrl, BASE_IMAGE_QUALITY, STORED_RENDER_MAX_SIDE } from "./renderImage";
+import { buildImg2ImgBody, sanitizePrompt } from "./renderRequest";
 
 interface UseRenderEngineParams {
   aiEngine: AiEngine;
@@ -13,6 +14,8 @@ interface UseRenderEngineParams {
   /** text = GET text2img; scene / upload = POST img2img with a base image (BUG-ST03) */
   inputMode: RenderInputMode;
   captureRef: React.MutableRefObject<(() => string | null) | null>;
+  /** Depth map of the same camera (5.03-A), sent as the control image */
+  depthCaptureRef?: React.MutableRefObject<(() => string | null) | null>;
   /** Data URI of the uploaded image (inputMode "upload") */
   uploadImage?: string | null;
 }
@@ -61,22 +64,12 @@ export async function readApiError(response: Response): Promise<{ message: strin
   return { message, code, retryAfterSec: Number.isFinite(ra) && ra > 0 ? ra : undefined };
 }
 
-/** Build sanitized prompt with architectural context to avoid API false-positive content filters */
-function sanitizePrompt(prompt: string): string {
-  const cleaned = prompt
-    .trim()
-    .replace(/[^\w\s,.\-!?']/g, " ")
-    .replace(/\s+/g, " ")
-    .slice(0, 300);
-  // Prefix with explicit architectural context to reduce content-filter false positives
-  return `architectural interior design visualization, empty furnished room, ${cleaned}`;
-}
-
 export function useRenderEngine({
   aiEngine,
   renderResolution,
   inputMode,
   captureRef,
+  depthCaptureRef,
   uploadImage = null,
 }: UseRenderEngineParams): UseRenderEngineReturn {
   const [aiImageUrl, setAiImageUrl] = useState<string | null>(null);
@@ -99,7 +92,7 @@ export function useRenderEngine({
   const handleGenerateAiRender = useCallback(async (prompt: string) => {
     if (!prompt.trim()) return false;
 
-    const sanitized = sanitizePrompt(prompt);
+    const sanitized = sanitizePrompt(prompt, inputMode !== "text");
     const res = RENDER_RESOLUTIONS[renderResolution];
     const seed = String(Date.now());
     const tier = useAuthStore.getState().userTier;
@@ -108,17 +101,21 @@ export function useRenderEngine({
     // img2img base (BUG-ST03): the 3D canvas or the uploaded image, sent as a
     // JPEG data URI ≤1024 px (contract: MCA-DOC-AI-ENGINES-CLIENT-CONTRACT §2)
     let baseImage: string | null = null;
+    let controlImage: string | null = null;
     if (inputMode !== "text") {
       const raw = inputMode === "scene" ? captureRef.current?.() ?? null : uploadImage;
       if (!raw) {
         setAiError(
           inputMode === "scene"
-            ? "The 3D view is not available. Switch to Single Module and wait for the scene to load."
+            ? "The 3D view is not available yet. Wait for the scene to load. / Vizualizarea 3D nu este gata."
             : "Choose an image first.",
         );
         return false;
       }
+      // 5.03-A: depth of exactly the same frame, right after the RGB capture
+      const rawDepth = inputMode === "scene" ? depthCaptureRef?.current?.() ?? null : null;
       baseImage = await toJpegDataUrl(raw, STORED_RENDER_MAX_SIDE, BASE_IMAGE_QUALITY);
+      if (rawDepth) controlImage = await toPngDataUrl(rawDepth, STORED_RENDER_MAX_SIDE);
       isDev && console.log("[AI Render] img2img base:", inputMode, "length:", baseImage.length);
     }
 
@@ -151,16 +148,16 @@ export function useRenderEngine({
           method: "POST",
           // Bearer token: the server resolves the tier itself (SEC-02); the session lives in localStorage
           headers: { "Content-Type": "application/json", ...(await authHeaders()) },
-          body: JSON.stringify({
+          body: JSON.stringify(buildImg2ImgBody({
             prompt: sanitized,
             width: res.width,
             height: res.height,
             seed,
-            // BUG-ST33: honour the chosen engine; "auto" → null (the img2img chain starts with cloudflare-klein)
-            engine: aiEngine !== "auto" ? aiEngine : null,
+            engine: aiEngine,
             baseImage,
+            controlImage,
             maxCostUsd,
-          }),
+          })),
           signal: controller.signal,
         });
       } else {
@@ -225,7 +222,7 @@ export function useRenderEngine({
     } finally {
       clearTimeout(timeoutId);
     }
-  }, [renderResolution, aiEngine, inputMode, captureRef, uploadImage]);
+  }, [renderResolution, aiEngine, inputMode, captureRef, depthCaptureRef, uploadImage]);
 
   return {
     aiImageUrl,

@@ -18,12 +18,12 @@ describe("RenderEngineBadge (BUG-ST29)", () => {
     renderIn("ro", <RenderEngineBadge engine="ai-horde" fallbackFrom={["cloudflare-klein"]} />);
     const text = screen.getByTestId("render-engine-badge").textContent;
     expect(text).toContain("Randat cu AI Horde");
-    expect(text).toContain("(alternativă: cloudflare-klein indisponibil)");
+    expect(text).toContain("(alternativă: FLUX.2 klein (Cloudflare) indisponibil)");
   });
 
   it("EN: engine only, no fallback text", () => {
     renderIn("en", <RenderEngineBadge engine="cloudflare-klein" />);
     const text = screen.getByTestId("render-engine-badge").textContent;
-    expect(text).toBe("Rendered with cloudflare-klein");
+    expect(text).toBe("Rendered with FLUX.2 klein (Cloudflare)");
   });
 });

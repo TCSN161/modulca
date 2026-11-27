@@ -1,5 +1,5 @@
 import { useState } from "react";
-import type { CameraAngle, StylePin } from "./renderConstants";
+import type { StylePin } from "./renderConstants";
 import { pinImage } from "./inspirationImages";
 
 /** BUG-ST35: product photo when we have one, else a labelled placeholder (never a bare colour block). */
@@ -46,8 +46,6 @@ interface RenderGalleryProps {
   moduleType: string;
   savedPins: Set<string>;
   onTogglePin: (label: string) => void;
-  camera: CameraAngle;
-  onCameraChange: (angle: CameraAngle) => void;
 }
 
 export default function RenderGallery({
@@ -56,21 +54,9 @@ export default function RenderGallery({
   moduleType,
   savedPins,
   onTogglePin,
-  camera,
-  onCameraChange,
 }: RenderGalleryProps) {
   return (
     <>
-      {/* Camera angle thumbnails */}
-      <div className="mx-auto flex gap-3" style={{ maxWidth: 800, width: "100%" }}>
-        {(["interior", "corner", "detail"] as CameraAngle[]).map((angle) => (
-          <button key={angle} onClick={() => onCameraChange(angle)}
-            className={`flex-1 rounded-lg border-2 px-4 py-3 text-center text-xs font-medium capitalize transition-all ${camera === angle ? "border-brand-amber-500 bg-brand-amber-50 text-brand-teal-800" : "border-gray-200 text-gray-500 hover:border-gray-300"}`}>
-            {angle} View
-          </button>
-        ))}
-      </div>
-
       {/* Pinterest-style Design Inspiration Board */}
       <div className="mt-2">
         <h3 className="mb-1 text-sm font-bold text-brand-teal-800">

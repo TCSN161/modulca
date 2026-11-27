@@ -37,8 +37,6 @@ describe("Design Inspiration images (BUG-ST35)", () => {
         moduleType="living"
         savedPins={new Set()}
         onTogglePin={() => {}}
-        camera="interior"
-        onCameraChange={() => {}}
       />,
     );
     expect(screen.getByAltText("Engineered Oak Flooring")).toBeTruthy();

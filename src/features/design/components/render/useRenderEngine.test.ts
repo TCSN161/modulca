@@ -9,6 +9,7 @@ vi.mock("./renderImage", async (orig) => ({
   ...(await orig<typeof import("./renderImage")>()),
   // jsdom has no canvas: pass through, tag so tests can see it was re-encoded
   toJpegDataUrl: vi.fn(async (s: string) => s.replace(/^data:image\/\w+/, "data:image/jpeg")),
+  toPngDataUrl: vi.fn(async (s: string) => s),
 }));
 
 import { useRenderEngine } from "./useRenderEngine";
@@ -161,5 +162,50 @@ describe("useRenderEngine — BUG-ST02 server errors, no client fallback", () =>
     await act(async () => { ok = await result.current.handleGenerateAiRender("kitchen"); });
     expect(ok).toBe(true);
     expect(result.current.aiEngineMeta).toMatchObject({ engine: "cloudflare-klein", fallbackFrom: [], inputMode: "scene" });
+  });
+});
+
+describe("useRenderEngine — 5.03-A depth control image + view prompt", () => {
+  beforeEach(() => {
+    fetchMock.mockReset();
+    vi.stubGlobal("fetch", fetchMock);
+  });
+  afterEach(() => vi.unstubAllGlobals());
+
+  function setupDepth(mode: RenderInputMode, depth: string | null) {
+    const captureRef = { current: () => "data:image/png;base64,RGB" };
+    const depthCaptureRef = { current: depth ? () => depth : null };
+    return renderHook(() =>
+      useRenderEngine({ aiEngine: "auto", renderResolution: "standard", inputMode: mode, captureRef, depthCaptureRef, uploadImage: "data:image/png;base64,UPLD" }),
+    );
+  }
+
+  it("Randează ce vezi: sends the depth map as controlImage (PNG, depth) next to the RGB base", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
+    const { result } = setupDepth("scene", "data:image/png;base64,DEPTH");
+    await act(() => result.current.handleGenerateAiRender("Turn this 3D view of a kitchen into a photoreal interior render"));
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.baseImage).toBe("data:image/jpeg;base64,RGB");
+    expect(body.controlImage).toBe("data:image/png;base64,DEPTH");
+    expect(body.controlType).toBe("depth");
+    expect(body.engine).toBeNull();
+    // the view sentence stays first: no text2img prefix in front of it
+    expect(body.prompt.startsWith("Turn this 3D view")).toBe(true);
+  });
+
+  it("upload: no control image (no 3D camera)", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
+    const { result } = setupDepth("upload", "data:image/png;base64,DEPTH");
+    await act(() => result.current.handleGenerateAiRender("Turn this image into a render"));
+    const body = JSON.parse(fetchMock.mock.calls[0][1].body);
+    expect(body.baseImage).toBe("data:image/jpeg;base64,UPLD");
+    expect(body).not.toHaveProperty("controlImage");
+  });
+
+  it("scene without a depth capture still renders (klein needs only the RGB)", async () => {
+    fetchMock.mockResolvedValue(new Response(null, { status: 500 }));
+    const { result } = setupDepth("scene", null);
+    await act(() => result.current.handleGenerateAiRender("x"));
+    expect(JSON.parse(fetchMock.mock.calls[0][1].body)).not.toHaveProperty("controlType");
   });
 });

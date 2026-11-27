@@ -1,7 +1,7 @@
 "use client";
 
-import { memo, useEffect, useMemo } from "react";
-import { Canvas, useThree } from "@react-three/fiber";
+import { memo, useMemo, useRef } from "react";
+import { Canvas } from "@react-three/fiber";
 import { OrbitControls, ContactShadows } from "@react-three/drei";
 import type { ModuleConfig } from "../../store";
 import { getEffectiveThickness } from "../../store";
@@ -11,15 +11,18 @@ import {
   ModuleWalls, ModuleFloor, ModuleCeiling,
   StaticFurniturePiece,
 } from "../shared/module3d";
+import { useWASD } from "../visualize/scene/useWASD";
+import { computeCameraPose, focalToVerticalFov, type CameraPreset, type FootprintBounds } from "./cameraPresets";
+import { ViewportRig, orbitPropsFor, type SceneCapture } from "./ViewportRig";
 
 type LightingMode = "daylight" | "evening" | "night";
-type CameraAngle = "interior" | "corner" | "detail";
 
-const CAMERA_POSITIONS: Record<CameraAngle, [number, number, number]> = {
-  interior: [2.8, 1.6, 2.8],
-  corner: [5.5, 4.5, 5.5],
-  detail: [1.5, 0.8, 2.5],
+/** The single module is drawn centred on the origin. */
+const MODULE_BOUNDS: FootprintBounds = {
+  minX: -MODULE_SIZE / 2, maxX: MODULE_SIZE / 2,
+  minZ: -MODULE_SIZE / 2, maxZ: MODULE_SIZE / 2,
 };
+const MODULE_SPHERE = { center: [0, WALL_HEIGHT / 2, 0] as [number, number, number], radius: 2.6 };
 
 const LIGHTING_CONFIGS: Record<LightingMode, { ambient: number; sun: number; sunColor: string; bgColor: string }> = {
   daylight: { ambient: 0.6, sun: 1.4, sunColor: "#fff8e7", bgColor: "#e8f0f8" },
@@ -27,27 +30,18 @@ const LIGHTING_CONFIGS: Record<LightingMode, { ambient: number; sun: number; sun
   night: { ambient: 0.15, sun: 0.3, sunColor: "#6688cc", bgColor: "#0a0a1a" },
 };
 
-/** Inner component that registers the gl capture function with the parent */
-function CanvasCapture({ onReady }: { onReady: (capture: () => string | null) => void }) {
-  const { gl } = useThree();
-  useEffect(() => {
-    onReady(() => {
-      try {
-        return gl.domElement.toDataURL("image/png");
-      } catch {
-        return null;
-      }
-    });
-  }, [gl, onReady]);
-  return null;
-}
-
-const SceneContent = memo(function SceneContent({ module, lighting, showPlants, showPeople }: {
+const SceneContent = memo(function SceneContent({ module, lighting, showPlants, showPeople, firstPerson, showCeiling }: {
   module: ModuleConfig;
   lighting: LightingMode;
   showPlants: boolean;
   showPeople: boolean;
+  firstPerson: boolean;
+  /** Off for the overview: a cutaway axonometric looks into the room */
+  showCeiling: boolean;
 }) {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const orbitRef = useRef<any>(null);
+  useWASD(orbitRef);
   const lc = useMemo(() => LIGHTING_CONFIGS[lighting], [lighting]);
   const preset = useMemo(
     () => getPreset(module.moduleType, module.layoutPreset)
@@ -92,7 +86,7 @@ const SceneContent = memo(function SceneContent({ module, lighting, showPlants, 
       <group position={[-MODULE_SIZE / 2, 0, -MODULE_SIZE / 2]}>
         <ModuleFloor color={floorColor} />
         <ModuleWalls wallConfigs={module.wallConfigs} wallColor={wallColor} wallThickness={effectiveThickness} />
-        <ModuleCeiling />
+        {showCeiling && <ModuleCeiling />}
 
         {furniture.map((item) => (
           <StaticFurniturePiece
@@ -165,12 +159,10 @@ const SceneContent = memo(function SceneContent({ module, lighting, showPlants, 
 
       <ContactShadows position={[0, -0.01, 0]} opacity={0.4} scale={12} blur={2.5} />
       <OrbitControls
-        target={[0, 1.2, 0]}
-        minPolarAngle={0.1}
-        maxPolarAngle={Math.PI / 2.1}
-        minDistance={2}
-        maxDistance={10}
+        ref={orbitRef}
+        makeDefault
         enablePan={false}
+        {...orbitPropsFor(firstPerson, { minDistance: 0.5, maxDistance: 10, maxPolarAngle: Math.PI / 2.1 })}
       />
     </>
   );
@@ -179,16 +171,23 @@ const SceneContent = memo(function SceneContent({ module, lighting, showPlants, 
 export interface RenderScene3DProps {
   module: ModuleConfig;
   lighting: LightingMode;
-  camera: CameraAngle;
+  /** Camera preset: overview, eye-level exterior, first-person interior (5.03-A) */
+  camera: CameraPreset;
+  /** Lens, 35 mm equivalent (16 = very wide … 50 = normal) */
+  focalMm: number;
   showPlants: boolean;
   showPeople?: boolean;
-  onReady?: (capture: () => string | null) => void;
+  onReady?: (capture: SceneCapture) => void;
 }
 
-function RenderScene3D({ module, lighting, camera, showPlants, showPeople = false, onReady }: RenderScene3DProps) {
+function RenderScene3D({ module, lighting, camera, focalMm, showPlants, showPeople = false, onReady }: RenderScene3DProps) {
+  const pose = useMemo(() => computeCameraPose(camera, MODULE_BOUNDS), [camera]);
+  const fov = focalToVerticalFov(focalMm);
+  // Initial props only: ViewportRig moves the live camera afterwards
   const cameraProps = useMemo(
-    () => ({ position: CAMERA_POSITIONS[camera], fov: camera === "detail" ? 50 : 35, near: 0.1, far: 100 }),
-    [camera],
+    () => ({ position: pose.position, fov, near: 0.05, far: 100 }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [],
   );
   return (
     <Canvas
@@ -197,8 +196,8 @@ function RenderScene3D({ module, lighting, camera, showPlants, showPeople = fals
       camera={cameraProps}
       style={{ width: "100%", height: "100%" }}
     >
-      {onReady && <CanvasCapture onReady={onReady} />}
-      <SceneContent module={module} lighting={lighting} showPlants={showPlants} showPeople={showPeople} />
+      <SceneContent module={module} lighting={lighting} showPlants={showPlants} showPeople={showPeople} firstPerson={pose.firstPerson} showCeiling={camera !== "overview"} />
+      <ViewportRig pose={pose} poseKey={camera} fovDeg={fov} sphere={MODULE_SPHERE} onReady={onReady} />
     </Canvas>
   );
 }

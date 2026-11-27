@@ -15,10 +15,11 @@ interface Props {
   compact?: boolean;
 }
 
+/** 5.03-A: the two Image → Image options first, RO + EN; text-only last. */
 const MODES: { id: RenderInputMode; label: string; short: string; hint: string }[] = [
-  { id: "text", label: "Text → Image", short: "Text→Img", hint: "From prompt only" },
-  { id: "scene", label: "3D + Text → Image", short: "3D+Text→Img", hint: "3D scene as base" },
-  { id: "upload", label: "Image → Image", short: "Img→Img", hint: "Your photo as base" },
+  { id: "scene", label: "Randează ce vezi", short: "Ce vezi", hint: "Render what you see (3D)" },
+  { id: "upload", label: "Imaginea ta", short: "Imaginea ta", hint: "Upload your image" },
+  { id: "text", label: "Doar text", short: "Text", hint: "Text → Image" },
 ];
 
 /**
@@ -71,7 +72,9 @@ export default function RenderInputModeSelector({ value, onChange, uploadImage, 
       />
       {value === "scene" && (
         <p className="mt-1.5 text-[10px] text-brand-teal-600 bg-brand-teal-50 border border-brand-teal-200 rounded-md px-2 py-1.5">
-          The 3D scene will be captured and used as a structural base. The AI will apply your style prompt while preserving the room layout.
+          Se trimite exact cadrul din vizualizatorul 3D (plus harta de adâncime). Rotește camera, alege o presetare sau Single / All Modules.
+          <br />
+          The exact 3D frame you see is sent (plus its depth map). Orbit, pick a camera preset, or switch Single / All Modules.
         </p>
       )}
       {value === "upload" && (

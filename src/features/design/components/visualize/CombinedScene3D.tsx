@@ -12,6 +12,15 @@ import {
   StaticFurniturePiece,
 } from "../shared/module3d";
 import { useWASD } from "./scene/useWASD";
+import { ViewportRig, orbitPropsFor, type SceneCapture } from "../render/ViewportRig";
+import { computeCameraPose, focalToVerticalFov, gridBounds, type CameraPreset } from "../render/cameraPresets";
+
+/** Render step (5.03-A): camera preset, lens and capture. Visualize omits it. */
+export interface CombinedViewport {
+  camera: CameraPreset;
+  focalMm: number;
+  onReady?: (capture: SceneCapture) => void;
+}
 
 /* ------------------------------------------------------------------ */
 /*  Clickable module highlight overlay                                 */
@@ -70,7 +79,7 @@ function ModuleClickArea({
 /*  Scene content                                                      */
 /* ------------------------------------------------------------------ */
 
-function SceneContent({ modules }: { modules: ModuleConfig[] }) {
+function SceneContent({ modules, viewport }: { modules: ModuleConfig[]; viewport?: CombinedViewport }) {
   const orbitRef = useRef<any>(null);
   useWASD(orbitRef);
   const selectedModule = useDesignStore((s) => s.selectedModule);
@@ -93,6 +102,19 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
   }, [modules]);
 
   const cameraDistance = extent * 1.4 + 4;
+
+  // Render step: preset camera inside/around the house, same frame for RGB + depth
+  const selRow = selectedModule?.row, selCol = selectedModule?.col;
+  const rig = useMemo(() => {
+    if (!viewport) return null;
+    const house = gridBounds(modules, MODULE_SIZE);
+    const room = modules.find((m) => m.row === selRow && m.col === selCol) ?? modules[0];
+    const roomBounds = room ? gridBounds([room], MODULE_SIZE) : house;
+    const pose = computeCameraPose(viewport.camera, house, roomBounds);
+    const key = viewport.camera === "interior" ? `interior-${room?.row}-${room?.col}` : `${viewport.camera}-${house.minX},${house.maxX},${house.minZ},${house.maxZ}`;
+    return { pose, key };
+  }, [viewport, modules, selRow, selCol]);
+  const firstPerson = rig?.pose.firstPerson ?? false;
 
   return (
     <>
@@ -149,12 +171,30 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
       </mesh>
 
       <ContactShadows position={[centerX, -0.005, centerZ]} opacity={0.25} scale={extent + 10} blur={2} />
-      <OrbitControls
-        ref={orbitRef}
-        target={[centerX, WALL_HEIGHT * 0.3, centerZ]}
-        minPolarAngle={0.2} maxPolarAngle={Math.PI / 2.2}
-        minDistance={3} maxDistance={cameraDistance * 2} enablePan
-      />
+      {viewport ? (
+        <OrbitControls
+          ref={orbitRef}
+          makeDefault
+          enablePan={!firstPerson}
+          {...orbitPropsFor(firstPerson, { minDistance: 0.5, maxDistance: cameraDistance * 2, maxPolarAngle: Math.PI / 2.05 })}
+        />
+      ) : (
+        <OrbitControls
+          ref={orbitRef}
+          target={[centerX, WALL_HEIGHT * 0.3, centerZ]}
+          minPolarAngle={0.2} maxPolarAngle={Math.PI / 2.2}
+          minDistance={3} maxDistance={cameraDistance * 2} enablePan
+        />
+      )}
+      {viewport && rig && (
+        <ViewportRig
+          pose={rig.pose}
+          poseKey={rig.key}
+          fovDeg={focalToVerticalFov(viewport.focalMm)}
+          sphere={{ center: [centerX, WALL_HEIGHT / 2, centerZ], radius: Math.hypot(extent / 2, extent / 2, WALL_HEIGHT / 2) + 0.5 }}
+          onReady={viewport.onReady}
+        />
+      )}
     </>
   );
 }
@@ -163,7 +203,7 @@ function SceneContent({ modules }: { modules: ModuleConfig[] }) {
 /*  Exported wrapper                                                   */
 /* ------------------------------------------------------------------ */
 
-export default function CombinedScene3D() {
+export default function CombinedScene3D({ viewport }: { viewport?: CombinedViewport } = {}) {
   const modules = useDesignStore((s) => s.modules);
 
   const cameraPos = useMemo<[number, number, number]>(() => {
@@ -187,10 +227,10 @@ export default function CombinedScene3D() {
   return (
     <Canvas
       shadows
-      camera={{ position: cameraPos, fov: 40, near: 0.1, far: 200 }}
+      camera={{ position: cameraPos, fov: 40, near: viewport ? 0.05 : 0.1, far: 200 }}
       style={{ background: "#f8f8f6", width: "100%", height: "100%" }}
     >
-      <SceneContent modules={modules} />
+      <SceneContent modules={modules} viewport={viewport} />
     </Canvas>
   );
 }

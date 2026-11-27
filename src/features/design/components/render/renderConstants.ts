@@ -1,5 +1,5 @@
 export type LightingMode = "daylight" | "evening" | "night";
-export type CameraAngle = "interior" | "corner" | "detail";
+export type { CameraPreset as CameraAngle } from "./cameraPresets";
 export type RenderMode = "template" | "ai";
 export type ViewMode = "single" | "all";
 /** AI input: prompt only, 3D view + prompt, uploaded image + prompt (BUG-ST03) */
@@ -15,7 +15,9 @@ export type AiEngine =
   // Premium engines
   | "blackforest" | "stability" | "openai"
   // Ultra-cheap
-  | "prodia";
+  | "prodia"
+  // Image → Image with structure (3.06 / 3.07)
+  | "cloudflare-klein" | "replicate-depth" | "stability-structure";
 
 export type EngineCapability = "text2img" | "img2img";
 export type EngineTier = "free" | "low-cost" | "mid" | "premium";
@@ -33,6 +35,10 @@ export interface EngineMetadata {
 
 export const AI_ENGINES: Record<AiEngine, EngineMetadata> = {
   auto:        { label: "Auto (Best Available)", description: "Smart routing by tier & task type", speed: "", capabilities: ["text2img", "img2img"], costPerImage: 0, tier: "free", freeQuota: "", euCompliant: true },
+  // ── Image → Image, keeps the 3D geometry (bake-off 3.06, 3.07) ──
+  "cloudflare-klein":    { label: "FLUX.2 klein (Cloudflare)", description: "Free, keeps the 3D view; default for Image → Image", speed: "Fast", capabilities: ["img2img"], costPerImage: 0, tier: "free", freeQuota: "CF daily pool", euCompliant: true },
+  "replicate-depth":     { label: "FLUX Depth (Replicate)", description: "Uses the depth map of your 3D view; only when funded", speed: "Medium", capabilities: ["img2img"], costPerImage: 0.025, tier: "mid", freeQuota: "Paid", euCompliant: false },
+  "stability-structure": { label: "Stability Structure", description: "Keeps the structure of the 3D view; only when funded", speed: "Medium", capabilities: ["img2img"], costPerImage: 0.05, tier: "premium", freeQuota: "Paid", euCompliant: false },
   // ── Free ──
   together:    { label: "Together.ai FLUX",  description: "Free 3 months, FLUX Schnell + Kontext img2img", speed: "Fast", capabilities: ["text2img", "img2img"], costPerImage: 0, tier: "free", freeQuota: "Free 3 months", euCompliant: false },
   cloudflare:  { label: "Cloudflare AI",     description: "Free forever (10K/day), EU regions, FLUX", speed: "Fast", capabilities: ["text2img"], costPerImage: 0, tier: "free", freeQuota: "10K neurons/day forever", euCompliant: true },

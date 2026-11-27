@@ -30,16 +30,14 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
-/**
- * Re-encode any image (data URI, blob: URL or http URL) as a JPEG data URI that
- * fits `maxSide`. Falls back to the input as a data URI when canvas is not
- * available (tests, old browsers), so callers never lose the image.
- */
-export async function toJpegDataUrl(
-  src: string,
-  maxSide = STORED_RENDER_MAX_SIDE,
-  quality = STORED_RENDER_QUALITY,
-): Promise<string> {
+/** Size that fits `maxSide` on the long side, never upscaled, at least 1 px. */
+export function fitWithin(width: number, height: number, maxSide: number): { width: number; height: number } {
+  const w0 = Math.max(1, width || 1), h0 = Math.max(1, height || 1);
+  const scale = Math.min(1, maxSide / Math.max(w0, h0));
+  return { width: Math.max(1, Math.round(w0 * scale)), height: Math.max(1, Math.round(h0 * scale)) };
+}
+
+async function reencode(src: string, maxSide: number, mime: "image/jpeg" | "image/png", quality: number): Promise<string> {
   let dataUrl = src;
   if (!src.startsWith("data:")) {
     const blob = await (await fetch(src)).blob();
@@ -47,20 +45,42 @@ export async function toJpegDataUrl(
   }
   try {
     const img = await loadImage(dataUrl);
-    const scale = Math.min(1, maxSide / Math.max(img.naturalWidth || 1, img.naturalHeight || 1));
-    const w = Math.max(1, Math.round((img.naturalWidth || 1) * scale));
-    const h = Math.max(1, Math.round((img.naturalHeight || 1) * scale));
+    const { width: w, height: h } = fitWithin(img.naturalWidth, img.naturalHeight, maxSide);
     const canvas = document.createElement("canvas");
     canvas.width = w;
     canvas.height = h;
     const ctx = canvas.getContext("2d");
     if (!ctx) return dataUrl;
-    ctx.fillStyle = "#ffffff"; // JPEG has no alpha: flatten on white
-    ctx.fillRect(0, 0, w, h);
+    if (mime === "image/jpeg") {
+      ctx.fillStyle = "#ffffff"; // JPEG has no alpha: flatten on white
+      ctx.fillRect(0, 0, w, h);
+    }
     ctx.drawImage(img, 0, 0, w, h);
-    const out = canvas.toDataURL("image/jpeg", quality);
-    return out.startsWith("data:image/jpeg") ? out : dataUrl;
+    const out = canvas.toDataURL(mime, quality);
+    return out.startsWith(`data:${mime}`) ? out : dataUrl;
   } catch {
     return dataUrl;
   }
+}
+
+/**
+ * Re-encode any image (data URI, blob: URL or http URL) as a JPEG data URI that
+ * fits `maxSide`. Falls back to the input as a data URI when canvas is not
+ * available (tests, old browsers), so callers never lose the image.
+ */
+export function toJpegDataUrl(
+  src: string,
+  maxSide = STORED_RENDER_MAX_SIDE,
+  quality = STORED_RENDER_QUALITY,
+): Promise<string> {
+  return reencode(src, maxSide, "image/jpeg", quality);
+}
+
+/**
+ * Same, as PNG: the depth control map (3.07 contract: PNG, same size as the
+ * base image). Both come from the same canvas and pass through fitWithin()
+ * with the same maxSide, so their sizes match.
+ */
+export function toPngDataUrl(src: string, maxSide = STORED_RENDER_MAX_SIDE): Promise<string> {
+  return reencode(src, maxSide, "image/png", 1);
 }

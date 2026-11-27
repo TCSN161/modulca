@@ -20,6 +20,10 @@ import { authHeaders } from "@/shared/lib/authHeaders";
 import RenderGallery from "./RenderGallery";
 import RenderInputModeSelector from "./RenderInputModeSelector";
 import RenderEngineBadge from "./RenderEngineBadge";
+import CameraControls from "./CameraControls";
+import { PRESET_FOCAL_MM, type CameraPreset } from "./cameraPresets";
+import { buildViewPrompt, type RenderView } from "./viewPrompt";
+import type { SceneCapture } from "./ViewportRig";
 import { useAuthStore } from "@/features/auth/store";
 import PublishButton from "@/features/gallery/components/PublishButton";
 import { getTierConfig } from "@/features/auth/types";
@@ -47,7 +51,13 @@ export default function RenderPage() {
   const [mobileSidebar, setMobileSidebar] = useState<"left" | "right" | null>(null);
   const [renderMode, setRenderMode] = useState<RenderMode>("template");
   const [lighting, setLighting] = useState<LightingMode>("daylight");
-  const [camera, setCamera] = useState<CameraAngle>("interior");
+  const [camera, setCameraState] = useState<CameraAngle>("overview");
+  // Lens, 35 mm equivalent; each preset brings its own default (5.03-A)
+  const [focalMm, setFocalMm] = useState<number>(PRESET_FOCAL_MM.overview);
+  const setCamera = useCallback((c: CameraPreset) => {
+    setCameraState(c);
+    setFocalMm(PRESET_FOCAL_MM[c]);
+  }, []);
   const [atmosphere, setAtmosphere] = useState({ naturalLight: true, plants: true, people: false });
   const [renderedImage, setRenderedImage] = useState<string | null>(null);
   const [isRendering, setIsRendering] = useState(false);
@@ -58,9 +68,11 @@ export default function RenderPage() {
   const [includePeople, setIncludePeople] = useState(false);
   const [includePlants, setIncludePlants] = useState(false);
   const [aiEngine, setAiEngine] = useState<AiEngine>("auto");
-  const [inputMode, setInputMode] = useState<RenderInputMode>("text");
+  // 5.03-A: "Randează ce vezi" (the 3D frame) is the default AI input
+  const [inputMode, setInputMode] = useState<RenderInputMode>("scene");
   const [uploadImage, setUploadImage] = useState<string | null>(null);
   const captureRef = useRef<(() => string | null) | null>(null);
+  const depthCaptureRef = useRef<(() => string | null) | null>(null);
 
   const {
     aiImageUrl,
@@ -72,7 +84,7 @@ export default function RenderPage() {
     aiEngineMeta,
     handleGenerateAiRender: generateAiRender,
     resetAiImage,
-  } = useRenderEngine({ aiEngine, renderResolution, inputMode, captureRef, uploadImage });
+  } = useRenderEngine({ aiEngine, renderResolution, inputMode, captureRef, depthCaptureRef, uploadImage });
 
   // Tier-based render limits
   const userTier = useAuthStore((s) => s.userTier);
@@ -111,14 +123,32 @@ export default function RenderPage() {
   }, [aiErrorInfo]);
   const quotaError = aiErrorInfo?.status === 429;
 
-  const handleSceneReady = useCallback((capture: () => string | null) => {
-    captureRef.current = capture;
+  // Both views (Single Module and All Modules) register RGB + depth capture of their live camera
+  const handleSceneReady = useCallback((capture: SceneCapture) => {
+    captureRef.current = capture.rgb;
+    depthCaptureRef.current = capture.depth;
   }, []);
 
-  // "All Modules" view has no capturable canvas: drop the stale single-module capture
+  // Until the new view's canvas registers, never send the previous view's frame
   useEffect(() => {
-    if (viewMode === "all") captureRef.current = null;
+    captureRef.current = null;
+    depthCaptureRef.current = null;
   }, [viewMode]);
+
+  const combinedViewport = useMemo(
+    () => ({ camera, focalMm, onReady: handleSceneReady }),
+    [camera, focalMm, handleSceneReady],
+  );
+
+  // Engines that can serve the chosen input; reset a choice that no longer fits
+  const engineKeys = useMemo(
+    () => (Object.keys(AI_ENGINES) as AiEngine[]).filter((k) =>
+      AI_ENGINES[k].capabilities.includes(inputMode === "text" ? "text2img" : "img2img")),
+    [inputMode],
+  );
+  useEffect(() => {
+    if (!engineKeys.includes(aiEngine)) setAiEngine("auto");
+  }, [engineKeys, aiEngine]);
 
   // Hydrate from localStorage first (preserves furnitureOverrides from Step 6),
   // then fall back to land store if localStorage had nothing.
@@ -140,7 +170,7 @@ export default function RenderPage() {
   // Reset rendered image when settings change
   useEffect(() => {
     setRenderedImage(null);
-  }, [lighting, camera, selectedModule]);
+  }, [lighting, camera, focalMm, selectedModule]);
 
   const currentMod = useMemo(
     () => (selectedModule
@@ -189,6 +219,34 @@ export default function RenderPage() {
     if (promptTemplate === "custom") return; // Don't overwrite custom prompts
     const styleName = styleDirection ? (getStyleDirection(styleDirection)?.label || styleDirection) : "modern";
     const templateSuffix = PROMPT_TEMPLATES[promptTemplate].suffix;
+
+    // 5.03-A / bake-off §4.2: Image → Image prompts describe the picture first
+    if (inputMode !== "text") {
+      const labelOf = (t: string) => MODULE_TYPES.find((mt) => mt.id === t)?.label || t;
+      const view: RenderView = inputMode === "upload" ? "upload" : camera;
+      const extras: string[] = [];
+      if (includePeople) extras.push("people living in the space");
+      if (includePlants) extras.push("indoor plants, greenery");
+      const finishes: string[] = [];
+      if (currentMod && view === "interior") {
+        const floor = FLOOR_MATERIALS.find((f) => f.id === currentMod.floorFinish)?.label;
+        const wall = WALL_MATERIALS.find((w) => w.id === currentMod.wallColor)?.label;
+        if (floor) finishes.push(`${floor} flooring`);
+        if (wall) finishes.push(`${wall} walls`);
+      }
+      const shown = viewMode === "all" ? modules : currentMod ? [currentMod] : [];
+      setAiPrompt(buildViewPrompt({
+        view,
+        moduleLabels: shown.map((m) => labelOf(m.moduleType)),
+        roomLabel: currentMod ? labelOf(currentMod.moduleType) : undefined,
+        styleName,
+        lighting,
+        finishes,
+        extras,
+        templateSuffix,
+      }));
+      return;
+    }
 
     if (viewMode === "all") {
       const moduleLabels = modules.map((m) => {
@@ -242,7 +300,7 @@ export default function RenderPage() {
     ].filter(Boolean);
 
     setAiPrompt(parts.join(", "));
-  }, [currentMod, styleDirection, lighting, viewMode, modules, promptTemplate, includePeople, includePlants, preset]);
+  }, [currentMod, styleDirection, lighting, viewMode, modules, promptTemplate, includePeople, includePlants, preset, inputMode, camera]);
 
   // Reset AI image when prompt changes
   useEffect(() => {
@@ -350,17 +408,9 @@ export default function RenderPage() {
             </div>
           </div>
 
-          {/* Camera */}
+          {/* Camera: presets + field of view (5.03-A) */}
           <div className="mb-5">
-            <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">Camera</label>
-            <div className="flex gap-1">
-              {(["interior", "corner", "detail"] as CameraAngle[]).map((c) => (
-                <button key={c} onClick={() => setCamera(c)}
-                  className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors ${camera === c ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                  {c}
-                </button>
-              ))}
-            </div>
+            <CameraControls camera={camera} onCameraChange={setCamera} focalMm={focalMm} onFocalChange={setFocalMm} roomLabel={currentMod?.label} />
           </div>
 
           {/* Atmosphere */}
@@ -446,7 +496,7 @@ export default function RenderPage() {
                   onChange={(e) => setAiEngine(e.target.value as AiEngine)}
                   className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none focus:ring-1 focus:ring-brand-amber-500"
                 >
-                  {(Object.keys(AI_ENGINES) as AiEngine[]).map((key) => (
+                  {engineKeys.map((key) => (
                     <option key={key} value={key}>
                       {AI_ENGINES[key].label}{AI_ENGINES[key].speed ? ` (${AI_ENGINES[key].speed})` : ""}
                     </option>
@@ -567,6 +617,7 @@ export default function RenderPage() {
                         baseSource: usedMode === "text" ? undefined : usedMode,
                         fallbackFrom: aiEngineMeta?.fallbackFrom.length ? aiEngineMeta.fallbackFrom : undefined,
                         resolution: resLabel,
+                        view: usedMode === "scene" ? { camera, focalMm, viewMode } : undefined,
                       };
                       // BUG-ST27: compressed + saved to the project row at once
                       const res = await persistSavedRender(render, projectId);
@@ -693,12 +744,13 @@ export default function RenderPage() {
                   {renderedImage ? (
                     <img src={renderedImage} alt="Generated render" className="h-full w-full object-contain bg-gray-900 rounded-2xl" />
                   ) : viewMode === "all" ? (
-                    <CombinedScene3D />
+                    <CombinedScene3D viewport={combinedViewport} />
                   ) : (
                     <RenderScene3D
                       module={currentMod}
                       lighting={lighting}
                       camera={camera}
+                      focalMm={focalMm}
                       showPlants={atmosphere.plants}
                       showPeople={atmosphere.people || includePeople}
                       onReady={handleSceneReady}
@@ -776,8 +828,6 @@ export default function RenderPage() {
                 moduleType={currentMod.moduleType}
                 savedPins={savedPins}
                 onTogglePin={handleTogglePin}
-                camera={camera}
-                onCameraChange={setCamera}
               />
             </div>
           )}
@@ -917,15 +967,7 @@ export default function RenderPage() {
                     </div>
                   </div>
                   <div className="mb-5">
-                    <label className="mb-2 block text-[10px] font-bold text-gray-400 uppercase">Camera</label>
-                    <div className="flex gap-1">
-                      {(["interior", "corner", "detail"] as CameraAngle[]).map((c) => (
-                        <button key={c} onClick={() => setCamera(c)}
-                          className={`flex-1 rounded-md px-2 py-1.5 text-xs font-medium capitalize transition-colors ${camera === c ? "bg-brand-teal-800 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"}`}>
-                          {c}
-                        </button>
-                      ))}
-                    </div>
+                    <CameraControls camera={camera} onCameraChange={setCamera} focalMm={focalMm} onFocalChange={setFocalMm} roomLabel={currentMod?.label} />
                   </div>
                   {renderMode === "template" ? (
                     <button
@@ -967,7 +1009,7 @@ export default function RenderPage() {
                         <label className="mb-1 block text-[10px] font-bold text-gray-400 uppercase">AI Engine</label>
                         <select value={aiEngine} onChange={(e) => setAiEngine(e.target.value as AiEngine)}
                           className="w-full rounded-lg border border-gray-200 bg-gray-50 px-3 py-2 text-xs text-gray-700 focus:border-brand-amber-500 focus:outline-none">
-                          {(Object.keys(AI_ENGINES) as AiEngine[]).map((key) => (
+                          {engineKeys.map((key) => (
                             <option key={key} value={key}>{AI_ENGINES[key].label}</option>
                           ))}
                         </select>

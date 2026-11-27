@@ -53,6 +53,8 @@ export interface SavedRender {
   resolution?: string;
   /** Engines that failed before `engine` answered (BUG-ST29) */
   fallbackFrom?: string[];
+  /** 3D camera of a "Randează ce vezi" render: preset, lens (mm), single/all modules (5.03-A) */
+  view?: { camera: "overview" | "exterior" | "interior"; focalMm: number; viewMode: "single" | "all" };
 }
 
 export interface WallConfigs {
