@@ -54,7 +54,7 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         description: "Single bed, desk & bookshelf",
         tier: "free",
         furniture: [
-          { id: "bed", label: "Single Bed", x: 0.1, z: 1.2, width: 0.9, depth: 1.9, height: 0.45, color: "#8B7355" },
+          { id: "bed", label: "Single Bed", x: 0.1, z: 1.0, width: 0.9, depth: 1.9, height: 0.45, color: "#8B7355" },
           { id: "desk", label: "Desk", x: 1.4, z: 0.1, width: 1.4, depth: 0.7, height: 0.75, color: "#C4A882" },
           { id: "chair", label: "Chair", x: 1.8, z: 0.9, width: 0.5, depth: 0.5, height: 0.8, color: "#555555" },
           { id: "bookshelf", label: "Bookshelf", x: 2.5, z: 1.4, width: 0.4, depth: 1.5, height: 1.8, color: "#A0926B" },
@@ -83,7 +83,7 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         description: "Counter along two walls, open center",
         tier: "free",
         furniture: [
-          { id: "counter-back", label: "Back Counter", x: 0.1, z: 0.05, width: 2.8, depth: 0.6, height: 0.9, color: "#E8E0D0" },
+          { id: "counter-back", label: "Back Counter", x: 0.1, z: 0.05, width: 2.2, depth: 0.6, height: 0.9, color: "#E8E0D0" },
           { id: "counter-left", label: "Side Counter", x: 0.1, z: 0.65, width: 0.6, depth: 1.5, height: 0.9, color: "#E8E0D0" },
           { id: "fridge", label: "Fridge", x: 2.3, z: 0.05, width: 0.6, depth: 0.6, height: 1.8, color: "#C0C0C0" },
           { id: "table", label: "Dining Table", x: 1.0, z: 1.6, width: 1.2, depth: 0.8, height: 0.75, color: "#8B7355" },
@@ -96,7 +96,7 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         tier: "free",
         furniture: [
           { id: "counter-left", label: "Left Counter", x: 0.1, z: 0.1, width: 0.6, depth: 2.8, height: 0.9, color: "#E8E0D0" },
-          { id: "counter-right", label: "Right Counter", x: 2.3, z: 0.1, width: 0.6, depth: 2.8, height: 0.9, color: "#E8E0D0" },
+          { id: "counter-right", label: "Right Counter", x: 2.3, z: 0.7, width: 0.6, depth: 2.2, height: 0.9, color: "#E8E0D0" },
           { id: "fridge", label: "Fridge", x: 2.3, z: 0.1, width: 0.6, depth: 0.6, height: 1.8, color: "#C0C0C0" },
         ],
       },
@@ -166,7 +166,7 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         furniture: [
           { id: "sofa", label: "L-Sofa", x: 0.2, z: 0.8, width: 2.2, depth: 0.9, height: 0.7, color: "#7A8B99" },
           { id: "coffee-table", label: "Coffee Table", x: 0.8, z: 1.9, width: 1.0, depth: 0.6, height: 0.4, color: "#8B7355" },
-          { id: "tv-unit", label: "TV Unit", x: 0.3, z: 2.7, width: 1.8, depth: 0.35, height: 0.5, color: "#A0926B" },
+          { id: "tv-unit", label: "TV Unit", x: 0.3, z: 2.6, width: 1.8, depth: 0.35, height: 0.5, color: "#A0926B" },
           { id: "rug", label: "Area Rug", x: 0.4, z: 1.0, width: 2.0, depth: 1.8, height: 0.02, color: "#C4B8A0" },
         ],
       },
@@ -177,8 +177,8 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         tier: "free",
         furniture: [
           { id: "table", label: "Dining Table", x: 0.6, z: 0.7, width: 1.6, depth: 1.0, height: 0.75, color: "#8B7355" },
-          { id: "chair1", label: "Chair", x: 0.7, z: 0.3, width: 0.45, depth: 0.45, height: 0.8, color: "#555555" },
-          { id: "chair2", label: "Chair", x: 1.65, z: 0.3, width: 0.45, depth: 0.45, height: 0.8, color: "#555555" },
+          { id: "chair1", label: "Chair", x: 0.7, z: 0.25, width: 0.45, depth: 0.45, height: 0.8, color: "#555555" },
+          { id: "chair2", label: "Chair", x: 1.65, z: 0.25, width: 0.45, depth: 0.45, height: 0.8, color: "#555555" },
           { id: "chair3", label: "Chair", x: 0.7, z: 1.75, width: 0.45, depth: 0.45, height: 0.8, color: "#555555" },
           { id: "chair4", label: "Chair", x: 1.65, z: 1.75, width: 0.45, depth: 0.45, height: 0.8, color: "#555555" },
           { id: "sideboard", label: "Sideboard", x: 0.2, z: 2.5, width: 2.0, depth: 0.4, height: 0.8, color: "#A0926B" },
@@ -192,7 +192,7 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         furniture: [
           { id: "sofa", label: "Recliner Sofa", x: 0.3, z: 0.6, width: 2.4, depth: 1.0, height: 0.8, color: "#4A4A4A" },
           { id: "screen", label: "Projector Screen", x: 0.2, z: 2.8, width: 2.6, depth: 0.05, height: 1.5, color: "#F0F0F0" },
-          { id: "console", label: "Media Console", x: 0.5, z: 2.5, width: 2.0, depth: 0.4, height: 0.45, color: "#333333" },
+          { id: "console", label: "Media Console", x: 0.5, z: 2.35, width: 2.0, depth: 0.4, height: 0.45, color: "#333333" },
         ],
       },
     ],
@@ -305,7 +305,7 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         furniture: [
           { id: "wardrobe", label: "Hall Wardrobe", x: 0.1, z: 0.1, width: 0.6, depth: 1.4, height: 2.0, color: "#F0EDE5" },
           { id: "mirror", label: "Mirror", x: 2.5, z: 0.8, width: 0.1, depth: 0.8, height: 1.4, color: "#C0C0C0" },
-          { id: "bench", label: "Hall Bench", x: 1.0, z: 2.4, width: 0.5, depth: 1.2, height: 0.45, color: "#D4A76A" },
+          { id: "bench", label: "Hall Bench", x: 1.0, z: 2.4, width: 1.2, depth: 0.5, height: 0.45, color: "#D4A76A" },
         ],
       },
       {
@@ -356,7 +356,7 @@ export const ROOM_LAYOUTS: RoomLayouts[] = [
         furniture: [
           { id: "planter-1", label: "Large Planter", x: 0.1, z: 0.1, width: 0.8, depth: 0.8, height: 0.5, color: "#68B584" },
           { id: "planter-2", label: "Large Planter", x: 2.1, z: 0.1, width: 0.8, depth: 0.8, height: 0.5, color: "#68B584" },
-          { id: "lounger", label: "Sun Lounger", x: 0.5, z: 1.5, width: 0.7, depth: 1.8, height: 0.4, color: "#F5F3EF" },
+          { id: "lounger", label: "Sun Lounger", x: 0.5, z: 1.0, width: 0.7, depth: 1.8, height: 0.4, color: "#F5F3EF" },
           { id: "side-table", label: "Side Table", x: 1.4, z: 1.8, width: 0.4, depth: 0.4, height: 0.5, color: "#D4A76A" },
         ],
       },
