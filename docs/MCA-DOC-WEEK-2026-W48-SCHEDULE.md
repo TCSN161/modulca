@@ -156,3 +156,20 @@ NAMING doc §3 lists the ingest as `1.03.MAIN_NotebookLM-Ingest`. But `scripts/c
 - Front-loading works: 6/10 CATUC files were pre-prepped before kickoff, so Phase 2 starts at ~50%.
 - Check weekday ↔ date when writing schedules (the Wed/Thu 26 slip went through 4 docs unnoticed).
 - One session per deliverable; specs on disk; no pasting context between chats.
+
+## 8. Plan final W48 (scris vineri 27, 15:00)
+
+| Când | Sesiune / sarcină | Grup | Stare |
+|---|---|---|---|
+| Vin 27 | 4.04 securitate plăți (ST14–17, ST19) | 4 | 🟢 |
+| Vin 27 | 5.03 bug-uri proiect (ST08, ST10, ST12, ST31, ST35) | 5 | 🟢 |
+| Vin 27 după | 10.01 Business: cercetare + plan de afaceri v0 (reluare) | 10 | ⏳ |
+| Vin 27 după | 3.07 motoare cu control de structură (gata, oprite până la credit) | 3 | ⏳ |
+| Vin 27 seara | 1.04 închidere W48 (MAIN nou): hartă, plan W49, Radar 9.02, buget, rezumat | 1 | ⏳ |
+| Sâm 28 | 5.03-A Image→Image automat (vedere curentă, camere, FOV, adâncime) | 5 | ⏳ |
+| Sâm 28 | MAIN: ST18 login Google cu numele ModulCA, ST20 erori hidratare, ST21 health, ST05 pagina admin | 1 | ⏳ |
+| Sâm 28 | Pachetul F2+F3 pentru partenerul arhitect (dacă a răspuns) | 7 | ⏳ |
+| Dum 29 | 1.05 retrospectivă noiembrie · verificarea link-urilor din bibliotecă (ST28) | 1 · 2 | ⏳ |
+| Lun 30 (W49) | 2.05 F4+F6 · 7.02 acord + DPA | 2 · 7 | 📅 |
+
+Costin: verificare pe site după deploy (randare după 3D cu klein, PDF nou, consultant CATUC) · contact sheet bake-off · citește F3 · Search Console → Sitemaps · conturile @modulca · răspunsul partenerului arhitect.
