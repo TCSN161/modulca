@@ -63,3 +63,6 @@ test-results/
 playwright-report/
 .env.local.tmp*
 .env*
+
+# Local MCP servers (Blender MCP, machine-specific; see docs/radar/2026-11-26-blender-connector.md §3)
+.mcp.json
