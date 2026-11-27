@@ -253,7 +253,8 @@
       "active": "Bètabonus actief",
       "daysLeft": "Je hebt nog {days} dagen gratis Premium-functies!",
       "bonusTitle": "Bètabonus — 3 maanden gratis Premium",
-      "bonusDescription": "Alle nieuwe gratis accounts krijgen 3 maanden lang Premium-functies tijdens onze bètafase. Ontwerp met HD-renders, alle tekeningen, PDF-export en meer — volledig gratis. Na 3 maanden kies je om te upgraden of door te gaan met het Explorer-abonnement."
+      "bonusDescription": "Alle nieuwe gratis accounts krijgen 3 maanden lang Premium-functies tijdens onze bètafase. Ontwerp met HD-renders, alle tekeningen, PDF-export en meer — volledig gratis. Na 3 maanden kies je om te upgraden of door te gaan met het Explorer-abonnement.",
+      "registerNote": "Geen kaart nodig. Na 3 maanden kies je: upgraden of gratis verder met Explorer."
     },
     "billing": {
       "monthly": "Maandelijks",

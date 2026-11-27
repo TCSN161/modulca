@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
+import { BetaPromoNotice } from "@/features/beta/components/BetaPromoNotice";
 import { useAuthStore } from "../store";
 import { isDemoMode } from "@/shared/lib/supabase";
 
@@ -50,6 +51,9 @@ export default function AuthForm({ mode }: AuthFormProps) {
       <p className="mb-6 text-sm text-gray-500">
         {isLogin ? tSignIn("subtitle") : tSignUp("subtitle")}
       </p>
+
+      {/* Beta promo at sign-up (BUG-ST19) */}
+      {!isLogin && <BetaPromoNotice />}
 
       {/* Demo mode notice */}
       {isDemoMode && (

@@ -253,7 +253,8 @@
       "active": "Bonus Beta activ",
       "daysLeft": "Ai funcții Premium gratuit încă {days} zile!",
       "bonusTitle": "Bonus Beta — 3 luni Premium gratuit",
-      "bonusDescription": "Toate conturile gratuite noi primesc funcții de nivel Premium timp de 3 luni pe durata fazei beta. Designează cu randări HD, toate desenele tehnice, export PDF și multe altele — complet gratuit. După 3 luni, alegi să faci upgrade sau să continui cu planul Explorer."
+      "bonusDescription": "Toate conturile gratuite noi primesc funcții de nivel Premium timp de 3 luni pe durata fazei beta. Designează cu randări HD, toate desenele tehnice, export PDF și multe altele — complet gratuit. După 3 luni, alegi să faci upgrade sau să continui cu planul Explorer.",
+      "registerNote": "Fără card. După 3 luni alegi: faci upgrade sau rămâi gratuit pe planul Explorator."
     },
     "billing": {
       "monthly": "Lunar",

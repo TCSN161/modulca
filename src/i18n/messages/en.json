@@ -253,7 +253,8 @@
       "active": "Beta Bonus Active",
       "daysLeft": "You have Premium features free for {days} more days!",
       "bonusTitle": "Beta Bonus — 3 Months Free Premium",
-      "bonusDescription": "All new free accounts get Premium-level features for 3 months during our beta phase. Design with HD renders, all drawings, PDF export, and more — completely free. After 3 months, choose to upgrade or continue with the Explorer plan."
+      "bonusDescription": "All new free accounts get Premium-level features for 3 months during our beta phase. Design with HD renders, all drawings, PDF export, and more — completely free. After 3 months, choose to upgrade or continue with the Explorer plan.",
+      "registerNote": "No card needed. After 3 months you choose: upgrade, or keep the free Explorer plan."
     },
     "billing": {
       "monthly": "Monthly",
