@@ -6,6 +6,7 @@ import Link from "next/link";
 import { useAuthStore } from "@/features/auth/store";
 import { listProjectsSettled, deleteProject, type ProjectRecord } from "@/features/auth/projectService";
 import { useAuthReady } from "@/features/design/hooks/useAuthReady";
+import { computeProjectCostFromData } from "@/features/design/projectCost";
 import { getTierConfig } from "@/features/auth/types";
 import { openCustomerPortal } from "@/shared/lib/stripe";
 import { BUILDING_PRESETS } from "@/shared/types";
@@ -308,7 +309,8 @@ export default function DashboardPage() {
                   const data = project.data as Record<string, unknown>;
                   const modules = Array.isArray(data.modules) ? data.modules.length : 0;
                   const style = typeof data.styleDirection === "string" ? data.styleDirection : null;
-                  const cost = modules * 9 * 1200; // rough estimate
+                  // BUG-ST12: same cost function as Design / Finalize (incl. products)
+                  const cost = Math.round(computeProjectCostFromData(data).grandTotal);
 
                   return (
                     <div

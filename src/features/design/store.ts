@@ -209,6 +209,51 @@ interface DesignStore {
   };
 }
 
+export interface DesignStats {
+  totalModules: number;
+  totalArea: number;
+  usableArea: number;
+  sharedWalls: number;
+  moduleCost: number;
+  sharedWallDiscount: number;
+  wallUpgradeCost: number;
+  thicknessUpgradeCost: number;
+  designFee: number;
+  totalEstimate: number;
+}
+
+/**
+ * Pure design cost (modules + finish + walls + fee). getStats() and
+ * projectCost.ts (dashboard card, Finalize, Products) all use this (BUG-ST12).
+ */
+export function computeDesignStats(modules: ModuleConfig[], finishLevel: string): DesignStats {
+  const totalModules = modules.length;
+  const totalArea = totalModules * 9;
+  const usableArea = totalModules * 7;
+  const sharedWalls = countSharedWalls(modules);
+  const finish = FINISH_LEVELS.find((f) => f.id === finishLevel) || FINISH_LEVELS[1];
+  const moduleCost = totalModules * finish.pricePerModule;
+  const sharedWallDiscount = sharedWalls * SHARED_WALL_DISCOUNT;
+  const wallUpgradeCost = computeWallUpgradeCost(modules);
+  const thicknessUpgradeCost = computeThicknessUpgradeCost(modules);
+  const subtotal = moduleCost - sharedWallDiscount + wallUpgradeCost + thicknessUpgradeCost;
+  const designFee = subtotal * DESIGN_FEE_PERCENTAGE;
+  const totalEstimate = subtotal + designFee;
+
+  return {
+    totalModules,
+    totalArea,
+    usableArea,
+    sharedWalls,
+    moduleCost,
+    sharedWallDiscount,
+    wallUpgradeCost,
+    thicknessUpgradeCost,
+    designFee,
+    totalEstimate,
+  };
+}
+
 function generateLabel(moduleType: string, index: number): string {
   const mt = MODULE_TYPES.find((m) => m.id === moduleType);
   const base = mt ? mt.label.toUpperCase().replace(/\s+/g, "") : moduleType.toUpperCase();
@@ -254,7 +299,7 @@ export function computeWallThicknessDefaults(wallConfigs: WallConfigs): WallThic
 /** Get the effective thickness configs (user-set or auto-default) */
 export function getEffectiveThickness(mod: ModuleConfig): WallThicknessConfigs {
   if (mod.wallThicknessConfigs) return mod.wallThicknessConfigs;
-  return computeWallThicknessDefaults(mod.wallConfigs);
+  return computeWallThicknessDefaults(mod.wallConfigs ?? ({} as WallConfigs));
 }
 
 /** Compute thickness upgrade cost for all modules */
@@ -264,7 +309,7 @@ function computeThicknessUpgradeCost(modules: ModuleConfig[]): number {
     const tc = getEffectiveThickness(mod);
     for (const side of ["north", "south", "east", "west"] as WallSide[]) {
       const t = tc[side];
-      cost += WALL_THICKNESS_SPECS[t].costPerWall;
+      cost += WALL_THICKNESS_SPECS[t]?.costPerWall ?? 0;
     }
   }
   return cost;
@@ -350,8 +395,8 @@ function computeWallUpgradeCost(modules: ModuleConfig[]): number {
   let cost = 0;
   for (const mod of modules) {
     for (const side of ["north", "south", "east", "west"] as WallSide[]) {
-      const wt = mod.wallConfigs[side];
-      cost += WALL_UPGRADE_PRICES[wt];
+      const wt = mod.wallConfigs?.[side];
+      cost += (wt && WALL_UPGRADE_PRICES[wt]) ?? 0;
     }
   }
   return cost;
@@ -637,31 +682,7 @@ export const useDesignStore = create<DesignStore>((set, get) => ({
 
   getStats: () => {
     const { modules, finishLevel } = get();
-    const totalModules = modules.length;
-    const totalArea = totalModules * 9;
-    const usableArea = totalModules * 7;
-    const sharedWalls = countSharedWalls(modules);
-    const finish = FINISH_LEVELS.find((f) => f.id === finishLevel) || FINISH_LEVELS[1];
-    const moduleCost = totalModules * finish.pricePerModule;
-    const sharedWallDiscount = sharedWalls * SHARED_WALL_DISCOUNT;
-    const wallUpgradeCost = computeWallUpgradeCost(modules);
-    const thicknessUpgradeCost = computeThicknessUpgradeCost(modules);
-    const subtotal = moduleCost - sharedWallDiscount + wallUpgradeCost + thicknessUpgradeCost;
-    const designFee = subtotal * DESIGN_FEE_PERCENTAGE;
-    const totalEstimate = subtotal + designFee;
-
-    return {
-      totalModules,
-      totalArea,
-      usableArea,
-      sharedWalls,
-      moduleCost,
-      sharedWallDiscount,
-      wallUpgradeCost,
-      thicknessUpgradeCost,
-      designFee,
-      totalEstimate,
-    };
+    return computeDesignStats(modules, finishLevel);
   },
 }));
 

@@ -19,6 +19,7 @@ import {
   subscribeSelectedProducts,
   type SelectedProduct,
 } from "../../productSelection";
+import { computeProjectCost } from "../../projectCost";
 import {
   Layers,
   Sofa,
@@ -293,11 +294,14 @@ export default function ProductsPage() {
       )
     : PRODUCT_CATALOG.filter((p) => p.category === activeCategory);
 
-  const productTotal = selectedProducts.reduce((sum, s) => {
-    const prod = PRODUCT_CATALOG.find((p) => p.id === s.productId);
-    return sum + (prod ? prod.price * s.quantity : 0);
-  }, 0);
-  const grandTotal = stats.totalEstimate + productTotal;
+  // BUG-ST12/ST31: one cost function; per-m² products cover the usable floor area
+  const cost = computeProjectCost({
+    modules,
+    finishLevel: useDesignStore.getState().finishLevel,
+    selectedProducts,
+  });
+  const productTotal = cost.productCost;
+  const grandTotal = cost.grandTotal;
 
   const addProduct = useCallback((productId: string) => {
     setSelectedProducts((prev) => {
@@ -595,6 +599,7 @@ export default function ProductsPage() {
               {selectedProducts.map((s) => {
                 const product = PRODUCT_CATALOG.find((p) => p.id === s.productId);
                 if (!product) return null;
+                const line = cost.productLines.find((l) => l.productId === s.productId);
                 return (
                   <div
                     key={s.productId}
@@ -623,8 +628,8 @@ export default function ProductsPage() {
                       )}
                       <p className="text-[10px] text-[#E8913A] font-semibold">
                         &euro;{product.price.toLocaleString()} &times;{" "}
-                        {s.quantity} ={" "}
-                        &euro;{(product.price * s.quantity).toLocaleString()}
+                        {line?.unit === "m2" ? `${line.quantity.toLocaleString()} m²` : s.quantity} ={" "}
+                        &euro;{(line?.total ?? product.price * s.quantity).toLocaleString()}
                       </p>
 
                       {/* Quantity Controls */}
