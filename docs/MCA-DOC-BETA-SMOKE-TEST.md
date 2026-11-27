@@ -149,7 +149,7 @@ Run 1 test project: `Smoke Test 1.03` (id `5895a485-…`, Compact House → Smal
 
 Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu e încă reverificat pe prod cu contul logat** → testul 2 (W49) confirmă. ST33–ST35 au apărut după run 1 (pagina de randare, bake-off).
 
-**Bilanț: 27 ✅ reparate · 5 🟡 parțial · 3 ❌ deschise** (ST18 închis pe 27 nov seara). Run 2 a adăugat ST36–ST39 (§6).
+**Bilanț: 27 ✅ reparate · 5 🟡 parțial · 3 ❌ deschise** (ST18 închis pe 27 nov seara). Run 2 a adăugat ST36–ST39 (§6): ST36 + ST37 ✅ reparate și verificate pe prod (e8f7dd0), ST38 + ST39 deschise (low, Chat 5).
 
 | BUG | Stare | Commit | Ce mai rămâne · cine |
 |---|---|---|---|
@@ -200,7 +200,7 @@ Proiect: `Smoke Test 1.03`. O singură randare consumată. Nu s-a descărcat PDF
 | Produse după încărcare completă (ST06) | ✅ produsul rămâne după navigare cu URL |
 | Architect prin URL direct (ST09) | ✅ se deschide workspace-ul; antetul arată id-ul proiectului, nu numele (ST39) |
 | Randare „Ce vezi” (5.04, ST01/ST03) | ✅ POST `/api/ai-render` 200 în ~20 s, cloudflare-klein img2img, păstrează unghiul, decupajul și mobilierul vederii 3D. Eticheta greșită (ST37) |
-| Randarea rămâne salvată (ST27) | ❌ **regresie**: după navigare randarea dispare de pe pagina de randare și din slide-ul „AI Renders”; `modulca-design.savedRenders` = 0 (ST36) |
+| Randarea rămâne salvată (ST27) | ✅ după e8f7dd0 (5.04): randarea nouă apare în slide-ul „AI Renders” după navigare (retest 27 nov seara). Înainte: ❌ **regresie**: după navigare randarea dispare de pe pagina de randare și din slide-ul „AI Renders”; `modulca-design.savedRenders` = 0 (ST36) |
 | Design Inspiration (ST35) | ✅ poze reale sau placeholder cu nume |
 | Prezentare (ST07) | ✅ copertă „Smoke Test 1.03”, 27 nov 2026 |
 | Consultant CATUC (ST13) | ✅ Claude, art. 294(2)(a)(ii), 296, 298, 309, 259, 264, 273, 582; marchează punctele în review la arhitectul partener; 6 articole citate |
@@ -218,3 +218,5 @@ Proiect: `Smoke Test 1.03`. O singură randare consumată. Nu s-a descărcat PDF
 | BUG-ST37 | F-D | Aceeași randare | Eticheta spune „Rendered with cloudflare-klein-img2img (fallback: FLUX.2 klein (Cloudflare) unavailable)”: motorul e chiar klein, deci nu e fallback. `engineMetaFromHeaders` compară id-ul cu sufix `-img2img` | **Chat 5** (eticheta) / Chat 3 (header) | low |
 | BUG-ST38 | F-A | Încărcare completă `/dashboard` logat | ~1 s antetul arată „Log in”, „Welcome back, Architect”, plan „Guest”, „--/1” până vine sesiunea | **Chat 5** dashboard + MAIN `auth/store` (`sessionChecked`) | low |
 | BUG-ST39 | F-B | `/project/[id]/architect` | Antetul arată „Project 5895a485-…” în loc de numele proiectului | **Chat 5** | low |
+
+**Retest 27 nov seara (după e8f7dd0 + redeploy cu variabilele noi)**: ST36 ✅ randarea „Ce vezi” se salvează imediat și apare în prezentare după navigare · ST37 ✅ eticheta „Rendered with FLUX.2 klein (Cloudflare)”, fără „fallback” · `/api/health` = **ok** (Pollinations cu cheie). 1 randare consumată.

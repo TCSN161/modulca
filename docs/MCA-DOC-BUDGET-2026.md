@@ -13,7 +13,7 @@ Legendă: ✅ cifră din documente · 🟡 estimare · ❓ **necunoscut, de conf
 | Serviciu | Plan | Cost/lună | Sigur? | Notă |
 |---|---|---|---|---|
 | Supabase | **Free** | €0 | ✅ Costin (27 nov) + `MCA-DOC-BLOCKERS-2026-11-19.md` B1 („Keep Supabase Free”) | Limite Free: 500 MB DB, 1 GB stocare, 50k utilizatori activi/lună, **pauză automată după 7 zile fără activitate** (s-a întâmplat în nov), **fără backup zilnic**. Pro ($25 ≈ €23) doar peste ~400 utilizatori sau dacă vrem backup înainte de beta |
-| Vercel | Hobby | €0 | ❓ | ⚠️ Hobby nu permite uz comercial → **Pro ($20 ≈ €18,5) cel târziu la lansare (1 feb)** sau la primul plătitor |
+| Vercel | Hobby | €0 | ✅ verificat 27 nov (Team Settings → Billing: Hobby, fără card) | ⚠️ Hobby nu permite uz comercial → **Pro ($20 ≈ €18,5) cel târziu la lansare (1 feb)** sau la primul plătitor |
 | Claude (Claude Code, abonament) | Pro €18 (19 nov) | €18 | ❓ | În W48 am rulat 3–4 sesiuni Opus deodată și am atins limita; dacă planul s-a schimbat (Max), totalul crește mult |
 | ChatGPT Plus | Plus | €20 | ❓ (încă activ?) | Rol: „a doua opinie”. În W48 n-a fost folosit în niciun flux |
 | Sentry | Team | ❓ ($26 dacă e plătit; €0 dacă e trial/free) | ❓ | `COMPANY_INFO.md` scrie „Team” → de verificat urgent |

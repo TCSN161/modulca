@@ -48,15 +48,15 @@
 | 3 | Citești F3 (+ nota CC1 / art. 440(3) care poate schimba F2) | până Lun 30 | 40 min | `src/knowledge/06-regulations/RO/modular-prefab-regulations.new.md` |
 | ~~4~~ | ✅ **Făcut (27 nov)**: brand verificat de Google, ecranul arată „ModulCA” + logo. ~~Login Google cu numele ModulCA~~ (ST18): brand în Google Cloud Console, trimis la verificare (2–3 zile lucrătoare la Google) | **Lun 30** (ca să fie aprobat înainte de 15 dec) | 15 min + așteptare | `docs/MCA-DOC-GOOGLE-LOGIN-BRANDING.md` varianta A (gratuită) |
 | ~~5~~ | ✅ **Făcut (27 nov)**: ~~Stripe, textele produselor~~, toate cele 6 produse TEST (lunar + anual); la LIVE (ian) se refac la fel | — | — | Stripe → Product catalog; textele exacte în `docs/sessions/NEXT-4.md` |
-| 6 | **Vercel**: `CF_KLEIN_MAX_SIDE=768` și cheia gratuită `POLLINATIONS_API_KEY` (dacă nu sunt puse) | Lun 30 | 10 min | Vercel → Environment Variables → Redeploy |
+| ~~6~~ | ✅ **Făcut (27 nov)**: `CF_KLEIN_MAX_SIDE=768` (Production+Preview) și `POLLINATIONS_API_KEY` (Production, cheie „Quest balance only” = €0) în Vercel, redeploy, `/api/health` = ok | — | — | — |
 | 7 | **Decizia €10 pe motoare**: (a) nimic, rămânem pe klein + Horde gratuit · (b) Replicate €10 ≈ 430 randări depth/canny · (c) Stability €10 ≈ 220 · (d) Cloudflare Workers Paid (≈ $5/lună + neuroni peste plafon, preț de verificat) · (e) OK pentru Leonardo Depth din creditul prepaid rămas (~240 randări, €0 nou) | **până pe 10 dec** (ideal Mie 2) | 10 min | Recomandarea MAIN: **(e) acum** (bani deja plătiți) + **(a)**; (b) doar dacă testul 2 arată randări nefidele |
 | 8 | **Upscale: rămâne doar pe cotă, sau doar pentru planurile plătite?** | Mie 2 | 2 min | Recomandarea MAIN: doar pe cotă în beta (toți sunt Premium promo), poartă de plan la lansare |
 | 9 | Conturi de afiliat **Profitshare** și **2Performant** (gratuite) + citești comisioanele reale | Joi 3 | 30 min | Sursa de venit R5; cifrele merg la 10.02 |
 | 10 | **Apel cu arhitectul partener** + trimiți pachetul F2+F3 (pregătit de 7.02) | când răspunde (ideal Lun 30 – Mar 1) | 45 min | Întrebările din handoff-ul Chat 7 + lista `research/2026-11-26-catuc-partner-review-list.md` |
 | 11 | Aprobări: emailurile DPA (Lun 30) · upgrade B15 (Mie 2) · emailul către utilizatori (Sâm 5) | W49 | 15 min total | un „OK” în chat-ul MAIN |
-| 12 | Search Console → Sitemaps: statusul e „Success”? | Lun 30 | 5 min | dacă tot „Couldn't fetch”, spui MAIN |
+| ~~12~~ | ✅ **Făcut (27 nov)**: sitemap-ul (240 URL, 200 OK) retrimis în Search Console (cont `uiiacgsauto`); „Couldn’t fetch” era statusul vechi. Recitim vineri 4 dec. Contul `costin.telefon` e acum și el proprietar (DNS) | — | — | — |
 | 13 | Rezervi conturile **@modulca** pe rețelele sociale | când ai timp, până pe 13 dec | 20 min | Instagram, TikTok, YouTube, Facebook, LinkedIn |
-| 14 | Confirmi costurile lunare reale (planul Claude, ChatGPT Plus, Vercel, domeniul) | Lun 30 | 10 min | completezi rândurile ❓ din `docs/MCA-DOC-BUDGET-2026.md` |
+| 14 | Confirmi costurile lunare reale (planul Claude, ChatGPT Plus, Sentry, domeniul; Vercel = Hobby ✅, Supabase = Free ✅) | Lun 30 | 10 min | completezi rândurile ❓ din `docs/MCA-DOC-BUDGET-2026.md` |
 | ~~16~~ | ✅ **Făcut (27 nov)**: ~~spațiul din baza Supabase~~ = 50 / 500 MB, detalii în bugetul §6 | — | — | — |
 | 15 | Lista de invitați beta (10–20, nume + email, fișier privat, nu în repo) | până pe 10 dec | 1 h | — |
 | ~~—~~ | ~~NotebookLM Q11–Q25~~ | — | — | **Nu mai e nevoie**: Q11–Q25 au fost răspunse și verificate de Chat 2 (2.07) din textul legii |
