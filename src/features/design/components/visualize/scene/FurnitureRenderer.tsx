@@ -5,6 +5,7 @@ import * as THREE from "three";
 import type { ThreeEvent } from "@react-three/fiber";
 import { Text, useCursor, useGLTF } from "@react-three/drei";
 import type { FurnitureItem } from "../../../layouts";
+import { makeGlbLit } from "../../shared/glbMaterials";
 import type { FurnitureOverride } from "../../../store";
 
 /* ------------------------------------------------------------------ */
@@ -50,8 +51,7 @@ const LABEL_TO_GLB: Record<string, string> = {
   "side table": "/models/sideTable.glb",
 
   // Storage & cabinets
-  wardrobe: "/models/cabinetBedDrawer.glb",
-  closet: "/models/cabinetBedDrawer.glb",
+  // 3.10: wardrobe/closet → procedural box; cabinetBedDrawer.glb (0.27 m) was stretched ×9
   dresser: "/models/cabinetBedDrawer.glb",
   bookshelf: "/models/cabinetBedDrawer.glb",
   "shared shelf": "/models/cabinetBedDrawer.glb",
@@ -134,6 +134,7 @@ function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: number; d
   useEffect(() => {
     if (!ref.current) return;
     const cloned = scene.clone(true);
+    makeGlbLit(cloned); // unlit GLB → lit + shadows (3.10)
     // Clear previous children
     while (ref.current.children.length) ref.current.remove(ref.current.children[0]);
     ref.current.add(cloned);

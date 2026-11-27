@@ -10,6 +10,7 @@ import { useRef, useEffect, Suspense, Component } from "react";
 import type { ReactElement } from "react";
 import * as THREE from "three";
 import { useGLTF } from "@react-three/drei";
+import { makeGlbLit } from "./glbMaterials";
 import type { WallConfigs, WallThicknessConfigs, FurnitureOverride } from "../../store";
 import type { FurnitureItem } from "../../layouts";
 
@@ -76,8 +77,7 @@ export const LABEL_TO_GLB: Record<string, string> = {
   "side table": "/models/sideTable.glb",
 
   // Storage & cabinets
-  wardrobe: "/models/cabinetBedDrawer.glb",
-  closet: "/models/cabinetBedDrawer.glb",
+  // 3.10: wardrobe/closet → procedural box; cabinetBedDrawer.glb (0.27 m) was stretched ×9
   dresser: "/models/cabinetBedDrawer.glb",
   bookshelf: "/models/cabinetBedDrawer.glb",
   "shared shelf": "/models/cabinetBedDrawer.glb",
@@ -337,6 +337,7 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
     cloned.rotation.set(0, 0, 0);
     cloned.scale.set(1, 1, 1);
     cloned.updateMatrixWorld(true);
+    makeGlbLit(cloned); // unlit GLB → lit + shadows (3.10)
 
     // Apply color override to all meshes if provided
     if (color) {
