@@ -7,7 +7,7 @@ import {
   sendPaymentFailedEmail,
   sendSubscriptionCancelledEmail,
 } from "@/shared/lib/email";
-import { resolveCheckoutTier, tierForPriceId, type PaidTier } from "../billing";
+import { resolveCheckoutTier, tierForPriceId, toDbSubscriptionStatus, type PaidTier } from "../billing";
 
 export const dynamic = "force-dynamic";
 
@@ -137,12 +137,13 @@ async function handleCheckoutComplete(session: Stripe.Checkout.Session) {
     return;
   }
 
-  await supabase.from("profiles").update({
+  const { error: updErr } = await supabase.from("profiles").update({
     tier,
     stripe_customer_id: session.customer as string,
     stripe_subscription_id: subscriptionId,
-    subscription_status: "active",
+    subscription_status: toDbSubscriptionStatus(subscription.status),
   }).eq("id", userId);
+  if (updErr) throw updErr; // → 500, Stripe retries (BUG-DB-01: no silent failure)
 
   // Send upgrade confirmation email
   const email = session.customer_email || session.customer_details?.email;
@@ -163,10 +164,13 @@ async function handleSubscriptionUpdate(sub: Stripe.Subscription) {
 
   console.log("[Stripe Webhook] Subscription updated:", { userId, tier, status });
 
-  await supabase.from("profiles").update({
+  // BUG-DB-01: map statuses the CHECK rejects, and surface a failed update
+  // (it used to fail silently and leave the tier unchanged).
+  const { error: updErr } = await supabase.from("profiles").update({
     tier: PAID_STATUSES.has(status) ? tier : "free",
-    subscription_status: status,
+    subscription_status: toDbSubscriptionStatus(status),
   }).eq("id", userId);
+  if (updErr) throw updErr; // → 500, Stripe retries
 }
 
 async function handleSubscriptionCancel(sub: Stripe.Subscription) {

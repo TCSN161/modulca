@@ -90,3 +90,26 @@ describe("resolveCheckoutTier (webhook)", () => {
     expect(resolveCheckoutTier(null, "premium").tier).toBe("premium");
   });
 });
+
+describe("toDbSubscriptionStatus (BUG-DB-01)", () => {
+  it("keeps allowed statuses and maps the ones the CHECK rejects", async () => {
+    const { toDbSubscriptionStatus } = await import("./billing");
+    expect(toDbSubscriptionStatus("active")).toBe("active");
+    expect(toDbSubscriptionStatus("trialing")).toBe("trialing");
+    expect(toDbSubscriptionStatus("incomplete")).toBe("unpaid");
+    expect(toDbSubscriptionStatus("incomplete_expired")).toBe("canceled");
+    expect(toDbSubscriptionStatus("paused")).toBe("canceled");
+  });
+});
+
+describe("computeBillingStatus (server-side beta promo)", () => {
+  it("reports the promo for a new free account and none for comp", async () => {
+    const { computeBillingStatus } = await import("./billing");
+    const s = computeBillingStatus(profile({ created_at: NEW }));
+    expect(s).toMatchObject({ tier: "free", effectiveTier: "premium", betaPromoActive: true, comp: false });
+    expect(s.betaPromoDaysLeft).toBeGreaterThan(80);
+    const c = computeBillingStatus(profile({ tier: "constructor" }));
+    expect(c).toMatchObject({ effectiveTier: "constructor", betaPromoActive: false, comp: true, hasSubscription: false });
+    expect(computeBillingStatus(null)).toMatchObject({ tier: "free", effectiveTier: "free", betaPromoActive: false });
+  });
+});

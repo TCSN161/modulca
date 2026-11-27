@@ -9,7 +9,7 @@
  *  - a webhook never lowers a comp account (paid tier, no subscription id).
  */
 
-import { getEffectiveTier, type AccountTier } from "@/features/auth/types";
+import { getBetaPromoDaysLeft, getEffectiveTier, type AccountTier } from "@/features/auth/types";
 
 export const TIER_RANK: Record<AccountTier, number> = {
   guest_free: 0,
@@ -117,4 +117,44 @@ export function resolveCheckoutTier(
     return { tier: current, keepTier: true };
   }
   return { tier: purchased, keepTier: false };
+}
+
+/**
+ * BUG-DB-01: profiles.subscription_status has a CHECK that only allows
+ * free / active / past_due / canceled / unpaid / trialing. Stripe also sends
+ * incomplete, incomplete_expired and paused; writing those made the whole
+ * update fail silently (tier unchanged). Map them onto allowed values.
+ */
+const DB_STATUSES = new Set(["free", "active", "past_due", "canceled", "unpaid", "trialing"]);
+export function toDbSubscriptionStatus(status: string): string {
+  if (DB_STATUSES.has(status)) return status;
+  if (status === "incomplete") return "unpaid";
+  return "canceled"; // incomplete_expired, paused, anything new
+}
+
+export interface BillingStatus {
+  tier: AccountTier;
+  effectiveTier: AccountTier;
+  betaPromoActive: boolean;
+  betaPromoDaysLeft: number;
+  comp: boolean;
+  hasSubscription: boolean;
+  subscriptionStatus: string | null;
+}
+
+/** Server-computed billing status (beta promo from the DB `created_at`, not the browser). */
+export function computeBillingStatus(profile: BillingProfile | null): BillingStatus {
+  const tier = normalizeAccountTier(profile?.tier ?? "free");
+  const createdAt = profile?.created_at ?? null;
+  const effectiveTier = getEffectiveTier(tier, createdAt);
+  const promo = tier === "free" && effectiveTier !== "free";
+  return {
+    tier,
+    effectiveTier,
+    betaPromoActive: promo,
+    betaPromoDaysLeft: promo ? getBetaPromoDaysLeft(tier, createdAt) : 0,
+    comp: isCompAccount(profile),
+    hasSubscription: hasLiveSubscription(profile),
+    subscriptionStatus: profile?.subscription_status ?? null,
+  };
 }
