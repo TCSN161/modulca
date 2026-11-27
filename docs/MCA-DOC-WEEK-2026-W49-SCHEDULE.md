@@ -23,6 +23,7 @@
 | Zi | Sesiuni (max 3, max 2 deodată) | Model | Costin |
 |---|---|---|---|
 | **Lun 30** | **2.05** F4+F6 (urbanism PUG/PUZ + ghidul de autorizare; NEXT-2) · **7.02** acord arhitect partener + emailuri DPA (draft) + pachetul F2+F3 · (5.04 img2img se termină, dacă n-a terminat în weekend) | Opus · Opus | Verificare pe site (§3 #1) · Google branding (§3 #4) · aprobi emailurile DPA |
+| **Lun 30** (în plus) | **5.05** începe cu **ST36** (randarea nu rămâne salvată, high) + ST37–ST39, apoi auditul PermitTracker | Opus | — |
 | **Mar 1** | **3.08** PDF în română: ST32 (RO+EN) + ST30 legende + ST31 costuri din `computeProjectCost` + ST29 header `X-AI-Fallback-From` · **2.09** verificarea link-urilor din bibliotecă (ST28) | Opus · Sonnet | Citești F4+F6 (seara) |
 | **Mie 2** | **8.02** Express MVP, partea 1 · **1.07** upgrade securitate B15 (sharp 0.34→0.35) | Opus · Sonnet | OK pentru B15 · **decizia €10** (de preferat azi, după verificarea klein) |
 | **Joi 3** | **8.02** Express MVP, partea 2 · **4.05** poartă de invitație + promo ancorat + plafon lunar de cost (30% din preț) + `ENGINE_LIMITS` după decizia €10 | Opus · Opus | Conturi de afiliat Profitshare + 2Performant (§3 #8) |
@@ -42,7 +43,7 @@
 
 | # | Ce | Când | Timp | Cum / unde |
 |---|---|---|---|---|
-| 1 | **Verifici reparațiile pe site** (logat): randare „3D + Text” (trebuie „Randat cu cloudflare-klein”), PDF nou (pagini, randări curate), consultantul la o întrebare CATUC, `/pricing` + „Manage” pe contul comp | Lun 30 | 45 min | modulca.eu; scrii în chat-ul MAIN ce nu merge |
+| ~~1~~ | ✅ **Făcut (27 nov seara, cu MAIN)**: run 2 în `MCA-DOC-BETA-SMOKE-TEST.md` §6 — totul OK în afară de **ST36** (randarea nu rămâne salvată). ~~Verifici reparațiile pe site~~ (logat): randare „3D + Text” (trebuie „Randat cu cloudflare-klein”), PDF nou (pagini, randări curate), consultantul la o întrebare CATUC, `/pricing` + „Manage” pe contul comp | Lun 30 | 45 min | modulca.eu; scrii în chat-ul MAIN ce nu merge |
 | 2 | Te uiți pe contact sheet-ul bake-off (klein vs randările vechi din PDF #8) | Lun 30 | 10 min | `docs/research/render-bakeoff-2026-11/index.html` |
 | 3 | Citești F3 (+ nota CC1 / art. 440(3) care poate schimba F2) | până Lun 30 | 40 min | `src/knowledge/06-regulations/RO/modular-prefab-regulations.new.md` |
 | ~~4~~ | ✅ **Făcut (27 nov)**: brand verificat de Google, ecranul arată „ModulCA” + logo. ~~Login Google cu numele ModulCA~~ (ST18): brand în Google Cloud Console, trimis la verificare (2–3 zile lucrătoare la Google) | **Lun 30** (ca să fie aprobat înainte de 15 dec) | 15 min + așteptare | `docs/MCA-DOC-GOOGLE-LOGIN-BRANDING.md` varianta A (gratuită) |

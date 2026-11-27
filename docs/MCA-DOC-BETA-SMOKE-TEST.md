@@ -88,6 +88,7 @@ Bug owners = `MCA-DOC-CHAT-WORKFLOW-2026-11-22.md` §10 (by path).
 | Run | Date | Who | Result |
 |---|---|---|---|
 | 1 | 2026-11-26 | 1.03 MAIN | see §4 |
+| 2 (parțial) | 2026-11-27 seara | 1.05 MAIN, Costin logat (Constructor) | retest ST-uri pe prod, după 5.04 (4f44173) → §6 |
 
 ## 3. BUG table
 
@@ -148,7 +149,7 @@ Run 1 test project: `Smoke Test 1.03` (id `5895a485-…`, Compact House → Smal
 
 Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu e încă reverificat pe prod cu contul logat** → testul 2 (W49) confirmă. ST33–ST35 au apărut după run 1 (pagina de randare, bake-off).
 
-**Bilanț: 27 ✅ reparate · 5 🟡 parțial · 3 ❌ deschise** (ST18 închis pe 27 nov seara).
+**Bilanț: 27 ✅ reparate · 5 🟡 parțial · 3 ❌ deschise** (ST18 închis pe 27 nov seara). Run 2 a adăugat ST36–ST39 (§6).
 
 | BUG | Stare | Commit | Ce mai rămâne · cine |
 |---|---|---|---|
@@ -187,3 +188,33 @@ Sursa: commit-urile de pe master. „Reparat” = în cod, pe master; **nimic nu
 | ST33 | ✅ | b757f22 | img2img trimite motorul ales |
 | ST34 | ✅ | 63b44d9 | img2img nu mai cade pe text2img plătit |
 | ST35 | ✅ | 1e8b4af | — |
+
+## 6. Run 2 (parțial), 2026-11-27 seara — retest pe prod, cont Constructor logat
+
+Proiect: `Smoke Test 1.03`. O singură randare consumată. Nu s-a descărcat PDF-ul.
+
+| Verificat | Rezultat |
+|---|---|
+| Dashboard (ST11) | ✅ 4 proiecte, plan Constructor; ~1 s la prima încărcare antetul arată „Log in” / plan „Guest” până se încarcă sesiunea (ST38) |
+| Finalize (ST08, ST12, ST31) | ✅ produsele listate (Engineered Oak Flooring 28 m², €1.176), totalul €40.272 = cardul din dashboard, include produsele; „4 projects saved” |
+| Produse după încărcare completă (ST06) | ✅ produsul rămâne după navigare cu URL |
+| Architect prin URL direct (ST09) | ✅ se deschide workspace-ul; antetul arată id-ul proiectului, nu numele (ST39) |
+| Randare „Ce vezi” (5.04, ST01/ST03) | ✅ POST `/api/ai-render` 200 în ~20 s, cloudflare-klein img2img, păstrează unghiul, decupajul și mobilierul vederii 3D. Eticheta greșită (ST37) |
+| Randarea rămâne salvată (ST27) | ❌ **regresie**: după navigare randarea dispare de pe pagina de randare și din slide-ul „AI Renders”; `modulca-design.savedRenders` = 0 (ST36) |
+| Design Inspiration (ST35) | ✅ poze reale sau placeholder cu nume |
+| Prezentare (ST07) | ✅ copertă „Smoke Test 1.03”, 27 nov 2026 |
+| Consultant CATUC (ST13) | ✅ Claude, art. 294(2)(a)(ii), 296, 298, 309, 259, 264, 273, 582; marchează punctele în review la arhitectul partener; 6 articole citate |
+| `/pricing` (ST16, ST17) | ✅ „Current Plan” pe Constructor, planurile mai mici „Included in your plan”, €149.90, cifre din config |
+| Manage (ST14) | ✅ `/api/stripe/portal` 200 → „Free account (comp), no Stripe subscription. Nothing to manage or pay.” |
+| Login Google (ST18) | ✅ „to continue to ModulCA” + logo |
+| `/api/health` (ST21) | ✅ module ok; „degraded” doar din lipsa `POLLINATIONS_API_KEY` |
+| Consola (ST20) | 🟡 tot apare React #418 pe pagina de randare |
+
+### Bug-uri noi
+
+| BUG | Flow | Pași | Așteptat vs real | Owner | Severitate |
+|---|---|---|---|---|---|
+| BUG-ST36 | F-D/F-E | Pagina de randare → AI Premium → „Ce vezi” → Generate with AI → apoi deschizi Prezentarea sau reîncarci pagina de randare | Așteptat: randarea salvată în proiect (fix-ul ST27). Real: dispare; slide-ul „AI Renders” spune „Save renders from Step 8”; `savedRenders` = 0 în localStorage. Probabil regresie din 4f44173 (5.04) sau calea img2img nu mai apelează `persistSavedRender` | **Chat 5** `features/design/components/render/**` | **high** |
+| BUG-ST37 | F-D | Aceeași randare | Eticheta spune „Rendered with cloudflare-klein-img2img (fallback: FLUX.2 klein (Cloudflare) unavailable)”: motorul e chiar klein, deci nu e fallback. `engineMetaFromHeaders` compară id-ul cu sufix `-img2img` | **Chat 5** (eticheta) / Chat 3 (header) | low |
+| BUG-ST38 | F-A | Încărcare completă `/dashboard` logat | ~1 s antetul arată „Log in”, „Welcome back, Architect”, plan „Guest”, „--/1” până vine sesiunea | **Chat 5** dashboard + MAIN `auth/store` (`sessionChecked`) | low |
+| BUG-ST39 | F-B | `/project/[id]/architect` | Antetul arată „Project 5895a485-…” în loc de numele proiectului | **Chat 5** | low |
