@@ -13,7 +13,9 @@
 - [x] code mapping (bf3262d): `shared/realModels.ts`, opt-in `?real3d=1` (localStorage `mca-real3d`; `?real3d=0` off), exact labels "Double Bed" / "Nightstand" / "Wardrobe", uniform scale 1 when footprint ±5 %, no preset tint. GLBs copied to `public/models/real/` (kit untouched). Unit test `realModels.test.ts`.
 - [x] acceptance screenshots `3.11-bedroom-before-kit.png` / `3.11-bedroom-after-real.png` (demo bedroom injected in localStorage, top view). FPS 30 in the browser pane for both modes (pane cap). [x] W49 §6 row.
 - [x] Costin OKed before/after (28 Nov) → real models are the default; opt-out `?real3d=0`.
-- [ ] **Left:** FPS on Costin's phone · wood reads darker in the app than in Blender (check exposure / AO strength) · then S/M/L variants + other rooms (W50). Optional: procedural fridge/washer/bookshelf instead of `cabinetBedDrawer.glb`.
+- [x] 3.11b (c1feccb): `fridge-60` (0.60×0.625×1.85, 824 tris, 23 KB), `washer-60` (0.60×0.615×0.85, 1 620 tris, 33 KB), `bookshelf-100` (1.0×0.35×1.8, 1 628 tris, 102 KB) + `bookshelf-160` (1.6×0.4×1.8, 2 000 tris, 119 KB), books on 3 shelves. Wood albedo brightened (bedroom set rebuilt: 103/56/66 KB). `realGlbPath(label, w, d)` picks the model whose footprint fits the slot ±5 %, checked before the 5.06 placeholder list (placeholders stay as fallback). Test covers every fridge/washer/bookshelf slot in all presets. Verified: all 7 real GLBs load in `/project/demo/visualize` (4-module demo), `3.11b-all-modules-real.png`. Total 7 models = 10 084 tris, 501 KB.
+- Note: c1feccb also committed the `*.raw.glb` intermediates by mistake; removed in the next commit (+ `.gitignore` in `3.11/`), still in history (~7.6 MB).
+- [ ] **Left:** FPS on Costin's phone · check the wood tone again in the app (brighter now; if still dark → AO strength / scene exposure) · "Display Shelf", "Shared Shelf", storage racks, dryer, stove, counters still primitives/kit · S/M/L variants + other rooms (W50).
 
 **Session:** `3.11.Engines_Bedroom-Blender-Remodel` · **Model:** Opus · Costin at the PC, Blender 5.3 open, MCP add-on on :9876. 3.10 is done (3286b75, d1fcdc7, 3fa1562).
 
