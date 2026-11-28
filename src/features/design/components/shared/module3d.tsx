@@ -14,6 +14,7 @@ import { makeGlbLit } from "./glbMaterials";
 import type { WallConfigs, WallThicknessConfigs, FurnitureOverride } from "../../store";
 import { isPlaceholderLabel } from "../../furniturePlaceholders";
 import { modelFrame, type FurnitureItem } from "../../layouts";
+import { fitScale, isRealModelPath, realGlbPath } from "./realModels";
 
 /* ------------------------------------------------------------------ */
 /*  Constants                                                          */
@@ -133,6 +134,8 @@ export const LABEL_TO_GLB: Record<string, string> = {
 export function getGlbPath(label: string): string | null {
   const lbl = label.toLowerCase();
   if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
+  const real = realGlbPath(lbl); // 3.11: real-size Blender models (opt-in ?real3d=1)
+  if (real) return real;
   if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
   const sortedKeys = Object.keys(LABEL_TO_GLB).sort((a, b) => b.length - a.length);
   for (const key of sortedKeys) {
@@ -342,7 +345,7 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
     makeGlbLit(cloned); // unlit GLB → lit + shadows (3.10)
 
     // Apply color override to all meshes if provided
-    if (color) {
+    if (color && !isRealModelPath(path)) {
       const threeColor = new THREE.Color(color);
       cloned.traverse((child) => {
         if (child instanceof THREE.Mesh && child.material) {
@@ -366,9 +369,8 @@ export function GlbFurniture({ path, w, h, d, color }: { path: string; w: number
 
     // Guard against degenerate models (zero-size dimensions)
     const MIN_DIM = 0.001;
-    const scaleX = size.x > MIN_DIM ? w / size.x : 1;
-    const scaleY = size.y > MIN_DIM ? h / size.y : 1;
-    const scaleZ = size.z > MIN_DIM ? d / size.z : 1;
+    // 3.11: uniform 1 when the footprint is real size (±5 %), else per-axis fit
+    const [scaleX, scaleY, scaleZ] = size.x > MIN_DIM && size.z > MIN_DIM ? fitScale(size, w, h, d) : [1, 1, 1];
 
     // Protect against insane scale values (corrupted model or bounding box)
     const MAX_SCALE = 1000;

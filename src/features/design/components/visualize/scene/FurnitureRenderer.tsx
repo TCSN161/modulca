@@ -7,6 +7,7 @@ import { Text, useCursor, useGLTF } from "@react-three/drei";
 import { isPlaceholderLabel } from "../../../furniturePlaceholders";
 import { modelFrame, type FurnitureItem } from "../../../layouts";
 import { makeGlbLit } from "../../shared/glbMaterials";
+import { fitScale, realGlbPath } from "../../shared/realModels";
 import type { FurnitureOverride } from "../../../store";
 
 /* ------------------------------------------------------------------ */
@@ -119,6 +120,8 @@ const LABEL_TO_GLB: Record<string, string> = {
 function getGlbPath(label: string): string | null {
   const lbl = label.toLowerCase();
   if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
+  const real = realGlbPath(lbl); // 3.11: real-size Blender models (opt-in ?real3d=1)
+  if (real) return real;
   // Try exact match first
   if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
   // Try partial match — sort keys longest-first so more specific keys win
@@ -145,10 +148,7 @@ function GlbFurniture({ path, w, h, d }: { path: string; w: number; h: number; d
     // Use per-axis (non-uniform) scaling so furniture fills its bounding box
     const box = new THREE.Box3().setFromObject(cloned);
     const size = box.getSize(new THREE.Vector3());
-    const scaleX = size.x > 0 ? w / size.x : 1;
-    const scaleY = size.y > 0 ? h / size.y : 1;
-    const scaleZ = size.z > 0 ? d / size.z : 1;
-    cloned.scale.set(scaleX, scaleY, scaleZ);
+    cloned.scale.set(...fitScale(size, w, h, d)); // 3.11: uniform 1 when real size (±5 %)
 
     // Re-compute after scale and position so the bottom sits at y=0
     const box2 = new THREE.Box3().setFromObject(cloned);
