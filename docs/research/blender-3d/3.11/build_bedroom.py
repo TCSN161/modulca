@@ -216,7 +216,12 @@ def wardrobe():  # wardrobe-80: 0.80 × 0.50 × 2.20, 2 doors
         box("handle_l", -0.040, -0.026, -0.26, -0.245, 0.95, 1.35, M["metal"], 0.003, 1, c),
         box("handle_r", 0.026, 0.040, -0.26, -0.245, 0.95, 1.35, M["metal"], 0.003, 1, c),
     ]
-    return bake_piece(piece, P, c, ao), ao
+    ob = bake_piece(piece, P, c, ao)
+    # vertical grain on the tall doors: swap u/v of UV1 (UV2/AO untouched)
+    uv = ob.data.uv_layers["UVMap"].data
+    for d in uv:
+        d.uv = (d.uv[1], d.uv[0])
+    return ob, ao
 
 def build(name):
     ob, ao = {"bed": bed, "nightstand": nightstand, "wardrobe": wardrobe}[name]()
