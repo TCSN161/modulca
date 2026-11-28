@@ -5,8 +5,8 @@ import * as THREE from "three";
  * These GLBs are modelled in metres at the bedroom/rest slot sizes, so they render at
  * uniform scale 1 instead of being stretched per axis like the ~½-size kit models.
  *
- * Opt-in until Costin OKs the before/after: `?real3d=1` turns it on (remembered in
- * localStorage), `?real3d=0` turns it off. Exact labels only, so e.g. "Hall Wardrobe"
+ * On by default since Costin OKed the before/after (28 Nov). `?real3d=0` turns it off
+ * (remembered in localStorage), `?real3d=1` turns it back on. Exact labels only, so e.g. "Hall Wardrobe"
  * keeps its old path.
  */
 const REAL_MODELS: Record<string, string> = {
@@ -21,15 +21,15 @@ export function realModelsEnabled(): boolean {
   if (typeof window === "undefined") return false;
   try {
     const q = new URLSearchParams(window.location.search).get("real3d");
-    if (q === "1") localStorage.setItem(STORAGE_KEY, "1");
-    if (q === "0") localStorage.removeItem(STORAGE_KEY);
-    return localStorage.getItem(STORAGE_KEY) === "1";
+    if (q === "0") localStorage.setItem(STORAGE_KEY, "0");
+    if (q === "1") localStorage.removeItem(STORAGE_KEY);
+    return localStorage.getItem(STORAGE_KEY) !== "0";
   } catch {
-    return false;
+    return true;
   }
 }
 
-/** Real-size GLB for this label, or null (flag off / no real model). */
+/** Real-size GLB for this label, or null (opted out / no real model). */
 export function realGlbPath(label: string): string | null {
   const path = REAL_MODELS[label.toLowerCase()];
   return path && realModelsEnabled() ? path : null;

@@ -12,7 +12,8 @@
 - [x] nightstand `nightstand-45.glb`: 0.45×0.40×0.50, 456 tris, 53 KB (AO 512). [x] wardrobe `wardrobe-80.glb`: 0.80×0.51×2.20, 456 tris, 63 KB (vertical grain). Set = 2 468 tris, 212 KB.
 - [x] code mapping (bf3262d): `shared/realModels.ts`, opt-in `?real3d=1` (localStorage `mca-real3d`; `?real3d=0` off), exact labels "Double Bed" / "Nightstand" / "Wardrobe", uniform scale 1 when footprint ±5 %, no preset tint. GLBs copied to `public/models/real/` (kit untouched). Unit test `realModels.test.ts`.
 - [x] acceptance screenshots `3.11-bedroom-before-kit.png` / `3.11-bedroom-after-real.png` (demo bedroom injected in localStorage, top view). FPS 30 in the browser pane for both modes (pane cap). [x] W49 §6 row.
-- [ ] **Left:** Costin's OK on before/after → make real models the default (flip `realModelsEnabled` default) · FPS on Costin's phone · wood reads darker in the app than in Blender (check exposure / AO strength) · then S/M/L variants + other rooms (W50). Optional: procedural fridge/washer/bookshelf instead of `cabinetBedDrawer.glb`.
+- [x] Costin OKed before/after (28 Nov) → real models are the default; opt-out `?real3d=0`.
+- [ ] **Left:** FPS on Costin's phone · wood reads darker in the app than in Blender (check exposure / AO strength) · then S/M/L variants + other rooms (W50). Optional: procedural fridge/washer/bookshelf instead of `cabinetBedDrawer.glb`.
 
 **Session:** `3.11.Engines_Bedroom-Blender-Remodel` · **Model:** Opus · Costin at the PC, Blender 5.3 open, MCP add-on on :9876. 3.10 is done (3286b75, d1fcdc7, 3fa1562).
 

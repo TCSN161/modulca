@@ -24,8 +24,13 @@ describe("3.11 realModels", () => {
     expect(fitScale(new THREE.Vector3(0.96, 0.38, 1.13), 1.4, 0.5, 2.0)).toEqual([1.4 / 0.96, 0.5 / 0.38, 2.0 / 1.13]);
   });
 
-  it("is opt-in and exact-label only", () => {
-    expect(realGlbPath("Double Bed")).toBeNull(); // flag off by default
+  it("is on by default, exact-label only, opt-out with mca-real3d=0", () => {
+    localStorage.removeItem("mca-real3d");
+    expect(realGlbPath("Double Bed")).toBe("/models/real/bed-double-140.glb");
+    expect(realGlbPath("Hall Wardrobe")).toBeNull();
+    localStorage.setItem("mca-real3d", "0");
+    expect(realGlbPath("Double Bed")).toBeNull();
+    localStorage.removeItem("mca-real3d");
     expect(isRealModelPath("/models/real/wardrobe-80.glb")).toBe(true);
     expect(isRealModelPath("/models/bedDouble.glb")).toBe(false);
   });
