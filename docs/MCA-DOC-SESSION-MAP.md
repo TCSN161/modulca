@@ -119,6 +119,7 @@ ModulCA
 5. **Maximum 2 sesiuni în paralel, maximum 3 pe zi** (limita de utilizare și memoria PC-ului; în W48 cu 3–4 deodată am atins limita), niciodată două pe aceleași fișiere. Toate lucrează în același folder: o eroare `tsc` în fișierul altei sesiuni = așteaptă, nu repara.
 6. **Arhivare**: o sesiune ✅ verificată de MAIN se poate arhiva; harta și commit-urile păstrează istoria.
 7. **În bara laterală**: o sesiune nouă stă sub MAIN cât lucrează (așa raportul vine automat la MAIN). Când e ✅ și verificată, MAIN o detașează și o mută în grupul chat-ului ei („2 · Neufert” etc.). Sesiunile din aprilie stau în „0 · Arhivă”.
+9. **Resursele PC-ului** (cerut de Costin 28 nov): MAIN verifică discul C:, RAM-ul și procesele Node/serverul local (:3000) înainte să pornească 2+ sesiuni, după ce termină un lot și la închiderea de vineri. Prag: < 10 GB liberi, un proces Node > 1,5 GB fără sesiune activă, > 8 procese Node cu sesiunile oprite → îl întreabă pe Costin într-un rând și oprește doar cu OK-ul lui; niciodată în timp ce lucrează o sesiune.
 8. **MAIN nou la fiecare săptămână** (sau când contextul se umple): 1.02 → 1.03 → … Harta asta e memoria comună, nu chat-ul.
 
 ---
