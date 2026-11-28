@@ -484,6 +484,33 @@ interface WalkthroughSceneProps {
  *  - enhanced: SMAA + N8AO (free, subtle)
  *  - cinematic: SMAA + N8AO + Bloom + DoF + Vignette + ChromaticAberration (Premium+)
  */
+/**
+ * 3.11 perf: the sun and the house do not move while you walk, so the shadow map
+ * does not need a redraw every frame (2048²/4096² pass over every shadow caster,
+ * which grew when 3.10 made all furniture GLBs cast shadows). Redraw on mount,
+ * when the modules change, and once a second so GLBs that load later still get
+ * their shadows.
+ */
+function StaticShadows({ modules }: { modules: ModuleConfig[] }) {
+  const gl = useThree((s) => s.gl);
+  const acc = useRef(0);
+  useEffect(() => {
+    gl.shadowMap.autoUpdate = false;
+    gl.shadowMap.needsUpdate = true;
+    return () => {
+      gl.shadowMap.autoUpdate = true;
+    };
+  }, [gl, modules]);
+  useFrame((_, delta) => {
+    acc.current += delta;
+    if (acc.current >= 1) {
+      acc.current = 0;
+      gl.shadowMap.needsUpdate = true;
+    }
+  });
+  return null;
+}
+
 function PostFX({ enhanced, cinematic }: { enhanced: boolean; cinematic: boolean }) {
   if (!enhanced && !cinematic) return null;
   return (
@@ -542,7 +569,8 @@ export default function WalkthroughScene({
 
   return (
     <Canvas
-      shadows={{ type: THREE.PCFSoftShadowMap, enabled: true }}
+      shadows={{ type: THREE.PCFShadowMap, enabled: true }} // PCFSoft is deprecated (three falls back to PCF)
+      dpr={[1, 1.5]} // 3.11 perf: cap the pixel ratio while walking
       camera={{ position: initialPos, fov: 70, near: 0.1, far: 200 }}
       style={{ background: bgColor, width: "100%", height: "100%" }}
       gl={{
@@ -554,6 +582,7 @@ export default function WalkthroughScene({
       <XR store={xrStore}>
         {/* Cinematic mode uses HDRI environment for reflections + realistic lighting */}
         {cinematic && <Environment preset="apartment" background={false} />}
+        <StaticShadows modules={modules} />
         <SceneContent
           modules={modules}
           teleportTarget={teleportTarget}
