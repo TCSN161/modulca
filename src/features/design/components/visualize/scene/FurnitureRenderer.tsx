@@ -117,11 +117,11 @@ const LABEL_TO_GLB: Record<string, string> = {
  * Longer keys are checked first during partial matching so that
  * "lounge chair" matches before "chair".
  */
-function getGlbPath(label: string): string | null {
+function getGlbPath(label: string, w?: number, d?: number): string | null {
   const lbl = label.toLowerCase();
-  if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
-  const real = realGlbPath(lbl); // 3.11: real-size Blender models (opt-in ?real3d=1)
+  const real = realGlbPath(lbl, w, d); // 3.11: real-size Blender model that fits the slot (opt-out ?real3d=0)
   if (real) return real;
+  if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
   // Try exact match first
   if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
   // Try partial match — sort keys longest-first so more specific keys win
@@ -563,9 +563,9 @@ export function FurniturePiece({
       {/* Rotated group containing furniture geometry */}
       <group rotation={[0, rotationY, 0]}>
         {/* GLB model (with error boundary + Suspense) or fallback geometry */}
-        {getGlbPath(item.label) ? (
+        {getGlbPath(item.label, frame.modelW, frame.modelD) ? (
           <SafeGlbFurniture
-            path={getGlbPath(item.label)!}
+            path={getGlbPath(item.label, frame.modelW, frame.modelD)!}
             w={frame.modelW}
             h={item.height}
             d={frame.modelD}

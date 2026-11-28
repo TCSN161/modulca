@@ -8,12 +8,24 @@ import * as THREE from "three";
  * On by default since Costin OKed the before/after (28 Nov). `?real3d=0` turns it off
  * (remembered in localStorage), `?real3d=1` turns it back on. Exact labels only, so e.g. "Hall Wardrobe"
  * keeps its old path.
+ * 3.11b: + fridge, washer, bookshelf (two widths). A label can have several sizes;
+ * the one whose footprint fits the slot (±5 %) wins, else the old path / primitive.
  */
-const REAL_MODELS: Record<string, string> = {
-  "double bed": "/models/real/bed-double-140.glb",
-  nightstand: "/models/real/nightstand-45.glb",
-  wardrobe: "/models/real/wardrobe-80.glb",
+const R = "/models/real/";
+/** label → real models, footprint in the model frame (w = x, d = z) */
+const REAL_MODELS: Record<string, { path: string; w: number; d: number }[]> = {
+  "double bed": [{ path: R + "bed-double-140.glb", w: 1.4, d: 2.0 }],
+  nightstand: [{ path: R + "nightstand-45.glb", w: 0.45, d: 0.4 }],
+  wardrobe: [{ path: R + "wardrobe-80.glb", w: 0.8, d: 0.51 }],
+  fridge: [{ path: R + "fridge-60.glb", w: 0.6, d: 0.625 }],
+  washer: [{ path: R + "washer-60.glb", w: 0.6, d: 0.615 }],
+  bookshelf: [
+    { path: R + "bookshelf-100.glb", w: 1.0, d: 0.35 },
+    { path: R + "bookshelf-160.glb", w: 1.6, d: 0.4 },
+  ],
 };
+
+const near = (a: number, b: number, tol = 0.05) => b > 0 && Math.abs(a - b) <= tol * b;
 
 const STORAGE_KEY = "mca-real3d";
 
@@ -29,10 +41,15 @@ export function realModelsEnabled(): boolean {
   }
 }
 
-/** Real-size GLB for this label, or null (opted out / no real model). */
-export function realGlbPath(label: string): string | null {
-  const path = REAL_MODELS[label.toLowerCase()];
-  return path && realModelsEnabled() ? path : null;
+/**
+ * Real-size GLB for this label that fits a modelW × modelD slot, or null (opted
+ * out / no real model / no size fits). Without a size the first model is used.
+ */
+export function realGlbPath(label: string, w?: number, d?: number): string | null {
+  const list = REAL_MODELS[label.toLowerCase()];
+  if (!list || !realModelsEnabled()) return null;
+  if (w == null || d == null) return list[0].path;
+  return list.find((m) => near(m.w, w) && near(m.d, d))?.path ?? null;
 }
 
 /**
@@ -42,8 +59,7 @@ export function realGlbPath(label: string): string | null {
  * Otherwise the old per-axis fit.
  */
 export function fitScale(size: THREE.Vector3, w: number, h: number, d: number, tol = 0.05): [number, number, number] {
-  const near = (a: number, b: number) => b > 0 && Math.abs(a - b) <= tol * b;
-  if (near(size.x, w) && near(size.z, d)) return [1, 1, 1];
+  if (near(size.x, w, tol) && near(size.z, d, tol)) return [1, 1, 1];
   return [size.x > 0.001 ? w / size.x : 1, size.y > 0.001 ? h / size.y : 1, size.z > 0.001 ? d / size.z : 1];
 }
 

@@ -34,4 +34,18 @@ describe("3.11 realModels", () => {
     expect(isRealModelPath("/models/real/wardrobe-80.glb")).toBe(true);
     expect(isRealModelPath("/models/bedDouble.glb")).toBe(false);
   });
+
+  it("3.11b: every fridge / washer / bookshelf slot gets a real model that fits", () => {
+    localStorage.removeItem("mca-real3d");
+    const hits: string[] = [];
+    for (const room of ROOM_LAYOUTS) for (const p of room.presets) for (const item of p.furniture) {
+      if (!["fridge", "washer", "bookshelf"].includes(item.label.toLowerCase())) continue;
+      const f = modelFrame(item);
+      const path = realGlbPath(item.label, f.modelW, f.modelD);
+      expect(path, `${room.moduleType}/${p.id}/${item.id}`).not.toBeNull();
+      hits.push(path!);
+    }
+    expect(new Set(hits)).toEqual(new Set(["/models/real/fridge-60.glb", "/models/real/washer-60.glb", "/models/real/bookshelf-100.glb", "/models/real/bookshelf-160.glb"]));
+    expect(realGlbPath("Bookshelf", 2.0, 0.5)).toBeNull(); // no size fits → old path
+  });
 });

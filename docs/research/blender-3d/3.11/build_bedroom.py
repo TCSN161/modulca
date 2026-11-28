@@ -23,7 +23,8 @@ def wood_image(size=1024):
     rings = 0.5 + 0.5 * np.sin(tau * (36 * V + 12 * warp))
     fine = 0.5 + 0.5 * np.sin(tau * (160 * V + 1.5 * np.sin(tau * 7 * U)))
     t = np.clip(0.65 * rings ** 2.2 + 0.2 * fine, 0, 1)
-    light = np.array([0.62, 0.47, 0.33]); dark = np.array([0.47, 0.33, 0.22])
+    # 3.11b: brighter than the first cut (read too dark under the app's ACES tone mapping)
+    light = np.array([0.76, 0.60, 0.44]); dark = np.array([0.60, 0.44, 0.30])
     rgb = light[None, None, :] * (1 - t[..., None]) + dark[None, None, :] * t[..., None]
     rgba = np.concatenate([rgb, np.ones((size, size, 1))], axis=2).astype(np.float32)
     img = bpy.data.images.new(name, size, size, alpha=False)
@@ -49,6 +50,13 @@ SPEC = {  # base colour (linear), roughness, metallic, wood texture?
     "fabric": ((0.34, 0.40, 0.42), 0.95, 0.0, False),   # duvet, blue-grey
     "uphol":  ((0.52, 0.50, 0.47), 0.95, 0.0, False),   # headboard pad, warm grey
     "metal":  ((0.55, 0.55, 0.56), 0.35, 1.0, False),
+    "appliance": ((0.82, 0.83, 0.84), 0.3, 0.0, False),  # white enamel
+    "glass":  ((0.03, 0.035, 0.04), 0.08, 0.0, False),
+    "panel":  ((0.10, 0.10, 0.11), 0.4, 0.0, False),
+    "book_r": ((0.45, 0.10, 0.08), 0.8, 0.0, False),
+    "book_b": ((0.08, 0.16, 0.30), 0.8, 0.0, False),
+    "book_g": ((0.15, 0.25, 0.14), 0.8, 0.0, False),
+    "book_c": ((0.75, 0.66, 0.50), 0.8, 0.0, False),
 }
 
 def make_mat(piece, kind, ao_img):
@@ -223,8 +231,90 @@ def wardrobe():  # wardrobe-80: 0.80 × 0.50 × 2.20, 2 doors
         d.uv = (d.uv[1], d.uv[0])
     return ob, ao
 
+# ---------------------------------------------------------------- 3.11b: appliances + shelves
+def cyl(name, cx, cz, r, y0, y1, mat, seg=32, bevel=0.003, coll=None):
+    """cylinder along Y (a front-facing disc/ring), centre (cx, cz)."""
+    me = bpy.data.meshes.new(name)
+    bm = bmesh.new()
+    bmesh.ops.create_cone(bm, cap_ends=True, segments=seg, radius1=r, radius2=r, depth=y1 - y0)
+    for v in bm.verts:
+        x, y, z = v.co
+        v.co = (cx + x, (y0 + y1) / 2 + z, cz + y)
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me); bm.free()
+    for poly in me.polygons:
+        poly.use_smooth = True
+    me.materials.append(mat)
+    ob = bpy.data.objects.new(name, me)
+    coll.objects.link(ob)
+    if bevel > 0:
+        b = ob.modifiers.new("Bevel", "BEVEL")
+        b.width = bevel; b.segments = 2; b.limit_method = "ANGLE"; b.harden_normals = True
+    wn = ob.modifiers.new("WeightedNormal", "WEIGHTED_NORMAL"); wn.keep_sharp = True
+    return ob
+
+def fridge():  # fridge-60: 0.60 × 0.60 × 1.85, freezer below
+    piece = "fridge-60"
+    c, ao, M = piece_setup(piece, 512)
+    P = [
+        box("plinth", -0.29, 0.29, -0.27, 0.29, 0.0, 0.06, M["panel"], 0.003, 1, c),
+        box("body", -0.30, 0.30, -0.28, 0.30, 0.06, 1.85, M["appliance"], 0.012, 3, c),
+        box("door_low", -0.297, 0.297, -0.30, -0.28, 0.07, 0.68, M["appliance"], 0.008, 3, c),
+        box("door_top", -0.297, 0.297, -0.30, -0.28, 0.70, 1.84, M["appliance"], 0.008, 3, c),
+        box("handle_low", 0.232, 0.248, -0.325, -0.30, 0.45, 0.65, M["metal"], 0.004, 2, c),
+        box("handle_top", 0.232, 0.248, -0.325, -0.30, 0.74, 1.14, M["metal"], 0.004, 2, c),
+    ]
+    return bake_piece(piece, P, c, ao), ao
+
+def washer():  # washer-60: 0.60 × 0.60 × 0.85, front loader
+    piece = "washer-60"
+    c, ao, M = piece_setup(piece, 512)
+    P = [
+        box("feet", -0.28, 0.28, -0.26, 0.28, 0.0, 0.02, M["panel"], 0.002, 1, c),
+        box("body", -0.30, 0.30, -0.28, 0.30, 0.02, 0.85, M["appliance"], 0.012, 3, c),
+        box("drawer", -0.28, -0.10, -0.29, -0.28, 0.74, 0.83, M["appliance"], 0.004, 2, c),
+        box("display", 0.0, 0.15, -0.292, -0.28, 0.76, 0.80, M["panel"], 0.003, 1, c),
+        cyl("knob", 0.22, 0.78, 0.03, -0.30, -0.28, M["metal"], 24, 0.003, c),
+        cyl("door_ring", 0.0, 0.40, 0.20, -0.31, -0.28, M["metal"], 40, 0.006, c),
+        cyl("door_glass", 0.0, 0.40, 0.155, -0.315, -0.31, M["glass"], 40, 0.003, c),
+    ]
+    return bake_piece(piece, P, c, ao), ao
+
+def bookshelf(w, d, piece):  # open bookshelf w × d × 1.80, 4 shelves, books on 3
+    import random
+    rnd = random.Random(311)
+    c, ao, M = piece_setup(piece, 1024)
+    t, H = 0.025, 1.80
+    x0, x1, y0, y1 = -w / 2, w / 2, -d / 2, d / 2
+    P = [
+        box("side_l", x0, x0 + t, y0, y1, 0.0, H, M["wood"], 0.004, 2, c),
+        box("side_r", x1 - t, x1, y0, y1, 0.0, H, M["wood"], 0.004, 2, c),
+        box("top", x0 + t, x1 - t, y0, y1, H - t, H, M["wood"], 0.004, 2, c),
+        box("plinth", x0 + t, x1 - t, y0 + 0.02, y1, 0.0, 0.06, M["wood_dark"], 0.002, 1, c),
+        box("bottom", x0 + t, x1 - t, y0, y1, 0.06, 0.085, M["wood"], 0.003, 2, c),
+        box("back", x0 + t, x1 - t, y1 - 0.008, y1, 0.085, H - t, M["wood_dark"], 0.0, 1, c),
+    ]
+    levels = [0.42, 0.76, 1.10, 1.44]
+    for i, z in enumerate(levels):
+        P.append(box(f"shelf{i}", x0 + t, x1 - t, y0, y1 - 0.008, z, z + 0.022, M["wood"], 0.003, 2, c))
+    books = [M["book_r"], M["book_b"], M["book_g"], M["book_c"]]
+    for zb in (0.085, 0.782, 1.122):  # bottom board, shelf 2, shelf 3 tops
+        x = x0 + t + 0.01
+        stop = x0 + t + (x1 - x0 - 2 * t) * rnd.uniform(0.55, 0.8)
+        while x < stop:
+            bw, bh, bd = rnd.uniform(0.022, 0.042), rnd.uniform(0.19, 0.27), min(d - 0.05, rnd.uniform(0.15, 0.22))
+            P.append(box("book", x, x + bw, y1 - 0.01 - bd, y1 - 0.01, zb, zb + bh, rnd.choice(books), 0.0, 1, c))
+            x += bw + 0.002
+    ob = bake_piece(piece, P, c, ao)
+    uv = ob.data.uv_layers["UVMap"].data  # vertical grain on the tall sides
+    for dd in uv:
+        dd.uv = (dd.uv[1], dd.uv[0])
+    return ob, ao
+
 def build(name):
-    ob, ao = {"bed": bed, "nightstand": nightstand, "wardrobe": wardrobe}[name]()
+    ob, ao = {"bed": bed, "nightstand": nightstand, "wardrobe": wardrobe, "fridge": fridge, "washer": washer,
+              "bookshelf-100": lambda: bookshelf(1.0, 0.35, "bookshelf-100"),
+              "bookshelf-160": lambda: bookshelf(1.6, 0.40, "bookshelf-160")}[name]()
     d = ob.dimensions
     info = {"piece": ob.name, "tris": tri_count(ob), "dims_xyz_m": [round(d.x, 3), round(d.y, 3), round(d.z, 3)],
             "mats": [m.name for m in ob.data.materials]}

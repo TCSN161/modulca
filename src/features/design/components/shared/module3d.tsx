@@ -131,11 +131,11 @@ export const LABEL_TO_GLB: Record<string, string> = {
 };
 
 /** Resolve a furniture label to a GLB path. Exact match first, then partial. */
-export function getGlbPath(label: string): string | null {
+export function getGlbPath(label: string, w?: number, d?: number): string | null {
   const lbl = label.toLowerCase();
-  if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
-  const real = realGlbPath(lbl); // 3.11: real-size Blender models (opt-in ?real3d=1)
+  const real = realGlbPath(lbl, w, d); // 3.11: real-size Blender model that fits the slot (opt-out ?real3d=0)
   if (real) return real;
+  if (isPlaceholderLabel(lbl)) return null; // 5.06: primitive until a fitting GLB exists
   if (LABEL_TO_GLB[lbl]) return LABEL_TO_GLB[lbl];
   const sortedKeys = Object.keys(LABEL_TO_GLB).sort((a, b) => b.length - a.length);
   for (const key of sortedKeys) {
@@ -659,7 +659,7 @@ export function StaticFurniturePiece({
   const frame = modelFrame({ ...item, width: safeW, depth: safeD });
   const rotationY = frame.rotationY + ((override?.rotation != null && Number.isFinite(override.rotation)) ? override.rotation : 0);
   const halfH = safeH / 2;
-  const glbPath = getGlbPath(item.label);
+  const glbPath = getGlbPath(item.label, frame.modelW, frame.modelD);
 
   // 4. Validate offset + position computes to a sane world coordinate
   const worldX = offsetX + posX + safeW / 2;
