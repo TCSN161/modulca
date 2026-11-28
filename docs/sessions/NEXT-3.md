@@ -5,6 +5,12 @@
 
 ## ▶ Next up first: 3.11 (Sun 6 Dec or next quota), written by 3.10 on 28 Nov
 
+### ⏸ 3.11 progress (running 28 Nov night; resume here after the 06:00 quota reset)
+- Layout step = done by 5.06 (bedroom/rest: bed 2.0×1.4 facing east, nightstand 0.45×0.40×0.50, wardrobe 0.80×0.50×2.20 facing north). Interior from code: 0.25 walls → 2.5 m (CLAUDE.md "2.4/0.3" is stale).
+- Source: `docs/research/blender-3d/3.11/build_bedroom.py` (run in Blender via MCP: `exec(open(p).read(), ns); ns["build"]("bed"|"nightstand"|"wardrobe")`) + `bedroom-3.11.blend`. Compress: `npx -y @gltf-transform/cli optimize X.raw.glb X.glb --compress meshopt --texture-compress webp` (`*.raw.glb` not committed).
+- [x] bed `bed-double-140.glb`: 1.40×2.00×0.95 m, 1 556 tris, 96 KB (wood albedo 1024 + AO 1024 on UV2, webp).
+- [ ] nightstand `nightstand-45.glb` · [ ] wardrobe `wardrobe-80.glb` · [ ] code mapping (uniform scale 1 when bbox ±5 %) · [ ] acceptance screenshots + FPS · [ ] W49 §6 row
+
 **Session:** `3.11.Engines_Bedroom-Blender-Remodel` · **Model:** Opus · Costin at the PC, Blender 5.3 open, MCP add-on on :9876. 3.10 is done (3286b75, d1fcdc7, 3fa1562).
 
 ### What 3.10 found (read `docs/research/blender-3d/3.10-audit-3d.md` + `3.10-blender-link.md`)
