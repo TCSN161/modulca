@@ -24,6 +24,7 @@ import {
 } from "../shared/module3d";
 
 import * as THREE from "three";
+import { freeSpotWorld } from "./spawn";
 
 const MOVE_SPEED = 3; // m/s
 const EYE_HEIGHT = 1.6;
@@ -225,14 +226,10 @@ function AutoTourController({
       stateRef.current = null;
       return;
     }
-    const wps = modules.map(
-      (m) =>
-        new THREE.Vector3(
-          m.col * MODULE_SIZE + MODULE_SIZE / 2,
-          EYE_HEIGHT,
-          m.row * MODULE_SIZE + MODULE_SIZE / 2
-        )
-    );
+    const wps = modules.map((m) => {
+      const [x, z] = freeSpotWorld(m); // 3.11: not inside the bed
+      return new THREE.Vector3(x, EYE_HEIGHT, z);
+    });
     stateRef.current = {
       waypoints: wps,
       currentIdx: 0,
@@ -342,12 +339,14 @@ function SceneContent({
   // Teleport
   useEffect(() => {
     if (!teleportTarget) return;
-    const x = teleportTarget.col * MODULE_SIZE + MODULE_SIZE / 2;
-    const z = teleportTarget.row * MODULE_SIZE + MODULE_SIZE / 2;
+    const target = modules.find((m) => m.row === teleportTarget.row && m.col === teleportTarget.col);
+    const [x, z] = target
+      ? freeSpotWorld(target) // 3.11: free spot, not inside furniture
+      : [teleportTarget.col * MODULE_SIZE + MODULE_SIZE / 2, teleportTarget.row * MODULE_SIZE + MODULE_SIZE / 2];
     camera.position.set(x, EYE_HEIGHT, z);
     cameraPositionRef.current.set(x, EYE_HEIGHT, z);
     onTeleportDone();
-  }, [teleportTarget, camera, cameraPositionRef, onTeleportDone]);
+  }, [teleportTarget, modules, camera, cameraPositionRef, onTeleportDone]);
 
   // Sun position (offset from building center so shadows look natural)
   const sunX = sceneBounds.centerX + 15;
@@ -553,11 +552,8 @@ export default function WalkthroughScene({
   const initialPos = useMemo(() => {
     if (modules.length === 0) return [0, EYE_HEIGHT, 0] as [number, number, number];
     const first = modules[0];
-    return [
-      first.col * MODULE_SIZE + MODULE_SIZE / 2,
-      EYE_HEIGHT,
-      first.row * MODULE_SIZE + MODULE_SIZE / 2,
-    ] as [number, number, number];
+    const [x, z] = freeSpotWorld(first); // 3.11: spawn on free floor, not inside the bed
+    return [x, EYE_HEIGHT, z] as [number, number, number];
   }, [modules]);
 
   if (modules.length === 0) return null;
