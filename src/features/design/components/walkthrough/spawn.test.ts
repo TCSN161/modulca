@@ -20,3 +20,13 @@ describe("3.11 walkthrough freeSpot", () => {
     expect(inBed).toBe(false);
   });
 });
+
+import { lookTargetWorld } from "./spawn";
+describe("3.11 walkthrough lookTargetWorld", () => {
+  it("bedroom/rest looks toward the bed side of the room", () => {
+    const mod = { row: 0, col: 0, moduleType: "bedroom", label: "", layoutPreset: "rest", floorFinish: "", wallColor: "", furnitureOverrides: {}, wallConfigs: {} } as never;
+    const [x, z] = lookTargetWorld(mod);
+    expect(x).toBeLessThan(1.5); // bed is on the west half
+    expect(z).toBeLessThan(1.5); // and the north half
+  });
+});

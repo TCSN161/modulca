@@ -43,3 +43,24 @@ export function freeSpotWorld(mod: ModuleConfig): [number, number] {
   const [x, z] = freeSpot(mod);
   return [mod.col * MODULE_SIZE + x, mod.row * MODULE_SIZE + z];
 }
+
+/**
+ * 3.11: where to look from the free spot — the area-weighted centre of the room's
+ * furniture (in bedroom/rest: the bed), so you arrive facing the room, not a corner.
+ * World XZ; falls back to the module centre when the room is empty.
+ */
+export function lookTargetWorld(mod: ModuleConfig): [number, number] {
+  const preset = getPreset(mod.moduleType, mod.layoutPreset) || getPresetsForType(mod.moduleType)[0];
+  const overrides = mod.furnitureOverrides?.[mod.layoutPreset] ?? {};
+  let ax = 0, az = 0, a = 0;
+  for (const f of preset?.furniture ?? []) {
+    if ((f.mountY ?? 0) >= HEAD || f.height < 0.05) continue;
+    const o = overrides[f.id] ?? {};
+    const x = Number.isFinite(o.x) ? o.x! : f.x;
+    const z = Number.isFinite(o.z) ? o.z! : f.z;
+    const area = f.width * f.depth;
+    ax += (x + f.width / 2) * area; az += (z + f.depth / 2) * area; a += area;
+  }
+  const [lx, lz] = a > 0 ? [ax / a, az / a] : [MODULE_SIZE / 2, MODULE_SIZE / 2];
+  return [mod.col * MODULE_SIZE + lx, mod.row * MODULE_SIZE + lz];
+}

@@ -24,7 +24,7 @@ import {
 } from "../shared/module3d";
 
 import * as THREE from "three";
-import { freeSpotWorld } from "./spawn";
+import { freeSpotWorld, lookTargetWorld } from "./spawn";
 
 const MOVE_SPEED = 3; // m/s
 const EYE_HEIGHT = 1.6;
@@ -336,6 +336,14 @@ function SceneContent({
     return { centerX, centerZ, radius };
   }, [modules]);
 
+  // 3.11: on arrival, face the first room's furniture (spawn spot comes from freeSpotWorld)
+  useEffect(() => {
+    const first = modules[0];
+    if (!first) return;
+    const [lx, lz] = lookTargetWorld(first);
+    camera.lookAt(lx, EYE_HEIGHT * 0.8, lz);
+  }, [camera, modules]);
+
   // Teleport
   useEffect(() => {
     if (!teleportTarget) return;
@@ -345,6 +353,10 @@ function SceneContent({
       : [teleportTarget.col * MODULE_SIZE + MODULE_SIZE / 2, teleportTarget.row * MODULE_SIZE + MODULE_SIZE / 2];
     camera.position.set(x, EYE_HEIGHT, z);
     cameraPositionRef.current.set(x, EYE_HEIGHT, z);
+    if (target) {
+      const [lx, lz] = lookTargetWorld(target); // 3.11: face the furniture, not a corner
+      camera.lookAt(lx, EYE_HEIGHT * 0.8, lz);
+    }
     onTeleportDone();
   }, [teleportTarget, modules, camera, cameraPositionRef, onTeleportDone]);
 
